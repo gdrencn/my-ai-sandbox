@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: release artifacts passed the complete current-WSL test suite. Public publication and fixed-entry verification are the final remaining steps. See Stage 3 and `validation/WSL_REPORT.json`.
+Current result: v0.1.0-test.1 is publicly released. Both release artifacts and the public one-line installation/testing entry passed the complete current-WSL test suite. See Stages 3–4 and the reports in validation/.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -48,3 +48,15 @@ Final requirements audit:
 | Installer preserves existing setup | packaged local installation and configuration-preservation unit test |
 
 Known verification limits remain: fresh-system installation was not run end to end by this installer, native Ubuntu and non-x86_64 hosts were not separately tested, and WSL without systemd requires a host restart after enabling it. No claim is made that these paths passed live testing.
+
+## Stage 4 — public release and entry verification
+
+- Public repository: https://github.com/gdrencn/my-ai-sandbox
+- Prerelease: https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.0-test.1
+- Published assets: mas.pyz, mas-test.pyz, bootstrap.py, install.sh, SHA256SUMS, WSL_REPORT.json.
+- Executed the documented public curl/bash entry with --test against GitHub. It resolved v0.1.0-test.1, verified and installed the actual downloadable assets, and completed all 13 integration groups (including 19 unit tests) with exit code 0.
+- Installed product and tester hashes match the release files. Evidence: validation/PUBLIC_ENTRY_REPORT.json.
+- All temporary test containers and test projects were removed. Only the standard default project, initialized storage/network and LXD shared image cache remain. Report logs are retained; temporary backups were removed.
+- Product and test tool are installed locally at ~/.local/bin/mas and ~/.local/bin/mas-test.
+
+This completes the first test release in the current WSL environment, subject to the explicitly recorded environment-verification limits above.

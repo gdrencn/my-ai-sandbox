@@ -26,4 +26,6 @@ Assets: mas.pyz, mas-test.pyz, bootstrap.py, install.sh, SHA256SUMS, and WSL_REP
 
 Test environment: WSL2 Ubuntu 26.04.1, x86_64, Python 3.14.4, LXD 6.9, dir storage and the standard LXD bridge. Native Ubuntu is supported by design but has not been tested on a separate host. Fresh-system package installation by the installer has not been exercised end to end; existing-environment installation has been verified. WSL without systemd needs the documented enable/restart step.
 
+Validation: 19 unit tests and 13 integration groups passed against the release product. The public one-line --test entry was also run successfully after publication, including download, checksums, installation, full CLI/TUI testing and cleanup. Reports are available in the repository's validation directory.
+
 LXD backups preserve MAC identities. Restoring while the source still exists on the same network may prevent the restored container from starting; this release does not rewrite network identities. GPU, host resource whitelists, directory sharing and model installation are outside this release.
