@@ -1,8 +1,18 @@
 """Shared transient terminal lines and permanent output for product and tester."""
+from contextvars import ContextVar
 import os
 import shutil
 import sys
 import unicodedata
+
+
+boundary = ContextVar('mas_output_boundary', default=None)
+
+
+def before_output():
+    callback = boundary.get()
+    if callback is not None:
+        callback()
 
 
 class Output:
@@ -20,6 +30,7 @@ class Output:
     def progress(self, message):
         if not self.tty:
             return
+        before_output()
         try:
             columns = os.get_terminal_size(self.stream.fileno()).columns
         except (AttributeError, OSError, ValueError):
@@ -37,6 +48,7 @@ class Output:
         self.active = True
 
     def keep(self, message):
+        before_output()
         self.clear()
         print(message, file=self.stream, flush=True)
 

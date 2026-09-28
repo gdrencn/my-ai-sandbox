@@ -1,0 +1,67 @@
+{
+  "product": "0.1.12",
+  "checks": [
+    {
+      "language": "zh_cn",
+      "case": "create",
+      "status": "passed"
+    },
+    {
+      "language": "zh_cn",
+      "case": "mount",
+      "status": "passed"
+    },
+    {
+      "language": "zh_cn",
+      "case": "no-input",
+      "status": "passed"
+    },
+    {
+      "language": "zh_cn",
+      "case": "error",
+      "status": "passed"
+    },
+    {
+      "language": "zh_cn",
+      "case": "cancel",
+      "status": "passed"
+    },
+    {
+      "language": "zh_cn",
+      "case": "empty",
+      "status": "passed"
+    },
+    {
+      "language": "en_us",
+      "case": "create",
+      "status": "passed"
+    },
+    {
+      "language": "en_us",
+      "case": "mount",
+      "status": "passed"
+    },
+    {
+      "language": "en_us",
+      "case": "no-input",
+      "status": "passed"
+    },
+    {
+      "language": "en_us",
+      "case": "error",
+      "status": "passed"
+    },
+    {
+      "language": "en_us",
+      "case": "cancel",
+      "status": "passed"
+    },
+    {
+      "language": "en_us",
+      "case": "empty",
+      "status": "passed"
+    }
+  ],
+  "product_sha256": "80a6cdeb4f3510c7a3c0fd6a30d26a28bf171d7b2c443abd5249988564f3e111",
+  "scope": "Actual PTYs using packaged presentation; operation output is a controlled fixture, not a native LXD operation."
+}

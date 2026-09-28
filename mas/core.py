@@ -3,6 +3,7 @@
 import json
 
 import os
+from functools import cached_property
 from pathlib import Path
 import re
 import shutil
@@ -41,6 +42,11 @@ su --login sandbox -c 'sudo -n /usr/bin/true'
 
 class Error(RuntimeError):
     """An actionable operation failure."""
+
+class ShellExitError(Error):
+    """Failure after the container shell returned: callers must leave menus."""
+    pass
+
 
 
 def read_output(stream):
@@ -127,13 +133,13 @@ class Manager:
         self.report = report or (lambda event: None)
         self.fs_root, self.fs_state = fs_root, fs_state
 
-    @property
+    @cached_property
     def filesystems(self):
         from .filesystems import Filesystems
         return Filesystems(self, self.fs_root, self.fs_state)
 
-    def mountfs(self, target, path=None):
-        return self.filesystems.mount(target, path)
+    def mountfs(self, target, path=None, *, default_home=False):
+        return self.filesystems.mount(target, path, default_home=default_home)
 
     def unmountfs(self, target, path=None):
         return self.filesystems.unmount(target, path)
@@ -230,32 +236,56 @@ class Manager:
                                ["init", image, "local:" + target, "-c", MANAGED + "=true"], "Stopped")
 
     def start(self, target):
-        instance = self.require(target)
-        if instance["status"] == "Running":
-            self.report(dict(action="start", target=target, status="ok", elapsed=0, observation="Running"))
-        elif instance["status"] != "Stopped":
-            raise Error(t("cannot_start", target=target, status=state(instance["status"])))
-        else:
-            with self.filesystems.transition(target):
-                self.require(target, stopped=True)
-                self._operation("start", target, ["start", "local:" + target], "Running")
-        return self._operation("prepare-user", target,
-                               ["exec", "local:" + target, "--", "/bin/sh", "-c", USER_SETUP], "Running")
+        return self._lifecycle(target, 'start')
 
     def stop(self, target):
+        return self._lifecycle(target, 'stop')
+
+    def _prepare_user(self, target):
+        return self._operation('prepare-user', target,
+                               ['exec', 'local:' + target, '--', '/bin/sh', '-c', USER_SETUP], 'Running')
+
+    def _lifecycle(self, target, action):
+        expected = 'Running' if action == 'start' else 'Stopped'
         instance = self.require(target)
-        if instance["status"] == "Stopped":
-            self.report(dict(action="stop", target=target, status="ok", elapsed=0, observation="Stopped"))
-            return instance
-        if instance["status"] != "Running":
-            raise Error(t("cannot_stop", target=target, status=state(instance["status"])))
-        with self.filesystems.transition(target):
+        if instance['status'] == expected:
+            self.report(dict(action=action, target=target, status='ok', elapsed=0, observation=expected))
+            return self._prepare_user(target) if action == 'start' else instance
+        if instance['status'] not in ('Running', 'Stopped'):
+            raise Error(t('cannot_' + action, target=target, status=state(instance['status'])))
+        with self.filesystems.locked():
             instance = self.require(target)
-            if instance["status"] == "Stopped":
-                return instance
-            if instance["status"] != "Running":
-                raise Error(t("cannot_stop", target=target, status=state(instance["status"])))
-            return self._operation("stop", target, ["stop", "local:" + target, "--timeout", str(self.lxd.timeout)], "Stopped")
+            if instance['status'] == expected:
+                return self._prepare_user(target) if action == 'start' else instance
+            if instance['status'] not in ('Running', 'Stopped'):
+                raise Error(t('cannot_' + action, target=target, status=state(instance['status'])))
+            entries = self.mountedfs(target)
+            completed = []
+            for index, entry in enumerate(entries):
+                try:
+                    self.unmountfs(target, entry['path'])
+                except (Error, OSError) as exc:
+                    raise Error(t('lifecycle_unmount_failed', action=t('action_' + action), target=target,
+                                  path=entry['path'], error=exc, completed=', '.join(completed) or '—',
+                                  pending=', '.join(e['path'] for e in entries[index+1:]) or '—')) from exc
+                completed.append(entry['path'])
+            self.require(target, stopped=action == 'start')
+            command = [action, 'local:' + target]
+            if action == 'stop':
+                command += ['--timeout', str(self.lxd.timeout)]
+            result = self._operation(action, target, command, expected)
+            if action == 'start':
+                result = self._prepare_user(target)
+            failures = []
+            for entry in entries:
+                try:
+                    self.mountfs(target, entry['path'], default_home=entry.get('default', False))
+                except (Error, OSError) as exc:
+                    failures.append(entry['path'] + ' → ' + entry['destination'] + ': ' + str(exc))
+            if failures:
+                raise Error(t('lifecycle_restore_failed', target=target, status=state(expected),
+                              errors='\n'.join(failures)))
+            return result
 
     def stop_all(self):
         failures = []
@@ -325,6 +355,9 @@ class Manager:
         self.require(target)
         self.start(target)
         code = subprocess.call(self.lxd.prefix + ["exec", "local:" + target, "--", "su", "--login", "sandbox"])
-        self.on_exit(target, ask)
-        if code:
-            raise Error(t("shell_exit", code=code))
+        try:
+            self.on_exit(target, ask)
+            if code:
+                raise Error(t("shell_exit", code=code))
+        except (Error, OSError) as exc:
+            raise ShellExitError(str(exc)) from exc

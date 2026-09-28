@@ -125,7 +125,7 @@ menu.interactive(exercise)
         source = """import sys, termios
 from types import SimpleNamespace
 from mas import menu
-from mas.terminal_ui import UI
+from mas.terminal_ui import UI, LeaveMenu
 original = termios.tcgetattr(0)
 def shell(target):
     assert termios.tcgetattr(0) == original
@@ -136,10 +136,12 @@ manager = SimpleNamespace(enter=shell)
 def exercise(view):
     view.choose('Before operation', [('go', 'Go')])
     assert termios.tcgetattr(0) == original
-    UI(view, manager).enter('test-target')
-    result = view.choose('Returned menu', [('first','First'),('second','Second')])
-    assert termios.tcgetattr(0) == original
-    return result
+    try:
+        UI(view, manager).enter('test-target')
+    except LeaveMenu:
+        assert termios.tcgetattr(0) == original
+        return 'host'
+    raise AssertionError('Menu should have exited')
 print('HISTORY_SENTINEL', end='', flush=True)
 print('RESULT=' + menu.interactive(exercise))
 """
@@ -151,9 +153,8 @@ print('RESULT=' + menu.interactive(exercise))
                 terminal.send('\n')
                 terminal.expect('Exit confirmation')
                 terminal.send('\n')
-                terminal.expect('Returned menu')
-                terminal.send('\x1b[B\n')
-                terminal.expect('RESULT=second')
+                terminal.expect('RESULT=host')
+                self.assertNotIn(b'Returned menu', terminal.buffer)
                 terminal.finish()
                 self.assert_inline(terminal.buffer)
                 self.assertIn(b'HISTORY_SENTINEL', terminal.buffer)

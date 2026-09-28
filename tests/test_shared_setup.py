@@ -121,6 +121,7 @@ class SharedSetupTests(unittest.TestCase):
         for outcome in ('success', Error('NATIVE_FAILURE'), menu.Cancelled()):
             output = io.StringIO()
             view = Mock()
+            view.heading.side_effect = lambda title: print('\n' + title + '\n')
             def callback():
                 print('FUNCTION_OUTPUT')
                 if isinstance(outcome, Exception): raise outcome

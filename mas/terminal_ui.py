@@ -2,8 +2,14 @@
 import json
 import sys
 from . import config, menu
-from .core import Error
+from .core import Error, ShellExitError
+from .output import before_output
 from .i18n import t, state
+
+
+class LeaveMenu(Exception):
+    def __init__(self, error=None):
+        self.error = error
 
 
 class UI:
@@ -11,25 +17,29 @@ class UI:
         self.view = view
         self.manager = manager
 
+    def write(self, message, error=False):
+        before_output()
+        print(message, file=sys.stderr if error else sys.stdout, flush=True)
+
     def choose(self, title, actions, default=None):
         return self.view.choose(title, [(key, t(label)) for key, label in actions], default=default)
 
     def present(self, title, callback, back=True):
         """One entry/result/return contract for actions and navigation sections."""
-        print('\n' + title + '\n', flush=True)
+        self.view.heading(title)
         result = None
         failed = False
         try:
             result = callback()
         except menu.Cancelled:
             if back:
-                print(t('cancelled'), flush=True)
+                self.write(t('cancelled'))
         except config.ConfigError as exc:
             failed = True
-            print(t(exc.key, **exc.values), file=sys.stderr, flush=True)
+            self.write(t(exc.key, **exc.values), error=True)
         except (Error, OSError) as exc:
             failed = True
-            print(t('error', error=exc), file=sys.stderr, flush=True)
+            self.write(t('error', error=exc), error=True)
         if back or failed:
             try:
                 self.view.choose(t('page_result'), [(None, t('menu_back'))])
@@ -45,14 +55,18 @@ class UI:
             def change_language():
                 selected = menu.language(self.view, config.get('language'))
                 config.set_value('language', selected)
-                print(t('language_saved', language=selected), flush=True)
+                self.write(t('language_saved', language=selected))
             self.present(t('language_title'), change_language)
 
     def info(self, target):
-        print(json.dumps(self.manager.info(target), indent=2), flush=True)
+        self.write(json.dumps(self.manager.info(target), indent=2))
 
     def enter(self, target):
-        self.manager.enter(target)
+        try:
+            self.manager.enter(target)
+        except ShellExitError as exc:
+            raise LeaveMenu(exc) from exc
+        raise LeaveMenu()
 
     def container(self, target):
         selected = 'info'
@@ -69,24 +83,28 @@ class UI:
                 elif selected == 'mountfs':
                     path = self.view.input(t('fs_path_prompt'))
                     destination = self.manager.mountfs(target, path or None)
-                    print(t('fs_mounted_at', path=destination), flush=True)
+                    self.write(t('fs_mounted_at', path=destination))
                 elif selected in ('mountedfs', 'unmountfs'):
                     from .cli import show_mounts
                     entries = self.manager.mountedfs(target)
-                    show_mounts(entries)
+                    if selected == 'mountedfs' or not entries:
+                        before_output()
+                        show_mounts(entries)
                     if selected == 'unmountfs' and entries:
-                        path = self.view.choose(t('fs_unmount_select'), [(e['path'], e['path']) for e in entries] + [(None, t('menu_back'))])
+                        status_column = any(e['status'] != 'mounted' for e in entries)
+                        rows = menu.column_rows([(e['path'], menu.status_cell(state(e['status']), e['status'])) if status_column else (e['path'],) for e in entries])
+                        path = self.view.choose(t('fs_unmount_select'), [(e['path'], row) for e, row in zip(entries, rows)] + [(None, t('menu_back'))])
                         if path is not None:
                             self.manager.unmountfs(target, path)
-                            print(t('menu_done'), flush=True)
+                            self.write(t('menu_done'))
                 elif selected == 'enter':
                     self.enter(target)
                 elif selected == 'delete':
                     deleted = self.manager.delete(target, self.view.confirm)
-                    print(t('menu_done' if deleted else 'cancelled'), flush=True)
+                    self.write(t('menu_done' if deleted else 'cancelled'))
                 elif selected == 'export':
                     done = self.manager.export(target, self.view.input(t('export_file')), self.view.confirm)
-                    print(t('menu_done' if done else 'cancelled'), flush=True)
+                    self.write(t('menu_done' if done else 'cancelled'))
                 else:
                     getattr(self.manager, selected)(target)
             self.present(t('page_action', action=t('menu_' + selected), target=target), action)
@@ -98,8 +116,9 @@ class UI:
         while True:
             items = self.manager.list()
             if not items:
-                print(t('menu_empty'), flush=True)
-            selected = self.view.choose(t('page_list'), [(item['name'], item['name'] + '  ' + state(item['status'])) for item in items] + [(None, t('menu_back'))], default=selected or (items[0]['name'] if items else None))
+                self.write(t('menu_empty'))
+            rows = menu.column_rows([(item['name'], menu.status_cell(state(item['status']), item['status'])) for item in items])
+            selected = self.view.choose(t('page_list'), [(item['name'], row) for item, row in zip(items, rows)] + [(None, t('menu_back'))], default=selected or (items[0]['name'] if items else None))
             if selected is None:
                 return
             self.present(t('page_container', target=selected), lambda: self.container(selected), back=False)
@@ -140,4 +159,8 @@ class UI:
 def run(manager):
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         raise Error(t('menu_terminal'))
-    menu.interactive(lambda view: UI(view, manager).loop())
+    try:
+        menu.interactive(lambda view: UI(view, manager).loop())
+    except LeaveMenu as done:
+        if done.error:
+            raise done.error

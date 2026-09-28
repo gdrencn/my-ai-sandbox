@@ -8,7 +8,7 @@ mas_choose_language() {
     local selected=0 key suffix
     printf '\033[?25l' >/dev/tty
     trap 'printf "\033[?25h" >/dev/tty' RETURN
-    printf '%s\n\n\n\n' '语言 / Language' >/dev/tty
+    printf '%s\n\n\n\n' '请选择界面语言 / Select interface language' >/dev/tty
     while true; do
         printf '\033[3A\r\033[2K' >/dev/tty
         if ((selected == 0)); then

@@ -11,6 +11,7 @@ import stat
 import subprocess
 import tempfile
 import time
+import threading
 from urllib.parse import urlencode, quote
 import uuid
 
@@ -69,6 +70,8 @@ class Filesystems:
         self.state = self.state.absolute()
         self.project = manager.lxd.project
         self.timeout = manager.lxd.timeout
+        self._thread_lock = threading.RLock()
+        self._lock_depth = 0
 
     def _private(self):
         self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -143,21 +146,34 @@ class Filesystems:
 
     @contextmanager
     def locked(self):
-        self._private()
-        fd = os.open(self.state / 'lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        # Reentrant within this shared Filesystems object, exclusive across
+        # threads/processes. Each nested call reloads committed registry state.
+        if not self._thread_lock.acquire(timeout=self.timeout):
+            raise Error(t('fs_lock_timeout'))
+        fd = None
+        entered = False
         try:
-            deadline = time.monotonic() + self.timeout
-            while True:
-                try:
-                    fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    break
-                except BlockingIOError:
-                    if time.monotonic() >= deadline:
-                        raise Error(t('fs_lock_timeout'))
-                    time.sleep(1)
+            if not self._lock_depth:
+                self._private()
+                fd = os.open(self.state / 'lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+                deadline = time.monotonic() + self.timeout
+                while True:
+                    try:
+                        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        break
+                    except BlockingIOError:
+                        if time.monotonic() >= deadline:
+                            raise Error(t('fs_lock_timeout'))
+                        time.sleep(1)
+            self._lock_depth += 1
+            entered = True
             yield self._load()
         finally:
-            os.close(fd)
+            if entered:
+                self._lock_depth -= 1
+            if fd is not None:
+                os.close(fd)
+            self._thread_lock.release()
 
     def _entries(self, data, target):
         return [e for e in data['mounts'] if e['target'] == target and e['project'] == self.project]
@@ -255,7 +271,7 @@ class Filesystems:
         if not self.state.exists():
             return []
         with self.locked() as data:
-            return [dict(path=e['path'], destination=e['destination'], status=self._status(e)) for e in self._entries(data, target)]
+            return [dict(path=e['path'], destination=e['destination'], status=self._status(e), default=e['default']) for e in self._entries(data, target)]
 
     def guard_delete(self, target):
         self.guard_transition(target)
@@ -323,15 +339,15 @@ class Filesystems:
             except ChildProcessError:
                 pass
 
-    def mount(self, target, path=None):
+    def mount(self, target, path=None, *, default_home=False):
         self._target(target)
         for program in ('sshfs', 'fusermount3'):
             if not shutil.which(program):
                 raise Error(t('fs_dependency', program=program))
         if os.geteuid() != 0 and not fuse_access_ready():
             raise Error(t('fuse_setup_required'))
-        default = path is None
-        path = self._home(target) if default else normalized(path)
+        default = path is None or default_home
+        path = self._home(target) if path is None else normalized(path)
         destination = self.root / target / path.lstrip('/')
         with self.locked() as data:
             self.manager.require(target)

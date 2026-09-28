@@ -1,6 +1,6 @@
 """Inline terminal menus. Only the active block is redrawn; history is preserved."""
 from contextlib import contextmanager
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import os
 import select
 import sys
@@ -8,6 +8,7 @@ import termios
 import unicodedata
 
 from .i18n import t
+from .output import boundary
 
 
 class Cancelled(Exception):
@@ -29,6 +30,69 @@ def clipped(text, width):
             break
         result += char
         used += size
+    return result
+
+
+def wrapped(text, width):
+    """Keep input instructions readable without terminal-controlled wrapping."""
+    remaining = clipped(text, 100000)
+    lines = []
+    while remaining:
+        line = clipped(remaining, max(2, width))
+        lines.append(line)
+        remaining = remaining[len(line):]
+    return lines or ['']
+
+
+@dataclass(frozen=True)
+class Cell:
+    text: str
+    tone: str = ''
+
+
+def status_cell(text, status):
+    tone = 'green' if status in ('Running', 'mounted') else 'yellow' if status in ('Stopped', 'residual', 'disconnected') else 'red'
+    return Cell(text, tone)
+
+
+@dataclass(frozen=True)
+class Columns:
+    values: tuple
+    widths: tuple
+    prefix: str = ''
+
+
+def column_rows(rows):
+    """One column structure per list; widths adapt together on each redraw."""
+    prepared = [tuple(cell if isinstance(cell, Cell) else Cell(str(cell)) for cell in row) for row in rows]
+    if not prepared:
+        return []
+    if len({len(row) for row in prepared}) != 1:
+        raise ValueError('Selection rows must have the same columns')
+    widths = tuple(max(cells(clipped(row[i].text, 100000)) for row in prepared) for i in range(len(prepared[0])))
+    return [Columns(row, widths) for row in prepared]
+
+
+def rendered(label, width):
+    if isinstance(label, str):
+        return clipped(label, width)
+    prefix = clipped(label.prefix, width)
+    available = max(0, width - cells(prefix))
+    widths = list(label.widths)
+    gap = 2
+    while sum(widths) + gap * max(0, len(widths)-1) > available and max(widths, default=0) > 1:
+        largest = max(range(len(widths)), key=widths.__getitem__)
+        widths[largest] -= 1
+    result = prefix
+    colors = {'green': '\x1b[32m', 'yellow': '\x1b[33m', 'red': '\x1b[31m'}
+    for index, (cell, size) in enumerate(zip(label.values, widths)):
+        value = clipped(cell.text, min(size, available))
+        result += colors.get(cell.tone, '') + value + ('\x1b[39m' if cell.tone in colors else '')
+        available -= cells(value)
+        if index < len(widths)-1:
+            padding = max(0, min(available, size - cells(value) + gap))
+            result += ' ' * padding
+            available -= padding
     return result
 
 
@@ -56,9 +120,19 @@ class Screen:
         self.fd = terminal.fileno()
         self.rows = 0
         self.dimensions = None
+        self.needs_gap = False
 
     def write(self, text):
         self.terminal.write(text.encode('utf-8'))
+
+    def before_output(self):
+        if self.needs_gap:
+            self.write('\n')
+            self.needs_gap = False
+
+    def heading(self, title):
+        self.write('\n' + clipped(title, 100000) + '\n')
+        self.needs_gap = True
 
     def size(self):
         value = os.get_terminal_size(self.fd)
@@ -75,10 +149,12 @@ class Screen:
         try:
             termios.tcsetattr(self.fd, termios.TCSANOW, changed)
             self.write('\n\x1b[?25l')
+            self.needs_gap = False
             yield
         finally:
             termios.tcsetattr(self.fd, termios.TCSANOW, original)
             self.write('\x1b[0m\x1b[?25h')
+            self.needs_gap = True
             self.rows = 0
 
     def key(self):
@@ -123,7 +199,7 @@ class Screen:
         lines = lines[:height - 1]
         for label, focused in lines:
             self.write('\r\x1b[2K' + ('\x1b[7m' if focused else '') +
-                       clipped(label, width - 1) + '\x1b[0m\n')
+                       rendered(label, width - 1) + '\x1b[0m\n')
         self.rows = len(lines)
 
     def choose(self, title, options, default=None, multiple=False, checked=(), radio=False):
@@ -140,7 +216,9 @@ class Screen:
                     value, label = options[index]
                     focused = index == selection.index
                     marker = ('☑' if value in selection.checked else '☐') if multiple else ('●' if focused else '○') if radio else ''
-                    lines.append((('❯ ' if focused else '  ') + (marker + ' ' if marker else '') + label, focused))
+                    prefix = ('❯ ' if focused else '  ') + (marker + ' ' if marker else '')
+                    row = prefix + label if isinstance(label, str) else replace(label, prefix=prefix)
+                    lines.append((row, focused))
                 lines.append((t('menu_multi_keys' if multiple else 'menu_keys'), False))
                 self.draw(lines)
                 key = self.key()
@@ -169,7 +247,9 @@ class Screen:
                 width = max(1, self.size()[0] - 3)
                 while cells(left) > width:
                     left = left[1:]
-                self.draw([(prompt, False), (left + '▏' + right, False), (t('input_keys'), False)])
+                instructions = wrapped(prompt, self.size()[0] - 1)[:max(1, self.size()[1] - 3)]
+                self.draw([(line, False) for line in instructions] +
+                          [(left + '▏' + right, False), (t('input_keys'), False)])
                 key = self.key()
                 while key == 'idle':
                     key = self.key()
@@ -198,7 +278,13 @@ class Screen:
 def interactive(callback):
     """The controlling terminal also works when installation stdin is a pipe."""
     with open('/dev/tty', 'r+b', buffering=0) as terminal:
-        return callback(Screen(terminal))
+        screen = Screen(terminal)
+        token = boundary.set(screen.before_output)
+        try:
+            return callback(screen)
+        finally:
+            screen.before_output()
+            boundary.reset(token)
 
 
 def confirm(message):
