@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: version 0.1.3 is implemented and has passed final artifact validation on the current WSL host. Public publication and fixed-entry verification are the remaining release steps. See Stage 6. The stages below describe development checkpoints; the version phase remains 1.
+Current result: version 0.1.3 is publicly released. Final artifact tests and the public one-line installation/test entry passed on the current WSL host. See Stage 6. The stages below describe development checkpoints; the version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -85,3 +85,10 @@ Implemented and checked against REQUIREMENTS.md:
 Validation: 28 standard-library unit tests passed. All 14 integration groups passed using the final product and tester zipapps, with the test tool configured to zh_cn. Product hash verification and zero cleanup errors are recorded in validation/V0_1_3_REPORT.json. The earlier candidate also passed all 14 groups; the final build additionally includes the real installer-terminal regression test. Local bootstrap installation, Chinese CLI output and installed product/tester hash equality passed on the existing host. Shell syntax, Python syntax and git diff whitespace checks passed.
 
 Verification limits: live fresh-system installation, native Ubuntu and non-x86_64 environments remain unverified. No third-party dependency was added. Historical stages and their verification limitations remain below their original version descriptions.
+
+
+### 0.1.3 publication and public entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.3 with product, matching tester, bootstrap, shell installer, SHA256SUMS and WSL_REPORT.json. Executed the original public curl/bash --test entry in a real terminal, selected zh_cn at its initial prompt, and confirmed it resolved v0.1.3. All 14 integration groups, including 28 unit tests, passed with no cleanup errors. The installed product and tester exactly match the released artifact hashes; the temporary test project was removed. Evidence: validation/V0_1_3_PUBLIC_REPORT.json. Test language selection used isolated preferences and did not overwrite the user's configuration. This was an existing-LXD host and needed no host sudo.
+
+The 0.1.3 batch is complete within the recorded verification limits. Documentation-only commits in this batch do not increment the submission-batch version.
