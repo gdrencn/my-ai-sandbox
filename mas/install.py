@@ -11,6 +11,7 @@ import shutil
 import shlex
 import subprocess
 import sys
+import tempfile
 
 from .core import Error, LXD
 
@@ -149,10 +150,17 @@ def configure_path(home=None, shell=None):
 def install_file(source, destination):
     destination = Path(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    temporary = destination.with_name("." + destination.name + ".installing")
-    shutil.copyfile(source, temporary)
-    temporary.chmod(0o755)
-    temporary.replace(destination)
+    fd, name = tempfile.mkstemp(prefix="." + destination.name + ".", dir=destination.parent)
+    temporary = Path(name)
+    try:
+        with os.fdopen(fd, "wb") as output, open(source, "rb") as incoming:
+            shutil.copyfileobj(incoming, output)
+            output.flush()
+            os.fsync(output.fileno())
+        temporary.chmod(0o755)
+        temporary.replace(destination)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def group_refresh_required():

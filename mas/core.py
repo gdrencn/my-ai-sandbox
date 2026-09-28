@@ -236,8 +236,9 @@ class Manager:
         elif instance["status"] != "Stopped":
             raise Error(t("cannot_start", target=target, status=state(instance["status"])))
         else:
-            self.filesystems.guard_transition(target)
-            self._operation("start", target, ["start", "local:" + target], "Running")
+            with self.filesystems.transition(target):
+                self.require(target, stopped=True)
+                self._operation("start", target, ["start", "local:" + target], "Running")
         return self._operation("prepare-user", target,
                                ["exec", "local:" + target, "--", "/bin/sh", "-c", USER_SETUP], "Running")
 
@@ -248,8 +249,13 @@ class Manager:
             return instance
         if instance["status"] != "Running":
             raise Error(t("cannot_stop", target=target, status=state(instance["status"])))
-        self.filesystems.guard_transition(target)
-        return self._operation("stop", target, ["stop", "local:" + target, "--timeout", str(self.lxd.timeout)], "Stopped")
+        with self.filesystems.transition(target):
+            instance = self.require(target)
+            if instance["status"] == "Stopped":
+                return instance
+            if instance["status"] != "Running":
+                raise Error(t("cannot_stop", target=target, status=state(instance["status"])))
+            return self._operation("stop", target, ["stop", "local:" + target, "--timeout", str(self.lxd.timeout)], "Stopped")
 
     def stop_all(self):
         failures = []
@@ -266,9 +272,9 @@ class Manager:
         self.filesystems.guard_delete(target)
         if not confirm(t("delete_confirm", target=target), ask):
             return False
-        self.require(target, stopped=True)
-        self.filesystems.guard_delete(target)
-        self._operation("delete", target, ["delete", "local:" + target], "Absent")
+        with self.filesystems.transition(target):
+            self.require(target, stopped=True)
+            self._operation("delete", target, ["delete", "local:" + target], "Absent")
         return True
 
     def import_container(self, target, filename):

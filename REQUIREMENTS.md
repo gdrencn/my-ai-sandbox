@@ -40,7 +40,7 @@ Frozen or transitional states must not be silently treated as stopped. Report un
 
 ## 3. Ownership and defaults
 
-Identify managed containers with instance-local `user.mas.managed=true` metadata. Creation and import establish this marker. All reads and actions target only managed containers, except the existence check necessary to prevent name collisions. Never adopt, stop, delete, export or enter an unmarked instance. Native lxc use does not remove ownership. No independent ownership database or third-party library.
+Identify managed containers with instance-local `user.mas.managed=true` metadata. Creation and import establish this marker. All reads and actions target only managed containers, except the existence check necessary to prevent name collisions. Never adopt, stop, delete, export or enter an unmarked instance. Native lxc use does not remove ownership. No independent container-ownership database or third-party library. Host mount recovery in section 16 only inspects/cleans that user's existing host records and does not adopt or act on an unmarked replacement container.
 
 Use standard LXD default profiles. Do not add GPU passthrough, host-directory sharing into containers, custom network policies or mas profiles. Section 16 separately specifies container-to-host filesystem access; it does not authorize exposing host directories to containers. The ownership marker and the explicitly requested default sandbox user setup are the only mas-specific configuration. Use existing networking; fresh initialization prepares ordinary outbound connectivity. Existing misconfiguration is reported, not silently overwritten.
 
@@ -52,7 +52,7 @@ Postconditions: new/import = existing stopped managed container; start = running
 
 ## 5. terminal text menu
 
-Provide access to all nine existing container operations, with list selection, input prompts, results and errors. The planned filesystem operations in section 16 must also be available through the same inline menus once implemented. Reuse shared functions directly. Restore ordinary terminal input before each operation and shell session; append a fresh menu afterward. From 0.1.6, use inline terminal text menus without curses or an alternate screen; do not introduce third-party dependencies.
+Provide access to all nine existing container operations, with list selection, input prompts, results and errors. The filesystem operations in section 16 must also be available through the same inline menus. Reuse shared functions directly. Restore ordinary terminal input before each operation and shell session; append a fresh menu afterward. From 0.1.6, use inline terminal text menus without curses or an alternate screen; do not introduce third-party UI/Python dependencies.
 
 ## 6. Installation
 
@@ -74,7 +74,7 @@ Cover new/list/start/stop/delete/info/import/export, default host-matching image
 
 ## 8. GitHub and releases
 
-Publish every completed and validated development batch as a test prerelease to the public my-ai-sandbox repository. Test publication is a mandatory completion step, not an optional follow-up and does not require repeated approval. Verify that the fixed public installation/test entry resolves the new version. Stable promotion is separate; do not defer a completed test release while discussing future features or stable publication. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.9. Filesystem mounts in section 16 are included. Product, installer and tester share each release version. A local version number does not imply publication. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
+Publish every completed and validated development batch as a test prerelease to the public my-ai-sandbox repository. Test publication is a mandatory completion step, not an optional follow-up and does not require repeated approval. Verify that the fixed public installation/test entry resolves the new version. Stable promotion is separate; do not defer a completed test release while discussing future features or stable publication. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.10. Filesystem mounts in section 16 are included. Product, installer and tester share each release version. A local version number does not imply publication. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
 
 ## 8.1. Language and user configuration
 
@@ -148,7 +148,7 @@ CLI and inline text-menu operations must reuse the tester's terminal line-render
 
 ## 16. Phase-1 extension — container filesystem mounts
 
-Status: implemented and locally verified in 0.1.9; test publication/public-entry verification follow. This section supersedes the earlier proposal to attach mounting to start and unmounting to stop. The user has now authorized completing this extension and publishing 0.1.9 test, followed by a code/documentation/test audit and 0.1.10 test. No stable promotion is included.
+Status: implemented, published and publicly verified in 0.1.9; robustness audit in 0.1.10. This section supersedes the earlier proposal to attach mounting to start and unmounting to stop. The user has now authorized completing this extension and publishing 0.1.9 test, followed by a code/documentation/test audit and 0.1.10 test. No stable promotion is included.
 
 ### 16.1. Shared operations and lifecycle independence
 
@@ -201,4 +201,17 @@ LXD's direct filesystem mount requires SSHFS on the host. It does not require in
 
 Verify CLI and menu paths, default and explicit homes, root and non-overlapping mounts, read/write/create/delete through the mount, running and stopped containers, independence from start/stop, exact unmount matching, ancestor/descendant refusal, managed-target scope, pre-existing files/directories/symlinks/mounts, truthful query status, failed mounting, failed unmounting, stale records, interrupted cleanup, concurrent conflicting requests and safe retry after cleanup. Use isolated test targets and host directories. Confirm existing container ownership/mode/ACL metadata is not rewritten by mounting, and record native new-file ownership and permission behavior without adding corrective changes. Keep warnings/errors and final summaries, with transient waits and complete structured test records.
 
-Deletion must refuse while that user has managed mount/residual records for the target; explicit unmount performs recovery first. A missing target may have its existing recorded mounts cleaned up without adopting another instance; an existing unmanaged target remains protected. Stable publication remains separate. Implementation records must identify the per-user mount-management scope and limitations of external lxc actions.
+Deletion must refuse while that user has managed mount/residual records for the target; explicit unmount performs recovery first. A missing target may have its existing recorded mounts cleaned up without adopting another instance; an existing unmanaged replacement remains untouched while recorded host resources may be recovered without accessing that replacement. Stable publication remains separate. Implementation records must identify the per-user mount-management scope and limitations of external lxc actions.
+
+
+## 17. Batch 0.1.10 — post-0.1.9 audit and reliability completion
+
+Audit all current documentation and source against the shipped 0.1.9 behavior. Preserve native LXD/SSHFS permission behavior and the existing scope; do not add GPU/resource policy, custom SFTP, package presets or stable promotion. Finish with versioned test publication and public-entry verification, not merely local changes.
+
+- Serialize same-user filesystem mount creation and container lifecycle transitions/deletion with the same record lock; recheck ownership/state after acquiring the lock so a concurrent mount cannot slip between a precondition and native execution. External LXD operations remain outside this lock's scope.
+- Validate every persisted mount/directory/process field before acting, preserve corrupt records and paths, and never signal a PID based only on its number. Recover owned native helpers after interrupted PID-record publication by checking process identity and exact per-mount command arguments.
+- Use persistent filesystem identity plus inode/owner for new directory records so changing kernel device numbers across host reboot does not imply directory replacement. Read legacy device/inode records conservatively; do not invent a safe migration when their identities cannot be verified.
+- Querying/cleaning existing per-user mount records must remain possible after an external deletion or replacement of the container. These recovery operations affect only recorded host resources, never the replacement container. New mounts still require current mas ownership.
+- Unmount completion includes native detach, helper termination and empty-directory cleanup. Report total elapsed time and preserve diagnostics; do not emit final success before cleanup finishes. Timeouts leave recoverable records and user-facing errors.
+- Use unique atomic installer staging files and reproducible zipapp builds. Preserve saved preferences, archive separation and numeric version selection.
+- Extend fault tests and real integration checks for schema corruption, stale process records, locking, reboot identity simulation, helper interruption, command timeouts, preserved paths, explicit/default-home changes, original metadata and native new-file metadata. Distinguish simulated failures from live tests and document remaining platform limits.

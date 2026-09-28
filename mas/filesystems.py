@@ -77,18 +77,45 @@ class Filesystems:
             data = json.loads(path.read_text())
             if data.get('version') != 1 or not isinstance(data.get('directories'), dict) or not isinstance(data.get('mounts'), list):
                 raise ValueError('schema')
+            for directory, identity in data['directories'].items():
+                candidate = Path(directory)
+                if str(candidate) != directory or (candidate != self.root and self.root not in candidate.parents) or '..' in candidate.parts:
+                    raise ValueError('directory')
+                legacy = isinstance(identity, list) and len(identity) == 2 and all(type(n) is int and n >= 0 for n in identity)
+                current = isinstance(identity, dict) and set(identity) == {'fsid', 'inode', 'owner'} and all(type(n) is int and n >= 0 for n in identity.values())
+                if not (legacy or current):
+                    raise ValueError('directory identity')
+            seen = set()
             for entry in data['mounts']:
                 if not isinstance(entry, dict) or not re.fullmatch('[a-f0-9]{32}', entry['id']):
                     raise ValueError('entry')
+                if set(entry) - {'id', 'target', 'project', 'path', 'destination', 'source', 'default', 'prepared', 'created', 'listener', 'sshfs', 'mount_id'}:
+                    raise ValueError('unknown field')
+                if entry['id'] in seen:
+                    raise ValueError('duplicate id')
+                seen.add(entry['id'])
                 validate_target(entry['target'])
-                if normalized(entry['path']) != entry['path'] or not isinstance(entry['project'], str):
+                if type(entry['default']) is not bool or entry['source'] not in ('', 'mas-' + entry['id'] + '@127.0.0.1:' + entry['path']):
+                    raise ValueError('source/default')
+                if 'prepared' in entry and type(entry['prepared']) is not bool:
+                    raise ValueError('prepared')
+                if 'mount_id' in entry and (type(entry['mount_id']) is not int or entry['mount_id'] <= 0):
+                    raise ValueError('mount id')
+                created = entry.get('created', [])
+                if not isinstance(created, list) or any(not isinstance(name, str) or str(Path(name)) != name or '..' in Path(name).parts or (Path(name) != self.root and self.root not in Path(name).parents) or not (Path(name) == Path(entry['destination']) or Path(name) in Path(entry['destination']).parents) for name in created):
+                    raise ValueError('created paths')
+                for kind in ('listener', 'sshfs'):
+                    identity = entry.get(kind)
+                    if identity is not None and (not isinstance(identity, dict) or set(identity) != {'pid', 'start', 'boot'} or type(identity['pid']) is not int or identity['pid'] <= 0 or not isinstance(identity['start'], str) or not identity['start'].isdigit() or not isinstance(identity['boot'], str) or not re.fullmatch('[a-f0-9-]{36}', identity['boot'])):
+                        raise ValueError('process identity')
+                if normalized(entry['path']) != entry['path'] or not isinstance(entry['project'], str) or not entry['project'] or any(ord(c) < 32 for c in entry['project']):
                     raise ValueError('path')
-                if Path(entry['destination']) != self.root / entry['target'] / entry['path'].lstrip('/'):
+                if entry['destination'] != str(self.root / entry['target'] / entry['path'].lstrip('/')):
                     raise ValueError('destination')
             return data
         except FileNotFoundError:
             return dict(version=1, directories={}, mounts=[])
-        except (ValueError, KeyError, TypeError, AttributeError) as exc:
+        except (ValueError, KeyError, TypeError, AttributeError, Error) as exc:
             raise Error(t('fs_state_invalid', path=self.state)) from exc
 
     def _save(self, data):
@@ -99,6 +126,11 @@ class Filesystems:
                 stream.flush()
                 os.fsync(stream.fileno())
             os.replace(name, self.state / 'mounts.json')
+            directory = os.open(self.state, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
         finally:
             Path(name).unlink(missing_ok=True)
 
@@ -124,10 +156,9 @@ class Filesystems:
         return [e for e in data['mounts'] if e['target'] == target and e['project'] == self.project]
 
     def _target(self, target, recovery=False):
-        item = self.manager.find(target)
-        if item is None and recovery:
-            return
-        self.manager.require(target)
+        validate_target(target)
+        if not recovery:
+            self.manager.require(target)
 
     def _home(self, target):
         content = self.manager.lxd.command(['file', 'pull', 'local:' + target + '/etc/passwd', '-'])
@@ -140,7 +171,7 @@ class Filesystems:
     def _directory(self, target, path):
         # Native files API returns a JSON directory listing, but symlinks return
         # their link target. Check each component so aliases cannot bypass overlap.
-        for part in [PurePosixPath('/'), *reversed(PurePosixPath(path).parents), PurePosixPath(path)]:
+        for part in dict.fromkeys([*reversed(PurePosixPath(path).parents), PurePosixPath(path)]):
             query = '/1.0/instances/' + quote(target, safe='') + '/files?' + urlencode(dict(project=self.project, path=str(part)))
             try:
                 value = json.loads(self.manager.lxd.command(['query', query]))
@@ -154,7 +185,14 @@ class Filesystems:
         info = path.lstat()
         if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid():
             raise Error(t('fs_conflict', path=path))
-        return [info.st_dev, info.st_ino]
+        return dict(fsid=os.statvfs(path).f_fsid, inode=info.st_ino, owner=info.st_uid)
+
+    def _same_directory(self, path, identity):
+        current = self._identity(path)
+        if isinstance(identity, list):
+            info = path.lstat()
+            return identity == [info.st_dev, info.st_ino]
+        return identity == current
 
     def _make(self, data, destination, entry=None):
         if os.path.lexists(destination):
@@ -162,7 +200,7 @@ class Filesystems:
         for part in [self.root, *[p for p in reversed(destination.parents) if self.root in p.parents], destination]:
             key = str(part)
             if os.path.lexists(part):
-                if data['directories'].get(key) != self._identity(part):
+                if not self._same_directory(part, data['directories'].get(key)):
                     raise Error(t('fs_conflict', path=part))
             else:
                 part.mkdir(mode=0o700)
@@ -180,7 +218,7 @@ class Filesystems:
             if identity is None:
                 continue
             if os.path.lexists(part):
-                if self._identity(part) != identity:
+                if not self._same_directory(part, identity):
                     raise Error(t('fs_conflict', path=part))
                 try:
                     part.rmdir()
@@ -219,7 +257,14 @@ class Filesystems:
         if self.list(target):
             raise Error(t('fs_before_transition', target=target))
 
-    def _wait(self, action, target, probe, diagnostics=None):
+    @contextmanager
+    def transition(self, target):
+        with self.locked() as data:
+            if self._entries(data, target):
+                raise Error(t('fs_before_transition', target=target))
+            yield
+
+    def _wait(self, action, target, probe, diagnostics=None, final=True):
         started = time.monotonic()
         outcome = 'error'
         observation = 'waiting'
@@ -236,12 +281,13 @@ class Filesystems:
                     return
                 time.sleep(max(0, 1-(time.monotonic()-tick)))
         finally:
-            self.manager.report(dict(action=action, target=target, status=outcome, observation=observation, elapsed=time.monotonic()-started, native_stderr=diagnostics() if diagnostics and outcome == 'ok' else ''))
+            if final:
+                self.manager.report(dict(action=action, target=target, status=outcome, observation=observation, elapsed=time.monotonic()-started, native_stderr=diagnostics() if diagnostics and outcome == 'ok' else ''))
 
     def _spawn(self, args, out, err, password=None):
         with out.open('ab') as stdout, err.open('ab') as stderr:
             child = subprocess.Popen(args, stdin=subprocess.PIPE if password is not None else subprocess.DEVNULL,
-                                     stdout=stdout, stderr=stderr, start_new_session=True,
+                                     stdout=stdout, stderr=stderr, start_new_session=True, cwd=out.parent,
                                      env={**os.environ, 'LC_ALL': 'C'})
         if password is not None:
             try:
@@ -251,11 +297,16 @@ class Filesystems:
                 pass
         return child
 
-    def _terminate(self, identity):
+    def _terminate(self, identity, progress=None):
         if alive(identity):
-            os.kill(identity['pid'], signal.SIGTERM)
+            try:
+                os.kill(identity['pid'], signal.SIGTERM)
+            except ProcessLookupError:
+                pass
             deadline = time.monotonic()+self.timeout
             while alive(identity):
+                if progress is not None:
+                    progress()
                 if time.monotonic() >= deadline:
                     raise Error(t('fs_process_timeout'))
                 time.sleep(1)
@@ -272,9 +323,10 @@ class Filesystems:
                 raise Error(t('fs_dependency', program=program))
         default = path is None
         path = self._home(target) if default else normalized(path)
-        self._directory(target, path)
         destination = self.root / target / path.lstrip('/')
         with self.locked() as data:
+            self.manager.require(target)
+            self._directory(target, path)
             for entry in self._entries(data, target):
                 if overlaps(path, entry['path']):
                     raise Error(t('fs_overlap', path=path, existing=entry['path']))
@@ -308,7 +360,7 @@ class Filesystems:
                             return False
                         sshfs = self._spawn(['sshfs', entry['source'], str(destination), '-f', '-p', port[1],
                             '-o', 'password_stdin', '-o', 'StrictHostKeyChecking=accept-new',
-                            '-o', 'UserKnownHostsFile='+str(work/'known_hosts'), '-o', 'GlobalKnownHostsFile=/dev/null',
+                            '-o', 'UserKnownHostsFile="'+str(work/'known_hosts').replace('\\', '\\\\').replace('"', '\\"')+'"', '-o', 'GlobalKnownHostsFile=/dev/null',
                             '-o', 'IdentityAgent=none', '-o', 'PubkeyAuthentication=no', '-o', 'PreferredAuthentications=password'],
                             work/'sshfs.out', work/'sshfs.err', password[1])
                         entry['sshfs'] = process_identity(sshfs.pid)
@@ -332,17 +384,60 @@ class Filesystems:
                 raise
         return str(destination)
 
+    def _owned_helper(self, pid, entry, kind):
+        try:
+            proc = Path('/proc') / str(pid)
+            if proc.stat().st_uid != os.getuid():
+                return False
+            args = proc.joinpath('cmdline').read_bytes().rstrip(b'\0').decode().split('\0')
+            if kind == 'listener':
+                suffix = ['file', 'mount', 'local:' + entry['target'], '--listen', '127.0.0.1:0', '--auth-user', 'mas-' + entry['id']]
+                return Path(args[0]).name == 'lxc' and args[-len(suffix):] == suffix
+            return Path(args[0]).name == 'sshfs' and args[1:4] == [entry['source'], entry['destination'], '-f']
+        except (OSError, UnicodeError):
+            return False
+
+    def _helpers(self, entry, kind):
+        recorded = entry.get(kind)
+        if recorded and alive(recorded) and not self._owned_helper(recorded['pid'], entry, kind):
+            raise Error(t('fs_state_invalid', path=self.state))
+        identities = []
+        for proc in Path('/proc').iterdir():
+            if proc.name.isdigit() and self._owned_helper(int(proc.name), entry, kind):
+                identity = process_identity(int(proc.name))
+                if identity:
+                    identities.append(identity)
+        return identities
+
     def _remove(self, data, entry):
+        started = time.monotonic()
+        outcome = 'error'
+        try:
+            self._cleanup(data, entry, started)
+            outcome = 'ok'
+        finally:
+            self.manager.report(dict(action='unmountfs', target=entry['target'], status=outcome,
+                observation='unmounted' if outcome == 'ok' else 'residual', elapsed=time.monotonic()-started))
+
+    def _cleanup(self, data, entry, started):
+        helpers = {kind: self._helpers(entry, kind) for kind in ('sshfs', 'listener')}
         actual = self._actual(entry)
         if actual:
             if not self._matching(entry, actual):
                 raise Error(t('fs_conflict', path=entry['destination']))
-            result = subprocess.run(['fusermount3', '-u', entry['destination']], text=True, capture_output=True, timeout=self.timeout)
+            try:
+                result = subprocess.run(['fusermount3', '-u', entry['destination']], text=True, capture_output=True, timeout=self.timeout)
+            except subprocess.TimeoutExpired as exc:
+                raise Error(t('fs_timeout', target=entry['target'])) from exc
             if result.returncode:
                 raise Error(result.stderr.strip() or t('fs_unmount_failed'))
-            self._wait('unmountfs', entry['target'], lambda: not self._actual(entry))
-        self._terminate(entry.get('sshfs'))
-        self._terminate(entry.get('listener'))
+            self._wait('unmountfs', entry['target'], lambda: not self._actual(entry), final=False)
+            if result.stderr:
+                self.manager.report(dict(action='unmountfs', target=entry['target'], status='waiting', observation='unmounted', elapsed=0, native_stderr=result.stderr))
+        for kind in ('sshfs', 'listener'):
+            for identity in helpers[kind]:
+                if self._owned_helper(identity['pid'], entry, kind):
+                    self._terminate(identity, lambda: self.manager.report(dict(action='unmountfs', target=entry['target'], status='waiting', observation='waiting', elapsed=time.monotonic()-started)))
         if entry.get('prepared'):
             self._reclaim(data, Path(entry['destination']))
         elif entry.get('created'):

@@ -23,7 +23,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 安装指定版本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.9
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.10
 ```
 
 ## 语言和配置
@@ -76,7 +76,7 @@ mas import restored demo.tar.gz
 
 CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 `mas delete demo --yes`、`mas export demo backup.tar.gz --yes`；`--no` 明确拒绝。`mas enter demo --yes` 表示终端退出后停止容器，`--no` 表示保持运行。没有交互终端且未指定确认参数时默认拒绝；不再使用管道输入 `y` 确认。
 
-## 容器文件系统挂载（0.1.9）
+## 容器文件系统挂载（0.1.9 起）
 
 ```bash
 mas mountfs demo                 # 默认 home → ~/LXDCMFS/demo/home/sandbox
@@ -94,11 +94,13 @@ mas unmountfs demo /
 
 只管理当前用户创建的挂载。状态保存在 `$XDG_STATE_HOME/my-ai-sandbox/filesystems`，默认 `~/.local/state/my-ai-sandbox/filesystems`，连接资料仅当前用户可访问。普通 CLI 退出后挂载继续存在。
 
-挂载与 start/stop 独立，不自动挂载或卸载。**LXD 6.9 会等待持续文件连接释放**，因此有挂载或残留记录时，mas 会拒绝改变容器启停状态或删除容器，提示先明确卸载。原生 lxc 操作和其他用户的挂载不受本用户记录锁协调。
+挂载与 start/stop 独立，不自动挂载或卸载。**LXD 6.9 会等待持续文件连接释放**，因此有挂载或残留记录时，mas 会拒绝改变容器启停状态或删除容器，提示先明确卸载。同一用户通过 mas 发起的挂载和启停/删除共用记录锁，并在锁内重新检查归属和状态。原生 lxc 操作和其他用户的挂载不受本用户记录锁协调。
 
 目标挂载点已存在时拒绝操作，即使是空目录。可复用本工具记录的公共父目录，但不能遮盖用户目录或其他挂载。允许多个互不包含的路径；拒绝父子重叠。卸载必须精确匹配：挂载 `/` 后，卸载 `/var/log` 会报错，不会替你卸载 `/`。
 
-成功卸载后只回收本工具创建的空目录；失败挂载也按同一规则回收。占用、非空、身份变化或无法确认归属时保留并报错，不递归删除内容。使用 `mountedfs` 查看异常/残留条目，再执行对应 `unmountfs` 清理。WSL 关闭后挂载不保留，残留目录需要按记录清理后再挂载；离线 VHDX 访问不在本功能范围内。
+成功卸载后只回收本工具创建的空目录；失败挂载也按同一规则回收。占用、非空、身份变化或无法确认归属时保留并报错，不递归删除内容。使用 `mountedfs` 查看异常/残留条目，再执行对应 `unmountfs` 清理。WSL 关闭后挂载不保留，残留目录需要按记录清理后再挂载；新记录通过文件系统标识、inode 和属主核验目录；旧版设备号记录若无法核验则保留并报错，不擅自迁移。离线 VHDX 访问不在本功能范围内。
+
+即使容器已被外部删除或替换，`mountedfs` 和明确路径的 `unmountfs` 仍可处理原有宿主记录，不会操作替换后的容器。默认卸载优先使用记录中的原 home。记录损坏或辅助进程身份不符时保留现场并报错。
 
 ## 一行安装并自动测试
 
@@ -109,7 +111,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 指定版本及结果目录：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.9 --output ./mas-results
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.10 --output ./mas-results
 ```
 
 已安装环境可直接运行 `mas-test`。测试工具与产品版本配套，测试使用独立 LXD project 和 `test-<唯一随机码>` 容器，通过真实 lxc 操作和伪终端测试 CLI/终端文本菜单；只清理本次创建的资源。原有容器不参与 `stop --all` 测试。语言测试使用临时配置，不修改用户偏好。英文界面测试的原始输出保留在详细日志中；面向用户的说明、阶段名称和总结始终使用选择的语言，外部程序的原始警告和错误不翻译。
@@ -132,7 +134,7 @@ python3 scripts/build.py
 python3 dist/mas.pyz --version
 ```
 
-`dist/mas.pyz` 为产品，不包含安装模块、测试代码或测试专用文案；`dist/mas-install.pyz` 为独立安装程序；`dist/mas-test.pyz` 为独立测试工具。三个文件版本一致。测试工具通过安装程序完成安装，安装程序不负责启动测试。仅使用标准库 zipapp 打包，适用于已具备受支持 Python 运行时的架构。
+`dist/mas.pyz` 为产品，不包含安装模块、测试代码或测试专用文案；`dist/mas-install.pyz` 为独立安装程序；`dist/mas-test.pyz` 为独立测试工具。三个文件版本一致。测试工具通过安装程序完成安装，安装程序不负责启动测试。仅使用标准库生成可重复构建的 zipapp，适用于已具备受支持 Python 运行时的架构。
 
 发布前核验 [REQUIREMENTS.md](REQUIREMENTS.md) 并更新 [IMPLEMENTED.md](IMPLEMENTED.md)。GitHub prerelease 保留版本资产、安装脚本、校验清单及测试报告。第一版没有 GPU 或模型工具自动安装功能。
 

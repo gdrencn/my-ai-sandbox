@@ -29,7 +29,7 @@ import zipfile
 
 from . import __version__, config
 from .test_output import Output
-from .core import Error, LXD, Manager, host_image
+from .core import Error, LXD, Manager, MANAGED, host_image
 
 from .i18n import t, Parser, catalog, progress_text
 
@@ -466,6 +466,9 @@ class Suite:
         before = self.exec(target, "stat -c '%u:%g:%a' /home/sandbox/mas-secret")
         home = self.fs_root/target/'home/sandbox'
         self.cli('mountfs', target)
+        with self.manager.filesystems.locked() as data:
+            entry=self.manager.filesystems._entries(data,target)[0]
+            assert (self.fs_state/entry['id']/'known_hosts').read_text().strip()
         assert home.joinpath('mas-secret').read_text() == 'container secret'
         home.joinpath('host-created').write_text('from host')
         assert self.exec(target, 'cat /home/sandbox/host-created') == 'from host'
@@ -514,8 +517,35 @@ class Suite:
         self.cli('unmountfs',target,'/var/log')
         assert not self.fs_root.exists()
         self.cli('mountfs',target,'/var/log')
+        # Simulate CLI death between native helper spawn and PID publication.
+        with fs.locked() as data:
+            entry=fs._entries(data,target)[0]
+            identities=[entry.pop(kind) for kind in ('listener','sshfs')]
+            fs._save(data)
         self.cli('unmountfs',target,'/var/log')
+        from .filesystems import alive
+        assert not any(alive(identity) for identity in identities)
         assert not self.manager.mountedfs(target)
+        # The original default mount survives a later account-home change.
+        self.cli('start',target)
+        self.cli('mountfs',target)
+        try:
+            self.exec(target, "mkdir -p /home/changed; sed -i '/^sandbox:/s|:/home/sandbox:|:/home/changed:|' /etc/passwd")
+            self.cli('unmountfs',target)
+        finally:
+            self.exec(target, "sed -i '/^sandbox:/s|:/home/changed:|:/home/sandbox:|' /etc/passwd")
+        assert not self.fs_root.exists()
+        self.cli('stop',target)
+        # External ownership changes must not prevent cleanup of our host mount.
+        self.cli('mountfs',target,'/var/log')
+        self.manager.lxd.command(['config','unset','local:'+target,MANAGED])
+        try:
+            assert '/var/log' in self.cli('mountedfs',target)
+            self.cli('unmountfs',target,'/var/log')
+            assert not self.manager.managed(self.manager.find(target))
+        finally:
+            self.manager.lxd.command(['config','set','local:'+target,MANAGED+'=true'])
+        assert not self.fs_root.exists()
 
     def filesystem_menu(self, target):
         with self.terminal([]) as terminal:
@@ -637,11 +667,10 @@ class Suite:
             return
         for target in self.targets:
             try:
+                for entry in self.manager.mountedfs(target):
+                    self.manager.unmountfs(target, entry["path"])
                 item = self.manager.find(target)
                 if item:
-                    if self.manager.managed(item):
-                        for entry in self.manager.mountedfs(target):
-                            self.manager.unmountfs(target, entry["path"])
                     if item["status"] != "Stopped":
                         self.manager._operation("cleanup-stop", target, ["stop", "local:" + target,
                                                 "--timeout", str(self.timeout)], "Stopped", require_marker=False)

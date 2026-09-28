@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.1.9 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.1.10 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -23,16 +23,16 @@ This maps the checks present in batch 0.1.9 to requirements and implementation. 
 | enter / on_exit | running and stopped entry as sandbox, default keep-running, explicit stop, menu return and subsequent navigation | shared start/stop reuse; startup failure prevents shell; nonzero shell exit still invokes exit handler then reports failure |
 | Shared _operation | one-second observations and elapsed events for real commands | state success alone cannot finish live command; exit code zero alone cannot skip state; marker required; nonzero native exit, LXD Error, failed query, interruption and 300-second simulated timeout; client termination and final events |
 | Text menus | complete lifecycle, classification/navigation, settings persistence, cancellation, shell return, native progress and JSON history | CSI/SS3, radio/multiple choice, defaults, UTF-8 editing, viewport resize, Ctrl-C/Escape restoration, row-redraw history preservation, no alternate-screen/screen-clear sequences |
-| Installation and packaging | separate installer invoked before final product testing; public normal/test entry; installed artifact hashes | missing snap/LXD sudo sequence, ready-system no-sudo, existing profile preservation, PATH idempotence, archive separation, mismatched version, bad download checksum prevents installation |
+| Installation and packaging | separate installer invoked before final product testing; public normal/test entry; installed artifact hashes | missing snap/LXD sudo sequence, ready-system no-sudo, existing profile preservation, PATH idempotence, atomic copy-failure preservation and concurrent install publication, archive separation, mismatched version, bad download checksum prevents installation |
 | Language / configuration | CLI get/set/help, menu language changes and cancellation, installation default in PTY | exact en_us/zh_cn identifiers, catalog keys/placeholders, saved defaults, broken config protection, unrelated preferences retained |
 | Shared progress display | complete real menu/CLI lifecycle; permanent final results, separate structured waiting records | redirected output has no ticks/escapes; Chinese narrow width; actual output terminal sizing; query warnings without newlines; PTY results/diagnostics/menu/interruption history |
-| Filesystem mounts | running/stopped reads and writes, root and default-home mounts, exact unmount, non-overlap, pre-existing paths, lifecycle refusal, killed-helper cleanup/retry, CLI and real menu actions; original and newly created metadata recorded | normalization, symlink/unknown-parent refusal, inode replacement, nonempty cleanup, corrupt records, default-home changes, mount-table identity, PID reuse, failed-attempt ownership, missing-SSHFS sudo |
+| Filesystem mounts | running/stopped reads and writes, root and default-home mounts, exact unmount, non-overlap, pre-existing paths, lifecycle refusal, killed-helper cleanup/retry, lost PID-record recovery, changed account home, external marker removal without adoption, persisted native host key, CLI and real menu actions; original and newly created metadata recorded | normalization, symlink/unknown-parent refusal, inode replacement, nonempty cleanup, corrupt records, default-home changes, mount-table identity, PID reuse, failed-attempt ownership, missing-SSHFS sudo; full schema rejection, replacement-container recovery, real lock contention, mount ownership recheck, simulated reboot device change, unmount timeout/cleanup failure, unrelated live PID refusal |
 | Tester behavior | localized per-stage results, persistent diagnostics, detailed logs, elapsed events, isolated cleanup | failed/interrupted group and later not_run status; cleanup/report errors produce failure; unit skips/details recorded; automatic discovery; Python optimization rejected because it disables assertions |
 
 ## Current limits
 
 - Full real runs are on the current Ubuntu WSL host. Native Ubuntu/cloud hosts and other architectures still require external-machine verification.
-- Historical user logs cover a missing-LXD installation. Batch 0.1.7 does not remove the host LXD/Python installation to repeat fresh provisioning; sudo, package-manager failure and existing configuration behavior use controlled subprocess tests.
+- Historical user logs cover a missing-LXD installation. The current batch does not remove the host LXD/Python installation to repeat fresh provisioning; sudo, package-manager failure and existing configuration behavior use controlled subprocess tests.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
 - GPU passthrough, host-to-container resource sharing and custom networking are excluded features, not covered functionality.
@@ -40,3 +40,7 @@ This maps the checks present in batch 0.1.9 to requirements and implementation. 
 The historical integration group identifier `tui` remains for report continuity; it now runs the inline text-menu application. New groups are `invalid-inputs`, `lifecycle-repeat` and `unmarked-import`.
 
 0.1.9 adds filesystems, filesystem-recovery and filesystem-menu (20 real groups in total). Actual ACL-bearing files, Windows-side access to FUSE mounts and offline VHDX mounting are not verified. Development SSHFS was unpacked from the Ubuntu repository because host sudo was unavailable; the missing-package installer branch is covered by controlled tests.
+
+Batch 0.1.10 also verifies reproducible builds by building twice and comparing all asset SHA-256 values. Reboot device-number changes and registry corruption are simulated; the development host is not rebooted or intentionally corrupted. Metadata checks cover UID/GID/mode and content; no claim of ACL-bearing live fixtures or universal filesystem-ID stability is made.
+
+A separate live smoke check also mounted and cleaned a path beneath a report directory containing spaces, and verified the private known_hosts file was populated. This is supplementary evidence, not an extra portable-suite group.

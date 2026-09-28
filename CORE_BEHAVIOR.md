@@ -1,13 +1,13 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.9. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.10. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
 - Locate lxc using PATH, then /snap/bin/lxc; fail with a setup instruction if absent. Use the local server and explicit project (default for the product; isolated project for tests).
 - Require an operation timeout of at least 300 seconds; default 600. Queries capture output, reject timeout/nonzero exit, and retain native stderr. Instance queries use lxc list local: --format=json, parse JSON and validate list/row structure. Query failure or malformed data never means target absence.
 - TARGET accepts 1–63 ASCII letters/digits/hyphens, starts with a letter and ends with an alphanumeric character. Reject remote, snapshot and option-like selectors.
-- An owned instance must have type container and instance-local config user.mas.managed exactly equal to true as a string. An inherited profile marker is insufficient. Existing-instance operations require ownership; new/import name collisions inspect all instances.
+- An owned instance must have type container and instance-local config user.mas.managed exactly equal to true as a string. An inherited profile marker is insufficient. Existing-container operations require ownership; host-only recovery of existing filesystem records does not query or mutate a replacement container; new/import name collisions inspect all instances.
 - Mutating _operation calls capture native stdout/stderr in temporary files to avoid pipe backpressure. Observe structured state every second, require both native exit zero and expected state, and normally require the ownership marker. Native nonzero exit, LXD Error state and query failures abort. Report observations, elapsed time, final result and native output.
 - On timeout/failure/interruption, stop a still-running client process and wait for it; do not claim the LXD daemon operation has been cancelled. Timeout messages include the last observed state; the final event includes elapsed time. Interactive container shells do not use this operation timer.
 - Confirmation is shared: terminal radio menu defaults No, --yes/--no supply explicit decisions, noninteractive input without consent declines. CLI/menu presentation localizes mas text and preserves original external output.
@@ -44,8 +44,12 @@ In order:
 Root's password is not set to empty. The ownership marker and this user/sudo preparation are the only mas-specific container configuration. No GPU mapping, host-directory sharing, network policy, port forwarding or custom profile is added. Fresh-host storage/network initialization, LXD installation, sudo authentication and host PATH setup belong to mas/install.py, not to container operation hooks.
 
 
-## Filesystem extension (0.1.9)
+## Filesystem extension (0.1.9–0.1.10)
 
-Manager delegates all three commands to one per-user Filesystems implementation. mountfs verifies ownership, resolves/validates the container directory through native LXD file APIs, locks mount records, rejects overlap and existing host destinations, creates tracked host directories, starts the native authenticated loopback listener and SSHFS, then checks the actual mount table and live helpers. unmountfs selects an exact recorded path, verifies mount identity, uses fusermount3, waits for disappearance, terminates identity-matched helpers and removes only tracked empty directories/private connection files. mountedfs reconciles records with mount table and helper identity without mounting or changing container state.
+Manager delegates all three commands to one per-user Filesystems implementation. mountfs verifies ownership, resolves/validates the container directory through native LXD file APIs, locks mount records, rejects overlap and existing host destinations, creates tracked host directories, starts the native authenticated loopback listener and SSHFS, then checks the actual mount table and live helpers. unmountfs selects an exact recorded path, verifies mount identity, uses fusermount3, waits for disappearance, terminates identity-matched helpers and removes only tracked empty directories/private connection files. The SSH known-hosts path is explicitly quoted and absolute inside private per-mount state. mountedfs reconciles records with mount table and helper identity without mounting or changing container state.
 
 Lifecycle transition/delete preconditions refuse this user's recorded mounts before native state changes. No start/stop hook mounts or unmounts automatically. Permissions/UID/GID/ACLs in the container are not rewritten; native new-file semantics apply. The registry is private under XDG_STATE_HOME and separate from the LXD container ownership marker.
+
+The same private registry lock spans mount creation and native start-from-Stopped, stop-from-Running, and deletion; ownership/state is rechecked inside the lock. Locks coordinate this user only. A repeated start of an already-running target retains user setup; stopped stop remains a no-op.
+
+Registry reads validate paths, directory identities, process tokens and required field types. New directory identities use filesystem ID/inode/owner; legacy device/inode records are compared conservatively. Helpers are checked against process start/boot identity and per-mount native command arguments. Exact owned helper arguments allow recovery when interrupted before PID publication. Only a verified helper may be signalled. Final unmount success follows detach, helper exit and directory/private-file cleanup, including total elapsed time. A native timeout preserves records for retry.

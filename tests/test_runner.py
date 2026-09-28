@@ -113,3 +113,18 @@ class RunnerTests(unittest.TestCase):
                 contextlib.redirect_stdout(io.StringIO()),self.assertRaisesRegex(RuntimeError,'Checksum mismatch'):
             bootstrap.main()
         execute.assert_not_called()
+
+    def test_cleanup_recovers_mounts_before_querying_missing_target(self):
+        suite=testing.Suite.__new__(testing.Suite)
+        suite.output=Output(io.StringIO())
+        suite.workspace=Mock();suite.created_project=True
+        suite.targets=['test-fixture'];suite.cleanup_errors=[]
+        suite.manager=Mock();suite.host=Mock();suite.project='test-project'
+        suite.manager.mountedfs.return_value=[{'path':'/var/log'}]
+        def find(target):
+            suite.manager.unmountfs.assert_called_once_with(target,'/var/log')
+            return None
+        suite.manager.find.side_effect=find
+        suite.cleanup()
+        self.assertEqual(suite.cleanup_errors,[])
+        suite.manager._operation.assert_not_called()

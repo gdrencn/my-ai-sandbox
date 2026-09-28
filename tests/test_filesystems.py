@@ -81,7 +81,7 @@ class FilesystemTests(unittest.TestCase):
             remove.assert_not_called()
 
     def entry(self,path='/home/sandbox'):
-        return dict(id='a'*32,target='demo',project='default',path=path,destination=str(self.fs.root/'demo'/path.lstrip('/')),source='fixture',default=True)
+        return dict(id='a'*32,target='demo',project='default',path=path,destination=str(self.fs.root/'demo'/path.lstrip('/')),source='mas-'+'a'*32+'@127.0.0.1:'+path,default=True)
 
     def test_default_unmount_uses_original_recorded_home(self):
         entry=self.entry('/old/home')
@@ -92,7 +92,7 @@ class FilesystemTests(unittest.TestCase):
             self.assertEqual(remove.call_args.args[1]['path'],'/old/home')
 
     def test_mount_table_identity_checks(self):
-        entry=self.entry();actual=dict(id=42,kind='fuse.sshfs',source='fixture')
+        entry=self.entry();actual=dict(id=42,kind='fuse.sshfs',source=entry['source'])
         self.assertTrue(self.fs._matching(entry,[actual]))
         self.assertFalse(self.fs._matching(entry,[actual,actual]))
         self.assertFalse(self.fs._matching(entry,[{**actual,'source':'foreign'}]))
@@ -146,3 +146,98 @@ class FilesystemTests(unittest.TestCase):
         with patch.object(Path,'read_text',read), patch('mas.install.shutil.which',side_effect=lambda name: None if name=='sshfs' else '/snap/bin/'+name), patch('mas.install.os.geteuid',return_value=1000), patch('mas.install.os.getgid',return_value=1000), patch('mas.install.os.getgroups',return_value=[986]), patch('mas.install.pwd.getpwuid',return_value=SimpleNamespace(pw_name='tester')), patch('mas.install.grp.getgrnam',return_value=SimpleNamespace(gr_gid=986,gr_mem=['tester'])), patch('mas.install.run') as run:
             self.assertFalse(prepare_system())
         self.assertEqual([c.args[0] for c in run.call_args_list],[['sudo','-v'],['apt-get','update'],['apt-get','install','-y','sshfs']])
+
+    def test_schema_damage_preserves_original_file(self):
+        import copy
+        self.fs._private()
+        base = dict(version=1, directories={}, mounts=[self.entry()])
+        changes = [lambda d: d['mounts'][0].update(listener={'pid': os.getpid()}),
+                   lambda d: d['mounts'][0].update(default='yes'),
+                   lambda d: d['mounts'][0].update(source='foreign'),
+                   lambda d: d['mounts'][0].update(created=['/tmp/foreign']),
+                   lambda d: d['directories'].update({'/tmp/foreign': [1, 2]}),
+                   lambda d: d['mounts'].append(d['mounts'][0].copy())]
+        for change in changes:
+            data=copy.deepcopy(base);change(data)
+            raw=json.dumps(data);(self.fs.state/'mounts.json').write_text(raw)
+            with self.assertRaises(Error): self.fs.list('demo')
+            self.assertEqual((self.fs.state/'mounts.json').read_text(),raw)
+
+    def test_recovery_never_queries_replacement_container(self):
+        with self.fs.locked() as data:
+            data['mounts'].append(self.entry());self.fs._save(data)
+        self.manager.find.side_effect=AssertionError('replacement must not be accessed')
+        self.manager.require.side_effect=AssertionError('replacement must not be accessed')
+        with patch.object(self.fs,'_actual',return_value=[]):
+            self.assertEqual(self.fs.list('demo')[0]['status'],'residual')
+            self.fs.unmount('demo')
+        self.assertEqual(self.fs.list('demo'),[])
+
+    def test_directory_identity_uses_filesystem_not_boot_device_number(self):
+        path=self.base/'identity';path.mkdir()
+        identity=self.fs._identity(path)
+        with patch.object(Path,'lstat',return_value=SimpleNamespace(st_mode=0o40700,st_uid=os.getuid(),st_ino=identity['inode'],st_dev=99999)):
+            self.assertTrue(self.fs._same_directory(path,identity))
+            self.assertFalse(self.fs._same_directory(path,[1,identity['inode']]))
+        self.assertFalse(self.fs._same_directory(path,{**identity,'fsid':identity['fsid']+1}))
+
+    def test_transition_holds_real_lock_and_refuses_records(self):
+        import fcntl
+        with self.fs.transition('demo'):
+            with (self.fs.state/'lock').open('rb') as other:
+                with self.assertRaises(BlockingIOError):fcntl.flock(other,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        with self.fs.locked() as data:
+            data['mounts'].append(self.entry());self.fs._save(data)
+        with self.assertRaises(Error):
+            with self.fs.transition('demo'):self.fail('must refuse')
+
+    def test_mount_rechecks_owner_after_lock(self):
+        self.manager.require.side_effect=[{},Error('replaced')]
+        with patch('mas.filesystems.shutil.which',return_value='/usr/bin/native'),patch.object(self.fs,'_directory'):
+            with self.assertRaisesRegex(Error,'replaced'):self.fs.mount('demo','/var/log')
+        with self.fs.locked() as data:self.assertEqual(data['mounts'],[])
+
+    def test_unmount_timeout_and_cleanup_failure_never_report_success(self):
+        import subprocess
+        entry=self.entry()
+        with self.fs.locked() as data:
+            data['mounts'].append(entry);self.fs._save(data)
+            actual=[dict(kind='fuse.sshfs',source=entry['source'],id=42)]
+            with patch.object(self.fs,'_actual',return_value=actual),patch('mas.filesystems.subprocess.run',side_effect=subprocess.TimeoutExpired('fusermount3',300)):
+                with self.assertRaises(Error):self.fs._remove(data,entry)
+            self.assertIn(entry,data['mounts'])
+            self.assertEqual(self.manager.report.call_args.args[0]['status'],'error')
+            entry['prepared']=True
+            with patch.object(self.fs,'_actual',return_value=[]),patch.object(self.fs,'_reclaim',side_effect=Error('nonempty')):
+                with self.assertRaises(Error):self.fs._remove(data,entry)
+            self.assertEqual(self.manager.report.call_args.args[0]['status'],'error')
+
+    def test_valid_token_for_unrelated_process_is_not_authority(self):
+        entry=self.entry();entry['listener']=process_identity(os.getpid())
+        with patch('mas.filesystems.os.kill') as kill:
+            with self.assertRaises(Error):self.fs._helpers(entry,'listener')
+            kill.assert_not_called()
+
+    def test_atomic_installer_preserves_product_on_copy_failure(self):
+        from mas.install import install_file
+        source=self.base/'source';source.write_text('new')
+        target=self.base/'mas';target.write_text('old')
+        with patch('mas.install.shutil.copyfileobj',side_effect=OSError('disk full')):
+            with self.assertRaises(OSError):install_file(source,target)
+        self.assertEqual(target.read_text(),'old')
+        self.assertEqual(sorted(p.name for p in self.base.iterdir()),['mas','source'])
+        install_file(source,target)
+        self.assertEqual(target.read_text(),'new')
+        self.assertEqual(target.stat().st_mode & 0o777,0o755)
+
+    def test_concurrent_installers_publish_complete_files(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from mas.install import install_file
+        sources=[self.base/'a',self.base/'b']
+        contents=[b'a'*200000,b'b'*200000]
+        for source,content in zip(sources,contents):source.write_bytes(content)
+        target=self.base/'mas'
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            list(executor.map(lambda source: install_file(source,target),sources))
+        self.assertIn(target.read_bytes(),contents)
+        self.assertFalse(list(self.base.glob('.mas.*')))

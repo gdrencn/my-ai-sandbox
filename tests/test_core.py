@@ -20,10 +20,12 @@ class BehaviorTests(unittest.TestCase):
         self.addCleanup(language.stop)
 
     def manager(self, status="Stopped", owned=True):
-        lxd = Mock()
+        lxd = Mock(timeout=300, project="default")
         lxd.instances.return_value = [{"name": "demo", "type": "container", "status": status,
                                       "config": {MANAGED: "true"} if owned else {}}]
-        manager = Manager(lxd)
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        manager = Manager(lxd, fs_state=Path(temporary.name)/"state")
         manager._operation = Mock()
         return manager
 

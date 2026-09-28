@@ -7,7 +7,7 @@ import shlex
 from pathlib import Path
 import shutil
 import tempfile
-import zipapp
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
@@ -40,7 +40,16 @@ def main():
                 shutil.copytree(ROOT / "tests", stage / "tests", ignore=shutil.ignore_patterns("__pycache__"))
             module, function = entry.split(":")
             (stage / "__main__.py").write_text(f"from {module} import {function}\nraise SystemExit({function}())\n")
-            zipapp.create_archive(stage, DIST / filename, interpreter="/usr/bin/env python3", compressed=True)
+            archive = DIST / filename
+            archive.write_bytes(b"#!/usr/bin/env python3\n")
+            with zipfile.ZipFile(archive, 'a', compression=zipfile.ZIP_DEFLATED) as package:
+                for source in sorted(stage.rglob('*')):
+                    if source.is_file():
+                        info = zipfile.ZipInfo(source.relative_to(stage).as_posix(), (2020, 1, 1, 0, 0, 0))
+                        info.compress_type = zipfile.ZIP_DEFLATED
+                        info.external_attr = 0o100644 << 16
+                        package.writestr(info, source.read_bytes())
+            archive.chmod(0o755)
     for name in ("bootstrap.py", "install.sh"):
         shutil.copyfile(ROOT / name, DIST / name)
     names = ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh")
