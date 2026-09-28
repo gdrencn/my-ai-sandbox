@@ -71,3 +71,5 @@ Final local 0.1.12 run: 133 packaged unit tests, no skips; 20 reported stages (u
 The 0.1.12 public-entry check exposed a missing minimal-bootstrap dependency despite successful product tests. The new regression executes the actual generated shell download block against controlled bytes, then imports bootstrap/menu in an isolated -I interpreter. The tester carries install.sh for this boundary check; ordinary product artifacts do not. This raises packaged unit coverage to 134 tests. Complete native/public outcomes are recorded after execution.
 
 Final local 0.1.13 verification passed all 134 packaged units and 20 reported stages in 365.7 seconds, with no skips or cleanup errors; see validation/V0_1_13_REPORT.json.
+
+Both public 0.1.13 entry modes passed; the public --test run passed 134 packaged units and all 20 stages in 368.5 seconds, without skips or cleanup errors. Installed hashes matched, ordinary installation preserved the tester, Windows UNC passed and isolated resources were reclaimed. Evidence: validation/V0_1_13_PUBLIC_REPORT.json.
