@@ -135,3 +135,12 @@ Verified against REQUIREMENTS.md section 12 before this update:
 Final packaged validation: 49 unit tests passed with no skips; all 14 real LXD integration groups passed after installation through the separate installer. CLI confirmations and every TUI container operation were driven using actual arrow sequences, Enter and Escape; reusable multiple-choice tests use Space. The TUI tests include language changes/cancellation, empty lists, cancelled creation, information scrolling, start, sandbox terminal entry and return, stop, export and overwrite refusal, deletion refusal/confirmation, import and stop-all. Actual states, backups, configuration and shell identity are checked. The focused PTY suite additionally checks resize and viewport selection. No cleanup errors occurred; the final noninteractive log contains no terminal-control escapes. Evidence: validation/V0_1_5_REPORT.json, whose product hash matches the final release artifact. Shell syntax, Python compilation and git diff whitespace checks passed.
 
 Verification environment remains the current Ubuntu WSL host with existing LXD. Native Ubuntu, other CPU architectures and a fresh full privileged installation were not rerun in this batch. No third-party dependency was added. Public-entry verification follows publication and is recorded separately below.
+
+
+### 0.1.5 publication and public entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.5 with product, separate installer, separate tester, bootstrap, shell entry, SHA256SUMS and WSL_REPORT.json.
+
+Ran the public curl/bash entry in a real PTY using fresh isolated preferences. Its radio language menu selected Chinese by default, Enter confirmed, and installation resolved v0.1.5. Normal installation left the existing tester modification time unchanged. Then ran the same public entry with --test; the downloaded tester invoked the installer before testing the installed product. All 49 packaged unit tests and all 14 integration groups passed, including the complete arrow-driven TUI workflow. Both installed executables match the released product/tester hashes. Cleanup had no errors, and both final validation projects were confirmed absent. Temporary preferences were removed without changing the user's saved language.
+
+Evidence: validation/V0_1_5_PUBLIC_REPORT.json. The 0.1.5 batch is complete within the WSL/platform and fresh-host limits documented above. This publication-evidence update remains part of the same submission batch.
