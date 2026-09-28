@@ -54,6 +54,8 @@ Provide access to all nine container operations, with list selection, input prom
 
 Provide a fixed one-line entry that installs the latest test release. Install missing LXD and its matching lxc client automatically, using the newest available stable snap release rather than development channels. Reuse existing installations without unsolicited upgrades. Prepare missing system prerequisites and initialize a fresh LXD environment with storage and network. Use sudo when needed. Do not overwrite existing LXD configuration.
 
+The fresh-install path must run `snap wait system seed.loaded` with administrator privileges, just like service setup and snap installation. Regression tests must cover missing LXD with snapd both already present and absent; a permission failure must not be mistaken for successful initialization.
+
 WSL service prerequisites, user permissions and restarts must be handled or reported accurately. Implementation baseline: Ubuntu 22.04 or newer with Python 3.10+, systemd and snap support; dir storage for fresh initialization; installation under ~/.local/bin. Zipapps contain no architecture-specific binaries. Do not claim untested host versions or architectures have passed.
 
 Native LXD backup semantics are preserved: imports retain network MAC identity and can conflict with a source container still present on the same network. This version does not silently turn restoration into cloning or rewrite network identities.

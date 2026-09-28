@@ -1,8 +1,10 @@
 import contextlib
 import io
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from mas.core import Error, LXD, MANAGED, Manager, confirm, host_image, validate_target
@@ -172,6 +174,38 @@ class BehaviorTests(unittest.TestCase):
             with self.assertRaisesRegex(Error, "root disk"):
                 initialize()
         run.assert_not_called()
+
+    def test_fresh_install_authenticates_snap_seed_wait(self):
+        from mas.install import prepare_system
+
+        for snap_present in (True, False):
+            commands = []
+
+            def execute(args, **kwargs):
+                commands.append(args)
+                native = args[1:] if args[0] == "sudo" else args
+                needs_root = native[0] in ("apt-get", "systemctl") or native[:2] in (
+                    ["snap", "wait"], ["snap", "install"])
+                if needs_root and args[0] != "sudo":
+                    return subprocess.CompletedProcess(args, 1, "", "error: access denied (try with sudo)")
+                output = "  6/stable: 6.9-abc 2026-09-25\n" if native == ["snap", "info", "lxd"] else ""
+                return subprocess.CompletedProcess(args, 0, output, "")
+
+            with self.subTest(snap_present=snap_present), \
+                    patch("mas.install.Path.read_text", side_effect=['ID=ubuntu\n', 'systemd\n']), \
+                    patch("mas.install.Path.exists", return_value=False), \
+                    patch("mas.install.shutil.which", side_effect=lambda name: "/usr/bin/snap" if name == "snap" and snap_present else None), \
+                    patch("mas.install.os.geteuid", return_value=1000), \
+                    patch("mas.install.os.getgid", return_value=1000), \
+                    patch("mas.install.os.getgroups", return_value=[986]), \
+                    patch("mas.install.pwd.getpwuid", return_value=SimpleNamespace(pw_name="tester")), \
+                    patch("mas.install.grp.getgrnam", return_value=SimpleNamespace(gr_gid=986, gr_mem=["tester"])), \
+                    patch("mas.install.sys.stdin.isatty", return_value=True), \
+                    patch("mas.install.subprocess.run", side_effect=execute), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertFalse(prepare_system())
+                self.assertIn(["sudo", "snap", "wait", "system", "seed.loaded"], commands)
+                self.assertIn(["sudo", "snap", "install", "lxd", "--channel=6/stable"], commands)
 
 
 if __name__ == "__main__":

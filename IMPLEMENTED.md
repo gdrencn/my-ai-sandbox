@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: v0.1.0-test.1 is publicly released. Both release artifacts and the public one-line installation/testing entry passed the complete current-WSL test suite. See Stages 3–4 and the reports in validation/.
+Current result: v0.1.0-test.1 is publicly released; a reported fresh-install permission bug is fixed locally for v0.1.0-test.2. See Stage 5. Earlier successful existing-host tests did not cover the failing fresh-install step.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -60,3 +60,11 @@ Known verification limits remain: fresh-system installation was not run end to e
 - Product and test tool are installed locally at ~/.local/bin/mas and ~/.local/bin/mas-test.
 
 This completes the first test release in the current WSL environment, subject to the explicitly recorded environment-verification limits above.
+
+## Stage 5 — fresh-install seed wait permission fix
+
+User report: on a machine without LXD, installation stopped at `snap wait system seed.loaded` with `error: access denied (try with sudo)`. The same unprivileged command reproduced the failure on the development host.
+
+The installer now runs that step through the shared privileged-command runner. Added a regression test exercising the fresh-install path with snapd present and absent, simulating the subprocess permission boundary. Before the fix both scenarios failed with the reported permission error; after the fix all 20 unit tests passed. No third-party dependency or host sudoers configuration was added.
+
+The v0.1.0-test.2 product and matching tester passed all 13 real integration groups (including 20 unit tests), with exit code 0 and no cleanup errors. The tested product hash matches the release artifact; evidence is in validation/TEST_2_REPORT.json. Publication is the remaining step. A full live fresh-host installation remains unverified here.

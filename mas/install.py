@@ -64,7 +64,7 @@ def prepare_system():
             run(["apt-get", "update"], privileged=True)
             run(["apt-get", "install", "-y", "snapd"], privileged=True)
         run(["systemctl", "enable", "--now", "snapd.socket"], privileged=True)
-        run(["snap", "wait", "system", "seed.loaded"])
+        run(["snap", "wait", "system", "seed.loaded"], privileged=True)
         channel = stable_channel(run(["snap", "info", "lxd"], capture=True))
         run(["snap", "install", "lxd", "--channel=" + channel], privileged=True)
     if os.geteuid() != 0:
