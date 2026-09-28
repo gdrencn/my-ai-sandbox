@@ -7,12 +7,16 @@ import sys
 from . import __version__
 from . import config
 from .core import Error, LXD, Manager
+from .diagnostics import diagnostic_lines
 
 from .i18n import t, state, progress_text, Parser
 
 
 def progress(event):
     print(progress_text(event), file=sys.stderr, flush=True)
+    if not event.get("native_failure"):
+        for line in diagnostic_lines(event.get("native_stdout", ""), event.get("native_stderr", "")):
+            print(line, file=sys.stderr, flush=True)
 
 
 def parser():

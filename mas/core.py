@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 import time
@@ -40,6 +41,11 @@ su --login sandbox -c 'sudo -n /usr/bin/true'
 
 class Error(RuntimeError):
     """An actionable operation failure."""
+
+
+def read_output(stream):
+    # pread leaves the shared file offset unchanged while the child is writing.
+    return os.pread(stream.fileno(), os.fstat(stream.fileno()).st_size, 0).decode("utf-8", errors="replace")
 
 
 def confirm(message, ask=input):
@@ -89,6 +95,8 @@ class LXD:
             raise Error(t('lxd_query_timeout')) from exc
         if result.returncode:
             raise Error(result.stderr.strip() or result.stdout.strip() or t('lxd_failed'))
+        if result.stderr:
+            print(result.stderr, file=sys.stderr, end="")
         return result.stdout
 
     def instances(self, timeout=None):
@@ -144,19 +152,24 @@ class Manager:
         last = "not yet observed"
         process = None
         outcome = "error"
+        native_stdout, native_stderr = "", ""
+        native_failure = False
         try:
-            with tempfile.TemporaryFile(mode="w+t") as output:
+            with tempfile.TemporaryFile(mode="w+t") as output, tempfile.TemporaryFile(mode="w+t") as errors:
                 process = subprocess.Popen(self.lxd.prefix + args, stdin=subprocess.DEVNULL,
-                                           stdout=output, stderr=output, text=True)
+                                           stdout=output, stderr=errors, text=True)
                 while True:
+                    native_stdout, native_stderr = read_output(output), read_output(errors)
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
                         raise Error(t("operation_timeout", action=action, target=target, last=state(last)))
                     tick = time.monotonic()
                     code = process.poll()
+                    if code is not None:
+                        native_stdout, native_stderr = read_output(output), read_output(errors)
                     if code is not None and code != 0:
-                        output.seek(0)
-                        raise Error(output.read().strip() or t("lxd_exit", code=code))
+                        native_failure = True
+                        raise Error((native_stdout + native_stderr).strip() or t("lxd_exit", code=code))
                     instance = self.find(target, remaining)
                     last = instance["status"] if instance else "Absent"
                     if instance and last == "Error":
@@ -175,7 +188,8 @@ class Manager:
                 process.kill()
                 process.wait()
             self.report(dict(action=action, target=target, status=outcome,
-                             elapsed=round(time.monotonic() - start, 3), observation=last))
+                             elapsed=round(time.monotonic() - start, 3), observation=last,
+                             native_stdout=native_stdout, native_stderr=native_stderr, native_failure=native_failure))
 
     def new(self, target, image=None):
         self.absent(target)

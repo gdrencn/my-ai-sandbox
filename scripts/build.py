@@ -17,15 +17,23 @@ def main():
     DIST.mkdir(exist_ok=True)
     messages = json.loads((ROOT / "mas/locales/en_us.json").read_text())
     installer = (ROOT / "scripts/install.template.sh").read_text().replace(
-        "@LANGUAGE_PROMPT@", shlex.quote(messages["choose_language"].format(current="en_us")))
+        "@LANGUAGE_PROMPT@", shlex.quote(messages["choose_language"].format(current="zh_cn")))
     (ROOT / "install.sh").write_text(installer)
 
-    for filename, entry, tests in (("mas.pyz", "mas.cli:main", False),
-                                   ("mas-test.pyz", "mas.testing:main", True)):
+    for filename, entry in (("mas.pyz", "mas.cli:main"),
+                            ("mas-install.pyz", "mas.install:main"),
+                            ("mas-test.pyz", "mas.testing:main")):
         with tempfile.TemporaryDirectory() as directory:
             stage = Path(directory)
-            shutil.copytree(ROOT / "mas", stage / "mas", ignore=shutil.ignore_patterns("__pycache__"))
-            if tests:
+            excluded = ["__pycache__"]
+            if filename != "mas-test.pyz":
+                excluded += ["testing.py", "test_output.py", "test"]
+            if filename == "mas-install.pyz":
+                excluded += ["cli.py", "tui.py", "__main__.py"]
+            if filename == "mas.pyz":
+                excluded += ["install.py"]
+            shutil.copytree(ROOT / "mas", stage / "mas", ignore=shutil.ignore_patterns(*excluded))
+            if filename == "mas-test.pyz":
                 shutil.copyfile(ROOT / "bootstrap.py", stage / "bootstrap.py")
                 shutil.copytree(ROOT / "tests", stage / "tests", ignore=shutil.ignore_patterns("__pycache__"))
             module, function = entry.split(":")
@@ -33,7 +41,7 @@ def main():
             zipapp.create_archive(stage, DIST / filename, interpreter="/usr/bin/env python3", compressed=True)
     for name in ("bootstrap.py", "install.sh"):
         shutil.copyfile(ROOT / name, DIST / name)
-    names = ("mas.pyz", "mas-test.pyz", "bootstrap.py", "install.sh")
+    names = ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh")
     (DIST / "SHA256SUMS").write_text("".join(
         hashlib.sha256((DIST / name).read_bytes()).hexdigest() + "  " + name + "\n" for name in names))
     print("Built " + ", ".join(names))

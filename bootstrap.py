@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+import subprocess
 import urllib.request
 
 from mas import config
@@ -61,18 +62,29 @@ def main():
         checksums[name.lstrip("*")] = digest
     with tempfile.TemporaryDirectory(prefix="mas-install-") as directory:
         paths = {}
-        for name in ("mas.pyz", "mas-test.pyz"):
+        legacy = "mas-install.pyz" not in assets
+        names = ["mas.pyz"] if legacy else ["mas.pyz", "mas-install.pyz"]
+        if args.test:
+            names.append("mas-test.pyz")
+        for name in names:
             data = download(assets[name])
             if hashlib.sha256(data).hexdigest() != checksums[name]:
                 raise RuntimeError(t("checksum_error", name=name))
             paths[name] = Path(directory) / name
             paths[name].write_bytes(data)
-        for module in list(sys.modules):
-            if module == "mas" or module.startswith("mas."):
-                del sys.modules[module]
-        sys.path.insert(0, str(paths["mas.pyz"]))
-        from mas.install import install
-        return install(paths["mas.pyz"], paths["mas-test.pyz"], args.test, test_args)
+        if legacy:
+            # Historical numeric releases predate the standalone installer.
+            code = ("import sys;sys.path.insert(0," + repr(str(paths["mas.pyz"])) + ");"
+                    "from mas.install import install;raise SystemExit(install(" + repr(str(paths["mas.pyz"])) + "," +
+                    repr(str(paths["mas-test.pyz"]) if args.test else None) + "," + repr(args.test) + "," + repr(test_args) + "))")
+            command = [sys.executable, "-c", code]
+        elif args.test:
+            command = [sys.executable, str(paths["mas-test.pyz"]), "--install", str(paths["mas-install.pyz"]),
+                       "--product", str(paths["mas.pyz"]), *test_args]
+        else:
+            command = [sys.executable, str(paths["mas-install.pyz"]), "--product", str(paths["mas.pyz"])]
+        return subprocess.call(command)
+
 
 
 if __name__ == "__main__":

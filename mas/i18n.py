@@ -11,7 +11,12 @@ from . import config
 
 @lru_cache(maxsize=2)
 def catalog(language):
-    return json.loads(files("mas.locales").joinpath(language + ".json").read_text(encoding="utf-8"))
+    root = files("mas.locales")
+    messages = json.loads(root.joinpath(language + ".json").read_text(encoding="utf-8"))
+    optional = root.joinpath("test").joinpath(language + ".json")
+    if optional.is_file():
+        messages.update(json.loads(optional.read_text(encoding="utf-8")))
+    return messages
 
 
 def t(message_id, *, locale=None, **values):

@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: version 0.1.3 is publicly released. Final artifact tests and the public one-line installation/test entry passed on the current WSL host. See Stage 6. The stages below describe development checkpoints; the version phase remains 1.
+Current result: version 0.1.4 has passed final artifact validation on the current WSL host. Public publication and entry checks remain. See Stage 7. Development checkpoint numbers below are not version phase numbers; the version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -92,3 +92,19 @@ Verification limits: live fresh-system installation, native Ubuntu and non-x86_6
 Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.3 with product, matching tester, bootstrap, shell installer, SHA256SUMS and WSL_REPORT.json. Executed the original public curl/bash --test entry in a real terminal, selected zh_cn at its initial prompt, and confirmed it resolved v0.1.3. All 14 integration groups, including 28 unit tests, passed with no cleanup errors. The installed product and tester exactly match the released artifact hashes; the temporary test project was removed. Evidence: validation/V0_1_3_PUBLIC_REPORT.json. Test language selection used isolated preferences and did not overwrite the user's configuration. This was an existing-LXD host and needed no host sudo.
 
 The 0.1.3 batch is complete within the recorded verification limits. Documentation-only commits in this batch do not increment the submission-batch version.
+
+
+## Stage 7 — version 0.1.4, separated distribution and concise testing
+
+Verified against the batch 0.1.4 requirements before this update:
+
+- configure_path in mas/install.py writes a guarded, idempotent PATH block using the actual installation directory. Bash login and interactive startup files are covered; Zsh uses ZDOTDIR when configured; POSIX sh uses .profile. Existing file content and PATH entries are preserved. Tests exercise repeated configuration and a home directory containing spaces. A new real Bash login shell, launched with only /usr/bin:/bin initially in PATH, found ~/.local/bin/mas and reported 0.1.4 without manual export.
+- Distribution now has mas.pyz, mas-install.pyz and mas-test.pyz. The normal entry downloads only product and installer plus bootstrap/verification resources. --test additionally downloads the tester, which invokes the installer, installs its own executable and starts verification. The installer installs only the product and does not invoke tests. Product and installer archives exclude test modules and test-only catalogs; product also excludes the installation module. Archive boundaries and both bootstrap download branches are tested. Historical numeric releases retain their original packaging through a compatibility call to their own installer.
+- Group-refresh continuation imports installation code from the installer archive, not the product. The tester separately refreshes its process groups when necessary. A real child-process continuation using the packaged installer succeeded with the sudo boundary simulated; live privileged setup was not repeated on this already prepared host.
+- First-use language defaults to zh_cn; saved en_us is retained. Shared interface catalogs remain canonical. Test-only translations are separate under mas/locales/test. User-facing test stage names, progress, diagnostic context and summaries use the selected language. English UI fixtures retain original output in detailed logs.
+- Test output refreshes normal progress on one transient terminal line. Stage success summaries, expected-error labels, warnings and failures are permanent. Error progress records are retained. Unknown stderr is retained even on successful exit; native warning/error lines in stdout are retained. Full native stdout/stderr and structured per-second wait events are recorded. Network probe retries retain a localized warning and their native error in the report.
+- Noninteractive output omits normal ticks and cursor-control sequences. Final output includes passed/failed/not-run stage counts, total test duration, cleanup status and report path. Cleanup errors remain visible and cause failure.
+
+Final packaged validation: all 40 unit tests and all 14 integration groups passed, no skipped unit tests and no cleanup errors. The test tool installed through the separate final installer before testing the installed product. Evidence: validation/V0_1_4_REPORT.json; its product hash matches the release product. Final noninteractive logs contain no escape sequences. A preceding real-PTY run verified transient redraw/clear behavior, localized visible progress, stage summaries and a single final summary. Subsequent focused tests verify error-progress retention and network retry diagnostics. Source-only unit discovery marks the archive-boundary check as skipped; the packaged run executes it and passes.
+
+The user-provided 0.1.3 transcript additionally verifies missing-LXD installation, initial sudo authentication, group refresh and all earlier tests on that user's Ubuntu WSL environment. For 0.1.4, native Ubuntu, other CPU architectures and a full live fresh-host reinstall remain unverified; this release preserves the existing system-sudo policy and fresh-install path.

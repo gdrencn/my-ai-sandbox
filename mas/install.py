@@ -8,12 +8,14 @@ from pathlib import Path
 import pwd
 import re
 import shutil
+import shlex
 import subprocess
 import sys
 
 from .core import Error, LXD
 
-from .i18n import t
+from .i18n import t, Parser
+from . import __version__
 
 
 def run(args, privileged=False, capture=False):
@@ -111,33 +113,91 @@ def initialize():
         raise Error(t('nic_missing'))
 
 
-def finish(product, tester=None, run_tests=False, test_args=None):
+def configure_path(home=None, shell=None):
+    """Persist one guarded block in the startup files used by the login shell."""
+    home = Path(home) if home is not None else Path.home()
+    shell = Path(shell or pwd.getpwuid(os.getuid()).pw_shell).name
+    destination = home / ".local/bin"
+    if shell == "bash":
+        login = next((home / name for name in (".bash_profile", ".bash_login", ".profile")
+                      if (home / name).exists()), home / ".profile")
+        files = [login, home / ".bashrc"]
+    elif shell == "zsh":
+        directory = Path(os.environ.get("ZDOTDIR") or home)
+        files = [directory / ".zprofile", directory / ".zshrc"]
+    elif shell in ("sh", "dash"):
+        files = [home / ".profile"]
+    else:
+        raise Error(t("unsupported_shell", shell=shell))
+    begin, end = "# >>> my-ai-sandbox PATH >>>", "# <<< my-ai-sandbox PATH <<<"
+    block = (begin + "\ncase \":${PATH-}:\" in\n    *" + shlex.quote(":" + str(destination) + ":") +
+             "*) ;;\n    *) export PATH=" + shlex.quote(str(destination)) + ':"${PATH-}" ;;\nesac\n' + end + "\n")
+    for path in files:
+        original = path.read_text() if path.exists() else ""
+        pattern = re.escape(begin) + r".*?" + re.escape(end) + r"\n?"
+        updated = re.sub(pattern, lambda _: block, original, flags=re.S) if begin in original else original.rstrip("\n") + "\n\n" + block
+        if updated != original:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(updated)
+    os.environ["PATH"] = str(destination) + os.pathsep + os.environ.get("PATH", "")
+
+
+def install_file(source, destination):
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_name("." + destination.name + ".installing")
+    shutil.copyfile(source, temporary)
+    temporary.chmod(0o755)
+    temporary.replace(destination)
+
+
+def group_refresh_required():
+    if os.geteuid() == 0:
+        return False
+    group = grp.getgrnam("lxd")
+    return group.gr_gid not in os.getgroups() and os.getgid() != group.gr_gid
+
+
+def refreshed_command(command):
+    username = pwd.getpwuid(os.getuid()).pw_name
+    from .config import path
+    # Preserve only the explicit preference location when sudo refreshes groups.
+    preferences = ["XDG_CONFIG_HOME=" + str(path().parent.parent)]
+    if os.environ.get("ZDOTDIR"):
+        preferences.append("ZDOTDIR=" + os.environ["ZDOTDIR"])
+    return ["sudo", "-u", username, "--", "env", *preferences, *command]
+
+
+def finish(product):
     initialize()
-    destination = Path.home() / ".local/bin"
-    destination.mkdir(parents=True, exist_ok=True)
-    for source, name in ((product, "mas"), (tester, "mas-test")):
-        if source:
-            temporary = destination / ("." + name + ".installing")
-            shutil.copyfile(source, temporary)
-            temporary.chmod(0o755)
-            temporary.replace(destination / name)
-    print(t("installed", path=destination / "mas"), flush=True)
-    if str(destination) not in os.environ.get("PATH", "").split(os.pathsep):
-        print(t('add_path'), flush=True)
-    if run_tests:
-        return subprocess.call([sys.executable, str(destination / "mas-test"), *(test_args or [])])
+    destination = Path.home() / ".local/bin/mas"
+    install_file(product, destination)
+    configure_path()
+    print(t("installed", path=destination), flush=True)
+    print(t("path_configured"), flush=True)
     return 0
 
 
-def install(product, tester=None, run_tests=False, test_args=None):
+def install(product):
     if prepare_system():
-        # sudo creates a fresh process with the user's updated supplementary groups.
-        # It does not run the product or tests as root.
-        username = pwd.getpwuid(os.getuid()).pw_name
-        code = ("import os,sys;os.environ['XDG_CONFIG_HOME']=" + repr(str(Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config"))) + ";sys.path.insert(0," + repr(str(product)) + ");"
-                "from mas.install import finish;raise SystemExit(finish(" + repr(str(product)) + "," +
-                repr(str(tester) if tester else None) + "," + repr(run_tests) + "," + repr(test_args) + "))")
-        run(["sudo", "-u", username, "--", sys.executable, "-c", code], privileged=True)
+        code = ("import sys;sys.path.insert(0," + repr(str(Path(__file__).resolve().parent.parent)) + ");"
+                "from mas.install import finish;raise SystemExit(finish(" + repr(str(product)) + "))")
+        run(refreshed_command([sys.executable, "-c", code]), privileged=True)
         print(t('new_terminal'))
         return 0
-    return finish(product, tester, run_tests, test_args)
+    return finish(product)
+
+
+def main(argv=None):
+    parser = Parser(description=t("help_installer"))
+    parser.add_argument("--version", action="version", version=__version__, help=t("help_version"))
+    parser.add_argument("--product", type=Path, required=True, help=t("help_install_product"))
+    args = parser.parse_args(argv)
+    try:
+        version = subprocess.check_output([sys.executable, str(args.product), "--version"], text=True, timeout=600).strip()
+        if version != __version__:
+            raise Error(t("product_mismatch"))
+        return install(args.product.resolve())
+    except (Error, OSError, subprocess.SubprocessError) as exc:
+        print(t("install_failed", error=exc), file=sys.stderr)
+        return 1

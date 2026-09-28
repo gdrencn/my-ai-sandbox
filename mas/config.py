@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 
 LANGUAGES = ("en_us", "zh_cn")
-DEFAULT_LANGUAGE = "en_us"
+DEFAULT_LANGUAGE = "zh_cn"
 
 
 class ConfigError(ValueError):

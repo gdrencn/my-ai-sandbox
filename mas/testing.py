@@ -4,6 +4,7 @@ import contextlib
 import errno
 import fcntl
 import hashlib
+import io
 import json
 
 import os
@@ -25,19 +26,23 @@ import uuid
 import zipfile
 
 from . import __version__, config
-from .cli import progress
+from .test_output import Output
 from .core import Error, LXD, Manager, host_image
 
-from .i18n import t, Parser
+from .i18n import t, Parser, catalog, progress_text
 
+
+PRODUCT_UNDER_TEST = None
 
 def random_target():
     return "test-" + uuid.uuid4().hex
 
 
 class Terminal:
-    def __init__(self, command, timeout, transcript):
+    def __init__(self, command, timeout, transcript, on_wait=None):
         self.timeout = timeout
+        self.on_wait = on_wait
+        self.started = self.last_update = time.monotonic()
         self.buffer = b""
         self.cursor = 0
         self.status = None
@@ -49,6 +54,10 @@ class Terminal:
         fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack("HHHH", 40, 200, 0, 0))
 
     def read(self):
+        now = time.monotonic()
+        if self.on_wait and now - self.last_update >= 1:
+            self.on_wait(now - self.started)
+            self.last_update = now
         if select.select([self.fd], [], [], 0.1)[0]:
             try:
                 chunk = os.read(self.fd, 65536)
@@ -102,6 +111,9 @@ class Suite:
              "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui"]
 
     def __init__(self, report_dir, timeout, product=None):
+        self.output = Output()
+        self.started = time.monotonic()
+        self.language = config.language()
         self.directory = report_dir
         self.product = product.resolve() if product else None
         if self.product:
@@ -113,7 +125,7 @@ class Suite:
         self.workspace = tempfile.TemporaryDirectory(prefix="backups-", dir=report_dir)
         self.config_home = Path(self.workspace.name) / "config"
         with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
-            config.set_value("language", "en_us")
+            config.set_value("language", self.language)
         self.timeout = timeout
         self.project = random_target()
         self.host = LXD(timeout=timeout)
@@ -127,20 +139,24 @@ class Suite:
 
     def report(self, event):
         self.events.append(event)
-        progress(event)
+        self.output.progress(progress_text(event))
+        self.output.diagnostics(event.get("native_stdout", ""), event.get("native_stderr", ""))
 
     @contextlib.contextmanager
     def case(self, name):
         start = time.monotonic()
-        print(t("test_case", name=name), flush=True)
+        self.current_case = name
+        title = t("case_" + name)
+        self.output.progress(t("working", name=title, elapsed=0))
         try:
             yield
         except BaseException as exc:
             self.results[name] = {"status": "failed", "elapsed": time.monotonic() - start, "error": str(exc)}
+            self.output.keep(t("stage_failed", name=title, elapsed=time.monotonic()-start, error=exc))
             raise
         else:
             self.results[name] = {"status": "passed", "elapsed": time.monotonic() - start}
-            print(t("test_pass", name=name, elapsed=self.results[name]["elapsed"]), flush=True)
+            self.output.keep(t("test_pass", name=title, elapsed=self.results[name]["elapsed"]))
 
     def target(self):
         name = random_target()
@@ -148,34 +164,79 @@ class Suite:
         return name
 
     def command(self, args):
-        # Exercise the actual CLI with an injected isolated manager. Product CLI
-        # never accepts a remote/project override or a test environment variable.
-        source = ("import os,sys;os.environ['XDG_CONFIG_HOME']=" + repr(str(self.config_home)) + ";sys.path.insert(0," + repr(str(self.product) if self.product else sys.path[0]) + ");"
+        # The injected Manager scopes the actual product to this test project.
+        self.event_path = self.directory / f"events-{self.counter}.jsonl"
+        source = ("import os,sys,json;os.environ['XDG_CONFIG_HOME']=" + repr(str(self.config_home)) + ";"
+                  "sys.path.insert(0," + repr(str(self.product) if self.product else sys.path[0]) + ");"
                   "from mas.cli import main,progress;from mas.core import Manager,LXD;"
+                  "events=open(" + repr(str(self.event_path)) + ", 'a');"
+                  "report=lambda event:(events.write(json.dumps(event)+'\\n'),events.flush(),progress(event));"
                   "raise SystemExit(main(manager=Manager(LXD(project=" + repr(self.project) +
-                  ",timeout=" + str(self.timeout) + "),report=progress)))")
+                  ",timeout=" + str(self.timeout) + "),report=report)))")
         return [sys.executable, "-c", source, *args]
+
+    def read_events(self, path, diagnostics=False):
+        if path.exists():
+            events = [json.loads(line) for line in path.read_text().splitlines() if line]
+            self.events.extend(events)
+            if diagnostics:
+                for event in events:
+                    self.output.diagnostics(event.get("native_stdout", ""), event.get("native_stderr", ""))
 
     def cli(self, *args, answer=None, code=0):
         start = time.monotonic()
-        result = subprocess.run(self.command(list(args)), input=answer or "", capture_output=True,
-                                text=True, timeout=self.timeout * 3)
         self.counter += 1
-        (self.directory / f"cli-{self.counter}.txt").write_text(result.stdout + result.stderr)
-        print(result.stderr, end="", flush=True)
-        print(t("test_cli", command=" ".join(args), elapsed=time.monotonic()-start), flush=True)
-        if result.returncode != code:
-            raise AssertionError(t("cli_failed", args=args, expected=code, actual=result.returncode, stdout=result.stdout, stderr=result.stderr))
-        return result.stdout
+        command = self.command(list(args))
+        event_path = self.event_path
+        stdout_path = self.directory / f"cli-{self.counter}.stdout.log"
+        stderr_path = self.directory / f"cli-{self.counter}.stderr.log"
+        action = catalog(self.language).get("action_" + args[0], args[0])
+        with stdout_path.open("w+") as stdout, stderr_path.open("w+") as stderr:
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=stdout, stderr=stderr, text=True)
+            try:
+                try:
+                    process.stdin.write(answer or "")
+                    process.stdin.close()
+                except BrokenPipeError:
+                    pass
+                while process.poll() is None:
+                    elapsed = time.monotonic() - start
+                    if elapsed >= self.timeout * 3:
+                        raise Error(t("wait_timeout", label=" ".join(args), timeout=self.timeout*3))
+                    self.output.progress(t("working", name=action + " " + " ".join(args[1:]), elapsed=elapsed))
+                    time.sleep(1)
+            finally:
+                if process.poll() is None:
+                    process.kill()
+                process.wait()
+                self.read_events(event_path)
+                stdout.seek(0)
+                stderr.seek(0)
+                out, err = stdout.read(), stderr.read()
+                if process.returncode != 0 and code != 0:
+                    self.output.keep(t("expected_error", command=" ".join(args)))
+                self.output.diagnostics(out, err, failed=process.returncode != 0)
+        if process.returncode != code:
+            raise AssertionError(t("cli_failed", args=args, expected=code, actual=process.returncode, stdout=out, stderr=err))
+        return out
 
     @contextlib.contextmanager
     def terminal(self, args):
         self.counter += 1
-        terminal = Terminal(self.command(args), self.timeout, self.directory / f"terminal-{self.counter}.log")
+        # English UI fixture expectations are isolated from user-facing output.
+        with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
+            previous = config.get("language")
+            config.set_value("language", "en_us")
+        terminal = Terminal(self.command(args), self.timeout, self.directory / f"terminal-{self.counter}.log",
+                            on_wait=lambda elapsed: self.output.progress(t("working", name=t("case_" + self.current_case), elapsed=elapsed)))
+        event_path = self.event_path
         try:
             yield terminal
         finally:
             terminal.close()
+            self.read_events(event_path, diagnostics=True)
+            with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
+                config.set_value("language", previous)
 
     def wait(self, label, probe, terminal=None):
         start = time.monotonic()
@@ -186,9 +247,10 @@ class Suite:
                     raise AssertionError(t("pty_unexpected", buffer=terminal.buffer[-2000:]))
             if probe():
                 elapsed = time.monotonic() - start
-                print(t("test_wait", label=label, elapsed=elapsed), flush=True)
+                self.output.progress(t("test_wait", label=t("wait_" + label), elapsed=elapsed))
                 self.events.append(dict(action="test-wait", target=label, status="ok", elapsed=elapsed))
                 return
+            self.output.progress(t("working", name=t("wait_" + label), elapsed=time.monotonic()-start))
             time.sleep(1)
         raise AssertionError(t("wait_timeout", label=label, timeout=self.timeout))
 
@@ -209,15 +271,23 @@ class Suite:
     def run(self):
         target, imported, external = self.target(), self.target(), self.target()
         with self.case("unit"):
-            from tests import test_core, test_i18n
+            from tests import test_core, test_i18n, test_distribution
             units = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module)
-                                       for module in (test_core, test_i18n))
-            result = unittest.TextTestRunner(verbosity=2).run(units)
+                                       for module in (test_core, test_i18n, test_distribution))
+            with (self.directory / "unit.log").open("w+") as log:
+                with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
+                    result = unittest.TextTestRunner(stream=log, verbosity=2).run(units)
+                log.seek(0)
+                details = log.read()
+            if not result.wasSuccessful():
+                self.output.keep(details)
+            else:
+                self.output.diagnostics(details, "")
             assert result.wasSuccessful(), t("unit_failed")
-        self.host.command(["project", "create", "local:" + self.project,
-                           "-c", "features.images=false", "-c", "features.profiles=false"])
-        self.created_project = True
         with self.case("new-default"):
+            self.host.command(["project", "create", "local:" + self.project,
+                               "-c", "features.images=false", "-c", "features.profiles=false"])
+            self.created_project = True
             self.cli("new", target)
             assert self.state(target, "Stopped")
             assert self.manager.info(target)["config"]["image.version"] == host_image().split(":")[1]
@@ -293,11 +363,13 @@ class Suite:
             assert self.state(imported, "Absent")
             self.cli("delete", target, answer="y\n")
         with self.case("language-config"):
-            assert self.cli("config", "get", "language").strip() == "en_us"
+            assert self.cli("config", "get", "language").strip() == self.language
             self.cli("config", "set", "language", "zh_cn")
             assert "管理" in self.cli("--help")
             assert self.cli("config", "get", "language").strip() == "zh_cn"
             self.cli("config", "set", "language", "en_us")
+            assert "Manage your" in self.cli("--help")
+            self.cli("config", "set", "language", self.language)
         with self.case("tui"):
             self.tui()
 
@@ -305,7 +377,9 @@ class Suite:
         try:
             self.exec(target, "python3 -c \"import urllib.request; urllib.request.urlopen('https://ubuntu.com',timeout=30).read(1)\"")
             return True
-        except Error:
+        except Error as exc:
+            self.events.append(dict(action="network-probe", target=target, status="warning", error=str(exc)))
+            self.output.keep(t("network_retry", error=exc))
             return False
 
     def tui(self):
@@ -393,6 +467,7 @@ class Suite:
             terminal.finish()
 
     def cleanup(self):
+        self.output.progress(t("working", name=t("cleanup_stage"), elapsed=0))
         try:
             self.workspace.cleanup()
         except OSError as exc:
@@ -423,19 +498,50 @@ class Suite:
             "os_release": Path("/etc/os-release").read_text(), "python": sys.version,
             "project": self.project, "targets": self.targets, "cases": self.results,
             "events": self.events, "cleanup_errors": self.cleanup_errors,
+            "elapsed": time.monotonic() - self.started,
         }, indent=2))
+
+
+def install_and_test(args):
+    """Only the tester orchestrates installation followed by verification."""
+    from .install import install_file, group_refresh_required, refreshed_command
+    try:
+        version = subprocess.check_output([sys.executable, str(args.install), "--version"], text=True, timeout=600).strip()
+        if version != __version__:
+            raise Error(t("installer_mismatch"))
+        code = subprocess.call([sys.executable, str(args.install), "--product", str(args.product)])
+        if code:
+            return code
+        tester = Path.home() / ".local/bin/mas-test"
+        install_file(Path(sys.argv[0]).resolve(), tester)
+        print(t("install_stage"), flush=True)
+        command = [sys.executable, str(tester), "--product", str(Path.home() / ".local/bin/mas"),
+                   "--timeout", str(args.timeout), "--output", str(args.output.absolute())]
+        if group_refresh_required():
+            command = refreshed_command(command)
+        return subprocess.call(command)
+    except (Error, OSError, subprocess.SubprocessError) as exc:
+        print(t("install_failed", error=exc), file=sys.stderr)
+        return 1
 
 
 def main(argv=None):
     parser = Parser(description=t('help_test'))
     parser.add_argument("--output", type=Path, default=Path("test-results") / time.strftime("%Y%m%d-%H%M%S"), help=t("help_output"))
     parser.add_argument("--timeout", type=int, default=600, help=t("help_timeout"))
+    parser.add_argument("--install", type=Path, help=t("help_test_install"))
     parser.add_argument("--product", type=Path, help=t('help_product'))
     args = parser.parse_args(argv)
+    global PRODUCT_UNDER_TEST
+    if args.install:
+        if args.product is None:
+            parser.error(t("product_required"))
+        return install_and_test(args)
     if args.product is None and zipfile.is_zipfile(sys.argv[0]):
         args.product = Path.home() / ".local/bin/mas"
         if not args.product.is_file():
             parser.error(t('product_required'))
+    PRODUCT_UNDER_TEST = args.product
     try:
         suite = Suite(args.output.absolute(), args.timeout, args.product)
     except (Error, OSError) as exc:
@@ -446,11 +552,24 @@ def main(argv=None):
         suite.run()
         success = True
     except (Exception, KeyboardInterrupt):
+        suite.output.clear()
         traceback.print_exc()
     finally:
         suite.cleanup()
-        suite.save()
-    print(t("report", path=suite.directory / "report.json"))
+        try:
+            suite.save()
+        except OSError as exc:
+            success = False
+            suite.output.keep(t("error", error=exc))
+    suite.output.clear()
+    for error in suite.cleanup_errors:
+        suite.output.keep(t("cleanup_failed", error=error))
+    if not suite.cleanup_errors:
+        suite.output.keep(t("cleanup_ok"))
+    counts = {status: sum(item["status"] == status for item in suite.results.values())
+              for status in ("passed", "failed", "not_run")}
+    suite.output.keep(t("final_summary", **counts, elapsed=time.monotonic()-suite.started))
+    suite.output.keep(t("report", path=suite.directory / "report.json"))
     return 0 if success and not suite.cleanup_errors else 1
 
 
