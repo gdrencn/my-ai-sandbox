@@ -12,7 +12,7 @@ This maps the checks present in batch 0.1.10 to requirements and implementation.
 
 | Requirement / code | Real product coverage | Focused failure / unit coverage |
 | --- | --- | --- |
-| Target validation, local scope and ownership | missing targets; remote/snapshot names; all operations reject unmarked fixture; native unmarked instance remains running under stop-all | instance-local marker, VM exclusion, profile-only marker exclusion, sorted managed list, invalid JSON/schema and query errors |
+| Target validation, local scope and ownership | missing targets; remote/snapshot names; start/stop/delete/info/enter/export reject unmarked fixture; native unmarked instance remains running under stop-all | instance-local marker, VM exclusion, profile-only marker exclusion, sorted managed list, invalid JSON/schema and query errors |
 | new | matching host image, explicit override, duplicate target, unavailable image | host-release selection, collisions with unmarked instances, command/state/marker wait guarantees |
 | list / info | managed listing, stopped state, unmarked/missing targets rejected, complete information in menu history | sorted filtering; malformed/failed query must not establish absence |
 | start | running state, sandbox identity, passwordless sudo, outbound HTTPS, repeated start, existing UID/home/file/shell preservation | Running skips native start but still prepares user; unsupported state rejection; failed startup blocks shell entry |

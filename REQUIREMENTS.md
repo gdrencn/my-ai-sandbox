@@ -206,6 +206,8 @@ Deletion must refuse while that user has managed mount/residual records for the 
 
 ## 17. Batch 0.1.10 — post-0.1.9 audit and reliability completion
 
+Status: implemented, verified and published as test v0.1.10. Both fixed public entry modes were verified; measured results and remaining environment limits are in IMPLEMENTED.md and TEST_COVERAGE.md.
+
 Audit all current documentation and source against the shipped 0.1.9 behavior. Preserve native LXD/SSHFS permission behavior and the existing scope; do not add GPU/resource policy, custom SFTP, package presets or stable promotion. Finish with versioned test publication and public-entry verification, not merely local changes.
 
 - Serialize same-user filesystem mount creation and container lifecycle transitions/deletion with the same record lock; recheck ownership/state after acquiring the lock so a concurrent mount cannot slip between a precondition and native execution. External LXD operations remain outside this lock's scope.
