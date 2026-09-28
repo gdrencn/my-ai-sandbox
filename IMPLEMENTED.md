@@ -182,3 +182,10 @@ Compared current requirements, historical implementation records and the actual 
 Final packaged validation: 77 tests across six discovered modules passed, zero failures/errors/skips; all 17 real LXD groups passed after installation through the separate installer. The report contains all 77 test identifiers. Cleanup had no errors. The final noninteractive log contains no terminal-control escapes. Python compilation, shell syntax and git diff checks passed. Evidence: validation/V0_1_7_REPORT.json; the recorded product hash matches the release asset.
 
 Verification remains current Ubuntu WSL with existing LXD. Fault-injection branches are explicitly distinguished from live failures in TEST_COVERAGE.md. Native Ubuntu, other CPU architectures and a fresh privileged host reinstall were not performed. No third-party dependency was added. Public-entry verification follows publication.
+
+
+### 0.1.7 publication and public entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.7 with product, separate installer/tester, bootstrap, shell entry, SHA256SUMS and WSL_REPORT.json. Public normal installation in a real terminal selected Chinese by default, resolved 0.1.7 and left the existing tester modification time unchanged. Public --test installation then passed all 77 discovered unit tests and all 17 real-product integration groups. The report records zero failures/errors/skips and all test identifiers; cleanup had no errors. Both installed executable hashes match the release assets. Public transcripts contain no alternate-screen or screen/scrollback-clear sequences. Both validation projects were confirmed removed, and temporary preferences were removed without changing user configuration.
+
+Evidence: validation/V0_1_7_PUBLIC_REPORT.json. The audit and test-improvement batch is complete within the coverage limits in TEST_COVERAGE.md. This documentation-only record remains part of batch 0.1.7.
