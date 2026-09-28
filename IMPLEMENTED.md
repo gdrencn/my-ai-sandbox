@@ -205,3 +205,12 @@ Final packaged validation: 82 unit tests across seven modules passed with no fai
 Terminal behavior boundary: commands retain normal terminal input modes. If a user types ahead during a wait, the terminal itself can echo keys/newlines and leave a waiting line in history. The real menu suite deliberately queues some navigation keys before operations complete; those echoed-input rows are distinct from periodic progress output. Focused PTY verification with input at prompts confirms that normal waiting rows disappear while results, warnings, errors and menus remain.
 
 Validation used the current Ubuntu WSL with existing LXD. No fresh-host installation, native Ubuntu run, public-entry validation or stable publication was performed in this batch. Resource/security settings and release-channel behavior were not changed.
+
+
+### 0.1.8 test publication and public-entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.8 as a test prerelease with the validated product, separate installer and tester, bootstrap, shell entry, SHA256SUMS and WSL_REPORT.json. Source commit: b4a802e9b70491463901c9cbc84d53297e2e68ae. Requirements now explicitly make test publication and fixed-entry verification mandatory after each completed, validated development batch, without renewed approval. Stable promotion remains separate.
+
+Ran the public curl/bash entry in actual PTYs with isolated fresh user preferences: both normal installation and --test resolved v0.1.8, with Chinese selected from the initial language menu. Normal installation preserved the existing tester modification time. The public --test flow installed the matching artifacts and passed all 82 packaged unit tests and all 17 real LXD integration groups, with no skipped unit tests or cleanup errors. Installed product/tester SHA-256 values match the release assets; the isolated project was confirmed removed. Public transcripts contain no alternate-screen, screen-clear or scrollback-clear sequences. Temporary preferences were removed without overwriting the user's saved configuration.
+
+Evidence: validation/V0_1_8_PUBLIC_REPORT.json. Validation remains current Ubuntu WSL with existing LXD; native Ubuntu and fresh privileged installation were not rerun. Filesystem-mount commands in section 16 of REQUIREMENTS.md remain unimplemented and are not part of this release. This publication record completes the same 0.1.8 batch; it does not increment the version.
