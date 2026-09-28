@@ -50,9 +50,11 @@ class LanguageTests(unittest.TestCase):
 
     def test_install_language_prompt_uses_saved_default(self):
         config.set_value("language", "zh_cn")
-        ask = Mock(return_value="")
-        self.assertEqual(choose_language(ask=ask), "zh_cn")
-        self.assertIn("[zh_cn]", ask.call_args.args[0])
+        ui = Mock()
+        ui.choose.side_effect = lambda title, options, default, radio: default
+        with patch('mas.menu.interactive', side_effect=lambda callback: callback(ui)):
+            self.assertEqual(choose_language(), "zh_cn")
+        self.assertEqual(ui.choose.call_args.kwargs['default'], 'zh_cn')
         self.assertEqual(choose_language("en_us"), "en_us")
 
     def test_broken_config_is_not_overwritten(self):
@@ -109,8 +111,8 @@ class LanguageTests(unittest.TestCase):
                   "from mas.i18n import choose_language;print(choose_language())")
         terminal = Terminal([sys.executable, "-c", source], 300, Path(os.environ["XDG_CONFIG_HOME"]) / "terminal.log")
         try:
-            terminal.expect("Language / 语言:")
-            terminal.send("2\n")
+            terminal.expect("English (en_us)")
+            terminal.send("\x1b[A\n")
             terminal.expect("zh_cn\r\n")
             terminal.finish()
             self.assertEqual(config.get("language"), "zh_cn")

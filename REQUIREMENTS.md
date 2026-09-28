@@ -15,11 +15,11 @@ Use LXD's existing functionality instead of reimplementing it. Each basic operat
 | `mas start TARGET` | Start one managed container. |
 | `mas stop TARGET` | Stop one managed container. |
 | `mas stop --all` | Stop all managed containers only; no TARGET. Reuse the shared stop function. |
-| `mas delete TARGET` | Ask for confirmation, then delete a stopped managed container only. |
+| `mas delete TARGET [--yes | --no]` | Ask for confirmation, then delete a stopped managed container only. |
 | `mas info TARGET` | Show managed container information and state. |
 | `mas import TARGET FILE` | Import into an explicitly named, nonexistent TARGET. Never overwrite any existing instance. Verify STOPPED afterwards. |
-| `mas export TARGET FILE` | Export a stopped managed container only. If FILE exists, ask whether to overwrite; default no, y/yes allows overwrite. |
-| `mas enter TARGET` | Start through the shared start function if stopped, then open a terminal using native LXD execution. |
+| `mas export TARGET FILE [--yes | --no]` | Export a stopped managed container only. If FILE exists, ask whether to overwrite; default No; selecting Yes allows overwrite. |
+| `mas enter TARGET [--yes | --no]` | Start through the shared start function if stopped, then open a terminal using native LXD execution. |
 | `mas config [get language / set language en_us / set language zh_cn]` | Read or update shared user settings without requiring LXD. |
 | `mas` | Open the TUI directly when no subcommand is supplied. No `mas tui` command. |
 
@@ -29,7 +29,7 @@ TARGET is a local container name, not a remote, project, snapshot or VM selector
 
 Image selection is confirmed: `mas new TARGET` requires no image argument and selects `ubuntu:<host Ubuntu VERSION_ID>`. Under WSL, use the Ubuntu release inside WSL, not the Windows version. For example, Ubuntu 26.04 selects `ubuntu:26.04`. An explicit `--image IMAGE` overrides this default. If the matching image is unavailable, report an error rather than silently falling back to another release. CLI and TUI use the same shared image-selection logic.
 
-Import and export take positional FILE arguments. Both CLI and TUI require confirmation before deleting a container. Confirmation defaults to no; only y/yes authorizes deletion or export overwrite. EOF declines confirmation. Prompts are implemented once with CLI and TUI supplying their input mechanisms.
+Import and export take positional FILE arguments. Both CLI and TUI require confirmation before deleting a container. Confirmation defaults to No; selecting Yes or passing --yes authorizes deletion or export overwrite. --no or cancellation declines confirmation. CLI and TUI share the confirmation menu. Noninteractive input without explicit consent declines.
 
 Enter the container as its default user, named `sandbox`, rather than root. Use the user's configured login shell (Bash for newly provisioned users). Provisioning this default user is an explicit exception to the original standard-container-only scope. The sandbox user has passwordless sudo, including sudo -i; do not set an empty root account password. Prepare and verify the user in the shared start function after starting the container; this preserves create as a stopped-container operation. Existing users are retained. Install sudo inside an Ubuntu container if missing, as required by the explicitly requested sudo capability.
 
@@ -71,7 +71,7 @@ Cover new/list/start/stop/delete/info/import/export, default host-matching image
 
 ## 8. GitHub and releases
 
-Publish to the public my-ai-sandbox repository after current WSL checks pass. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.4. Product, installer and tester share that version, with Git tag v0.1.4. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
+Publish to the public my-ai-sandbox repository after current WSL checks pass. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.5. Product, installer and tester share that version, with Git tag v0.1.5. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
 
 ## 8.1. Language and user configuration
 
@@ -101,3 +101,16 @@ No GPU passthrough, host directory sharing management, resource whitelist, model
 5. Always provide a final test summary with passed, failed and unexecuted stage counts, total elapsed time, cleanup outcome and report path when the suite starts. Cleanup failures must be printed and cause nonzero exit. Test interruption and failures must clear transient progress. Verify artifact separation, orchestration order, shell PATH persistence/idempotency, language defaults and both terminal/nonterminal output behavior. Run the existing container integration coverage on the final artifacts before publication.
 
 User-provided 0.1.3 logs show successful automatic installation on an Ubuntu WSL environment initially without LXD, followed by all 28 unit tests and 14 integration groups passing. This supplements the earlier existing-host validation; it does not establish native Ubuntu coverage.
+
+
+## 12. Batch 0.1.5 — shared interactive UI specification
+
+- Both TUI pages and interactive CLI choices use shared standard-library menu components, input decoding and selection rules. Options occupy separate left-aligned rows, with a visible focus marker and highlight. Instructions occupy their own row. Do not introduce third-party dependencies.
+- TUI main menu separates Container management, Settings and Exit. Container management provides Container list, New, Import, Stop all and Back. Selecting a container opens Info, Start, Enter, Stop, Export, Delete and Back. Settings provides Language and Back. All nine container operations retain their shared Manager implementations and ownership protections.
+- Up/Down moves focus; Enter/Right activates a menu item; Escape/Left returns to the previous page. Support both normal (CSI) and application (SS3) arrow-key sequences in real terminals. Focus and viewport remain valid after list changes or terminal resize. Empty lists remain navigable.
+- Single-choice prompts use one option per row and default selection. First-install language defaults to the Chinese row; saved language selects its corresponding row. Deletion, export overwrite and stop-after-exit prompts default to No. The same confirmation policy applies in CLI and TUI. Cancellation never authorizes an action.
+- Shared menu primitives also support multiple choices: arrows move focus, Space toggles a checkmark, Enter submits; focus and checked state are distinct. No new product setting or container bulk action is introduced solely to expose this primitive.
+- Noninteractive operations use explicit arguments, not keyboard menus. --language supplies installation language; confirmation-capable CLI commands support mutually exclusive --yes / --no. For enter these govern stopping after the terminal exits. With no explicit consent and no interactive input, confirmation is declined. Legacy piped y/n is not a confirmation interface.
+- The missing-Python bootstrap uses Bash built-ins for its initial language menu, with labels generated from the same catalogs and the same selection rules. After Python is available, installation, CLI and TUI use the shared Python menu implementation.
+- Text fields for TARGET, image and paths remain editable text input, on their own pages with clear prompts and cancellation. Container shell entry suspends the TUI and restores the previous page after the shared exit handler. Container information supports scrolling and Back.
+- Verification uses real PTYs and sends actual arrow sequences, Enter, Space and Escape, rather than relying only on former letter shortcuts. Cover both arrow encodings, initial focus, single/multiple selection, cancellation, CLI confirmations, main/submenu navigation, language persistence, empty lists and every TUI container operation, including export overwrite, delete defaults, enter/exit and stop-all. Test actual state/results, not just appearance. Complete artifact validation and update IMPLEMENTED.md before release.

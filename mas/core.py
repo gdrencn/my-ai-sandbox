@@ -51,7 +51,11 @@ def read_output(stream):
 def confirm(message, ask=input):
     """One confirmation policy, independent of CLI or TUI presentation."""
     try:
-        return ask(t("confirm", message=message)).strip().lower() in ("y", "yes")
+        if ask is input:
+            from .menu import confirm as menu_confirm
+            return menu_confirm(message)
+        answer = ask(message)
+        return answer if isinstance(answer, bool) else answer.strip().lower() in ("y", "yes")
     except EOFError:
         return False
 

@@ -35,6 +35,10 @@ def parser():
         command = commands.add_parser(name)
         if name != "list":
             command.add_argument("target", metavar="TARGET", **({"nargs": "?"} if name == "stop" else {}))
+        if name in ("delete", "export", "enter"):
+            consent = command.add_mutually_exclusive_group()
+            consent.add_argument("--yes", dest="consent", action="store_const", const=True, help=t("help_yes"))
+            consent.add_argument("--no", dest="consent", action="store_const", const=False, help=t("help_no"))
         if name == "stop":
             command.add_argument("--all", action="store_true", help=t('help_all'))
         if name == "new":
@@ -61,6 +65,7 @@ def main(argv=None, manager=None):
             else:
                 print(json.dumps(config.load(), ensure_ascii=False, indent=2))
             return 0
+        ask = input if getattr(args, "consent", None) is None else lambda _: args.consent
         manager = manager or Manager(LXD(timeout=args.timeout), report=progress)
         if args.command is None:
             from .tui import run
@@ -75,11 +80,13 @@ def main(argv=None, manager=None):
         elif args.command == "import":
             manager.import_container(args.target, args.file)
         elif args.command == "export":
-            if not manager.export(args.target, args.file):
+            if not manager.export(args.target, args.file, ask):
                 print(t('cancelled'))
         elif args.command == "delete":
-            if not manager.delete(args.target):
+            if not manager.delete(args.target, ask):
                 print(t('cancelled'))
+        elif args.command == "enter":
+            manager.enter(args.target, ask)
         elif args.command == "stop" and args.all:
             manager.stop_all()
         else:

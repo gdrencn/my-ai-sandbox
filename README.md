@@ -23,7 +23,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 安装指定版本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.4
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.5
 ```
 
 ## 语言和配置
@@ -41,7 +41,7 @@ mas config set language zh_cn
 mas config set language en_us
 ```
 
-TUI 按 `c` 打开配置，按 `1` 选择英文、`2` 选择中文，立即生效；`q` 返回。CLI、TUI 和安装程序共享配置，保存于 `$XDG_CONFIG_HOME/my-ai-sandbox/config.json`，默认 `~/.config/my-ai-sandbox/config.json`。查看和修改配置不需要 LXD。
+TUI 主菜单选择“设置”，进入语言菜单后用 ↑/↓ 选择，Enter 确认，立即生效；Esc/← 返回。CLI、TUI 和安装程序共享配置，保存于 `$XDG_CONFIG_HOME/my-ai-sandbox/config.json`，默认 `~/.config/my-ai-sandbox/config.json`。查看和修改配置不需要 LXD。
 
 产品文案集中在 `mas/locales/en_us.json` 和 `mas/locales/zh_cn.json`。LXD、sudo、包管理器原生输出和机器可读字段保留原样。宿主 sudo 完全使用系统认证机制，不保存密码、不保活、不修改 sudo 超时或宿主 sudoers。已准备好的测试环境不需要宿主 sudo。
 
@@ -58,21 +58,23 @@ mas enter demo
 mas stop demo
 mas stop --all                         # 仅停止 mas 管理的容器
 mas export demo demo.tar.gz
-mas delete demo                        # 默认 N，输入 y 确认
+mas delete demo                        # 菜单默认选“否”，可选择“是”确认
 mas import restored demo.tar.gz
 ```
 
 - 创建后容器保持停止。WSL 的默认镜像版本取自 WSL 内部的 Ubuntu；对应镜像不可用时明确报错，不降级。
 - 启动的后置处理准备默认用户 `sandbox`，允许其免密 sudo。进入容器使用 sandbox 的登录 shell；root 账户不设空密码。
-- `enter` 必要时调用共享启动功能。终端内 `exit` 后询问是否停止，默认 N。
-- 删除和导出要求容器已停止。CLI 和 TUI 删除都要确认；导出文件存在时询问是否覆盖，默认 N。导入要求目标名称不存在。
+- `enter` 必要时调用共享启动功能。终端内 `exit` 后询问是否停止，默认选“否”。
+- 删除和导出要求容器已停止。CLI 和 TUI 删除都要确认；导出文件存在时询问是否覆盖，默认选“否”。导入要求目标名称不存在。
 - 仅管理本地 LXD 默认 project 内标记为 `user.mas.managed=true` 的容器；不接管原生 lxc 创建的其他容器。该标记用于管理范围区分，不是对拥有 LXD 管理权限的用户的安全隔离。
 - 每秒探测一次，默认每个底层操作最多等待 10 分钟。可使用 `mas --timeout 1800 start demo` 延长，最小 300 秒。明确失败立即返回，成功必须同时满足原生命令完成和目标状态。
 - 本版不配置 GPU、目录共享或自定义端口映射。容器使用标准默认 profile，宿主网络配置必须允许外网访问。
 
 **备份是恢复用途，并非克隆模板。** LXD 导出会保留网卡 MAC。源容器与导入副本同时存在时，LXD 可能拒绝启动副本。恢复前先处理原容器；mas 不静默改写备份中的网络身份。
 
-TUI：方向键选择；`n` 创建、`s` 启动、`t` 停止、`a` 停止全部受管理容器、`e` 进入、`d` 删除、`i` 信息、`m` 导入、`x` 导出、`r` 刷新、`c` 配置、`q` 退出。
+TUI 主菜单分为“容器管理”“设置”“退出”。容器管理提供列表、创建、导入、停止全部；选中容器后进入信息、启动、进入终端、停止、导出、删除菜单。所有菜单每项独立一行、左对齐，↑/↓ 移动，Enter/→ 确定，Esc/← 返回。
+
+CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 `mas delete demo --yes`、`mas export demo backup.tar.gz --yes`；`--no` 明确拒绝。`mas enter demo --yes` 表示终端退出后停止容器，`--no` 表示保持运行。没有交互终端且未指定确认参数时默认拒绝；不再使用管道输入 `y` 确认。
 
 ## 一行安装并自动测试
 
@@ -83,7 +85,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 指定版本及结果目录：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.4 --output ./mas-results
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.5 --output ./mas-results
 ```
 
 已安装环境可直接运行 `mas-test`。测试工具与产品版本配套，测试使用独立 LXD project 和 `test-<唯一随机码>` 容器，通过真实 lxc 操作和伪终端测试 CLI/TUI；只清理本次创建的资源。原有容器不参与 `stop --all` 测试。语言测试使用临时配置，不修改用户偏好。英文界面测试的原始输出保留在详细日志中；面向用户的说明、阶段名称和总结始终使用选择的语言，外部程序的原始警告和错误不翻译。

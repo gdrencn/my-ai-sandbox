@@ -30,9 +30,11 @@ class DistributionTests(unittest.TestCase):
 
     def test_first_install_defaults_chinese_and_saved_english_wins(self):
         from mas.i18n import choose_language
-        self.assertEqual(choose_language(ask=lambda _: ''), 'zh_cn')
-        config.set_value('language', 'en_us')
-        self.assertEqual(choose_language(ask=lambda _: ''), 'en_us')
+        with patch('mas.menu.interactive', side_effect=lambda callback: callback(None)), \
+                patch('mas.menu.language', side_effect=lambda ui, current: current):
+            self.assertEqual(choose_language(), 'zh_cn')
+            config.set_value('language', 'en_us')
+            self.assertEqual(choose_language(), 'en_us')
 
     def test_path_is_persistent_idempotent_and_quoted(self):
         profile = self.home / '.bash_profile'

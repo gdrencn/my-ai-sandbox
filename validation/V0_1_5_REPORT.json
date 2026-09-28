@@ -1,0 +1,1181 @@
+{
+  "version": "0.1.5",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "product": "/home/gordon/.local/bin/mas",
+  "product_sha256": "ec7a2e67e68f016fdb2a00eafc58ebb3accdbee9edac8ff17b759e1545024ed0",
+  "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+  "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+  "project": "test-d2f6337a9cdf4553bcf97a4a1c569bf7",
+  "targets": [
+    "test-a581e7f320314900b51967b0b19f952d",
+    "test-3ec368baea6d4bca933b94a71e861e45",
+    "test-d932d2901c804fb787de83c0e257b32c",
+    "test-d7fac03e92374085b74fd5677c7682f2",
+    "test-9830292f44684f4fa2895a645687c6a3",
+    "test-114ea2c452f7456bb305a3616d9a0ef7"
+  ],
+  "cases": {
+    "unit": {
+      "status": "passed",
+      "elapsed": 2.660830615001032
+    },
+    "new-default": {
+      "status": "passed",
+      "elapsed": 3.2439124299999094
+    },
+    "missing-image": {
+      "status": "passed",
+      "elapsed": 2.0885226620011963
+    },
+    "list-info": {
+      "status": "passed",
+      "elapsed": 3.0029269990009197
+    },
+    "start-user-network": {
+      "status": "passed",
+      "elapsed": 4.903406673001882
+    },
+    "running-guards": {
+      "status": "passed",
+      "elapsed": 2.0941893759991217
+    },
+    "enter-running-default-exit": {
+      "status": "passed",
+      "elapsed": 1.5658660020017123
+    },
+    "enter-stopped-stop-exit": {
+      "status": "passed",
+      "elapsed": 10.839929958998255
+    },
+    "export-import": {
+      "status": "passed",
+      "elapsed": 46.204654978999315
+    },
+    "overwrite-confirmation": {
+      "status": "passed",
+      "elapsed": 28.51877918199898
+    },
+    "ownership-and-stop-all": {
+      "status": "passed",
+      "elapsed": 13.580383173000882
+    },
+    "delete-confirmation": {
+      "status": "passed",
+      "elapsed": 3.710336157000711
+    },
+    "language-config": {
+      "status": "passed",
+      "elapsed": 7.007924045999971
+    },
+    "tui": {
+      "status": "passed",
+      "elapsed": 60.98207037500106
+    }
+  },
+  "events": [
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.271,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 2.1,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-a581e7f320314900b51967b0b19f952d\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "new",
+      "target": "test-d7fac03e92374085b74fd5677c7682f2",
+      "status": "waiting",
+      "elapsed": 0.096,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-d7fac03e92374085b74fd5677c7682f2",
+      "status": "error",
+      "elapsed": 1.001,
+      "observation": "Absent",
+      "native_stdout": "Creating test-d7fac03e92374085b74fd5677c7682f2\n",
+      "native_stderr": "Error: Failed instance creation: Failed getting remote image info: Failed getting image: The requested image could not be found for fingerprint \"mas-missing-6bfba4c238254d9ca9c077528ba3b28d\"\n",
+      "native_failure": true
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.083,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 1.083,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.093,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.076,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.094,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 2.094,
+      "observation": "Running",
+      "native_stdout": ".....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "test-wait",
+      "target": "outbound HTTPS",
+      "status": "ok",
+      "elapsed": 0.6515818309999304
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 0,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.086,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.089,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 1.089,
+      "observation": "Running",
+      "native_stdout": "status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.092,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.097,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 2.091,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.089,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 1.089,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.102,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.083,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.089,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 2.09,
+      "observation": "Running",
+      "native_stdout": "....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.09,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.111,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.084,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 3.093,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 4.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 4.091,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 3.102,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 4.08,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 5.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 6.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 7.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 8.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 9.084,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 10.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 11.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 12.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 13.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 14.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 15.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 16.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 17.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 18.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 19.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 20.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 21.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 22.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 23.098,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 24.103,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 25.101,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 26.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 27.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 28.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 28.096,
+      "observation": "Stopped",
+      "native_stdout": "\rBackup exported successfully!\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.081,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 1.082,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 0.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 1.089,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 2.084,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 3.089,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 4.106,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 5.079,
+      "observation": "Stopped"
+    },
+    {
+      "action": "import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "ok",
+      "elapsed": 5.079,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "mark-import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 0.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 1.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "ok",
+      "elapsed": 1.093,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 0.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 1.082,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "ok",
+      "elapsed": 1.082,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 0.12,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 1.079,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 2.086,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "ok",
+      "elapsed": 2.086,
+      "observation": "Running",
+      "native_stdout": "....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.09,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.352,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 2.085,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-a581e7f320314900b51967b0b19f952d\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 2.084,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 3.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 4.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 5.107,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 6.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 7.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 8.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 9.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 10.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 11.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 12.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 13.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 14.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 15.107,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 16.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 17.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 18.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 19.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 20.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 21.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 22.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 23.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 24.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 25.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 26.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 27.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 28.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 28.086,
+      "observation": "Stopped",
+      "native_stdout": "\rBackup exported successfully!\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "test-wait",
+      "target": "external running",
+      "status": "ok",
+      "elapsed": 0.08454241300205467
+    },
+    {
+      "action": "stop",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 0.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 1.098,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 2.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "ok",
+      "elapsed": 2.095,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 0,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 0.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "waiting",
+      "elapsed": 1.114,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-3ec368baea6d4bca933b94a71e861e45",
+      "status": "ok",
+      "elapsed": 1.114,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 0.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "waiting",
+      "elapsed": 1.09,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-a581e7f320314900b51967b0b19f952d",
+      "status": "ok",
+      "elapsed": 1.09,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI new",
+      "status": "ok",
+      "elapsed": 1.4551198650005972
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI start",
+      "status": "ok",
+      "elapsed": 1.184471044998645
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI stop",
+      "status": "ok",
+      "elapsed": 4.527320925000822
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI export",
+      "status": "ok",
+      "elapsed": 29.01275048000025
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI delete",
+      "status": "ok",
+      "elapsed": 1.1810320160002448
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI import",
+      "status": "ok",
+      "elapsed": 4.478552373002458
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI imported start",
+      "status": "ok",
+      "elapsed": 1.1794379289967765
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI stop all",
+      "status": "ok",
+      "elapsed": 4.45465144300033
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "waiting",
+      "elapsed": 0.084,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "waiting",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "waiting",
+      "elapsed": 2.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "ok",
+      "elapsed": 2.095,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "waiting",
+      "elapsed": 0.074,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "waiting",
+      "elapsed": 1.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-d932d2901c804fb787de83c0e257b32c",
+      "status": "ok",
+      "elapsed": 1.079,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-114ea2c452f7456bb305a3616d9a0ef7",
+      "status": "waiting",
+      "elapsed": 0.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-114ea2c452f7456bb305a3616d9a0ef7",
+      "status": "waiting",
+      "elapsed": 1.078,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-114ea2c452f7456bb305a3616d9a0ef7",
+      "status": "ok",
+      "elapsed": 1.079,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    }
+  ],
+  "cleanup_errors": [],
+  "elapsed": 195.38180790600018
+}

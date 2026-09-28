@@ -15,9 +15,11 @@ DIST = ROOT / "dist"
 
 def main():
     DIST.mkdir(exist_ok=True)
-    messages = json.loads((ROOT / "mas/locales/en_us.json").read_text())
-    installer = (ROOT / "scripts/install.template.sh").read_text().replace(
-        "@LANGUAGE_PROMPT@", shlex.quote(messages["choose_language"].format(current="zh_cn")))
+    messages = json.loads((ROOT / "mas/locales/zh_cn.json").read_text())
+    installer = (ROOT / "scripts/install.template.sh").read_text()
+    for token, key in {"LANGUAGE_TITLE": "language_title", "LANGUAGE_ZH": "language_zh",
+                       "LANGUAGE_EN": "language_en", "LANGUAGE_KEYS": "menu_keys"}.items():
+        installer = installer.replace("@" + token + "@", shlex.quote(messages[key]))
     (ROOT / "install.sh").write_text(installer)
 
     for filename, entry in (("mas.pyz", "mas.cli:main"),
