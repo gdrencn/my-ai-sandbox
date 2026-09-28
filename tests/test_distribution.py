@@ -180,3 +180,28 @@ class DistributionTests(unittest.TestCase):
             self.assertEqual(main(["--product","unused.pyz"]),1)
         install.assert_not_called()
         self.assertIn("安装程序与产品版本不匹配",errors.getvalue())
+
+
+    def test_minimal_bootstrap_downloads_all_shared_menu_dependencies(self):
+        """Execute the real shell entry's download block, without checkout imports."""
+        archive = Path(sys.argv[0])
+        def source_bytes(name):
+            if zipfile.is_zipfile(archive):
+                with zipfile.ZipFile(archive) as package:
+                    return package.read(name)
+            return (Path(__file__).resolve().parents[1] / name).read_bytes()
+        shell = source_bytes('install.sh').decode()
+        block = shell.split("<<'PY'\n")[-1].split('\nPY\n', 1)[0]
+        destination = self.home / 'isolated-bootstrap'
+        destination.mkdir()
+        def fetch(url, **kwargs):
+            name = url.split('/main/', 1)[1]
+            return io.BytesIO(source_bytes(name))
+        with patch.object(sys, 'argv', ['-', str(destination)]), patch('urllib.request.urlopen', side_effect=fetch):
+            exec(compile(block, '<bootstrap download>', 'exec'), {})
+        code = ('import sys;sys.path.insert(0,' + repr(str(destination)) + ');'
+                'import bootstrap;from mas.menu import Screen;'
+                'from mas.i18n import t;assert t("language_zh")')
+        result = subprocess.run([sys.executable, '-I', '-c', code], cwd=destination,
+                                capture_output=True, text=True, timeout=300)
+        self.assertEqual(result.returncode, 0, result.stderr)

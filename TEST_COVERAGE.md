@@ -65,3 +65,7 @@ For count clarity, the 0.1.11 report contains 20 stages in total: the unit-test 
 - Validation remains scoped to the current Ubuntu WSL/LXD host. Native Ubuntu/cloud, other architectures, live ACL-bearing fixtures and offline VHDX access are not established.
 
 Final local 0.1.12 run: 133 packaged unit tests, no skips; 20 reported stages (unit plus 19 real integration stages), all passed in 362.6 seconds; cleanup verified. Evidence: validation/V0_1_12_REPORT.json. Public-entry verification is recorded after publication.
+
+## Batch 0.1.13 bootstrap boundary
+
+The 0.1.12 public-entry check exposed a missing minimal-bootstrap dependency despite successful product tests. The new regression executes the actual generated shell download block against controlled bytes, then imports bootstrap/menu in an isolated -I interpreter. The tester carries install.sh for this boundary check; ordinary product artifacts do not. This raises packaged unit coverage to 134 tests. Complete native/public outcomes are recorded after execution.

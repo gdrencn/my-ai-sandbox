@@ -302,3 +302,14 @@ An exploratory full run found two tester assertions still waiting for the old de
 Final frozen-package result: 133 unit tests with zero failures/errors/skips; all 20 reported stages (unit plus 19 real integration stages) passed in 362.6 seconds with no cleanup errors. The isolated LXD project, mount roots and mount/directory records were confirmed reclaimed. Windows UNC read/write operations passed again. Evidence: validation/V0_1_12_REPORT.json. Product SHA-256: 80a6cdeb4f3510c7a3c0fd6a30d26a28bf171d7b2c443abd5249988564f3e111. Repeated builds have identical asset checksums; packaged source matches the workspace. Python 3.10 grammar parsing, shell syntax and diff checks passed.
 
 Limits: current Ubuntu WSL/LXD host only. Native Ubuntu/cloud, other architectures, live ACL-bearing files, offline VHDX access and a fresh privileged installation were not rerun. Lifecycle failure branches use controlled injection; real tests establish successful transitions/restoration. Prior Windows Explorer success is user-reported, separate from the portable tester's Windows UNC API verification. No additional permission/resource policy, dependency or stable promotion was introduced. Test publication and public-entry verification are recorded below after execution.
+
+
+### 0.1.12 publication and bootstrap check failure
+
+Published test v0.1.12 from a66ab80dbc485f509a13eab971bdba3e004b9768 with seven assets. The first public normal-installation check failed before language selection: the shell entry's minimal download list omitted mas/output.py after the shared menu began importing it. The module is present in the product/installer archives; local native tests did not exercise this separately downloaded bootstrap dependency boundary. No successful public installation or public full-test result is claimed for this version. Its published assets are retained unchanged. Version 0.1.13 corrects the fixed entry and release shell artifact.
+
+## Stage 16 — version 0.1.13, bootstrap dependency correction
+
+The generated fixed entry now downloads mas/output.py with the shared menu's other runtime modules. The standalone tester includes the generated install.sh only to exercise its actual Python download block with controlled source responses. A clean interpreter using -I then imports bootstrap and the downloaded menu from that isolated directory, without the development checkout. This regression uses the shell entry's own manifest instead of maintaining a second list. Normal product/installer separation is unchanged; no tester content is added to ordinary installation.
+
+Verified source discovery: 134 tests passed, with only the existing archive-boundary check skipped outside an archive. The packaged unit stage also passed with the matching 0.1.13 product; full native and public-entry validation remains in progress. No change to the 0.1.12 container or mount behavior is made in this corrective batch.
