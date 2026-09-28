@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.12. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.13. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 

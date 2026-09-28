@@ -284,3 +284,5 @@ The 0.1.12 native/product tests passed, but public entry verification failed bef
 - Include every runtime module needed by the shared language menu in the minimal bootstrap download. Keep ordinary installation free of tester downloads.
 - Package the generated shell entry in the standalone tester solely for a regression that executes its actual download-stage Python block against controlled source bytes, then imports bootstrap and its menu in a clean interpreter without the development checkout. Do not duplicate a second download manifest in tests.
 - Verify all packaged unit tests, isolated bootstrap imports, ordinary public installation and public --test installation with the complete native test suite. Record the failed 0.1.12 public check separately from successful final results, and identify 0.1.13 as the supported fixed entry.
+
+Section 22 implementation and local frozen-package verification are complete: 134 packaged units and all 20 report stages passed. Public-entry completion is recorded after release.

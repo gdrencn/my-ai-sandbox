@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.1.12 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.1.13 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -69,3 +69,5 @@ Final local 0.1.12 run: 133 packaged unit tests, no skips; 20 reported stages (u
 ## Batch 0.1.13 bootstrap boundary
 
 The 0.1.12 public-entry check exposed a missing minimal-bootstrap dependency despite successful product tests. The new regression executes the actual generated shell download block against controlled bytes, then imports bootstrap/menu in an isolated -I interpreter. The tester carries install.sh for this boundary check; ordinary product artifacts do not. This raises packaged unit coverage to 134 tests. Complete native/public outcomes are recorded after execution.
+
+Final local 0.1.13 verification passed all 134 packaged units and 20 reported stages in 365.7 seconds, with no skips or cleanup errors; see validation/V0_1_13_REPORT.json.
