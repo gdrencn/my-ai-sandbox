@@ -194,11 +194,11 @@ class Suite:
         self.event_path = self.directory / f"events-{self.counter}.jsonl"
         source = ("import os,sys,json;os.environ['XDG_CONFIG_HOME']=" + repr(str(self.config_home)) + ";"
                   "sys.path.insert(0," + repr(str(self.product) if self.product else sys.path[0]) + ");"
-                  "from mas.cli import main,progress;from mas.core import Manager,LXD;"
+                  "from mas.cli import main,Progress;from mas.core import Manager,LXD;"
                   "events=open(" + repr(str(self.event_path)) + ", 'a');"
-                  "report=lambda event:(events.write(json.dumps(event)+'\\n'),events.flush(),progress(event));"
+                  "progress=Progress();report=lambda event:(events.write(json.dumps(event)+'\\n'),events.flush(),progress(event));"
                   "raise SystemExit(main(manager=Manager(LXD(project=" + repr(self.project) +
-                  ",timeout=" + str(self.timeout) + "),report=report)))")
+                  ",timeout=" + str(self.timeout) + ",diagnostic=progress.output.keep),report=report)))")
         return [sys.executable, "-c", source, *args]
 
     def read_events(self, path, diagnostics=False):

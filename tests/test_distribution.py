@@ -145,7 +145,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_successful_native_command_keeps_diagnostics_and_raw_output(self):
         from mas.core import Manager, MANAGED
-        from mas.cli import progress
+        from mas.cli import Progress
         events=[]
         manager=Manager(Mock(prefix=[sys.executable], timeout=300), events.append)
         manager.find=Mock(return_value={"name":"demo","status":"Stopped","type":"container","config":{MANAGED:"true"}})
@@ -154,7 +154,7 @@ class DistributionTests(unittest.TestCase):
         self.assertIn('normal native output',event['native_stdout'])
         self.assertIn('native notice',event['native_stderr'])
         with contextlib.redirect_stderr(io.StringIO()) as output:
-            progress(event)
+            Progress()(event)
         self.assertIn('native notice',output.getvalue())
         self.assertNotIn('normal native output',output.getvalue())
 

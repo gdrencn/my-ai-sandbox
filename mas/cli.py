@@ -8,15 +8,25 @@ from . import __version__
 from . import config
 from .core import Error, LXD, Manager
 from .diagnostics import diagnostic_lines
+from .output import Output
 
 from .i18n import t, state, progress_text, Parser
 
 
-def progress(event):
-    print(progress_text(event), file=sys.stderr, flush=True)
-    if not event.get("native_failure"):
-        for line in diagnostic_lines(event.get("native_stdout", ""), event.get("native_stderr", "")):
-            print(line, file=sys.stderr, flush=True)
+class Progress:
+    """One reporter shared by CLI commands and the inline menu application."""
+    def __init__(self, stream=None):
+        self.output = Output(stream if stream is not None else sys.stderr)
+
+    def __call__(self, event):
+        message = progress_text(event)
+        if event["status"] == "waiting":
+            self.output.progress(message)
+        else:
+            self.output.keep(message)
+        if not event.get("native_failure"):
+            for line in diagnostic_lines(event.get("native_stdout", ""), event.get("native_stderr", "")):
+                self.output.keep(line)
 
 
 def parser():
@@ -55,6 +65,7 @@ def main(argv=None, manager=None):
         arguments.error(t('cli_timeout'))
     if args.command == "stop" and bool(args.target) == args.all:
         arguments.error(t('cli_stop_args'))
+    progress = Progress()
     try:
         if args.command == "config":
             if args.config_action == "set":
@@ -66,7 +77,7 @@ def main(argv=None, manager=None):
                 print(json.dumps(config.load(), ensure_ascii=False, indent=2))
             return 0
         ask = input if getattr(args, "consent", None) is None else lambda _: args.consent
-        manager = manager or Manager(LXD(timeout=args.timeout), report=progress)
+        manager = manager or Manager(LXD(timeout=args.timeout, diagnostic=progress.output.keep), report=progress)
         if args.command is None:
             from .terminal_ui import run
             run(manager)
@@ -93,11 +104,13 @@ def main(argv=None, manager=None):
             getattr(manager, args.command)(args.target)
         return 0
     except config.ConfigError as exc:
-        print(t(exc.key, **exc.values), file=sys.stderr)
+        progress.output.keep(t(exc.key, **exc.values))
         return 1
     except (Error, OSError) as exc:
-        print(f"mas: {exc}", file=sys.stderr)
+        progress.output.keep(f"mas: {exc}")
         return 1
     except KeyboardInterrupt:
-        print("\n" + t("interrupted"), file=sys.stderr)
+        progress.output.keep(t("interrupted"))
         return 130
+    finally:
+        progress.output.clear()

@@ -79,7 +79,7 @@ def validate_target(target):
 
 
 class LXD:
-    def __init__(self, project="default", timeout=DEFAULT_TIMEOUT):
+    def __init__(self, project="default", timeout=DEFAULT_TIMEOUT, diagnostic=None):
         if timeout < 300:
             raise Error(t('timeout_minimum'))
         executable = shutil.which("lxc")
@@ -89,6 +89,7 @@ class LXD:
             raise Error(t('lxd_missing'))
         self.prefix = [executable, "--project", project]
         self.project = project
+        self.diagnostic = diagnostic
         self.timeout = timeout
 
     def command(self, args, timeout=None):
@@ -100,7 +101,10 @@ class LXD:
         if result.returncode:
             raise Error(result.stderr.strip() or result.stdout.strip() or t('lxd_failed'))
         if result.stderr:
-            print(result.stderr, file=sys.stderr, end="")
+            if self.diagnostic is not None:
+                self.diagnostic(result.stderr.rstrip("\n"))
+            else:
+                print(result.stderr, file=sys.stderr, end="")
         return result.stdout
 
     def instances(self, timeout=None):

@@ -1,0 +1,42 @@
+"""Shared transient terminal lines and permanent output for product and tester."""
+import os
+import shutil
+import sys
+import unicodedata
+
+
+class Output:
+    def __init__(self, stream=None):
+        self.stream = stream or sys.stdout
+        self.tty = self.stream.isatty()
+        self.active = False
+
+    def clear(self):
+        if self.active:
+            self.stream.write('\r\033[2K')
+            self.stream.flush()
+            self.active = False
+
+    def progress(self, message):
+        if not self.tty:
+            return
+        try:
+            columns = os.get_terminal_size(self.stream.fileno()).columns
+        except (AttributeError, OSError, ValueError):
+            columns = shutil.get_terminal_size().columns
+        width = max(0, columns - 1)
+        text, used = '', 0
+        for char in message.replace('\n', ' '):
+            size = 0 if unicodedata.combining(char) else 2 if unicodedata.east_asian_width(char) in ('W', 'F') else 1
+            if used + size > width:
+                break
+            text += char
+            used += size
+        self.stream.write('\r\033[2K' + text)
+        self.stream.flush()
+        self.active = True
+
+    def keep(self, message):
+        self.clear()
+        print(message, file=self.stream, flush=True)
+

@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.7. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.8. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
@@ -11,6 +11,8 @@ This is an inventory of the additional behavior implemented in mas/core.py as of
 - Mutating _operation calls capture native stdout/stderr in temporary files to avoid pipe backpressure. Observe structured state every second, require both native exit zero and expected state, and normally require the ownership marker. Native nonzero exit, LXD Error state and query failures abort. Report observations, elapsed time, final result and native output.
 - On timeout/failure/interruption, stop a still-running client process and wait for it; do not claim the LXD daemon operation has been cancelled. Timeout messages include the last observed state; the final event includes elapsed time. Interactive container shells do not use this operation timer.
 - Confirmation is shared: terminal radio menu defaults No, --yes/--no supply explicit decisions, noninteractive input without consent declines. CLI/menu presentation localizes mas text and preserves original external output.
+
+CLI and text-menu waiting events share the tester's terminal-line renderer: normal progress refreshes in place, final results and diagnostics remain, and redirected output omits waiting ticks. Successful query stderr uses a permanent-output callback in the product so it cannot be erased by subsequent progress. Structured event records remain complete. This presentation change does not change operation completion criteria.
 
 ## Operation inventory
 

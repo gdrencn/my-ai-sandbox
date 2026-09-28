@@ -20,6 +20,9 @@ Use LXD's existing functionality instead of reimplementing it. Each basic operat
 | `mas import TARGET FILE` | Import into an explicitly named, nonexistent TARGET. Never overwrite any existing instance. Verify STOPPED afterwards. |
 | `mas export TARGET FILE [--yes | --no]` | Export a stopped managed container only. If FILE exists, ask whether to overwrite; default No; selecting Yes allows overwrite. |
 | `mas enter TARGET [--yes | --no]` | Start through the shared start function if stopped, then open a terminal using native LXD execution. |
+| `mas mountfs TARGET [PATH]` | Planned, not implemented: mount a container directory read-write at its corresponding host path; see section 16. |
+| `mas unmountfs TARGET [PATH]` | Planned, not implemented: unmount the exact container directory previously mounted; see section 16. |
+| `mas mountedfs TARGET` | Planned, not implemented: list managed filesystem mounts and their actual status; see section 16. |
 | `mas config [get language / set language en_us / set language zh_cn]` | Read or update shared user settings without requiring LXD. |
 | `mas` | Open the terminal text menu directly when no subcommand is supplied. No `mas tui` command. |
 
@@ -39,7 +42,7 @@ Frozen or transitional states must not be silently treated as stopped. Report un
 
 Identify managed containers with instance-local `user.mas.managed=true` metadata. Creation and import establish this marker. All reads and actions target only managed containers, except the existence check necessary to prevent name collisions. Never adopt, stop, delete, export or enter an unmarked instance. Native lxc use does not remove ownership. No independent ownership database or third-party library.
 
-Use standard LXD default profiles. Do not add GPU, directory sharing, custom network policies or mas profiles. The ownership marker and the explicitly requested default sandbox user setup are the only mas-specific configuration. Use existing networking; fresh initialization prepares ordinary outbound connectivity. Existing misconfiguration is reported, not silently overwritten.
+Use standard LXD default profiles. Do not add GPU passthrough, host-directory sharing into containers, custom network policies or mas profiles. Section 16 separately specifies container-to-host filesystem access; it does not authorize exposing host directories to containers. The ownership marker and the explicitly requested default sandbox user setup are the only mas-specific configuration. Use existing networking; fresh initialization prepares ordinary outbound connectivity. Existing misconfiguration is reported, not silently overwritten.
 
 ## 4. Completion and waiting
 
@@ -49,7 +52,7 @@ Postconditions: new/import = existing stopped managed container; start = running
 
 ## 5. terminal text menu
 
-Provide access to all nine container operations, with list selection, input prompts, results and errors. Reuse shared functions directly. Restore ordinary terminal input before each operation and shell session; append a fresh menu afterward. From 0.1.6, use inline terminal text menus without curses or an alternate screen; do not introduce third-party dependencies.
+Provide access to all nine existing container operations, with list selection, input prompts, results and errors. The planned filesystem operations in section 16 must also be available through the same inline menus once implemented. Reuse shared functions directly. Restore ordinary terminal input before each operation and shell session; append a fresh menu afterward. From 0.1.6, use inline terminal text menus without curses or an alternate screen; do not introduce third-party dependencies.
 
 ## 6. Installation
 
@@ -71,7 +74,7 @@ Cover new/list/start/stop/delete/info/import/export, default host-matching image
 
 ## 8. GitHub and releases
 
-Publish to the public my-ai-sandbox repository after current WSL checks pass. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.7. Product, installer and tester share that version, with Git tag v0.1.7. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
+Publish every completed and validated development batch as a test prerelease to the public my-ai-sandbox repository. Test publication is a mandatory completion step, not an optional follow-up and does not require repeated approval. Verify that the fixed public installation/test entry resolves the new version. Stable promotion is separate; do not defer a completed test release while discussing future features or stable publication. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current local development batch is 0.1.8; the published release remains 0.1.7. Product, installer and tester share each release version. A local version number does not imply publication. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
 
 ## 8.1. Language and user configuration
 
@@ -89,7 +92,7 @@ Keep REQUIREMENTS.md and IMPLEMENTED.md inside this project. Before updating IMP
 
 ## 10. Exclusions
 
-No GPU passthrough, host directory sharing management, resource whitelist, model installation, model service management, custom port forwarding, non-Ubuntu support, plugins or general diagnostic framework in this version.
+No GPU passthrough, host-directory sharing into containers, resource whitelist, model installation, model service management, custom port forwarding, non-Ubuntu support, plugins or general diagnostic framework in this version. Container-to-host filesystem mounting is now an approved requirement in section 16, pending implementation. A general container package-preinstallation feature has no agreed package list or installation policy and is not required by filesystem mounting; its priority and scope remain to be confirmed. The existing installation of sudo when needed for the sandbox user remains authorized.
 
 
 ## 11. Batch 0.1.4 acceptance criteria
@@ -136,3 +139,66 @@ Expand shared-operation regression tests for native completion versus observed s
 Extend real-LXD verification with invalid/missing targets and backup inputs, repeated lifecycle operations retaining sandbox identity/home/shell, and restoring a native unmarked backup with explicit post-import management marking. Preserve isolated projects, unique test names, minimum operation timeouts, diagnostics, history and cleanup.
 
 Discover all packaged test modules automatically. Reports must record unit-test counts, failures, errors and skipped reasons separately from integration-group outcomes, plus test module names and test identifiers. Regression-test the runner's failure/interruption, cleanup-error and report-error exit semantics. Preserve normal/test artifact separation and validate final archives and public install/test entry before publishing 0.1.7.
+
+
+## 15. Batch 0.1.8 — shared transient operation progress
+
+CLI and inline text-menu operations must reuse the tester's terminal line-rendering primitive. In an interactive terminal, refresh normal waiting status and elapsed time on one bounded line; replace that line with a permanent final success or error result before subsequent menus, prompts or shell entry. Preserve warnings and native failure diagnostics without overwriting them. Preserve operation polling, state/command completion checks and structured test events. Redirected output must be plain text without cursor controls; omit normal waiting ticks and retain final results and diagnostics. Cover terminal rendering, interruption/failure, sequential operations, localized text, narrow terminal widths and noninteractive output. Keep test-specific diagnostic filtering outside the product archive and add no dependencies. This batch does not change stable release channels or resource/security configuration.
+
+
+## 16. Planned phase-1 extension — container filesystem mounts
+
+Status: requirements approved for documentation; not implemented. This section supersedes the earlier proposal to attach mounting to start and unmounting to stop. Documentation approval does not authorize installing dependencies, creating mounts or changing existing container data.
+
+### 16.1. Shared operations and lifecycle independence
+
+Add shared mountfs, unmountfs and mountedfs functions. CLI and inline terminal menus call those same functions; cleanup and path checks are reused rather than duplicated. All targets must be mas-managed local containers under the existing ownership rules.
+
+- `mas mountfs TARGET [PATH]`: mount the specified container directory for read/write access from the host.
+- `mas unmountfs TARGET [PATH]`: unmount that exact previously mounted container directory and reclaim eligible host directories.
+- `mas mountedfs TARGET`: list independently mounted container paths, host mount points and verified status, including abnormal or residual managed entries. The listed container paths identify exact unmount selections. A directory inside a mount is not a separate mounted item. Show an explicit empty result when there are no managed entries. Querying must not mount, unmount, start or stop a container.
+
+Mounting is independent of start, stop, stop --all, enter and the exit handler. Those operations must not automatically mount or unmount. Filesystem access should use LXD's native support for running and stopped containers; mounting must not implicitly start the container. If a container's default user/home has not yet been provisioned, report that the requested directory cannot be resolved or does not exist rather than provisioning it as a side effect.
+
+No new background container-health monitor is included. Container failure does not imply that an independent host mount was automatically removed. A host/WSL shutdown removes live mounts but can leave mount-point directories and management records. Query and cleanup must distinguish live, failed and residual states instead of assuming that a directory's existence proves a working mount.
+
+### 16.2. Path mapping and symmetric unmount semantics
+
+Use exactly `~/LXDCMFS/TARGET` as the host mapping base for container `/`, where the host `~` is the invoking user's home. PATH denotes a container directory, not an arbitrary host destination. When omitted, resolve the actual home of the container's default sandbox user; do not hard-code `/home/sandbox` for an existing user with a different home.
+
+| Command | Container directory | Host mount point |
+| --- | --- | --- |
+| `mas mountfs demo` | Default user's home, for example `/home/sandbox` | `~/LXDCMFS/demo/home/sandbox` |
+| `mas mountfs demo /var/log` | `/var/log` | `~/LXDCMFS/demo/var/log` |
+| `mas mountfs demo /` | `/` | `~/LXDCMFS/demo` |
+
+The base is a path-mapping convention, not an automatic root mount. Mounting home alone must not also mount `/` at the base. Unmount with no PATH selects the default home; explicit PATH selects that exact mount. `unmountfs TARGET /` means unmount an independently mounted root, not unmount every entry for the container. If `/` is mounted but `/var/log` is not separately mounted, `unmountfs TARGET /var/log` must refuse without altering any mount or deleting any directory, explain that the path belongs to `/`, and identify the matching root-unmount command.
+
+Multiple non-overlapping directory mounts for one target are allowed. Reject ancestor/descendant overlap and do not stack mounts. Resolve path identity consistently so alternate spellings cannot evade overlap or ownership checks or escape the intended host mapping base. Exact rules for relative paths, explicit tilde arguments and symlink resolution remain to be confirmed; examples use absolute container paths, and omission selects home without host-shell tilde expansion.
+
+### 16.3. Conflicts, ownership and cleanup
+
+Refuse to create a mount over any existing destination: regular file, empty or nonempty directory, symbolic link (including a dangling link), or another mount. Do not overwrite, remove or hide pre-existing content. Common parent directories previously created and tracked by mas can be reused for non-overlapping mounts. Validate parent paths as well as the leaf; do not follow an unexpected host symlink into another location.
+
+Track sufficient ownership and source identity to distinguish mas-created mount points and intermediate directories from user paths. Container ownership remains the LXD marker; mount/directory records do not replace it. The storage format of mount records remains an implementation decision. Verify actual mounts in addition to records; do not claim success solely from a command exit code. Use the shared one-second waiting, timeout and elapsed-output rules for completion checks.
+
+- Normal unmount: verify the mount has gone, then remove its tracked empty mount-point directory and any tracked empty parents no longer used by other mounts.
+- Failed mount: verify no residual mount remains before reclaiming only empty directories created by that attempt.
+- Unmount failure, nonempty directories or uncertain ownership: preserve the path and report the reason. Do not force deletion or recursively delete contents.
+- Abnormal exit: verify recorded ownership and actual mount state before cleanup. Never infer authority to delete from the name or location alone. A prior mas record alone is insufficient if the path has since been replaced.
+
+Cleanup removes empty host mount-point directories only after unmounting; it must not delete the container directory or its contents. Residual entries must be visible in mountedfs and handled by the shared unmount/cleanup logic. Do not claim a failed mount is healthy or silently overwrite it on a later request.
+
+### 16.4. Native permissions and dependencies
+
+Use standard LXD filesystem access and its default permission behavior. Do not add custom UID/GID mappings or permission-check overrides. Mounting/unmounting must not chmod, chown, rewrite ACLs or otherwise alter container file/directory permissions. Explicit host file operations through a successful read/write mount act on the container's files, preserving native operation semantics. Do not promise sandbox ownership for newly created host-side files or universal access to every special path; observe and document native behavior before considering adjustments.
+
+The direction is container-to-host access. No host home or other host resource may be shared into the container without explicit user authorization.
+
+LXD's direct filesystem mount requires SSHFS on the host. It does not require installing SSHFS, an SSH server or another package inside the container. Prefer the native LXD mounting command and its standard behavior. The existing rule requiring explicit approval for third-party dependencies still applies before installation. Host dependency setup, execution identity and process lifetime must be settled before implementation; do not silently introduce a custom SFTP server or additional library.
+
+### 16.5. Required verification and remaining decisions
+
+Verify CLI and menu paths, default and explicit homes, root and non-overlapping mounts, read/write/create/delete through the mount, running and stopped containers, independence from start/stop, exact unmount matching, ancestor/descendant refusal, managed-target scope, pre-existing files/directories/symlinks/mounts, truthful query status, failed mounting, failed unmounting, stale records, interrupted cleanup, concurrent conflicting requests and safe retry after cleanup. Use isolated test targets and host directories. Confirm existing container ownership/mode/ACL metadata is not rewritten by mounting, and record native new-file ownership and permission behavior without adding corrective changes. Keep warnings/errors and final summaries, with transient waits and complete structured test records.
+
+Before implementation, confirm behavior when deleting a container with active mounts, behavior when the default user's home changes between mount and unmount, handling of symlinked/relative container paths, and the installation/privilege/process-lifetime policy for the native host mount. Stable publication timing for this extension remains to be decided; this section does not claim a stable release has been published.
