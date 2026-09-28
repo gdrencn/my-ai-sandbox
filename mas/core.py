@@ -94,7 +94,8 @@ class LXD:
 
     def command(self, args, timeout=None):
         try:
-            result = subprocess.run(self.prefix + args, text=True, capture_output=True,
+            prefix = [self.prefix[0], "--force-local"] if args and args[0] == "query" else self.prefix
+            result = subprocess.run(prefix + args, text=True, capture_output=True,
                                     stdin=subprocess.DEVNULL, timeout=timeout or self.timeout)
         except subprocess.TimeoutExpired as exc:
             raise Error(t('lxd_query_timeout')) from exc
@@ -121,9 +122,24 @@ class LXD:
 
 
 class Manager:
-    def __init__(self, lxd=None, report=None):
+    def __init__(self, lxd=None, report=None, fs_root=None, fs_state=None):
         self.lxd = lxd or LXD()
         self.report = report or (lambda event: None)
+        self.fs_root, self.fs_state = fs_root, fs_state
+
+    @property
+    def filesystems(self):
+        from .filesystems import Filesystems
+        return Filesystems(self, self.fs_root, self.fs_state)
+
+    def mountfs(self, target, path=None):
+        return self.filesystems.mount(target, path)
+
+    def unmountfs(self, target, path=None):
+        return self.filesystems.unmount(target, path)
+
+    def mountedfs(self, target):
+        return self.filesystems.list(target)
 
     @staticmethod
     def managed(instance):
@@ -220,6 +236,7 @@ class Manager:
         elif instance["status"] != "Stopped":
             raise Error(t("cannot_start", target=target, status=state(instance["status"])))
         else:
+            self.filesystems.guard_transition(target)
             self._operation("start", target, ["start", "local:" + target], "Running")
         return self._operation("prepare-user", target,
                                ["exec", "local:" + target, "--", "/bin/sh", "-c", USER_SETUP], "Running")
@@ -231,6 +248,7 @@ class Manager:
             return instance
         if instance["status"] != "Running":
             raise Error(t("cannot_stop", target=target, status=state(instance["status"])))
+        self.filesystems.guard_transition(target)
         return self._operation("stop", target, ["stop", "local:" + target, "--timeout", str(self.lxd.timeout)], "Stopped")
 
     def stop_all(self):
@@ -245,9 +263,11 @@ class Manager:
 
     def delete(self, target, ask=input):
         self.require(target, stopped=True)
+        self.filesystems.guard_delete(target)
         if not confirm(t("delete_confirm", target=target), ask):
             return False
         self.require(target, stopped=True)
+        self.filesystems.guard_delete(target)
         self._operation("delete", target, ["delete", "local:" + target], "Absent")
         return True
 

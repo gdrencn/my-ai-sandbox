@@ -60,5 +60,9 @@
   "case_invalid-inputs": "Invalid targets and backup inputs",
   "case_lifecycle-repeat": "Repeated lifecycle and user preservation",
   "case_unmarked-import": "Unmarked native backup import",
-  "test_optimization": "Tests require assertions; do not use Python -O or PYTHONOPTIMIZE."
+  "test_optimization": "Tests require assertions; do not use Python -O or PYTHONOPTIMIZE.",
+  "case_filesystems": "Filesystem mount/read/write/unmount",
+  "case_filesystem-recovery": "Filesystem recovery",
+  "case_filesystem-menu": "Filesystem menu",
+  "wait_filesystem-disconnect": "filesystem disconnect"
 }

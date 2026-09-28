@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.8. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.9. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
@@ -42,3 +42,10 @@ In order:
 6. Verify passwordless sudo through sandbox's login session using sudo -n /usr/bin/true.
 
 Root's password is not set to empty. The ownership marker and this user/sudo preparation are the only mas-specific container configuration. No GPU mapping, host-directory sharing, network policy, port forwarding or custom profile is added. Fresh-host storage/network initialization, LXD installation, sudo authentication and host PATH setup belong to mas/install.py, not to container operation hooks.
+
+
+## Filesystem extension (0.1.9)
+
+Manager delegates all three commands to one per-user Filesystems implementation. mountfs verifies ownership, resolves/validates the container directory through native LXD file APIs, locks mount records, rejects overlap and existing host destinations, creates tracked host directories, starts the native authenticated loopback listener and SSHFS, then checks the actual mount table and live helpers. unmountfs selects an exact recorded path, verifies mount identity, uses fusermount3, waits for disappearance, terminates identity-matched helpers and removes only tracked empty directories/private connection files. mountedfs reconciles records with mount table and helper identity without mounting or changing container state.
+
+Lifecycle transition/delete preconditions refuse this user's recorded mounts before native state changes. No start/stop hook mounts or unmounts automatically. Permissions/UID/GID/ACLs in the container are not rewritten; native new-file semantics apply. The registry is private under XDG_STATE_HOME and separate from the LXD container ownership marker.

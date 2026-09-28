@@ -29,6 +29,13 @@ class Progress:
                 self.output.keep(line)
 
 
+def show_mounts(entries):
+    if not entries:
+        print(t("fs_empty"))
+    for entry in entries:
+        print(f"{entry['path']}\t{entry['destination']}\t{state(entry['status'])}")
+
+
 def parser():
     result = Parser(prog="mas", description=t('cli_description'))
     result.add_argument("--version", action="version", version=__version__, help=t("help_version"))
@@ -41,7 +48,7 @@ def parser():
         item.add_argument("key", choices=["language"])
         if action == "set":
             item.add_argument("value", choices=config.LANGUAGES)
-    for name in ("new", "list", "start", "stop", "delete", "info", "import", "export", "enter"):
+    for name in ("new", "list", "start", "stop", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs"):
         command = commands.add_parser(name)
         if name != "list":
             command.add_argument("target", metavar="TARGET", **({"nargs": "?"} if name == "stop" else {}))
@@ -49,6 +56,8 @@ def parser():
             consent = command.add_mutually_exclusive_group()
             consent.add_argument("--yes", dest="consent", action="store_const", const=True, help=t("help_yes"))
             consent.add_argument("--no", dest="consent", action="store_const", const=False, help=t("help_no"))
+        if name in ("mountfs", "unmountfs"):
+            command.add_argument("path", metavar="PATH", nargs="?", help=t("help_fs_path"))
         if name == "stop":
             command.add_argument("--all", action="store_true", help=t('help_all'))
         if name == "new":
@@ -86,6 +95,11 @@ def main(argv=None, manager=None):
                 print(f"{item['name']}\t{state(item['status'])}")
         elif args.command == "info":
             print(json.dumps(manager.info(args.target), indent=2))
+        elif args.command in ("mountfs", "unmountfs"):
+            result = getattr(manager, args.command)(args.target, args.path)
+            print(t("fs_mounted_at", path=result) if args.command == "mountfs" else t("menu_done"))
+        elif args.command == "mountedfs":
+            show_mounts(manager.mountedfs(args.target))
         elif args.command == "new":
             manager.new(args.target, args.image)
         elif args.command == "import":

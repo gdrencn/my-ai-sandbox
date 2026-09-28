@@ -48,7 +48,7 @@ class UI:
 
     def container(self, target):
         selected = 'info'
-        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'back')]
+        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'mountedfs', 'mountfs', 'unmountfs', 'back')]
         while True:
             selected = self.choose(t('page_container', target=target), actions, selected)
             if selected == 'back':
@@ -58,6 +58,19 @@ class UI:
                 nonlocal deleted
                 if selected == 'info':
                     self.info(target)
+                elif selected == 'mountfs':
+                    path = self.view.input(t('fs_path_prompt'))
+                    destination = self.manager.mountfs(target, path or None)
+                    print(t('fs_mounted_at', path=destination), flush=True)
+                elif selected in ('mountedfs', 'unmountfs'):
+                    from .cli import show_mounts
+                    entries = self.manager.mountedfs(target)
+                    show_mounts(entries)
+                    if selected == 'unmountfs' and entries:
+                        path = self.view.choose(t('fs_unmount_select'), [(e['path'], e['path']) for e in entries] + [(None, t('menu_back'))])
+                        if path is not None:
+                            self.manager.unmountfs(target, path)
+                            print(t('menu_done'), flush=True)
                 elif selected == 'enter':
                     self.enter(target)
                 elif selected == 'delete':

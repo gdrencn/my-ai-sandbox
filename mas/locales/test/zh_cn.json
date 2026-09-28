@@ -60,5 +60,9 @@
   "case_invalid-inputs": "无效目标与备份输入",
   "case_lifecycle-repeat": "重复启停与用户数据保留",
   "case_unmarked-import": "无标记原生备份导入",
-  "test_optimization": "测试不能在 Python -O 或 PYTHONOPTIMIZE 模式下运行，否则断言会被禁用。"
+  "test_optimization": "测试不能在 Python -O 或 PYTHONOPTIMIZE 模式下运行，否则断言会被禁用。",
+  "case_filesystems": "文件系统挂载读写与卸载",
+  "case_filesystem-recovery": "文件系统异常恢复",
+  "case_filesystem-menu": "文件系统菜单",
+  "wait_filesystem-disconnect": "文件系统连接退出"
 }

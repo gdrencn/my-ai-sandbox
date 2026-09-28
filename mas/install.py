@@ -61,6 +61,7 @@ def prepare_system():
     if Path("/proc/1/comm").read_text().strip() != "systemd":
         raise Error(t('systemd_required'))
     executable = shutil.which("lxd") or ("/snap/bin/lxd" if Path("/snap/bin/lxd").exists() else None)
+    needs_sshfs = not shutil.which("sshfs")
     if os.geteuid() != 0:
         try:
             group = grp.getgrnam("lxd")
@@ -69,7 +70,7 @@ def prepare_system():
                            or (group.gr_gid not in os.getgroups() and os.getgid() != group.gr_gid))
         except KeyError:
             needs_group = True
-        if not executable or needs_group:
+        if not executable or needs_group or needs_sshfs:
             print(t("sudo_auth"), flush=True)
             run(["sudo", "-v"], privileged=True)
     if not executable:
@@ -80,6 +81,9 @@ def prepare_system():
         run(["snap", "wait", "system", "seed.loaded"], privileged=True)
         channel = stable_channel(run(["snap", "info", "lxd"], capture=True))
         run(["snap", "install", "lxd", "--channel=" + channel], privileged=True)
+    if needs_sshfs:
+        run(["apt-get", "update"], privileged=True)
+        run(["apt-get", "install", "-y", "sshfs"], privileged=True)
     if os.geteuid() != 0:
         username = pwd.getpwuid(os.getuid()).pw_name
         group = grp.getgrnam("lxd")

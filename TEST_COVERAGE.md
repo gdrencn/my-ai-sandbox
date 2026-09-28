@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.1.8 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.1.9 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -26,6 +26,7 @@ This maps the checks present in batch 0.1.8 to requirements and implementation. 
 | Installation and packaging | separate installer invoked before final product testing; public normal/test entry; installed artifact hashes | missing snap/LXD sudo sequence, ready-system no-sudo, existing profile preservation, PATH idempotence, archive separation, mismatched version, bad download checksum prevents installation |
 | Language / configuration | CLI get/set/help, menu language changes and cancellation, installation default in PTY | exact en_us/zh_cn identifiers, catalog keys/placeholders, saved defaults, broken config protection, unrelated preferences retained |
 | Shared progress display | complete real menu/CLI lifecycle; permanent final results, separate structured waiting records | redirected output has no ticks/escapes; Chinese narrow width; actual output terminal sizing; query warnings without newlines; PTY results/diagnostics/menu/interruption history |
+| Filesystem mounts | running/stopped reads and writes, root and default-home mounts, exact unmount, non-overlap, pre-existing paths, lifecycle refusal, killed-helper cleanup/retry, CLI and real menu actions; original and newly created metadata recorded | normalization, symlink/unknown-parent refusal, inode replacement, nonempty cleanup, corrupt records, default-home changes, mount-table identity, PID reuse, failed-attempt ownership, missing-SSHFS sudo |
 | Tester behavior | localized per-stage results, persistent diagnostics, detailed logs, elapsed events, isolated cleanup | failed/interrupted group and later not_run status; cleanup/report errors produce failure; unit skips/details recorded; automatic discovery; Python optimization rejected because it disables assertions |
 
 ## Current limits
@@ -34,6 +35,8 @@ This maps the checks present in batch 0.1.8 to requirements and implementation. 
 - Historical user logs cover a missing-LXD installation. Batch 0.1.7 does not remove the host LXD/Python installation to repeat fresh provisioning; sudo, package-manager failure and existing configuration behavior use controlled subprocess tests.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
-- GPU passthrough, resource sharing and custom networking are excluded features, not covered functionality.
+- GPU passthrough, host-to-container resource sharing and custom networking are excluded features, not covered functionality.
 
 The historical integration group identifier `tui` remains for report continuity; it now runs the inline text-menu application. New groups are `invalid-inputs`, `lifecycle-repeat` and `unmarked-import`.
+
+0.1.9 adds filesystems, filesystem-recovery and filesystem-menu (20 real groups in total). Actual ACL-bearing files, Windows-side access to FUSE mounts and offline VHDX mounting are not verified. Development SSHFS was unpacked from the Ubuntu repository because host sudo was unavailable; the missing-package installer branch is covered by controlled tests.

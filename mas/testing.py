@@ -133,7 +133,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -154,7 +154,9 @@ class Suite:
         self.timeout = timeout
         self.project = random_target()
         self.host = LXD(timeout=timeout)
-        self.manager = Manager(LXD(project=self.project, timeout=timeout), self.report)
+        self.fs_root = self.directory / "mounts"
+        self.fs_state = self.directory / "mount-state"
+        self.manager = Manager(LXD(project=self.project, timeout=timeout), self.report, self.fs_root, self.fs_state)
         self.created_project = False
         self.targets = []
         self.events = []
@@ -198,7 +200,7 @@ class Suite:
                   "events=open(" + repr(str(self.event_path)) + ", 'a');"
                   "progress=Progress();report=lambda event:(events.write(json.dumps(event)+'\\n'),events.flush(),progress(event));"
                   "raise SystemExit(main(manager=Manager(LXD(project=" + repr(self.project) +
-                  ",timeout=" + str(self.timeout) + ",diagnostic=progress.output.keep),report=report)))")
+                  ",timeout=" + str(self.timeout) + ",diagnostic=progress.output.keep),report=report,fs_root=" + repr(str(self.fs_root)) + ",fs_state=" + repr(str(self.fs_state)) + "))) ")
         return [sys.executable, "-c", source, *args]
 
     def read_events(self, path, diagnostics=False):
@@ -429,6 +431,12 @@ class Suite:
             self.cli('import', target, str(native_backup))
             restored = self.manager.info(target)
             assert restored['config']['user.mas.managed'] == 'true' and restored['status'] == 'Stopped'
+        with self.case("filesystems"):
+            self.filesystems(target)
+        with self.case("filesystem-recovery"):
+            self.filesystem_recovery(target)
+        with self.case("filesystem-menu"):
+            self.filesystem_menu(target)
         with self.case("delete-confirmation"):
             with self.terminal(["delete", imported]) as terminal:
                 terminal.expect("Delete " + imported)
@@ -451,6 +459,90 @@ class Suite:
             self.cli("config", "set", "language", self.language)
         with self.case("tui"):
             self.tui()
+
+    def filesystems(self, target):
+        self.cli('start', target)
+        self.exec(target, "printf 'container secret' > /home/sandbox/mas-secret; chown sandbox:sandbox /home/sandbox/mas-secret; chmod 600 /home/sandbox/mas-secret")
+        before = self.exec(target, "stat -c '%u:%g:%a' /home/sandbox/mas-secret")
+        home = self.fs_root/target/'home/sandbox'
+        self.cli('mountfs', target)
+        assert home.joinpath('mas-secret').read_text() == 'container secret'
+        home.joinpath('host-created').write_text('from host')
+        assert self.exec(target, 'cat /home/sandbox/host-created') == 'from host'
+        self.events.append(dict(action='filesystem-native-metadata', target=target, status='ok', existing=before.strip(), created=self.exec(target, "stat -c '%u:%g:%a' /home/sandbox/host-created").strip()))
+        home.joinpath('host-created').unlink()
+        assert self.exec(target, "stat -c '%u:%g:%a' /home/sandbox/mas-secret") == before
+        self.cli('stop',target,code=1)
+        assert self.state(target,'Running')
+        self.cli('mountfs',target,code=1)
+        self.cli('mountfs',target,'/home',code=1)
+        self.cli('mountfs',target,'/var/log')
+        listing=self.cli('mountedfs',target)
+        assert '/home/sandbox' in listing and '/var/log' in listing
+        self.cli('unmountfs',target,'/home/sandbox/child',code=1)
+        assert home.is_mount()
+        self.cli('unmountfs',target,'/var/log')
+        self.cli('unmountfs',target)
+        assert not self.fs_root.exists()
+        self.cli('stop',target)
+        self.cli('mountfs',target,'/')
+        self.cli('start',target,code=1)
+        assert self.state(target,'Stopped')
+        self.cli('delete',target,answer='y',code=1)
+        self.cli('unmountfs',target,'/var/log',code=1)
+        assert self.fs_root.joinpath(target).is_mount()
+        assert self.fs_root.joinpath(target,'etc/passwd').read_text()
+        self.cli('unmountfs',target,'/')
+        assert not self.fs_root.exists()
+        # A pre-existing empty destination must survive refusal.
+        home.mkdir(parents=True)
+        self.cli('mountfs',target,code=1)
+        assert home.is_dir() and not home.is_mount()
+        home.rmdir();home.parent.rmdir();home.parent.parent.rmdir();self.fs_root.rmdir()
+        for invalid in ('relative','/home/../etc','/var/run'):
+            self.cli('mountfs',target,invalid,code=1)
+        assert self.state(target,'Stopped')
+
+    def filesystem_recovery(self, target):
+        self.cli('mountfs',target,'/var/log')
+        fs=self.manager.filesystems
+        with fs.locked() as data:
+            entry=fs._entries(data,target)[0]
+            os.kill(entry['sshfs']['pid'],signal.SIGTERM)
+        self.wait('filesystem-disconnect',lambda: self.manager.mountedfs(target)[0]['status'] != 'mounted')
+        self.cli('mountedfs',target)
+        self.cli('unmountfs',target,'/var/log')
+        assert not self.fs_root.exists()
+        self.cli('mountfs',target,'/var/log')
+        self.cli('unmountfs',target,'/var/log')
+        assert not self.manager.mountedfs(target)
+
+    def filesystem_menu(self, target):
+        with self.terminal([]) as terminal:
+            down='\x1b[B';back='\x1b[D'
+            terminal.expect('my-ai-sandbox');terminal.send('\n')
+            terminal.expect('Container management');terminal.send('\n')
+            terminal.expect('Containers')
+            # Sorted list can also contain the imported fixture.
+            names=[item['name'] for item in self.manager.list()]
+            terminal.send(down*names.index(target)+'\n')
+            terminal.expect('Container: '+target)
+            terminal.send(down*7+'\n')
+            terminal.expect('Container path (Enter = sandbox home):');terminal.send('/var/log\n')
+            terminal.expect('Mounted at ')
+            terminal.expect('Container: '+target)
+            terminal.send('\x1b[A\n')
+            terminal.expect(str(self.fs_root/target/'var/log'))
+            terminal.expect('Container: '+target)
+            terminal.send(down*2+'\n')
+            terminal.expect('Select an exact path to unmount');terminal.send('\x1b[A\n')
+            terminal.expect('Completed.')
+            terminal.expect('Container: '+target)
+            terminal.send(back);terminal.expect('Containers')
+            terminal.send(back);terminal.expect('Container management')
+            terminal.send(back);terminal.expect('my-ai-sandbox')
+            terminal.send(down*2+'\n');terminal.finish()
+        assert not self.manager.mountedfs(target) and not self.fs_root.exists()
 
     def network(self, target):
         try:
@@ -547,6 +639,9 @@ class Suite:
             try:
                 item = self.manager.find(target)
                 if item:
+                    if self.manager.managed(item):
+                        for entry in self.manager.mountedfs(target):
+                            self.manager.unmountfs(target, entry["path"])
                     if item["status"] != "Stopped":
                         self.manager._operation("cleanup-stop", target, ["stop", "local:" + target,
                                                 "--timeout", str(self.timeout)], "Stopped", require_marker=False)
