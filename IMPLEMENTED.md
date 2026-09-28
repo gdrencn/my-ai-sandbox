@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: v0.1.0-test.1 is publicly released; a reported fresh-install permission bug is fixed locally for v0.1.0-test.2. See Stage 5. Earlier successful existing-host tests did not cover the failing fresh-install step.
+Current result: v0.1.0-test.2 is publicly released with the fresh-install snap seed permission fix. See Stage 5. Earlier successful existing-host tests did not cover the failing fresh-install step.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -67,4 +67,4 @@ User report: on a machine without LXD, installation stopped at `snap wait system
 
 The installer now runs that step through the shared privileged-command runner. Added a regression test exercising the fresh-install path with snapd present and absent, simulating the subprocess permission boundary. Before the fix both scenarios failed with the reported permission error; after the fix all 20 unit tests passed. No third-party dependency or host sudoers configuration was added.
 
-The v0.1.0-test.2 product and matching tester passed all 13 real integration groups (including 20 unit tests), with exit code 0 and no cleanup errors. The tested product hash matches the release artifact; evidence is in validation/TEST_2_REPORT.json. Publication is the remaining step. A full live fresh-host installation remains unverified here.
+The v0.1.0-test.2 product and matching tester passed all 13 real integration groups (including 20 unit tests), with exit code 0 and no cleanup errors. The tested product hash matches the release artifact; evidence is in validation/TEST_2_REPORT.json. Published at https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.0-test.2. The fixed public installation entry resolved test.2, installed successfully on the existing development environment, and installed product/tester hashes match the release files. A full live fresh-host installation remains unverified here.
