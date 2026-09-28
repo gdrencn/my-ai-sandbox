@@ -2,6 +2,8 @@
 """Build architecture-independent zipapps without pip or external tools."""
 
 import hashlib
+import json
+import shlex
 from pathlib import Path
 import shutil
 import tempfile
@@ -13,12 +15,18 @@ DIST = ROOT / "dist"
 
 def main():
     DIST.mkdir(exist_ok=True)
+    messages = json.loads((ROOT / "mas/locales/en_us.json").read_text())
+    installer = (ROOT / "scripts/install.template.sh").read_text().replace(
+        "@LANGUAGE_PROMPT@", shlex.quote(messages["choose_language"].format(current="en_us")))
+    (ROOT / "install.sh").write_text(installer)
+
     for filename, entry, tests in (("mas.pyz", "mas.cli:main", False),
                                    ("mas-test.pyz", "mas.testing:main", True)):
         with tempfile.TemporaryDirectory() as directory:
             stage = Path(directory)
             shutil.copytree(ROOT / "mas", stage / "mas", ignore=shutil.ignore_patterns("__pycache__"))
             if tests:
+                shutil.copyfile(ROOT / "bootstrap.py", stage / "bootstrap.py")
                 shutil.copytree(ROOT / "tests", stage / "tests", ignore=shutil.ignore_patterns("__pycache__"))
             module, function = entry.split(":")
             (stage / "__main__.py").write_text(f"from {module} import {function}\nraise SystemExit({function}())\n")

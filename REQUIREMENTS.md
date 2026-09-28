@@ -20,6 +20,7 @@ Use LXD's existing functionality instead of reimplementing it. Each basic operat
 | `mas import TARGET FILE` | Import into an explicitly named, nonexistent TARGET. Never overwrite any existing instance. Verify STOPPED afterwards. |
 | `mas export TARGET FILE` | Export a stopped managed container only. If FILE exists, ask whether to overwrite; default no, y/yes allows overwrite. |
 | `mas enter TARGET` | Start through the shared start function if stopped, then open a terminal using native LXD execution. |
+| `mas config [get language / set language en_us / set language zh_cn]` | Read or update shared user settings without requiring LXD. |
 | `mas` | Open the TUI directly when no subcommand is supplied. No `mas tui` command. |
 
 TARGET is a local container name, not a remote, project, snapshot or VM selector. The first release operates on the local LXD server's default project, independent of the user's default remote. This limits accidental scope changes.
@@ -66,11 +67,21 @@ Release a standalone test tool with a fixed one-line download/install/run entry 
 
 Test container names are `test-<unique-random-code>`. Operate on those explicit targets and clean up only resources created by that run. Never stop other managed user containers while testing `stop --all`: use a temporary isolated LXD test project for the integration test. The product itself still operates on default. Report cleanup failures. Keep installed LXD and permanent environment setup.
 
-Cover new/list/start/stop/delete/info/import/export, default host-matching image selection (including WSL), explicit image overrides, unavailable-image errors without fallback, enter from stopped/running states as sandbox, exit default/no/yes, delete confirmation in CLI and TUI, export overwrite confirmation and default refusal, CLI argument and error handling, bare mas opening the TUI, all TUI actions and terminal return, outbound networking, backup round-trip data integrity, ownership rejection, duplicate import, running-state restrictions and stop-all isolation. Exercise real terminal interaction rather than relying solely on mocks. Record unsuccessful, skipped and unexecuted tests accurately. Supplement with focused standard-library unit tests for failure paths that are unsuitable for provoking on a live host.
+Cover new/list/start/stop/delete/info/import/export, default host-matching image selection (including WSL), explicit image overrides, unavailable-image errors without fallback, enter from stopped/running states as sandbox, exit default/no/yes, delete confirmation in CLI and TUI, export overwrite confirmation and default refusal, CLI argument and error handling, bare mas opening the TUI, all TUI actions and terminal return, outbound networking, backup round-trip data integrity, ownership rejection, duplicate import, running-state restrictions and stop-all isolation. Exercise real terminal interaction rather than relying solely on mocks. Cover language selection, persistence, canonical identifiers, localized CLI feedback, immediate TUI language switching and Chinese prompts; isolate test preferences from user configuration. Record unsuccessful, skipped and unexecuted tests accurately. Supplement with focused standard-library unit tests for failure paths that are unsuitable for provoking on a live host.
 
 ## 8. GitHub and releases
 
-Create public repository `my-ai-sandbox` through the current gh login. Publish only after the current WSL checks pass. Use versioned GitHub prereleases, initially `v0.1.0-test.1`, containing product and matching test assets. A fixed entry resolves the newest test prerelease; it must not rely on GitHub's stable-only latest-release redirect. Preserve earlier versioned assets. Include checksums, installation instructions, tested environment and test results.
+Publish to the public my-ai-sandbox repository after current WSL checks pass. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The next version is 0.1.3. Product and tester share that version, with Git tag v0.1.3. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
+
+## 8.1. Language and user configuration
+
+Support exactly en_us and zh_cn throughout language filenames, persisted values and CLI arguments. Store all mas-owned interface messages in dedicated translation catalogs, shared by installation, CLI, TUI, core operation messages and the test tool. Preserve native LXD, sudo, package-manager output and machine-readable identifiers verbatim, with localized mas context where needed.
+
+Ask for language before installation starts; reuse the saved language as the default on subsequent installations. Noninteractive installation may explicitly select a language. Store user preferences in $XDG_CONFIG_HOME/my-ai-sandbox/config.json (default ~/.config/my-ai-sandbox/config.json). TUI has a settings entry, initially containing language; changes take effect immediately and persist. CLI: mas config, mas config get language, mas config set language zh_cn, mas config set language en_us. CLI and TUI reuse the same configuration functions. CLI configuration reading and changes must not require LXD.
+
+## 8.2. System sudo behavior
+
+At installation/testing startup, determine whether the current flow needs host sudo. If it does, invoke system sudo -v once before privileged work. Subsequent commands use normal system sudo behavior. No password handling, custom authentication cache, keepalive, expiry policy, timeout extension or host sudoers edits. System-driven reauthentication remains the system's responsibility. A test run with an already usable LXD needs no host sudo.
 
 ## 9. Documentation and stages
 

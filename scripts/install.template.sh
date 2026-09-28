@@ -12,7 +12,7 @@ if ! command -v python3 >/dev/null; then
         esac
     done
     while [[ $mas_language != en_us && $mas_language != zh_cn ]]; do
-        printf '%s' 'Language / 语言: 1 English (en_us), 2 简体中文 (zh_cn) [en_us]: ' >/dev/tty
+        printf '%s' @LANGUAGE_PROMPT@ >/dev/tty
         read -r mas_language </dev/tty
         case $mas_language in 1|'') mas_language=en_us ;; 2) mas_language=zh_cn ;; esac
     done

@@ -1,6 +1,7 @@
 """Shared operations. Only this module implements container lifecycle behavior."""
 
 import json
+
 import os
 from pathlib import Path
 import re
@@ -9,6 +10,8 @@ import subprocess
 import tarfile
 import tempfile
 import time
+
+from .i18n import t, state
 
 MANAGED = "user.mas.managed"
 DEFAULT_TIMEOUT = 600
@@ -42,7 +45,7 @@ class Error(RuntimeError):
 def confirm(message, ask=input):
     """One confirmation policy, independent of CLI or TUI presentation."""
     try:
-        return ask(message + " [y/N] ").strip().lower() in ("y", "yes")
+        return ask(t("confirm", message=message)).strip().lower() in ("y", "yes")
     except EOFError:
         return False
 
@@ -56,24 +59,24 @@ def host_image():
             key, value = line.split("=", 1)
             values[key] = "".join(shlex.split(value))
     if values.get("ID") != "ubuntu" or not re.fullmatch(r"\d+\.\d+", values.get("VERSION_ID", "")):
-        raise Error("Cannot select an Ubuntu image from this host; specify --image explicitly.")
+        raise Error(t('host_image_error'))
     return "ubuntu:" + values["VERSION_ID"]
 
 
 def validate_target(target):
     if not re.fullmatch(r"[A-Za-z](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", target):
-        raise Error("TARGET must be a local container name (1–63 letters, digits or hyphens; start with a letter).")
+        raise Error(t('invalid_target'))
 
 
 class LXD:
     def __init__(self, project="default", timeout=DEFAULT_TIMEOUT):
         if timeout < 300:
-            raise Error("Timeout must be at least 300 seconds.")
+            raise Error(t('timeout_minimum'))
         executable = shutil.which("lxc")
         if not executable and Path("/snap/bin/lxc").exists():
             executable = "/snap/bin/lxc"
         if not executable:
-            raise Error("LXD/lxc is missing. Run the installer to prepare this machine.")
+            raise Error(t('lxd_missing'))
         self.prefix = [executable, "--project", project]
         self.project = project
         self.timeout = timeout
@@ -83,16 +86,16 @@ class LXD:
             result = subprocess.run(self.prefix + args, text=True, capture_output=True,
                                     stdin=subprocess.DEVNULL, timeout=timeout or self.timeout)
         except subprocess.TimeoutExpired as exc:
-            raise Error("LXD query timed out; the server operation may still be running.") from exc
+            raise Error(t('lxd_query_timeout')) from exc
         if result.returncode:
-            raise Error(result.stderr.strip() or result.stdout.strip() or "LXD command failed.")
+            raise Error(result.stderr.strip() or result.stdout.strip() or t('lxd_failed'))
         return result.stdout
 
     def instances(self, timeout=None):
         try:
             return json.loads(self.command(["list", "local:", "--format=json"], timeout))
         except (ValueError, TypeError) as exc:
-            raise Error("LXD returned invalid instance data; absence cannot be established.") from exc
+            raise Error(t('lxd_invalid_data')) from exc
 
 
 class Manager:
@@ -112,16 +115,16 @@ class Manager:
     def require(self, target, stopped=False):
         instance = self.find(target)
         if instance is None:
-            raise Error(f"Container {target} does not exist.")
+            raise Error(t("container_missing", target=target))
         if not self.managed(instance):
-            raise Error(f"Container {target} is not managed by mas; no action taken.")
+            raise Error(t("container_unmanaged", target=target))
         if stopped and instance["status"] != "Stopped":
-            raise Error(f"Container {target} must be stopped first (currently {instance['status']}).")
+            raise Error(t("container_must_stop", target=target, status=state(instance["status"])))
         return instance
 
     def absent(self, target):
         if self.find(target) is not None:
-            raise Error(f"TARGET {target} already exists; nothing will be overwritten.")
+            raise Error(t("target_exists", target=target))
 
     def list(self):
         return sorted((item for item in self.lxd.instances() if self.managed(item)),
@@ -148,17 +151,16 @@ class Manager:
                 while True:
                     remaining = deadline - time.monotonic()
                     if remaining <= 0:
-                        raise Error(f"{action} {target} timed out; last state: {last}. "
-                                    "LXD may still be working; inspect before retrying.")
+                        raise Error(t("operation_timeout", action=action, target=target, last=state(last)))
                     tick = time.monotonic()
                     code = process.poll()
                     if code is not None and code != 0:
                         output.seek(0)
-                        raise Error(output.read().strip() or f"LXD exited with {code}.")
+                        raise Error(output.read().strip() or t("lxd_exit", code=code))
                     instance = self.find(target, remaining)
                     last = instance["status"] if instance else "Absent"
                     if instance and last == "Error":
-                        raise Error(f"{target} entered LXD Error state.")
+                        raise Error(t("container_error", target=target))
                     matches = last == expected
                     if instance and require_marker:
                         matches = matches and self.managed(instance)
@@ -179,7 +181,7 @@ class Manager:
         self.absent(target)
         image = image or host_image()
         if image.startswith("-"):
-            raise Error("Invalid image reference.")
+            raise Error(t('invalid_image'))
         return self._operation("new", target,
                                ["init", image, "local:" + target, "-c", MANAGED + "=true"], "Stopped")
 
@@ -188,7 +190,7 @@ class Manager:
         if instance["status"] == "Running":
             self.report(dict(action="start", target=target, status="ok", elapsed=0, observation="Running"))
         elif instance["status"] != "Stopped":
-            raise Error(f"Cannot start {target} from {instance['status']}.")
+            raise Error(t("cannot_start", target=target, status=state(instance["status"])))
         else:
             self._operation("start", target, ["start", "local:" + target], "Running")
         return self._operation("prepare-user", target,
@@ -200,7 +202,7 @@ class Manager:
             self.report(dict(action="stop", target=target, status="ok", elapsed=0, observation="Stopped"))
             return instance
         if instance["status"] != "Running":
-            raise Error(f"Cannot stop {target} from {instance['status']}.")
+            raise Error(t("cannot_stop", target=target, status=state(instance["status"])))
         return self._operation("stop", target, ["stop", "local:" + target, "--timeout", str(self.lxd.timeout)], "Stopped")
 
     def stop_all(self):
@@ -211,11 +213,11 @@ class Manager:
             except Error as exc:
                 failures.append(str(exc))
         if failures:
-            raise Error("Some containers could not be stopped:\n" + "\n".join(failures))
+            raise Error(t("stop_failures", errors="\n".join(failures)))
 
     def delete(self, target, ask=input):
         self.require(target, stopped=True)
-        if not confirm(f"Delete {target}?", ask):
+        if not confirm(t("delete_confirm", target=target), ask):
             return False
         self.require(target, stopped=True)
         self._operation("delete", target, ["delete", "local:" + target], "Absent")
@@ -225,11 +227,11 @@ class Manager:
         self.absent(target)
         path = Path(filename).expanduser().absolute()
         if not path.is_file():
-            raise Error(f"Backup does not exist: {path}")
+            raise Error(t("backup_missing", path=path))
         instance = self._operation("import", target, ["import", "local:", str(path), target],
                                    "Stopped", require_marker=False)
         if instance.get("type") != "container":
-            raise Error(f"Imported {target} is not a container; it was left unmanaged. Only container backups are supported.")
+            raise Error(t("import_not_container", target=target))
         # lxc import has no config override. Mark only after this import succeeds.
         self._operation("mark-import", target,
                         ["config", "set", "local:" + target, MANAGED + "=true"], "Stopped")
@@ -238,13 +240,13 @@ class Manager:
         self.require(target, stopped=True)
         destination = Path(filename).expanduser().absolute()
         overwrite = destination.exists() or destination.is_symlink()
-        if overwrite and not confirm(f"Overwrite {destination}?", ask):
+        if overwrite and not confirm(t("overwrite_confirm", path=destination), ask):
             return False
         if overwrite and (destination.is_symlink() or not destination.is_file()):
-            raise Error("Export destination must be a regular file, not a directory or symbolic link.")
+            raise Error(t('export_regular'))
         self.require(target, stopped=True)
         if not destination.parent.is_dir():
-            raise Error(f"Export directory does not exist: {destination.parent}")
+            raise Error(t("export_directory", path=destination.parent))
         # Publish only the complete backup. A declined overwrite preserves the old file.
         with tempfile.TemporaryDirectory(prefix=".mas-export-", dir=destination.parent) as directory:
             backup = Path(directory) / "backup.tar.gz"
@@ -252,17 +254,17 @@ class Manager:
             try:
                 with tarfile.open(backup, "r:*") as archive:
                     if not any(member.name.rstrip("/") == "backup/index.yaml" for member in archive):
-                        raise Error("LXD export is missing its backup metadata.")
+                        raise Error(t('export_metadata'))
                 if overwrite:
                     os.replace(backup, destination)
                 else:
                     os.link(backup, destination)
             except (tarfile.TarError, OSError) as exc:
-                raise Error(f"Cannot validate or publish export: {exc}") from exc
+                raise Error(t("export_failed", error=exc)) from exc
         return True
 
     def on_exit(self, target, ask=input):
-        if confirm(f"Stop {target}?", ask):
+        if confirm(t("stop_confirm", target=target), ask):
             self.stop(target)
 
     def enter(self, target, ask=input):
@@ -271,4 +273,4 @@ class Manager:
         code = subprocess.call(self.lxd.prefix + ["exec", "local:" + target, "--", "su", "--login", "sandbox"])
         self.on_exit(target, ask)
         if code:
-            raise Error(f"Container terminal exited with status {code}.")
+            raise Error(t("shell_exit", code=code))

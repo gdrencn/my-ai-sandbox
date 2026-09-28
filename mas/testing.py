@@ -1,11 +1,11 @@
 """Portable real-LXD test runner, using only Python's standard library."""
 
-import argparse
 import contextlib
 import errno
 import fcntl
 import hashlib
 import json
+
 import os
 from pathlib import Path
 import platform
@@ -20,12 +20,15 @@ import termios
 import time
 import traceback
 import unittest
+from unittest.mock import patch
 import uuid
 import zipfile
 
-from . import __version__
+from . import __version__, config
 from .cli import progress
 from .core import Error, LXD, Manager, host_image
+
+from .i18n import t, Parser
 
 
 def random_target():
@@ -74,15 +77,15 @@ class Terminal:
                 self.cursor = index + len(expected)
                 return
             if self.status is not None:
-                raise AssertionError(f"Terminal exited {self.status} before {text!r}: {self.buffer[-2000:]!r}")
-        raise AssertionError(f"Terminal wait timed out after {self.timeout}s for {text!r}: {self.buffer[-2000:]!r}")
+                raise AssertionError(t("pty_exited", status=self.status, text=text, buffer=self.buffer[-2000:]))
+        raise AssertionError(t("pty_timeout", timeout=self.timeout, text=text, buffer=self.buffer[-2000:]))
 
     def finish(self):
         start = time.monotonic()
         while self.status is None and time.monotonic() - start < self.timeout:
             self.read()
         if self.status != 0:
-            raise AssertionError(f"Terminal exit status: {self.status}; {self.buffer[-2000:]!r}")
+            raise AssertionError(t("pty_status", status=self.status, buffer=self.buffer[-2000:]))
 
     def close(self):
         if self.status is None:
@@ -96,7 +99,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "tui"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.directory = report_dir
@@ -105,9 +108,12 @@ class Suite:
             result = subprocess.run([sys.executable, str(self.product), "--version"],
                                     text=True, capture_output=True, timeout=600)
             if result.returncode or result.stdout.strip() != __version__:
-                raise Error("Product and test-tool versions do not match, or product cannot run.")
+                raise Error(t('version_mismatch'))
         report_dir.mkdir(parents=True, exist_ok=False)
         self.workspace = tempfile.TemporaryDirectory(prefix="backups-", dir=report_dir)
+        self.config_home = Path(self.workspace.name) / "config"
+        with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
+            config.set_value("language", "en_us")
         self.timeout = timeout
         self.project = random_target()
         self.host = LXD(timeout=timeout)
@@ -126,7 +132,7 @@ class Suite:
     @contextlib.contextmanager
     def case(self, name):
         start = time.monotonic()
-        print(f"TEST {name}", flush=True)
+        print(t("test_case", name=name), flush=True)
         try:
             yield
         except BaseException as exc:
@@ -134,7 +140,7 @@ class Suite:
             raise
         else:
             self.results[name] = {"status": "passed", "elapsed": time.monotonic() - start}
-            print(f"PASS {name} ({self.results[name]['elapsed']:.1f}s)", flush=True)
+            print(t("test_pass", name=name, elapsed=self.results[name]["elapsed"]), flush=True)
 
     def target(self):
         name = random_target()
@@ -144,7 +150,7 @@ class Suite:
     def command(self, args):
         # Exercise the actual CLI with an injected isolated manager. Product CLI
         # never accepts a remote/project override or a test environment variable.
-        source = ("import sys;sys.path.insert(0," + repr(str(self.product) if self.product else sys.path[0]) + ");"
+        source = ("import os,sys;os.environ['XDG_CONFIG_HOME']=" + repr(str(self.config_home)) + ";sys.path.insert(0," + repr(str(self.product) if self.product else sys.path[0]) + ");"
                   "from mas.cli import main,progress;from mas.core import Manager,LXD;"
                   "raise SystemExit(main(manager=Manager(LXD(project=" + repr(self.project) +
                   ",timeout=" + str(self.timeout) + "),report=progress)))")
@@ -157,9 +163,9 @@ class Suite:
         self.counter += 1
         (self.directory / f"cli-{self.counter}.txt").write_text(result.stdout + result.stderr)
         print(result.stderr, end="", flush=True)
-        print(f"CLI {' '.join(args)} completed in {time.monotonic()-start:.1f}s", flush=True)
+        print(t("test_cli", command=" ".join(args), elapsed=time.monotonic()-start), flush=True)
         if result.returncode != code:
-            raise AssertionError(f"CLI {args}: expected {code}, got {result.returncode}: {result.stdout} {result.stderr}")
+            raise AssertionError(t("cli_failed", args=args, expected=code, actual=result.returncode, stdout=result.stdout, stderr=result.stderr))
         return result.stdout
 
     @contextlib.contextmanager
@@ -177,14 +183,14 @@ class Suite:
             if terminal:
                 terminal.read()
                 if terminal.status is not None:
-                    raise AssertionError(f"TUI exited unexpectedly: {terminal.buffer[-2000:]!r}")
+                    raise AssertionError(t("pty_unexpected", buffer=terminal.buffer[-2000:]))
             if probe():
                 elapsed = time.monotonic() - start
-                print(f"WAIT {label}: {elapsed:.1f}s", flush=True)
+                print(t("test_wait", label=label, elapsed=elapsed), flush=True)
                 self.events.append(dict(action="test-wait", target=label, status="ok", elapsed=elapsed))
                 return
             time.sleep(1)
-        raise AssertionError(f"Wait {label} exceeded {self.timeout}s")
+        raise AssertionError(t("wait_timeout", label=label, timeout=self.timeout))
 
     def state(self, target, expected):
         instance = self.manager.find(target)
@@ -203,9 +209,11 @@ class Suite:
     def run(self):
         target, imported, external = self.target(), self.target(), self.target()
         with self.case("unit"):
-            from tests import test_core
-            result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(test_core))
-            assert result.wasSuccessful(), "Unit tests failed"
+            from tests import test_core, test_i18n
+            units = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module)
+                                       for module in (test_core, test_i18n))
+            result = unittest.TextTestRunner(verbosity=2).run(units)
+            assert result.wasSuccessful(), t("unit_failed")
         self.host.command(["project", "create", "local:" + self.project,
                            "-c", "features.images=false", "-c", "features.profiles=false"])
         self.created_project = True
@@ -216,7 +224,7 @@ class Suite:
         with self.case("missing-image"):
             missing = self.target()
             self.cli("new", missing, "--image", "ubuntu:mas-missing-" + uuid.uuid4().hex, code=1)
-            assert self.state(missing, "Absent"), "Unavailable image unexpectedly created a container"
+            assert self.state(missing, "Absent"), t("image_unexpected")
         with self.case("list-info"):
             assert target in self.cli("list")
             assert json.loads(self.cli("info", target))["status"] == "Stopped"
@@ -277,13 +285,19 @@ class Suite:
             assert external not in self.cli("list")
             self.cli("stop", "--all")
             assert self.state(target, "Stopped") and self.state(imported, "Stopped")
-            assert self.state(external, "Running"), "stop --all affected an unmanaged container"
+            assert self.state(external, "Running"), t("ownership_failed")
         with self.case("delete-confirmation"):
             self.cli("delete", imported, answer="\n")
             assert self.state(imported, "Stopped")
             self.cli("delete", imported, answer="y\n")
             assert self.state(imported, "Absent")
             self.cli("delete", target, answer="y\n")
+        with self.case("language-config"):
+            assert self.cli("config", "get", "language").strip() == "en_us"
+            self.cli("config", "set", "language", "zh_cn")
+            assert "管理" in self.cli("--help")
+            assert self.cli("config", "get", "language").strip() == "zh_cn"
+            self.cli("config", "set", "language", "en_us")
         with self.case("tui"):
             self.tui()
 
@@ -299,6 +313,32 @@ class Suite:
         backup = Path(self.workspace.name) / "tui-backup.tar.gz"
         with self.terminal([]) as terminal:
             terminal.expect("my-ai-sandbox")
+            terminal.send("c")
+            terminal.expect("Settings")
+            terminal.send("2")
+            terminal.expect(t("settings_title", locale="zh_cn"))
+            assert self.cli("config", "get", "language").strip() == "zh_cn"
+            terminal.send("q")
+            terminal.expect(t("tui_title", locale="zh_cn"))
+            terminal.send("n")
+            terminal.expect(t("new_target", locale="zh_cn"))
+            terminal.send(target + "\n")
+            terminal.expect(t("new_image", locale="zh_cn"))
+            terminal.send("\n")
+            self.wait("TUI Chinese new", lambda: self.state(target, "Stopped"), terminal)
+            terminal.send("d")
+            terminal.expect("[y/N]")
+            terminal.send("\n")
+            terminal.expect(t("cancelled", locale="zh_cn"))
+            assert self.state(target, "Stopped")
+            terminal.send("c")
+            terminal.expect(t("settings_title", locale="zh_cn"))
+            terminal.send("1")
+            terminal.expect("Settings")
+            terminal.send("q")
+            terminal.expect("my-ai-sandbox")
+            self.cli("delete", target, answer="y\n")
+            terminal.send("r")
             terminal.send("n")
             terminal.expect("New TARGET:")
             terminal.send(target + "\n")
@@ -328,11 +368,11 @@ class Suite:
             terminal.send(str(backup) + "\n")
             terminal.expect("[y/N]")
             terminal.send("\n")
-            terminal.expect("Cancelled.")
+            terminal.expect(t("cancelled", locale="en_us"))
             terminal.send("d")
             terminal.expect("[y/N]")
             terminal.send("\n")
-            terminal.expect("Cancelled.")
+            terminal.expect(t("cancelled", locale="en_us"))
             assert self.state(target, "Stopped")
             terminal.send("d")
             terminal.expect("[y/N]")
@@ -356,7 +396,7 @@ class Suite:
         try:
             self.workspace.cleanup()
         except OSError as exc:
-            self.cleanup_errors.append(f"Temporary backups: {exc}")
+            self.cleanup_errors.append(t("backup_cleanup", error=exc))
         if not self.created_project:
             return
         for target in self.targets:
@@ -387,19 +427,19 @@ class Suite:
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Run isolated, real-LXD mas integration tests.")
-    parser.add_argument("--output", type=Path, default=Path("test-results") / time.strftime("%Y%m%d-%H%M%S"))
-    parser.add_argument("--timeout", type=int, default=600)
-    parser.add_argument("--product", type=Path, help="exact product zipapp to test")
+    parser = Parser(description=t('help_test'))
+    parser.add_argument("--output", type=Path, default=Path("test-results") / time.strftime("%Y%m%d-%H%M%S"), help=t("help_output"))
+    parser.add_argument("--timeout", type=int, default=600, help=t("help_timeout"))
+    parser.add_argument("--product", type=Path, help=t('help_product'))
     args = parser.parse_args(argv)
     if args.product is None and zipfile.is_zipfile(sys.argv[0]):
         args.product = Path.home() / ".local/bin/mas"
         if not args.product.is_file():
-            parser.error("Install the product first or specify --product PATH to its zipapp")
+            parser.error(t('product_required'))
     try:
         suite = Suite(args.output.absolute(), args.timeout, args.product)
     except (Error, OSError) as exc:
-        print(f"Cannot start tests: {exc}", file=sys.stderr)
+        print(t("test_start_error", error=exc), file=sys.stderr)
         return 1
     success = False
     try:
@@ -410,7 +450,7 @@ def main(argv=None):
     finally:
         suite.cleanup()
         suite.save()
-    print(f"Report: {suite.directory / 'report.json'}")
+    print(t("report", path=suite.directory / "report.json"))
     return 0 if success and not suite.cleanup_errors else 1
 
 

@@ -12,6 +12,13 @@ from mas.cli import main
 
 
 class BehaviorTests(unittest.TestCase):
+    def setUp(self):
+        from mas.i18n import catalog
+        catalog("en_us")
+        language = patch("mas.config.language", return_value="en_us")
+        language.start()
+        self.addCleanup(language.stop)
+
     def manager(self, status="Stopped", owned=True):
         lxd = Mock()
         lxd.instances.return_value = [{"name": "demo", "type": "container", "status": status,
@@ -204,6 +211,8 @@ class BehaviorTests(unittest.TestCase):
                     patch("mas.install.subprocess.run", side_effect=execute), \
                     contextlib.redirect_stdout(io.StringIO()):
                 self.assertFalse(prepare_system())
+                self.assertEqual(commands[0], ["sudo", "-v"])
+                self.assertEqual(commands.count(["sudo", "-v"]), 1)
                 self.assertIn(["sudo", "snap", "wait", "system", "seed.loaded"], commands)
                 self.assertIn(["sudo", "snap", "install", "lxd", "--channel=6/stable"], commands)
 

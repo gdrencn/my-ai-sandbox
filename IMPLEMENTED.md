@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: v0.1.0-test.2 is publicly released with the fresh-install snap seed permission fix. See Stage 5. Earlier successful existing-host tests did not cover the failing fresh-install step.
+Current result: version 0.1.3 is implemented and has passed final artifact validation on the current WSL host. Public publication and fixed-entry verification are the remaining release steps. See Stage 6. The stages below describe development checkpoints; the version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -68,3 +68,20 @@ User report: on a machine without LXD, installation stopped at `snap wait system
 The installer now runs that step through the shared privileged-command runner. Added a regression test exercising the fresh-install path with snapd present and absent, simulating the subprocess permission boundary. Before the fix both scenarios failed with the reported permission error; after the fix all 20 unit tests passed. No third-party dependency or host sudoers configuration was added.
 
 The v0.1.0-test.2 product and matching tester passed all 13 real integration groups (including 20 unit tests), with exit code 0 and no cleanup errors. The tested product hash matches the release artifact; evidence is in validation/TEST_2_REPORT.json. Published at https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.0-test.2. The fixed public installation entry resolved test.2, installed successfully on the existing development environment, and installed product/tester hashes match the release files. A full live fresh-host installation remains unverified here.
+
+
+## Stage 6 — version 0.1.3, language settings and system sudo
+
+Implemented and checked against REQUIREMENTS.md:
+
+- Product and tester use 0.1.3. The fixed installer selects the highest published numeric version, including prereleases, and accepts exact pins with or without v. Numeric ordering is regression tested with 0.1.9 and 0.1.10. Existing suffixed releases are preserved.
+- All mas-owned interface messages are in mas/locales/en_us.json and zh_cn.json. CLI, TUI, installer, shared operations and test-tool presentation reuse mas/i18n.py. Native command output, test-framework output and machine identifiers retain their original form.
+- mas/config.py provides atomic persisted preferences in the XDG configuration location. CLI config works without LXD; unknown preferences are retained. Supported language identifiers are consistently en_us and zh_cn.
+- Installation prompts before product installation, with the saved default and an explicit --language option. The minimal installer downloads the shared configuration/catalog modules; its missing-Python prompt is generated from the same catalog. Real PTY tests verify language selection. An initial /dev/tty read/write-mode issue was fixed and regression tested.
+- TUI c opens settings; 1 selects English and 2 selects Chinese immediately. Unicode cell widths are handled for drawing and prompts. Real terminal tests cover switching, Chinese creation, default refusal to delete, return to English and the complete TUI lifecycle.
+- Installer checks whether host privilege is required and uses system sudo -v before privileged setup. Later commands use normal sudo; no password storage, keepalive, custom cache or host sudo policy changes exist. Ready environments require no host sudo. Fresh snapd/LXD paths verify privileged snap seed waiting and upfront authentication in simulated subprocess tests.
+- The standalone tester uses temporary preferences, preserving user settings. Its full workflow covers both languages and retains wait durations and cleanup results.
+
+Validation: 28 standard-library unit tests passed. All 14 integration groups passed using the final product and tester zipapps, with the test tool configured to zh_cn. Product hash verification and zero cleanup errors are recorded in validation/V0_1_3_REPORT.json. The earlier candidate also passed all 14 groups; the final build additionally includes the real installer-terminal regression test. Local bootstrap installation, Chinese CLI output and installed product/tester hash equality passed on the existing host. Shell syntax, Python syntax and git diff whitespace checks passed.
+
+Verification limits: live fresh-system installation, native Ubuntu and non-x86_64 environments remain unverified. No third-party dependency was added. Historical stages and their verification limitations remain below their original version descriptions.

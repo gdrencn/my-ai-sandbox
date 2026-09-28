@@ -1,0 +1,214 @@
+{
+  "version": "0.1.3",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "product": "/home/gordon/my-ai-sandbox/dist/mas.pyz",
+  "product_sha256": "e50074e574265eda1a3550a09de2347484271ad30247dae227ac4a3a8671fae8",
+  "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+  "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+  "project": "test-37022734f518435a99c4083815ce21a2",
+  "targets": [
+    "test-c3dfa9233cf04b2188bd4911edc969e1",
+    "test-e8dd509b94984259a4e2203695772e02",
+    "test-969e6200abfa466084e91cb641852cf2",
+    "test-83589127a1da438f9f6144bda7031b30",
+    "test-55d26f06d876471eb0ea965591bf0d27",
+    "test-c050193081be425f8947b6d5b48e97e8"
+  ],
+  "cases": {
+    "unit": {
+      "status": "passed",
+      "elapsed": 0.07891809500142699
+    },
+    "new-default": {
+      "status": "passed",
+      "elapsed": 2.421293321000121
+    },
+    "missing-image": {
+      "status": "passed",
+      "elapsed": 1.2358319550003216
+    },
+    "list-info": {
+      "status": "passed",
+      "elapsed": 0.4375240190001932
+    },
+    "start-user-network": {
+      "status": "passed",
+      "elapsed": 4.1123844440007815
+    },
+    "running-guards": {
+      "status": "passed",
+      "elapsed": 0.40891896600078326
+    },
+    "enter-running-default-exit": {
+      "status": "passed",
+      "elapsed": 1.5909421640008077
+    },
+    "enter-stopped-stop-exit": {
+      "status": "passed",
+      "elapsed": 12.110895181998785
+    },
+    "export-import": {
+      "status": "passed",
+      "elapsed": 40.957002228999045
+    },
+    "overwrite-confirmation": {
+      "status": "passed",
+      "elapsed": 28.518831219000276
+    },
+    "ownership-and-stop-all": {
+      "status": "passed",
+      "elapsed": 6.17329249300019
+    },
+    "delete-confirmation": {
+      "status": "passed",
+      "elapsed": 3.014459849000559
+    },
+    "language-config": {
+      "status": "passed",
+      "elapsed": 0.3100068759995338
+    },
+    "tui": {
+      "status": "passed",
+      "elapsed": 61.85982440400039
+    }
+  },
+  "events": [
+    {
+      "action": "test-wait",
+      "target": "outbound HTTPS",
+      "status": "ok",
+      "elapsed": 0.5616888219992688
+    },
+    {
+      "action": "test-wait",
+      "target": "external running",
+      "status": "ok",
+      "elapsed": 0.07299584300017159
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI Chinese new",
+      "status": "ok",
+      "elapsed": 1.3555460989991843
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI new",
+      "status": "ok",
+      "elapsed": 1.3912809920002474
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI start",
+      "status": "ok",
+      "elapsed": 1.1755212480002228
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI stop",
+      "status": "ok",
+      "elapsed": 4.572765699998854
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI export",
+      "status": "ok",
+      "elapsed": 29.008248128999185
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI delete",
+      "status": "ok",
+      "elapsed": 1.174158207999426
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI import",
+      "status": "ok",
+      "elapsed": 4.463142683000115
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI imported start",
+      "status": "ok",
+      "elapsed": 2.356487011000354
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI stop all",
+      "status": "ok",
+      "elapsed": 7.804806894999274
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "waiting",
+      "elapsed": 0.099,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "waiting",
+      "elapsed": 1.088,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "waiting",
+      "elapsed": 2.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "ok",
+      "elapsed": 2.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "waiting",
+      "elapsed": 0.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "waiting",
+      "elapsed": 1.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-969e6200abfa466084e91cb641852cf2",
+      "status": "ok",
+      "elapsed": 1.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-c050193081be425f8947b6d5b48e97e8",
+      "status": "waiting",
+      "elapsed": 0.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-c050193081be425f8947b6d5b48e97e8",
+      "status": "waiting",
+      "elapsed": 1.081,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-c050193081be425f8947b6d5b48e97e8",
+      "status": "ok",
+      "elapsed": 1.081,
+      "observation": "Absent"
+    }
+  ],
+  "cleanup_errors": []
+}
