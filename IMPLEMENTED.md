@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: version 0.1.4 has passed final artifact validation on the current WSL host. Public publication and entry checks remain. See Stage 7. Development checkpoint numbers below are not version phase numbers; the version phase remains 1.
+Current result: version 0.1.4 is publicly released. Final artifact validation and both public entry paths passed on the current WSL host. See Stage 7. Development checkpoint numbers below are not version phase numbers; the version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -108,3 +108,14 @@ Verified against the batch 0.1.4 requirements before this update:
 Final packaged validation: all 40 unit tests and all 14 integration groups passed, no skipped unit tests and no cleanup errors. The test tool installed through the separate final installer before testing the installed product. Evidence: validation/V0_1_4_REPORT.json; its product hash matches the release product. Final noninteractive logs contain no escape sequences. A preceding real-PTY run verified transient redraw/clear behavior, localized visible progress, stage summaries and a single final summary. Subsequent focused tests verify error-progress retention and network retry diagnostics. Source-only unit discovery marks the archive-boundary check as skipped; the packaged run executes it and passes.
 
 The user-provided 0.1.3 transcript additionally verifies missing-LXD installation, initial sudo authentication, group refresh and all earlier tests on that user's Ubuntu WSL environment. For 0.1.4, native Ubuntu, other CPU architectures and a full live fresh-host reinstall remain unverified; this release preserves the existing system-sudo policy and fresh-install path.
+
+
+### 0.1.4 publication and public entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.4 with mas.pyz, mas-install.pyz, mas-test.pyz, bootstrap.py, install.sh, SHA256SUMS and WSL_REPORT.json.
+
+Executed the public entry without --test in a real terminal with fresh isolated preferences: the prompt defaulted to zh_cn, Enter selected Chinese, and product installation succeeded. The pre-existing tester file's modification time was unchanged. Bootstrap branch tests separately verify that the normal path never requests the tester asset.
+
+Then saved en_us and ran the public --test entry: the prompt correctly reused en_us, selection of Chinese took effect, and the downloaded tester invoked the separate installer before testing. All 40 unit tests and all 14 integration groups passed with no cleanup errors. Real terminal output contained transient clear/redraw sequences, no leaked English waiting ticks and exactly one localized final summary. Product and tester bytes match the release artifacts. The test project was removed and original user preferences were preserved by the validation harness. Evidence: validation/V0_1_4_PUBLIC_REPORT.json.
+
+The 0.1.4 batch is complete within the stated platform and fresh-host verification limits. The final documentation commit belongs to this same batch and does not increment the version.
