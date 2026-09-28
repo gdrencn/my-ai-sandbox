@@ -17,7 +17,7 @@
   "pty_timeout": "Terminal wait timed out after {timeout}s for {text!r}: {buffer!r}",
   "pty_status": "Terminal exit status: {status}; {buffer!r}",
   "cli_failed": "CLI {args}: expected {expected}, got {actual}: {stdout} {stderr}",
-  "pty_unexpected": "TUI exited unexpectedly: {buffer!r}",
+  "pty_unexpected": "Terminal text menu exited unexpectedly: {buffer!r}",
   "wait_timeout": "Wait {label} exceeded {timeout}s",
   "backup_cleanup": "Temporary backups: {error}",
   "help_test_install": "matching installer archive; install before testing",
@@ -56,5 +56,9 @@
   "wait_TUI imported start": "text menu imported start",
   "wait_TUI stop all": "text menu stop all",
   "network_retry": "Warning: network probe failed; will retry: {error}",
-  "version_mismatch": "Product and test-tool versions do not match, or product cannot run."
+  "version_mismatch": "Product and test-tool versions do not match, or product cannot run.",
+  "case_invalid-inputs": "Invalid targets and backup inputs",
+  "case_lifecycle-repeat": "Repeated lifecycle and user preservation",
+  "case_unmarked-import": "Unmarked native backup import",
+  "test_optimization": "Tests require assertions; do not use Python -O or PYTHONOPTIMIZE."
 }

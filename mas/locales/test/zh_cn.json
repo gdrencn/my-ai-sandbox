@@ -17,7 +17,7 @@
   "pty_timeout": "终端等待 {text!r} 超时（{timeout} 秒）：{buffer!r}",
   "pty_status": "终端退出状态：{status}；{buffer!r}",
   "cli_failed": "CLI {args}：预期退出码 {expected}，实际 {actual}：{stdout} {stderr}",
-  "pty_unexpected": "TUI 意外退出：{buffer!r}",
+  "pty_unexpected": "终端文本菜单意外退出：{buffer!r}",
   "wait_timeout": "等待 {label} 超过 {timeout} 秒",
   "backup_cleanup": "临时备份：{error}",
   "help_test_install": "配套安装程序文件；先安装再测试",
@@ -56,5 +56,9 @@
   "wait_TUI imported start": "文本菜单 启动导入容器",
   "wait_TUI stop all": "文本菜单 全部停止",
   "network_retry": "警告：网络探测未成功，将重试：{error}",
-  "version_mismatch": "产品与测试工具版本不匹配，或产品无法运行。"
+  "version_mismatch": "产品与测试工具版本不匹配，或产品无法运行。",
+  "case_invalid-inputs": "无效目标与备份输入",
+  "case_lifecycle-repeat": "重复启停与用户数据保留",
+  "case_unmarked-import": "无标记原生备份导入",
+  "test_optimization": "测试不能在 Python -O 或 PYTHONOPTIMIZE 模式下运行，否则断言会被禁用。"
 }

@@ -4,6 +4,8 @@ import contextlib
 import errno
 import fcntl
 import hashlib
+import importlib
+from importlib.resources import files
 import io
 import json
 
@@ -33,6 +35,29 @@ from .i18n import t, Parser, catalog, progress_text
 
 
 PRODUCT_UNDER_TEST = None
+
+def unit_modules():
+    return [importlib.import_module('tests.' + item.name[:-3])
+            for item in sorted(files('tests').iterdir(), key=lambda item: item.name)
+            if item.name.startswith('test_') and item.name.endswith('.py')]
+
+
+def test_ids(suite):
+    for test in suite:
+        if isinstance(test, unittest.TestSuite):
+            yield from test_ids(test)
+        else:
+            yield test.id()
+
+
+def unit_summary(result, modules, identifiers):
+    return dict(tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors),
+                skipped=[dict(test=test.id(), reason=reason) for test, reason in result.skipped],
+                expected_failures=[test.id() for test, _ in result.expectedFailures],
+                unexpected_successes=[test.id() for test in result.unexpectedSuccesses],
+                successful=result.wasSuccessful(), modules=[module.__name__ for module in modules],
+                test_ids=identifiers)
+
 
 def random_target():
     return "test-" + uuid.uuid4().hex
@@ -108,7 +133,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -136,6 +161,7 @@ class Suite:
         self.results = {case: {"status": "not_run"} for case in self.CASES}
         self.cleanup_errors = []
         self.counter = 0
+        self.unit_results = None
 
     def report(self, event):
         self.events.append(event)
@@ -274,12 +300,13 @@ class Suite:
     def run(self):
         target, imported, external = self.target(), self.target(), self.target()
         with self.case("unit"):
-            from tests import test_core, test_i18n, test_distribution, test_menu
-            units = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module)
-                                       for module in (test_core, test_i18n, test_distribution, test_menu))
+            modules = unit_modules()
+            units = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module) for module in modules)
+            identifiers = list(test_ids(units))
             with (self.directory / "unit.log").open("w+") as log:
                 with contextlib.redirect_stdout(log), contextlib.redirect_stderr(log):
                     result = unittest.TextTestRunner(stream=log, verbosity=2).run(units)
+                self.unit_results = unit_summary(result, modules, identifiers)
                 log.seek(0)
                 details = log.read()
             if not result.wasSuccessful():
@@ -302,11 +329,39 @@ class Suite:
             assert target in self.cli("list")
             assert json.loads(self.cli("info", target))["status"] == "Stopped"
             self.cli("new", target, code=1)
+        with self.case("invalid-inputs"):
+            missing = self.target()
+            for action in ('start', 'stop', 'info', 'delete', 'enter'):
+                self.cli(action, missing, code=1)
+            self.cli('export', missing, str(self.directory/'missing.tar.gz'), code=1)
+            self.cli('import', missing, str(self.directory/'missing.tar.gz'), code=1)
+            self.cli('new', 'remote:bad', code=1)
+            self.cli('new', 'bad/snapshot', code=1)
+            bad = Path(self.workspace.name)/'corrupt.tar.gz'
+            bad.write_bytes(b'not an LXD backup')
+            self.cli('import', missing, str(bad), code=1)
+            assert self.state(missing, 'Absent')
+            assert self.state(target, 'Stopped')
         with self.case("start-user-network"):
             self.cli("start", target)
             assert self.exec(target, "su --login sandbox -c 'id -un; sudo -n id -u'").splitlines() == ["sandbox", "0"]
             self.wait("outbound HTTPS", lambda: self.network(target))
             self.exec(target, "printf '%s' mas-roundtrip-data > /home/sandbox/mas-proof")
+        with self.case("lifecycle-repeat"):
+            identity = self.exec(target, "id -u sandbox; getent passwd sandbox")
+            self.exec(target, "printf preserve > /home/sandbox/mas-retain; usermod --shell /bin/sh sandbox")
+            try:
+                self.cli('start', target)
+                assert self.exec(target, 'getent passwd sandbox').rstrip().endswith(':/bin/sh')
+                assert self.exec(target, 'cat /home/sandbox/mas-retain') == 'preserve'
+                assert self.exec(target, 'id -u sandbox') == identity.splitlines()[0]+'\n'
+                self.cli('stop', target)
+                self.cli('stop', target)
+                self.cli('start', target)
+                assert self.exec(target, 'cat /home/sandbox/mas-retain') == 'preserve'
+                assert self.exec(target, "su --login sandbox -c 'sudo -n id -u'").strip() == '0'
+            finally:
+                self.exec(target, 'usermod --shell /bin/bash sandbox')
         with self.case("running-guards"):
             self.cli("delete", target, answer="y\n", code=1)
             self.cli("export", target, str(self.directory / "forbidden.tar.gz"), code=1)
@@ -365,6 +420,15 @@ class Suite:
             self.cli("stop", "--all")
             assert self.state(target, "Stopped") and self.state(imported, "Stopped")
             assert self.state(external, "Running"), t("ownership_failed")
+        with self.case("unmarked-import"):
+            native_backup = Path(self.workspace.name)/'native-unmarked.tar.gz'
+            self.manager.lxd.command(['config', 'unset', 'local:'+target, 'user.mas.managed'])
+            assert not self.manager.managed(self.manager.find(target))
+            self.manager._operation('export', target, ['export', 'local:'+target, str(native_backup)], 'Stopped', require_marker=False)
+            self.manager._operation('delete', target, ['delete', 'local:'+target], 'Absent', require_marker=False)
+            self.cli('import', target, str(native_backup))
+            restored = self.manager.info(target)
+            assert restored['config']['user.mas.managed'] == 'true' and restored['status'] == 'Stopped'
         with self.case("delete-confirmation"):
             with self.terminal(["delete", imported]) as terminal:
                 terminal.expect("Delete " + imported)
@@ -503,6 +567,7 @@ class Suite:
             "os_release": Path("/etc/os-release").read_text(), "python": sys.version,
             "project": self.project, "targets": self.targets, "cases": self.results,
             "events": self.events, "cleanup_errors": self.cleanup_errors,
+            "unit_tests": self.unit_results,
             "elapsed": time.monotonic() - self.started,
         }, indent=2))
 
@@ -537,6 +602,8 @@ def main(argv=None):
     parser.add_argument("--install", type=Path, help=t("help_test_install"))
     parser.add_argument("--product", type=Path, help=t('help_product'))
     args = parser.parse_args(argv)
+    if not __debug__:
+        parser.error(t('test_optimization'))
     global PRODUCT_UNDER_TEST
     if args.install:
         if args.product is None:
@@ -560,7 +627,10 @@ def main(argv=None):
         suite.output.clear()
         traceback.print_exc()
     finally:
-        suite.cleanup()
+        try:
+            suite.cleanup()
+        except Exception as exc:
+            suite.cleanup_errors.append(str(exc))
         try:
             suite.save()
         except OSError as exc:

@@ -105,7 +105,13 @@ class LXD:
 
     def instances(self, timeout=None):
         try:
-            return json.loads(self.command(["list", "local:", "--format=json"], timeout))
+            instances = json.loads(self.command(["list", "local:", "--format=json"], timeout))
+            if not isinstance(instances, list) or any(
+                    not isinstance(item, dict)
+                    or any(not isinstance(item.get(key), str) for key in ("name", "status", "type"))
+                    or not isinstance(item.get("config"), dict) for item in instances):
+                raise ValueError("Invalid instance list schema")
+            return instances
         except (ValueError, TypeError) as exc:
             raise Error(t('lxd_invalid_data')) from exc
 

@@ -71,7 +71,7 @@ Cover new/list/start/stop/delete/info/import/export, default host-matching image
 
 ## 8. GitHub and releases
 
-Publish to the public my-ai-sandbox repository after current WSL checks pass. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.6. Product, installer and tester share that version, with Git tag v0.1.6. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
+Publish to the public my-ai-sandbox repository after current WSL checks pass. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.7. Product, installer and tester share that version, with Git tag v0.1.7. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
 
 ## 8.1. Language and user configuration
 
@@ -125,3 +125,14 @@ Keep Container management, Settings and their existing actions, vertical left-al
 Restore normal terminal input before running a container command or opening its shell, and after confirmation, cancellation, interruption or failure. Commands print normal progress/results, then append the next menu. Container information is printed completely into history, with a Back choice afterward; use native terminal scrollback instead of a fullscreen information viewer. Enter invokes the existing shared start/shell/exit handler and returns to the appropriate menu. Preserve lifecycle, ownership and waiting logic.
 
 Verify actual PTY navigation, both arrow encodings, editing, Unicode input, resize, cancellation and terminal-mode restoration. Verify the absence of alternate-screen, screen-clear and scrollback-clear sequences in menu output; verify prior text and operation diagnostics remain in history. Run all nine container operations through the text menu, plus shared CLI confirmations, full real-LXD regression tests and public normal/test installation. Update IMPLEMENTED.md after verification and publish 0.1.6.
+
+
+## 14. Batch 0.1.7 — coverage audit and failure-path verification
+
+Audit the requirements, implementation record and current code together. Maintain a requirement-to-test coverage map with real-LXD, PTY and simulated-failure evidence distinguished; do not claim a line-coverage percentage or untested platform coverage.
+
+Expand shared-operation regression tests for native completion versus observed state, native failures, LXD Error state, query failures/invalid data, ownership-marker verification, interruption and timeout cleanup. Validate export failure preservation, archive metadata, publication collisions, temporary-file cleanup and confirmation-time state changes; import must not mark failed or non-container imports. Cover idempotent start/stop, unsupported states, stop-all partial failure and enter failure ordering. Reject malformed structured LXD list data explicitly rather than treating it as absence or leaking an unhandled schema exception.
+
+Extend real-LXD verification with invalid/missing targets and backup inputs, repeated lifecycle operations retaining sandbox identity/home/shell, and restoring a native unmarked backup with explicit post-import management marking. Preserve isolated projects, unique test names, minimum operation timeouts, diagnostics, history and cleanup.
+
+Discover all packaged test modules automatically. Reports must record unit-test counts, failures, errors and skipped reasons separately from integration-group outcomes, plus test module names and test identifiers. Regression-test the runner's failure/interruption, cleanup-error and report-error exit semantics. Preserve normal/test artifact separation and validate final archives and public install/test entry before publishing 0.1.7.
