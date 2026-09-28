@@ -54,3 +54,5 @@ A separate live smoke check also mounted and cleaned a path beneath a report dir
 - The portable filesystems group now performs Windows UNC operations when WSL interop is available and records a filesystem-windows-unc event. On native Ubuntu or hosts without interop, that access route is explicitly recorded as not_run; Linux mount tests still run. No claim of human-driven Explorer GUI validation, live ACL-bearing fixtures, offline VHDX support or universal Windows/WSL version compatibility is made.
 
 Host SSHFS is now installed normally from Ubuntu packages. Host /etc/fuse.conf enables user_allow_other, while mas mount options remain allow_root. Earlier environment limits in historical batch notes are retained as history, not descriptions of the current host.
+
+For count clarity, the current report contains 20 stages in total: the unit-test stage and 19 real integration stages. The 118 individual unit tests are reported separately inside unit_tests. Both the frozen local run and the public installation/test run passed these stages; see validation/V0_1_11_REPORT.json and validation/V0_1_11_PUBLIC_REPORT.json.
