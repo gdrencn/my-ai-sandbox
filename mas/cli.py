@@ -68,7 +68,7 @@ def main(argv=None, manager=None):
         ask = input if getattr(args, "consent", None) is None else lambda _: args.consent
         manager = manager or Manager(LXD(timeout=args.timeout), report=progress)
         if args.command is None:
-            from .tui import run
+            from .terminal_ui import run
             run(manager)
         elif args.command == "list":
             for item in manager.list():

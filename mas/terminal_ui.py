@@ -1,17 +1,14 @@
-"""Paged terminal menus calling the same lifecycle functions as the CLI."""
-import curses
+"""Inline text-menu application; operations reuse the ordinary CLI backend."""
 import json
 import sys
 from . import config, menu
 from .core import Error
-from .i18n import t, state, progress_text
-from .menu import cells
+from .i18n import t, state
 
 
 class UI:
-    def __init__(self, screen, manager):
-        self.screen = screen
-        self.view = menu.Screen(screen)
+    def __init__(self, view, manager):
+        self.view = view
         self.manager = manager
 
     def choose(self, title, actions, default=None):
@@ -21,11 +18,11 @@ class UI:
         try:
             callback()
         except menu.Cancelled:
-            self.view.message = t('cancelled')
+            print(t('cancelled'), flush=True)
         except config.ConfigError as exc:
-            self.view.message = t(exc.key, **exc.values)
+            print(t(exc.key, **exc.values), file=sys.stderr, flush=True)
         except (Error, OSError) as exc:
-            self.view.message = t('error', error=exc)
+            print(t('error', error=exc), file=sys.stderr, flush=True)
 
     def settings(self):
         while True:
@@ -35,46 +32,19 @@ class UI:
             def change_language():
                 selected = menu.language(self.view, config.get('language'))
                 config.set_value('language', selected)
-                self.view.message = t('language_saved', language=selected)
+                print(t('language_saved', language=selected), flush=True)
             self.guarded(change_language)
 
     def info(self, target):
-        lines = json.dumps(self.manager.info(target), indent=2).splitlines()
-        offset = 0
-        while True:
-            self.screen.clear()
-            self.view.line(0, t('tui_info', target=target))
-            height = self.screen.getmaxyx()[0]
-            for row, line in enumerate(lines[offset:offset + max(1, height - 2)], 1):
-                self.view.line(row, line)
-            self.screen.refresh()
-            key = menu.read_key(self.screen)
-            if key == 'back':
-                return
-            if key == 'down':
-                offset = min(offset + 1, max(0, len(lines) - 1))
-            if key == 'up':
-                offset = max(0, offset - 1)
+        print(t('menu_info_title', target=target), flush=True)
+        print(json.dumps(self.manager.info(target), indent=2), flush=True)
+        try:
+            self.view.choose(t('menu_info_title', target=target), [(None, t('menu_back'))])
+        except menu.Cancelled:
+            pass
 
     def enter(self, target):
-        curses.def_prog_mode()
-        curses.endwin()
-        previous = self.manager.report
-        from .cli import progress
-        self.manager.report = progress
-        try:
-            self.manager.enter(target)
-        finally:
-            self.manager.report = previous
-            curses.reset_prog_mode()
-            # The CLI exit menu owns a nested curses session. Re-establish the
-            # outer session's input mode after its wrapper restores the shell.
-            curses.noecho()
-            curses.cbreak()
-            self.screen.keypad(True)
-            curses.curs_set(0)
-            self.screen.clear()
-            self.screen.refresh()
+        self.manager.enter(target)
 
     def container(self, target):
         selected = 'info'
@@ -92,10 +62,10 @@ class UI:
                     self.enter(target)
                 elif selected == 'delete':
                     deleted = self.manager.delete(target, self.view.confirm)
-                    self.view.message = t('menu_done' if deleted else 'cancelled')
+                    print(t('menu_done' if deleted else 'cancelled'), flush=True)
                 elif selected == 'export':
                     done = self.manager.export(target, self.view.input(t('export_file')), self.view.confirm)
-                    self.view.message = t('menu_done' if done else 'cancelled')
+                    print(t('menu_done' if done else 'cancelled'), flush=True)
                 else:
                     getattr(self.manager, selected)(target)
             self.guarded(action)
@@ -107,7 +77,7 @@ class UI:
         while True:
             items = self.manager.list()
             if not items:
-                self.view.message = t('menu_empty')
+                print(t('menu_empty'), flush=True)
             selected = self.view.choose(t('page_list'), [(item['name'], item['name'] + '  ' + state(item['status'])) for item in items] + [(None, t('menu_back'))], default=selected or (items[0]['name'] if items else None))
             if selected is None:
                 return
@@ -135,26 +105,18 @@ class UI:
             self.guarded(action)
 
     def loop(self):
-        previous = self.manager.report
-        self.manager.report = lambda event: self.view.progress(progress_text(event))
-        try:
-            selected = 'management'
-            while True:
-                try:
-                    selected = self.choose(t('page_main'), [('management', 'page_management'), ('settings', 'page_settings'), ('exit', 'menu_exit')], selected)
-                except menu.Cancelled:
-                    return
-                if selected == 'exit':
-                    return
-                self.guarded(self.management if selected == 'management' else self.settings)
-        finally:
-            self.manager.report = previous
+        selected = 'management'
+        while True:
+            try:
+                selected = self.choose(t('page_main'), [('management', 'page_management'), ('settings', 'page_settings'), ('exit', 'menu_exit')], selected)
+            except menu.Cancelled:
+                return
+            if selected == 'exit':
+                return
+            self.guarded(self.management if selected == 'management' else self.settings)
 
 
 def run(manager):
     if not sys.stdin.isatty() or not sys.stdout.isatty():
-        raise Error(t('tui_terminal'))
-    try:
-        curses.wrapper(lambda screen: UI(screen, manager).loop())
-    except curses.error as exc:
-        raise Error(t('tui_failed', error=exc)) from exc
+        raise Error(t('menu_terminal'))
+    menu.interactive(lambda view: UI(view, manager).loop())

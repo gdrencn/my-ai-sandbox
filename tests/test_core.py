@@ -126,7 +126,7 @@ class BehaviorTests(unittest.TestCase):
 
     def test_bare_cli_opens_tui(self):
         manager = self.manager()
-        with patch("mas.tui.run") as run:
+        with patch("mas.terminal_ui.run") as run:
             self.assertEqual(main([], manager), 0)
         run.assert_called_once_with(manager)
 

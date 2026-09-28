@@ -1,4 +1,4 @@
-"""Exercise actual terminal key sequences, not mocked curses key codes."""
+"""Exercise actual terminal key sequences, including inline rendering and terminal modes."""
 import json
 import os
 from pathlib import Path
@@ -23,6 +23,7 @@ class MenuTests(unittest.TestCase):
                 terminal.send(keys)
                 terminal.expect('RESULT=' + json.dumps(expected))
                 terminal.finish()
+                self.assert_inline(terminal.buffer)
             finally:
                 terminal.close()
 
@@ -76,32 +77,108 @@ class MenuTests(unittest.TestCase):
                 terminal.send('\x1b[B' * 25 + '\n')
                 terminal.expect('RESULT=25')
                 terminal.finish()
+                self.assert_inline(terminal.buffer)
             finally:
                 terminal.close()
 
-    def test_shell_return_restores_immediate_arrow_input(self):
-        source = '''import curses, sys, termios
+    def test_shell_and_operations_receive_normal_terminal_mode(self):
+        source = """import sys, termios
 from types import SimpleNamespace
 from mas import menu
-from mas.tui import UI
-manager = SimpleNamespace(report=None, enter=lambda target: menu.confirm('Nested exit'))
-def exercise(screen):
-    ui = UI(screen, manager)
-    ui.enter('test-target')
-    flags = termios.tcgetattr(0)[3]
-    assert not flags & (termios.ICANON | termios.ECHO), flags
-    return ui.view.choose('Returned menu', [('first', 'First'), ('second', 'Second')])
-print('RESULT=' + curses.wrapper(exercise))
-'''
+from mas.terminal_ui import UI
+original = termios.tcgetattr(0)
+def shell(target):
+    assert termios.tcgetattr(0) == original
+    print('SHELL_OUTPUT', flush=True)
+    menu.confirm('Exit confirmation')
+    assert termios.tcgetattr(0) == original
+manager = SimpleNamespace(enter=shell)
+def exercise(view):
+    view.choose('Before operation', [('go', 'Go')])
+    assert termios.tcgetattr(0) == original
+    UI(view, manager).enter('test-target')
+    result = view.choose('Returned menu', [('first','First'),('second','Second')])
+    assert termios.tcgetattr(0) == original
+    return result
+print('HISTORY_SENTINEL', end='', flush=True)
+print('RESULT=' + menu.interactive(exercise))
+"""
         source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
         with tempfile.TemporaryDirectory() as directory:
-            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'nested.log')
+            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'return.log')
             try:
-                terminal.expect('Nested exit')
+                terminal.expect('Before operation')
+                terminal.send('\n')
+                terminal.expect('Exit confirmation')
                 terminal.send('\n')
                 terminal.expect('Returned menu')
                 terminal.send('\x1b[B\n')
                 terminal.expect('RESULT=second')
                 terminal.finish()
+                self.assert_inline(terminal.buffer)
+                self.assertIn(b'HISTORY_SENTINEL', terminal.buffer)
+                self.assertIn(b'SHELL_OUTPUT', terminal.buffer)
+                history = self.render_history(terminal.buffer)
+                self.assertIn('HISTORY_SENTINEL', history)
+                self.assertIn('SHELL_OUTPUT', history)
+                self.assertIn('Before operation', history)
+                self.assertIn('Exit confirmation', history)
             finally:
                 terminal.close()
+
+    def assert_inline(self, output):
+        for forbidden in (b'\x1b[?1049', b'\x1b[?1047', b'\x1b[?47', b'\x1b[2J', b'\x1b[3J', b'\x1b[H'):
+            self.assertNotIn(forbidden, output)
+
+    def test_unicode_and_cursor_editing(self):
+        self.terminal_case("ui.input('Menu test')", '中文ab\x1b[D\x7fX\n', '中文Xb')
+
+    def test_cancel_and_interrupt_restore_terminal(self):
+        for key in ('\x1b', '\x03'):
+            source = """import termios
+from mas import menu
+original = termios.tcgetattr(0)
+try:
+    menu.interactive(lambda ui: ui.input('Mode check'))
+except (menu.Cancelled, KeyboardInterrupt):
+    pass
+assert termios.tcgetattr(0) == original
+print('RESTORED')
+"""
+            source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
+            with tempfile.TemporaryDirectory() as directory:
+                terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'mode.log')
+                try:
+                    terminal.expect('Mode check')
+                    terminal.send(key)
+                    terminal.expect('RESTORED')
+                    terminal.finish()
+                    self.assert_inline(terminal.buffer)
+                finally:
+                    terminal.close()
+
+    def render_history(self, output):
+        # Interpret the inline renderer's row movement/erasure to ensure earlier
+        # output survives on screen, not merely somewhere in a raw transcript.
+        import re
+        rows, row, column = [''], 0, 0
+        for token in re.split(r'(\x1b\[[0-?]*[ -/]*[@-~])', output.decode()):
+            if token.startswith('\x1b['):
+                if token.endswith('A'):
+                    row -= int(token[2:-1] or 1)
+                    self.assertGreaterEqual(row, 0)
+                elif token == '\x1b[2K':
+                    rows[row] = ''
+                continue
+            for char in token:
+                if char == '\r':
+                    column = 0
+                elif char == '\n':
+                    row += 1
+                    while row >= len(rows):
+                        rows.append('')
+                else:
+                    line = rows[row].ljust(column)
+                    rows[row] = line[:column] + char + line[column+1:]
+                    column += 1
+        return '\n'.join(rows)

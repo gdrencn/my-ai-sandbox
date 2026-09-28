@@ -12,7 +12,7 @@ from unittest.mock import patch, Mock
 from mas import config
 from mas.cli import main
 from mas.i18n import catalog, choose_language, progress_text, t
-from mas.tui import cells
+from mas.menu import cells
 
 
 class LanguageTests(unittest.TestCase):

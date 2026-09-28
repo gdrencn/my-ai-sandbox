@@ -466,6 +466,10 @@ class Suite:
             send(back, "my-ai-sandbox")
             terminal.send(down * 2 + "\n")
             terminal.finish()
+            for forbidden in (b'\x1b[?1049', b'\x1b[?1047', b'\x1b[?47', b'\x1b[2J', b'\x1b[3J', b'\x1b[H'):
+                assert forbidden not in terminal.buffer, repr(forbidden)
+            assert b'"status": "Stopped"' in terminal.buffer
+            assert b'[ok] start ' in terminal.buffer
 
     def cleanup(self):
         self.output.progress(t("working", name=t("cleanup_stage"), elapsed=0))

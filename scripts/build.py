@@ -31,7 +31,7 @@ def main():
             if filename != "mas-test.pyz":
                 excluded += ["testing.py", "test_output.py", "test"]
             if filename == "mas-install.pyz":
-                excluded += ["cli.py", "tui.py", "__main__.py"]
+                excluded += ["cli.py", "terminal_ui.py", "__main__.py"]
             if filename == "mas.pyz":
                 excluded += ["install.py"]
             shutil.copytree(ROOT / "mas", stage / "mas", ignore=shutil.ignore_patterns(*excluded))
