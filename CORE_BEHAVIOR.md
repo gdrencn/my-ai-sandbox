@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.10. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.11. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
@@ -44,7 +44,7 @@ In order:
 Root's password is not set to empty. The ownership marker and this user/sudo preparation are the only mas-specific container configuration. No GPU mapping, host-directory sharing, network policy, port forwarding or custom profile is added. Fresh-host storage/network initialization, LXD installation, sudo authentication and host PATH setup belong to mas/install.py, not to container operation hooks.
 
 
-## Filesystem extension (0.1.9–0.1.10)
+## Filesystem extension (0.1.9–0.1.11)
 
 Manager delegates all three commands to one per-user Filesystems implementation. mountfs verifies ownership, resolves/validates the container directory through native LXD file APIs, locks mount records, rejects overlap and existing host destinations, creates tracked host directories, starts the native authenticated loopback listener and SSHFS, then checks the actual mount table and live helpers. unmountfs selects an exact recorded path, verifies mount identity, uses fusermount3, waits for disappearance, terminates identity-matched helpers and removes only tracked empty directories/private connection files. The SSH known-hosts path is explicitly quoted and absolute inside private per-mount state. mountedfs reconciles records with mount table and helper identity without mounting or changing container state.
 
@@ -53,3 +53,11 @@ Lifecycle transition/delete preconditions refuse this user's recorded mounts bef
 The same private registry lock spans mount creation and native start-from-Stopped, stop-from-Running, and deletion; ownership/state is rechecked inside the lock. Locks coordinate this user only. A repeated start of an already-running target retains user setup; stopped stop remains a no-op.
 
 Registry reads validate paths, directory identities, process tokens and required field types. New directory identities use filesystem ID/inode/owner; legacy device/inode records are compared conservatively. Helpers are checked against process start/boot identity and per-mount native command arguments. Exact owned helper arguments allow recovery when interrupted before PID publication. Only a verified helper may be signalled. Final unmount success follows detach, helper exit and directory/private-file cleanup, including total elapsed time. A native timeout preserves records for retry.
+
+## 0.1.11 host access and presentation
+
+New SSHFS processes use allow_root. The installer enables the host FUSE user_allow_other gate when absent; mountfs checks that prerequisite for non-root callers before creating resources. The mount permits the mounting user and host root, not arbitrary ordinary users. No container permission/ownership mapping is added. Existing mounts keep their original options until explicitly unmounted and remounted.
+
+UI.present provides a blank-line/title entry and a dedicated result/Back step for operation success, cancellation and error. Navigation sections retain their own menus. The parent is redrawn only after return, preserving its selection. Shared Selection.move wraps in both directions without changing checked values. These presentation changes do not duplicate or change Manager lifecycle operations.
+
+The pre-Python bootstrap and independent installer use mas/dependencies.sh for missing-package detection, a single APT refresh, grouped installation and APT presentation. It preserves native prompts and diagnostics, including prompts without a newline. The Python installer loads the same packaged resource; the generated shell entry embeds it. Product archives exclude it. Snap retains native progress. No standalone sudo -v, password storage or keepalive is used.

@@ -18,6 +18,13 @@ from .core import Error, validate_target
 from .i18n import t
 
 
+def fuse_access_ready(path=Path('/etc/fuse.conf')):
+    try:
+        return any(line.split('#', 1)[0].strip() == 'user_allow_other' for line in path.read_text().splitlines())
+    except FileNotFoundError:
+        return False
+
+
 def normalized(path):
     if not isinstance(path, str) or not path.startswith('/') or any(ord(c) < 32 or ord(c) == 127 for c in path) or '..' in path.split('/'):
         raise Error(t('fs_path_invalid'))
@@ -321,6 +328,8 @@ class Filesystems:
         for program in ('sshfs', 'fusermount3'):
             if not shutil.which(program):
                 raise Error(t('fs_dependency', program=program))
+        if os.geteuid() != 0 and not fuse_access_ready():
+            raise Error(t('fuse_setup_required'))
         default = path is None
         path = self._home(target) if default else normalized(path)
         destination = self.root / target / path.lstrip('/')
@@ -359,7 +368,7 @@ class Filesystems:
                         if not port or not password:
                             return False
                         sshfs = self._spawn(['sshfs', entry['source'], str(destination), '-f', '-p', port[1],
-                            '-o', 'password_stdin', '-o', 'StrictHostKeyChecking=accept-new',
+                            '-o', 'password_stdin', '-o', 'allow_root', '-o', 'StrictHostKeyChecking=accept-new',
                             '-o', 'UserKnownHostsFile="'+str(work/'known_hosts').replace('\\', '\\\\').replace('"', '\\"')+'"', '-o', 'GlobalKnownHostsFile=/dev/null',
                             '-o', 'IdentityAgent=none', '-o', 'PubkeyAuthentication=no', '-o', 'PreferredAuthentications=password'],
                             work/'sshfs.out', work/'sshfs.err', password[1])

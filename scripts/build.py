@@ -20,6 +20,11 @@ def main():
     for token, key in {"LANGUAGE_TITLE": "language_title", "LANGUAGE_ZH": "language_zh",
                        "LANGUAGE_EN": "language_en", "LANGUAGE_KEYS": "menu_keys"}.items():
         installer = installer.replace("@" + token + "@", shlex.quote(messages[key]))
+    installer = installer.replace('@DEPENDENCIES@', (ROOT / 'mas/dependencies.sh').read_text())
+    for language, suffix in (('zh_cn', 'ZH'), ('en_us', 'EN')):
+        catalog = json.loads((ROOT / 'mas/locales' / (language + '.json')).read_text())
+        for key in ('apt_setup', 'apt_done', 'apt_failed'):
+            installer = installer.replace('@' + key.upper() + '_' + suffix + '@', shlex.quote(catalog[key]))
     (ROOT / "install.sh").write_text(installer)
 
     for filename, entry in (("mas.pyz", "mas.cli:main"),
@@ -33,7 +38,7 @@ def main():
             if filename == "mas-install.pyz":
                 excluded += ["cli.py", "terminal_ui.py", "__main__.py"]
             if filename == "mas.pyz":
-                excluded += ["install.py"]
+                excluded += ["install.py", "dependencies.sh"]
             shutil.copytree(ROOT / "mas", stage / "mas", ignore=shutil.ignore_patterns(*excluded))
             if filename == "mas-test.pyz":
                 shutil.copyfile(ROOT / "bootstrap.py", stage / "bootstrap.py")

@@ -1,0 +1,42 @@
+{
+  "version": "0.1.11",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "baseline_without_allow_root": {
+    "project": "test-3d727eeaee6d4e79bd021c6a79b423c0",
+    "target": "test-c155670699714fcbbf0eba7ca75c741b",
+    "path": "/home/gordon/my-ai-sandbox/test-results/v0.1.11-windows-probe2/mounts/test-c155670699714fcbbf0eba7ca75c741b/home/sandbox",
+    "windows_path": "\\\\wsl.localhost\\codex\\home\\gordon\\my-ai-sandbox\\test-results\\v0.1.11-windows-probe2\\mounts\\test-c155670699714fcbbf0eba7ca75c741b\\home\\sandbox",
+    "returncode": 3,
+    "output": "\u4f7f\u7528\u201c1\u201d\u4e2a\u53c2\u6570\u8c03\u7528\u201cGetFileSystemEntries\u201d\u65f6\u53d1\u751f\u5f02\u5e38:\u201c\u5bf9\u8def\u5f84\u201c\\\\wsl.localhost\\codex\\home\\gordon\\my-ai-sandbox\\test-results\\v0.1.11-windows-probe2\\mounts\\test-c155670699714fcbbf0eba7ca75c741b\\home\\sandbox\u201d\u7684\u8bbf\u95ee\u88ab\u62d2\u7edd\u3002\u201d\n"
+  },
+  "with_allow_root": {
+    "windows": [
+      {
+        "action": "filesystem-windows-unc",
+        "status": "ok",
+        "path": "\\\\wsl.localhost\\codex\\home\\gordon\\my-ai-sandbox\\test-results\\v0.1.11-allow-root\\mounts\\test-b26c4d733e4e4d28ae20d237312c8179\\home\\sandbox",
+        "operations": [
+          "list",
+          "read",
+          "create",
+          "edit",
+          "delete",
+          "mkdir",
+          "rmdir"
+        ]
+      }
+    ],
+    "root_access": true,
+    "other_user_denied": true,
+    "metadata_before": "1001:1001:600",
+    "metadata_after": "1001:1001:600",
+    "linux_read": true
+  },
+  "other_identity": {
+    "uid": 65534,
+    "gid": 65534,
+    "supplementary_groups": [],
+    "method": "Root chdir into mount, then drop all groups and UID/GID before listdir"
+  },
+  "scope": "Windows UNC filesystem API through PowerShell; no manual Explorer GUI interaction; isolated project and mount cleanup completed"
+}

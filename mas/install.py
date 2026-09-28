@@ -1,5 +1,6 @@
 """First-install setup. Existing LXD installations and profiles are preserved."""
 
+from importlib.resources import files
 import grp
 import json
 
@@ -19,10 +20,11 @@ from .i18n import t, Parser
 from . import __version__
 
 
-def run(args, privileged=False, capture=False):
+def run(args, privileged=False, capture=False, display=True, label=None):
     if privileged and os.geteuid() != 0 and args[0] != "sudo":
         args = ["sudo", *args]
-    print(t("setup_command", command=" ".join(args)), flush=True)
+    if display:
+        print(t("setup_command", command=" ".join(args)), flush=True)
     tty = None
     try:
         if privileged and os.geteuid() != 0 and not sys.stdin.isatty():
@@ -37,8 +39,56 @@ def run(args, privileged=False, capture=False):
         if tty:
             tty.close()
     if result.returncode:
-        raise Error((result.stderr or "").strip() or t("setup_failed", command=" ".join(args)))
+        raise Error((result.stderr or "").strip() or t("setup_failed", command=label or " ".join(args)))
     return result.stdout or ""
+
+
+def dependency_script():
+    return files('mas').joinpath('dependencies.sh').read_text()
+
+
+def prepare_dependencies():
+    script = dependency_script()
+    packages = subprocess.check_output(['bash', '-c', script + '\nmas_missing_dependencies'], text=True).splitlines()
+    if packages:
+        labels = {name: t(key) for name, key in (
+            ('MAS_APT_SETUP', 'apt_setup'), ('MAS_APT_DONE', 'apt_done'), ('MAS_APT_FAILED', 'apt_failed'))}
+        assignments = '\n'.join(name + '=' + shlex.quote(value) for name, value in labels.items())
+        run(['bash', '-o', 'pipefail', '-c', assignments + '\n' + script + '\nmas_install_dependencies'], display=False, label=t('apt_setup'))
+
+
+def enable_fuse_access(path=Path('/etc/fuse.conf')):
+    """Called with system privilege; preserve existing host FUSE configuration."""
+    from .filesystems import fuse_access_ready
+    if fuse_access_ready(path):
+        return
+    if path.is_symlink():
+        raise Error(t('fuse_config_symlink', path=path))
+    original = path.read_text() if path.exists() else ''
+    mode = path.stat().st_mode & 0o777 if path.exists() else 0o644
+    fd, temporary = tempfile.mkstemp(dir=path.parent, prefix='.mas-fuse-')
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            stream.write(original + ('\n' if original and not original.endswith('\n') else '') + 'user_allow_other\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary, mode)
+        if path.exists():
+            info = path.stat()
+            os.chown(temporary, info.st_uid, info.st_gid)
+        os.replace(temporary, path)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
+def prepare_fuse_access():
+    from .filesystems import fuse_access_ready
+    if fuse_access_ready():
+        return
+    print(t('fuse_setup'), flush=True)
+    code = ('import sys;sys.path.insert(0,' + repr(str(Path(__file__).resolve().parent.parent)) + ');'
+            'from mas.install import enable_fuse_access;enable_fuse_access()')
+    run([sys.executable, '-c', code], privileged=True, display=False, label=t('fuse_setup'))
 
 
 def stable_channel(info):
@@ -62,29 +112,13 @@ def prepare_system():
     if Path("/proc/1/comm").read_text().strip() != "systemd":
         raise Error(t('systemd_required'))
     executable = shutil.which("lxd") or ("/snap/bin/lxd" if Path("/snap/bin/lxd").exists() else None)
-    needs_sshfs = not shutil.which("sshfs")
-    if os.geteuid() != 0:
-        try:
-            group = grp.getgrnam("lxd")
-            username = pwd.getpwuid(os.getuid()).pw_name
-            needs_group = ((username not in group.gr_mem and os.getgid() != group.gr_gid)
-                           or (group.gr_gid not in os.getgroups() and os.getgid() != group.gr_gid))
-        except KeyError:
-            needs_group = True
-        if not executable or needs_group or needs_sshfs:
-            print(t("sudo_auth"), flush=True)
-            run(["sudo", "-v"], privileged=True)
+    prepare_dependencies()
+    prepare_fuse_access()
     if not executable:
-        if not shutil.which("snap"):
-            run(["apt-get", "update"], privileged=True)
-            run(["apt-get", "install", "-y", "snapd"], privileged=True)
         run(["systemctl", "enable", "--now", "snapd.socket"], privileged=True)
         run(["snap", "wait", "system", "seed.loaded"], privileged=True)
         channel = stable_channel(run(["snap", "info", "lxd"], capture=True))
         run(["snap", "install", "lxd", "--channel=" + channel], privileged=True)
-    if needs_sshfs:
-        run(["apt-get", "update"], privileged=True)
-        run(["apt-get", "install", "-y", "sshfs"], privileged=True)
     if os.geteuid() != 0:
         username = pwd.getpwuid(os.getuid()).pw_name
         group = grp.getgrnam("lxd")

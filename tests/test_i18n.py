@@ -81,7 +81,7 @@ class LanguageTests(unittest.TestCase):
             if str(path) == "/etc/os-release": return "ID=ubuntu\n"
             if str(path) == "/proc/1/comm": return "systemd\n"
             return original(path, *args, **kwargs)
-        with patch.object(Path, "read_text", read), \
+        with patch("mas.install.prepare_dependencies"), patch("mas.install.prepare_fuse_access"), patch.object(Path, "read_text", read), \
                 patch("mas.install.shutil.which", return_value="/snap/bin/lxd"), \
                 patch("mas.install.os.geteuid", return_value=1000), \
                 patch("mas.install.os.getgid", return_value=1000), \
@@ -112,7 +112,7 @@ class LanguageTests(unittest.TestCase):
         terminal = Terminal([sys.executable, "-c", source], 300, Path(os.environ["XDG_CONFIG_HOME"]) / "terminal.log")
         try:
             terminal.expect("English (en_us)")
-            terminal.send("\x1b[A\n")
+            terminal.send("\n")
             terminal.expect("zh_cn\r\n")
             terminal.finish()
             self.assertEqual(config.get("language"), "zh_cn")

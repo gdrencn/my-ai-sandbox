@@ -40,7 +40,7 @@ class Selection:
     checked: set = field(default_factory=set)
 
     def move(self, step):
-        self.index = max(0, min(len(self.options) - 1, self.index + step))
+        self.index = (self.index + step) % len(self.options) if self.options else 0
 
     def toggle(self):
         self.checked.symmetric_difference_update({self.options[self.index][0]})

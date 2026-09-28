@@ -14,15 +14,28 @@ class UI:
     def choose(self, title, actions, default=None):
         return self.view.choose(title, [(key, t(label)) for key, label in actions], default=default)
 
-    def guarded(self, callback):
+    def present(self, title, callback, back=True):
+        """One entry/result/return contract for actions and navigation sections."""
+        print('\n' + title + '\n', flush=True)
+        result = None
+        failed = False
         try:
-            callback()
+            result = callback()
         except menu.Cancelled:
-            print(t('cancelled'), flush=True)
+            if back:
+                print(t('cancelled'), flush=True)
         except config.ConfigError as exc:
+            failed = True
             print(t(exc.key, **exc.values), file=sys.stderr, flush=True)
         except (Error, OSError) as exc:
+            failed = True
             print(t('error', error=exc), file=sys.stderr, flush=True)
+        if back or failed:
+            try:
+                self.view.choose(t('page_result'), [(None, t('menu_back'))])
+            except menu.Cancelled:
+                pass
+        return result
 
     def settings(self):
         while True:
@@ -33,15 +46,10 @@ class UI:
                 selected = menu.language(self.view, config.get('language'))
                 config.set_value('language', selected)
                 print(t('language_saved', language=selected), flush=True)
-            self.guarded(change_language)
+            self.present(t('language_title'), change_language)
 
     def info(self, target):
-        print(t('menu_info_title', target=target), flush=True)
         print(json.dumps(self.manager.info(target), indent=2), flush=True)
-        try:
-            self.view.choose(t('menu_info_title', target=target), [(None, t('menu_back'))])
-        except menu.Cancelled:
-            pass
 
     def enter(self, target):
         self.manager.enter(target)
@@ -81,7 +89,7 @@ class UI:
                     print(t('menu_done' if done else 'cancelled'), flush=True)
                 else:
                     getattr(self.manager, selected)(target)
-            self.guarded(action)
+            self.present(t('page_action', action=t('menu_' + selected), target=target), action)
             if deleted:
                 return
 
@@ -94,7 +102,7 @@ class UI:
             selected = self.view.choose(t('page_list'), [(item['name'], item['name'] + '  ' + state(item['status'])) for item in items] + [(None, t('menu_back'))], default=selected or (items[0]['name'] if items else None))
             if selected is None:
                 return
-            self.guarded(lambda: self.container(selected))
+            self.present(t('page_container', target=selected), lambda: self.container(selected), back=False)
 
     def management(self):
         selected = 'list'
@@ -115,7 +123,7 @@ class UI:
                     self.manager.import_container(target, self.view.input(t('backup_file')))
                 else:
                     self.manager.stop_all()
-            self.guarded(action)
+            self.present(t('menu_' + selected), action, back=selected != 'list')
 
     def loop(self):
         selected = 'management'
@@ -126,7 +134,7 @@ class UI:
                 return
             if selected == 'exit':
                 return
-            self.guarded(self.management if selected == 'management' else self.settings)
+            self.present(t('page_' + selected), self.management if selected == 'management' else self.settings, back=False)
 
 
 def run(manager):

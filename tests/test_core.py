@@ -201,6 +201,8 @@ class BehaviorTests(unittest.TestCase):
                 return subprocess.CompletedProcess(args, 0, output, "")
 
             with self.subTest(snap_present=snap_present), \
+                    patch("mas.install.prepare_dependencies"), \
+                    patch("mas.install.prepare_fuse_access"), \
                     patch("mas.install.Path.read_text", side_effect=['ID=ubuntu\n', 'systemd\n']), \
                     patch("mas.install.Path.exists", return_value=False), \
                     patch("mas.install.shutil.which", side_effect=lambda name: "/usr/bin/snap" if name == "snap" and snap_present else None), \
@@ -213,8 +215,7 @@ class BehaviorTests(unittest.TestCase):
                     patch("mas.install.subprocess.run", side_effect=execute), \
                     contextlib.redirect_stdout(io.StringIO()):
                 self.assertFalse(prepare_system())
-                self.assertEqual(commands[0], ["sudo", "-v"])
-                self.assertEqual(commands.count(["sudo", "-v"]), 1)
+                self.assertNotIn(["sudo", "-v"], commands)
                 self.assertIn(["sudo", "snap", "wait", "system", "seed.loaded"], commands)
                 self.assertIn(["sudo", "snap", "install", "lxd", "--channel=6/stable"], commands)
 

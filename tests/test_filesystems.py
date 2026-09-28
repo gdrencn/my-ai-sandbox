@@ -136,16 +136,17 @@ class FilesystemTests(unittest.TestCase):
             with patch.object(self.fs,'_actual',return_value=[]):self.fs._remove(data,entry)
             self.assertTrue(dest.is_dir())
 
-    def test_existing_lxd_missing_sshfs_authenticates_once(self):
+    def test_existing_lxd_uses_shared_dependency_preparation_without_preauth(self):
         from mas.install import prepare_system
         original=Path.read_text
         def read(path,*args,**kwargs):
             if str(path)=='/etc/os-release': return 'ID=ubuntu\n'
             if str(path)=='/proc/1/comm': return 'systemd\n'
             return original(path,*args,**kwargs)
-        with patch.object(Path,'read_text',read), patch('mas.install.shutil.which',side_effect=lambda name: None if name=='sshfs' else '/snap/bin/'+name), patch('mas.install.os.geteuid',return_value=1000), patch('mas.install.os.getgid',return_value=1000), patch('mas.install.os.getgroups',return_value=[986]), patch('mas.install.pwd.getpwuid',return_value=SimpleNamespace(pw_name='tester')), patch('mas.install.grp.getgrnam',return_value=SimpleNamespace(gr_gid=986,gr_mem=['tester'])), patch('mas.install.run') as run:
+        with patch('mas.install.prepare_dependencies') as dependencies, patch('mas.install.prepare_fuse_access'), patch.object(Path,'read_text',read), patch('mas.install.shutil.which',side_effect=lambda name: None if name=='sshfs' else '/snap/bin/'+name), patch('mas.install.os.geteuid',return_value=1000), patch('mas.install.os.getgid',return_value=1000), patch('mas.install.os.getgroups',return_value=[986]), patch('mas.install.pwd.getpwuid',return_value=SimpleNamespace(pw_name='tester')), patch('mas.install.grp.getgrnam',return_value=SimpleNamespace(gr_gid=986,gr_mem=['tester'])), patch('mas.install.run') as run:
             self.assertFalse(prepare_system())
-        self.assertEqual([c.args[0] for c in run.call_args_list],[['sudo','-v'],['apt-get','update'],['apt-get','install','-y','sshfs']])
+        dependencies.assert_called_once_with()
+        run.assert_not_called()
 
     def test_schema_damage_preserves_original_file(self):
         import copy
@@ -193,7 +194,7 @@ class FilesystemTests(unittest.TestCase):
 
     def test_mount_rechecks_owner_after_lock(self):
         self.manager.require.side_effect=[{},Error('replaced')]
-        with patch('mas.filesystems.shutil.which',return_value='/usr/bin/native'),patch.object(self.fs,'_directory'):
+        with patch('mas.filesystems.fuse_access_ready',return_value=True), patch('mas.filesystems.shutil.which',return_value='/usr/bin/native'),patch.object(self.fs,'_directory'):
             with self.assertRaisesRegex(Error,'replaced'):self.fs.mount('demo','/var/log')
         with self.fs.locked() as data:self.assertEqual(data['mounts'],[])
 

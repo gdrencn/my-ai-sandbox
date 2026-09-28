@@ -1,5 +1,6 @@
 """Portable real-LXD test runner, using only Python's standard library."""
 
+import base64
 import contextlib
 import errno
 import fcntl
@@ -15,6 +16,7 @@ import platform
 import pty
 import select
 import signal
+import shutil
 import struct
 import subprocess
 import sys
@@ -470,6 +472,7 @@ class Suite:
             entry=self.manager.filesystems._entries(data,target)[0]
             assert (self.fs_state/entry['id']/'known_hosts').read_text().strip()
         assert home.joinpath('mas-secret').read_text() == 'container secret'
+        self.windows_filesystem(home)
         home.joinpath('host-created').write_text('from host')
         assert self.exec(target, 'cat /home/sandbox/host-created') == 'from host'
         self.events.append(dict(action='filesystem-native-metadata', target=target, status='ok', existing=before.strip(), created=self.exec(target, "stat -c '%u:%g:%a' /home/sandbox/host-created").strip()))
@@ -505,6 +508,41 @@ class Suite:
         for invalid in ('relative','/home/../etc','/var/run'):
             self.cli('mountfs',target,invalid,code=1)
         assert self.state(target,'Stopped')
+
+    def windows_filesystem(self, home):
+        """Exercise the actual Windows UNC access route when WSL interop exists."""
+        powershell = shutil.which('powershell.exe')
+        if not os.environ.get('WSL_DISTRO_NAME') or not powershell or not shutil.which('wslpath'):
+            self.events.append(dict(action='filesystem-windows-unc', status='not_run',
+                                    reason='Windows interop is unavailable on this host'))
+            return
+        windows = subprocess.check_output(['wslpath', '-w', str(home)], text=True, timeout=self.timeout).strip()
+        # Encoding is explicit: native Windows console defaults need not be UTF-8.
+        script = """[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
+$ErrorActionPreference='Stop'
+$path=WINDOWS_PATH
+try {
+    $entries=[IO.Directory]::GetFileSystemEntries($path)
+    if ([IO.File]::ReadAllText((Join-Path $path 'mas-secret')) -ne 'container secret') { throw 'Read mismatch' }
+    $file=Join-Path $path 'windows-created'
+    [IO.File]::WriteAllText($file,'from Windows')
+    if ([IO.File]::ReadAllText($file) -ne 'from Windows') { throw 'Write mismatch' }
+    [IO.File]::AppendAllText($file,' edited')
+    if ([IO.File]::ReadAllText($file) -ne 'from Windows edited') { throw 'Edit mismatch' }
+    [IO.File]::Delete($file)
+    $dir=Join-Path $path 'windows-directory'
+    [IO.Directory]::CreateDirectory($dir) | Out-Null
+    [IO.Directory]::Delete($dir)
+    Write-Output 'WINDOWS_UNC_OK'
+} catch { Write-Output $_.Exception.Message; exit 1 }
+""".replace('WINDOWS_PATH', "'" + windows.replace("'", "''") + "'")
+        result = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-EncodedCommand',
+                                 base64.b64encode(script.encode('utf-16le')).decode()],
+                                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=self.timeout)
+        assert result.returncode == 0 and 'WINDOWS_UNC_OK' in result.stdout, result.stdout + result.stderr
+        assert not (home/'windows-created').exists() and not (home/'windows-directory').exists()
+        self.events.append(dict(action='filesystem-windows-unc', status='ok', path=windows,
+                                operations=['list', 'read', 'create', 'edit', 'delete', 'mkdir', 'rmdir']))
 
     def filesystem_recovery(self, target):
         self.cli('mountfs',target,'/var/log')
@@ -547,27 +585,35 @@ class Suite:
             self.manager.lxd.command(['config','set','local:'+target,MANAGED+'=true'])
         assert not self.fs_root.exists()
 
+    def menu_result(self, terminal, parent, chinese=False):
+        terminal.expect('操作结果' if chinese else 'Operation result')
+        terminal.expect('返回' if chinese else 'Back')
+        terminal.read()
+        # The parent must not appear before the user explicitly returns.
+        assert parent.encode() not in terminal.buffer[terminal.cursor:]
+        terminal.send('\x1b[D')
+        terminal.expect(parent)
+
     def filesystem_menu(self, target):
         with self.terminal([]) as terminal:
-            down='\x1b[B';back='\x1b[D'
+            down='\x1b[B';back='\x1b[D';parent='Container: '+target
             terminal.expect('my-ai-sandbox');terminal.send('\n')
             terminal.expect('Container management');terminal.send('\n')
             terminal.expect('Containers')
-            # Sorted list can also contain the imported fixture.
             names=[item['name'] for item in self.manager.list()]
             terminal.send(down*names.index(target)+'\n')
-            terminal.expect('Container: '+target)
+            terminal.expect(parent)
             terminal.send(down*7+'\n')
             terminal.expect('Container path (Enter = sandbox home):');terminal.send('/var/log\n')
             terminal.expect('Mounted at ')
-            terminal.expect('Container: '+target)
+            self.menu_result(terminal,parent)
             terminal.send('\x1b[A\n')
             terminal.expect(str(self.fs_root/target/'var/log'))
-            terminal.expect('Container: '+target)
+            self.menu_result(terminal,parent)
             terminal.send(down*2+'\n')
             terminal.expect('Select an exact path to unmount');terminal.send('\x1b[A\n')
             terminal.expect('Completed.')
-            terminal.expect('Container: '+target)
+            self.menu_result(terminal,parent)
             terminal.send(back);terminal.expect('Containers')
             terminal.send(back);terminal.expect('Container management')
             terminal.send(back);terminal.expect('my-ai-sandbox')
@@ -588,70 +634,77 @@ class Suite:
         backup = Path(self.workspace.name) / "tui-backup.tar.gz"
         with self.terminal([]) as terminal:
             def send(keys, expected):
-                terminal.send(keys)
-                terminal.expect(expected)
+                terminal.send(keys);terminal.expect(expected)
+            def result(parent, chinese=False):
+                self.menu_result(terminal,parent,chinese)
             down, up, back = "\x1b[B", "\x1bOA", "\x1b[D"
             terminal.expect("my-ai-sandbox")
             send(down + "\n", "Settings")
             send("\n", "Language / 语言")
-            send("\x1b", "Language: en_us")
+            terminal.send("\x1b");result("Settings")
             send("\n", "Language / 语言")
-            send(up + "\n", "语言：zh_cn")
+            terminal.send(up + "\n");result("设置",True)
             assert self.cli("config", "get", "language").strip() == 'zh_cn'
             send("\n", "语言 / Language")
-            send(down + "\n", "Language: en_us")
+            terminal.send(down + "\n");result("Settings")
             send(back, "my-ai-sandbox")
             send(up + "\x1b[C", "Container management")
-            # Empty list and cancelled creation return safely to their parent menu.
             send("\n", "No managed containers.")
             send(back, "Container management")
             send(down + "\n", "New TARGET:")
-            send("\x1b", "Container management")
+            terminal.send("\x1b");result("Container management")
             send("\n", "New TARGET:")
             send(target + "\n", "Image (Enter = host Ubuntu):")
             terminal.send("\n")
             self.wait("TUI new", lambda: self.state(target, "Stopped"), terminal)
+            result("Container management")
             send(up + "\n", "Containers")
             send("\n", "Container: " + target)
-            send("\n", "Info:")
-            send(down + up + back, "Container: " + target)
+            send("\n", '\"status\": \"Stopped\"')
+            result("Container: " + target)
             terminal.send(down + "\n")
             self.wait("TUI start", lambda: self.state(target, "Running"), terminal)
+            result("Container: " + target)
             send(down + "\n", "sandbox@")
             self.check_shell(terminal)
             send("exit\n", f"Stop {target}?")
-            send("\n", "Container: " + target)
+            terminal.send("\n");result("Container: " + target)
             assert self.state(target, 'Running')
             terminal.send(down + "\n")
             self.wait("TUI stop", lambda: self.state(target, "Stopped"), terminal)
+            result("Container: " + target)
             send(down + "\n", "Export FILE:")
             terminal.send(str(backup) + "\n")
             self.wait("TUI export", backup.exists, terminal)
+            result("Container: " + target)
             send("\n", "Export FILE:")
             send(str(backup) + "\n", "Overwrite ")
-            send("\n", "Cancelled.")
+            send("\n", "Cancelled.");result("Container: " + target)
             send(down + "\n", "Delete " + target)
-            send("\n", "Cancelled.")
+            send("\n", "Cancelled.");result("Container: " + target)
             assert self.state(target, 'Stopped')
             send("\n", "Delete " + target)
             terminal.send(down + "\n")
             self.wait("TUI delete", lambda: self.state(target, "Absent"), terminal)
+            result("Containers")
             send(back, "Container management")
             send(down * 2 + "\n", "Import TARGET:")
             send(imported + "\n", "Backup FILE:")
             terminal.send(str(backup) + "\n")
             self.wait("TUI import", lambda: self.state(imported, "Stopped"), terminal)
+            result("Container management")
             send(up * 2 + "\n", "Containers")
             send("\n", "Container: " + imported)
             terminal.send(down + "\n")
             self.wait("TUI imported start", lambda: self.state(imported, "Running"), terminal)
+            result("Container: " + imported)
             send(back, "Containers")
             send(back, "Container management")
             terminal.send(down * 3 + "\n")
             self.wait("TUI stop all", lambda: self.state(imported, "Stopped"), terminal)
+            result("Container management")
             send(back, "my-ai-sandbox")
-            terminal.send(down * 2 + "\n")
-            terminal.finish()
+            terminal.send(down * 2 + "\n");terminal.finish()
             for forbidden in (b'\x1b[?1049', b'\x1b[?1047', b'\x1b[?47', b'\x1b[2J', b'\x1b[3J', b'\x1b[H'):
                 assert forbidden not in terminal.buffer, repr(forbidden)
             assert b'"status": "Stopped"' in terminal.buffer

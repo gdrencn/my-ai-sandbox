@@ -14,7 +14,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 普通安装只下载产品和独立安装程序，不下载或安装测试工具。`--test` 才额外下载 `mas-test.pyz`，由测试工具调用同版本安装程序完成安装，再运行完整测试，并安装 `~/.local/bin/mas-test`。
 
-安装脚本自动安装缺失的 Python 3、snapd、最新稳定渠道的 LXD 及其 lxc 客户端，以及宿主 SSHFS，开始时判断是否需要宿主权限，需要时调用系统 `sudo -v` 认证；后续使用系统默认 sudo 行为。全新 LXD 使用原生自动初始化（dir 存储和默认桥接网络）；已有环境不自动升级或覆盖配置。新增 lxd 用户组权限后，安装过程通过一个刷新用户组的用户进程继续运行，日常使用请打开新终端。
+安装脚本自动安装缺失的 Python 3、snapd、最新稳定渠道的 LXD 及其 lxc 客户端，以及宿主 SSHFS，先统一检测缺失依赖，需要 APT 时只刷新一次索引并合并安装；不再单独执行 `sudo -v`，由实际提权命令触发系统认证。正常 APT 进度在终端原地刷新，保留环节总结、警告和错误。全新 LXD 使用原生自动初始化（dir 存储和默认桥接网络）；已有环境不自动升级或覆盖配置。新增 lxd 用户组权限后，安装过程通过一个刷新用户组的用户进程继续运行，日常使用请打开新终端。
 
 宿主支持范围：Ubuntu 22.04 及更新版本（原生系统和 WSL2），Python 3.10+，需要可运行 snapd 的 systemd 环境。WSL 未启用 systemd 时，安装脚本会给出启用及重启提示。云服务器必须允许容器运行所需的内核功能。当前实际验证环境见 [IMPLEMENTED.md](IMPLEMENTED.md)，不能把支持目标视为所有环境已实测。
 
@@ -23,7 +23,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 安装指定版本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.10
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.11
 ```
 
 ## 语言和配置
@@ -72,7 +72,7 @@ mas import restored demo.tar.gz
 
 **备份是恢复用途，并非克隆模板。** LXD 导出会保留网卡 MAC。源容器与导入副本同时存在时，LXD 可能拒绝启动副本。恢复前先处理原容器；mas 不静默改写备份中的网络身份。
 
-终端文本菜单的主菜单分为“容器管理”“设置”“退出”。容器管理提供列表、创建、导入、停止全部；选中容器后进入信息、启动、进入终端、停止、导出、删除、挂载查询、挂载、卸载菜单。所有菜单每项独立一行、左对齐，↑/↓ 移动，Enter/→ 确定，Esc/← 返回。菜单直接显示在当前终端位置，仅局部刷新当前菜单，不切换全屏、不清屏，历史输出可以向上滚动查看。执行操作时正常等待进度在同一行刷新，最终结果和诊断保留，完成后追加菜单；容器信息完整输出，进入容器使用正常终端会话。
+终端文本菜单的主菜单分为“容器管理”“设置”“退出”。容器管理提供列表、创建、导入、停止全部；选中容器后进入信息、启动、进入终端、停止、导出、删除、挂载查询、挂载、卸载菜单。所有菜单每项独立一行、左对齐，↑/↓ 循环移动（首项向上到末项、末项向下到首项），Enter/→ 确定，Esc/← 返回。菜单直接显示在当前终端位置，仅局部刷新当前菜单，不切换全屏、不清屏，历史输出可以向上滚动查看。执行操作时正常等待进度在同一行刷新，最终结果和诊断保留，每个功能先以空行和标题明确进入，结果、错误或取消后停留在“操作结果／返回”，主动返回后才恢复上级菜单及原选中项。容器列表保留自己的选择和返回页；容器信息完整输出，进入容器使用正常终端会话。
 
 CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 `mas delete demo --yes`、`mas export demo backup.tar.gz --yes`；`--no` 明确拒绝。`mas enter demo --yes` 表示终端退出后停止容器，`--no` 表示保持运行。没有交互终端且未指定确认参数时默认拒绝；不再使用管道输入 `y` 确认。
 
@@ -91,6 +91,8 @@ mas unmountfs demo /
 省略路径时读取 sandbox 用户实际 home；未准备该用户时不会为了挂载而启动容器。显式路径只接受绝对路径，不接受上级跳转、控制字符或符号链接路径。根路径映射是目录组织规则，挂载 home 不会同时挂载整个根目录。
 
 挂载可读写，宿主创建、修改、删除文件直接作用于容器。使用 LXD 原生本地 SFTP 服务和以当前宿主用户运行的 SSHFS，容器不安装 SSH 服务。保留原生权限行为，不改写原文件的 UID/GID、权限或 ACL，不自行增加身份映射。新建文件也遵循原生行为，不保证归 sandbox 所有。挂载内容的符号链接行为遵循宿主 SSHFS 版本默认行为；本功能不是额外安全隔离层。
+
+从 0.1.11 起，新挂载使用 `allow_root`，允许挂载用户与宿主 root 访问，兼容 Windows 经 WSL 的文件访问；不会开放给其他普通宿主用户。安装程序会在需要时启用宿主 `/etc/fuse.conf` 的 `user_allow_other` 配置开关，保留已有设置；实际挂载仍使用 `allow_root`。旧挂载不会自动改变，需要先 `mas unmountfs TARGET [PATH]`，再重新 `mas mountfs TARGET [PATH]`。
 
 只管理当前用户创建的挂载。状态保存在 `$XDG_STATE_HOME/my-ai-sandbox/filesystems`，默认 `~/.local/state/my-ai-sandbox/filesystems`，连接资料仅当前用户可访问。普通 CLI 退出后挂载继续存在。
 
@@ -111,7 +113,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 指定版本及结果目录：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.10 --output ./mas-results
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.11 --output ./mas-results
 ```
 
 已安装环境可直接运行 `mas-test`。测试工具与产品版本配套，测试使用独立 LXD project 和 `test-<唯一随机码>` 容器，通过真实 lxc 操作和伪终端测试 CLI/终端文本菜单；只清理本次创建的资源。原有容器不参与 `stop --all` 测试。语言测试使用临时配置，不修改用户偏好。英文界面测试的原始输出保留在详细日志中；面向用户的说明、阶段名称和总结始终使用选择的语言，外部程序的原始警告和错误不翻译。

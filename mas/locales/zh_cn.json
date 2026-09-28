@@ -184,5 +184,13 @@
   "state_residual": "残留",
   "state_disconnected": "连接异常",
   "state_conflict": "冲突",
-  "fs_before_transition": "改变 {target} 的启停状态或删除前，请先卸载并清理已记录的挂载；LXD 会等待文件连接释放。"
+  "fs_before_transition": "改变 {target} 的启停状态或删除前，请先卸载并清理已记录的挂载；LXD 会等待文件连接释放。",
+  "apt_setup": "环境准备",
+  "apt_done": "依赖准备完成",
+  "apt_failed": "依赖准备失败",
+  "fuse_setup": "准备宿主 FUSE 配置，允许挂载用户及 root 访问。",
+  "fuse_setup_required": "宿主尚未允许普通用户使用 allow_root；请重新运行 mas 安装程序。",
+  "fuse_config_symlink": "FUSE 配置是符号链接，未修改：{path}",
+  "page_result": "操作结果",
+  "page_action": "{action}：{target}"
 }

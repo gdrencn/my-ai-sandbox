@@ -184,5 +184,13 @@
   "state_residual": "Residual",
   "state_disconnected": "Disconnected",
   "state_conflict": "Conflict",
-  "fs_before_transition": "Unmount and clean up recorded filesystems before changing container state or deleting {target}; LXD waits for open file connections."
+  "fs_before_transition": "Unmount and clean up recorded filesystems before changing container state or deleting {target}; LXD waits for open file connections.",
+  "apt_setup": "Setup",
+  "apt_done": "Dependency preparation completed",
+  "apt_failed": "Dependency preparation failed",
+  "fuse_setup": "Preparing host FUSE configuration for access by the mounting user and root.",
+  "fuse_setup_required": "Host FUSE does not yet permit allow_root for ordinary users; run the mas installer again.",
+  "fuse_config_symlink": "FUSE configuration is a symlink; unchanged: {path}",
+  "page_result": "Operation result",
+  "page_action": "{action}: {target}"
 }

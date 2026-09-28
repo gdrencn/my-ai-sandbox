@@ -139,7 +139,7 @@ class DistributionTests(unittest.TestCase):
         with zipfile.ZipFile(PRODUCT_UNDER_TEST) as archive:
             names=archive.namelist()
         self.assertFalse(any(name.startswith(('tests/', 'mas/locales/test/')) for name in names))
-        for forbidden in ('mas/testing.py','mas/test_output.py','mas/install.py'):
+        for forbidden in ('mas/testing.py','mas/test_output.py','mas/install.py','mas/dependencies.sh'):
             self.assertNotIn(forbidden,names)
 
 

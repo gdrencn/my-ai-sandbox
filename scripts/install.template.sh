@@ -24,8 +24,8 @@ mas_choose_language() {
                 suffix=''
                 IFS= read -rsn2 -t 0.2 suffix </dev/tty || true
                 case $suffix in
-                    '[A'|'OA') selected=0 ;;
-                    '[B'|'OB') selected=1 ;;
+                    '[A'|'OA') selected=$(( (selected + 1) % 2 )) ;;
+                    '[B'|'OB') selected=$(( (selected + 1) % 2 )) ;;
                     '[C'|'OC') break ;;
                     ''|'[D'|'OD') return 130 ;;
                 esac ;;
@@ -47,14 +47,12 @@ if ! command -v python3 >/dev/null; then
         mas_language=$(mas_choose_language)
     done
     export MAS_LANGUAGE=$mas_language
-    if [[ $EUID -eq 0 ]]; then
-        apt-get update
-        apt-get install -y python3
-    else
-        sudo -v </dev/tty
-        sudo apt-get update </dev/tty
-        sudo apt-get install -y python3 </dev/tty
-    fi
+    case $mas_language in
+        zh_cn) MAS_APT_SETUP=@APT_SETUP_ZH@; MAS_APT_DONE=@APT_DONE_ZH@; MAS_APT_FAILED=@APT_FAILED_ZH@ ;;
+        en_us) MAS_APT_SETUP=@APT_SETUP_EN@; MAS_APT_DONE=@APT_DONE_EN@; MAS_APT_FAILED=@APT_FAILED_EN@ ;;
+    esac
+@DEPENDENCIES@
+    mas_install_dependencies
 fi
 mas_bootstrap=$(mktemp -d)
 trap 'rm -rf "$mas_bootstrap"' EXIT

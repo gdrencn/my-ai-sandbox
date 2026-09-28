@@ -44,6 +44,46 @@ class MenuTests(unittest.TestCase):
         self.terminal_case("ui.confirm('Menu test')", '\x1b', False)
         self.terminal_case("ui.confirm('Menu test')", '\x1b[B\n', True)
 
+    def test_wrap_navigation_in_real_terminal(self):
+        options = "ui.choose('Menu test', [('a','A'),('b','B'),('c','C')])"
+        self.terminal_case(options, '\x1b[A\n', 'c')
+        self.terminal_case(options, '\x1b[B' * 3 + '\n', 'a')
+        self.terminal_case("ui.choose('Menu test', [('a','A')])", '\x1b[A\x1b[B\n', 'a')
+        self.terminal_case("ui.confirm('Menu test')", '\x1b[A\n', True)
+        self.terminal_case("ui.choose('Menu test', [('a','A'),('b','B'),('c','C')], multiple=True)",
+                           ' \x1b[A \x1b[B\n', ['a', 'c'])
+
+    def test_function_failure_stays_visible_until_explicit_return(self):
+        source = """import sys
+from mas import menu, config
+from mas.core import Error
+from mas.terminal_ui import UI
+config.set_value('language', 'en_us')
+def failure():
+    raise Error('NATIVE_FAILURE_SENTINEL')
+def exercise(view):
+    UI(view, None).present('ACTION_TITLE', failure)
+    print('PARENT_MENU', flush=True)
+menu.interactive(exercise)
+"""
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CONFIG_HOME': directory}):
+            source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
+            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'failure.log')
+            try:
+                terminal.expect('NATIVE_FAILURE_SENTINEL')
+                terminal.expect('Operation result')
+                terminal.read()
+                self.assertNotIn(b'PARENT_MENU', terminal.buffer)
+                terminal.send('\n')
+                terminal.expect('PARENT_MENU'); terminal.finish()
+                self.assert_inline(terminal.buffer)
+                history = self.render_history(terminal.buffer)
+                self.assertLess(history.index('ACTION_TITLE'), history.index('NATIVE_FAILURE_SENTINEL'))
+                self.assertLess(history.index('NATIVE_FAILURE_SENTINEL'), history.index('Operation result'))
+                self.assertLess(history.index('Operation result'), history.index('PARENT_MENU'))
+            finally:
+                terminal.close()
+
     def test_text_backspace(self):
         self.terminal_case("ui.input('Menu test')", 'abc\x7fd\n', 'abd')
 
