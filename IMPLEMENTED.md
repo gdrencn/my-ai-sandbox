@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: test version 0.1.14 is publicly released; final frozen-package validation and both public installation entry modes passed. Stage 17 records the current behavior. Earlier stages are historical checkpoints, including superseded interfaces. Checkpoint numbers are not version phase numbers; the version phase remains 1.
+Current result: version 0.1.15 implementation and frozen-package validation are complete; test publication/public-entry checks follow below. Stage 18 records the current behavior; previous stages are historical checkpoints. The version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -348,3 +348,23 @@ Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.14 from c75
 Both fixed curl/bash modes resolved 0.1.14 and succeeded in actual PTYs. Ordinary installation preserved the existing tester modification time. Public --test passed all 153 packaged units and all 20 report stages in 367.1 seconds, without skips or cleanup errors. Installed product/tester hashes matched the frozen release files; the Windows UNC event passed. Independent checks confirmed the isolated project, mount root and registry entries were reclaimed. Language preferences were isolated and restored; no alternate-screen, screen-clear or scrollback-clear sequences were observed. Evidence: validation/V0_1_14_PUBLIC_REPORT.json.
 
 This completes section 23, including test publication and public-entry verification. The above environment/coverage limits remain; no stable promotion occurred.
+
+
+## Stage 18 — version 0.1.15, dependency terminal flow and merged navigation
+
+Requirements sections 24–25 were recorded before product changes. Implementation was then verified against those requirements before this completion record.
+
+The installation hang was reproduced without installing host packages: real same-user sudo-rs 0.2.13-0ubuntu1.2 with terminal stdin and piped output left a forked terminal-reading child in T. Direct-terminal and EOF-input variants completed. Observations and the minimal source are retained in validation/V0_1_15_SUDO_REPRODUCTION.json. Ubuntu's installed changelog did not list the related terminal fix; upstream sudo-rs issue 1598 was investigated, but the exact signal/patch attribution was not established from this process snapshot.
+
+- The single shared Bash helper now keeps sudo's own stdout connected to the terminal and places the APT/tee/renderer pipeline inside sudo's command. Interactive package input remains a terminal; redirected output uses EOF package input while sudo still owns authentication. No sudoers change, sudo replacement, standalone sudo -v, stored password, keepalive or new dependency was introduced. Failure status and full native failure logs are preserved.
+- Rendering buffers normal partial prefixes across read timeouts and handles carriage returns; it does not automatically make unterminated ordinary progress permanent. Unknown native prompts remain visible before newline, and warnings/errors remain permanent. Bootstrap and installer use the same implementation; the generated shell was rebuilt and its dependency/package regression passed.
+- Bare mas opens one main menu with list/new/import/mas preferences/exit. Chinese is mas 选项; English is mas Preferences. Container actions remain behind selection. Stop all is before Back in the container list only when more than one managed container exists and at least one live status is not exactly Stopped. A non-name control key avoids collisions. After actions the list and eligibility refresh, retaining valid selection; initial selection is the first container. Query failures remain errors. The existing Manager.stop_all and per-target stop orchestration are unchanged.
+- Deletion's bilingual no-mount instruction now refers only to deletion. Existing deletion guards, exact mount cleanup and lifecycle behavior are unchanged.
+
+Nine new units bring the total to 162; they cover real sudo/PTY child reads and unterminated prompts, redirected operation, normal/diagnostic fragments, main-menu structure, conditional bulk actions, first-row selection, preference return, name/control separation, query failure and shared stop-all reuse. Existing controlled authentication tests remain. A new native dependency-install stage executes actual APT update and SSHFS installation as sandbox through system sudo inside a disposable test container; the recorded versions exactly match the reported host: sudo-rs 0.2.13-0ubuntu1.2 and apt 3.2.0 (amd64). This fixture-only installation does not change product container provisioning.
+
+An exploratory integration run was deliberately interrupted after a review caught the first-container default selecting Back. The selection was corrected and asserted before rebuilding the final package; exploratory resources were reclaimed. Its partial results are not release evidence.
+
+Final frozen validation: 162 packaged units with zero failures/errors/skips; all 21 report stages (unit plus 20 integrations) passed in 420.6 seconds. The new merged menu, eligible bulk stop, native dependencies, lifecycle/mount recovery, Windows UNC operations and terminal exit passed. Independent checks confirmed the isolated project, mount root and registry entries were reclaimed. Report: validation/V0_1_15_REPORT.json. Product SHA-256: bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6. Packaged sources match the workspace and repeated builds are byte-identical; Python 3.10 grammar, shell syntax and diff checks passed.
+
+Limits: the full fresh-host snap/LXD/group/FUSE installation was not repeated. Actual password entry remains a user/system boundary, tested with controlled prompt fixtures; the new live sudo probe uses the same user and the container installation uses standard mas passwordless sudo. Native Ubuntu/cloud, other architectures and offline VHDX remain unverified. The user's already-paused old installer was not resumed or terminated. No stable promotion. Public verification follows publication.

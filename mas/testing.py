@@ -135,7 +135,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -351,6 +351,8 @@ class Suite:
             assert self.exec(target, "su --login sandbox -c 'id -un; sudo -n id -u'").splitlines() == ["sandbox", "0"]
             self.wait("outbound HTTPS", lambda: self.network(target))
             self.exec(target, "printf '%s' mas-roundtrip-data > /home/sandbox/mas-proof")
+        with self.case("dependency-install"):
+            self.dependencies(target)
         with self.case("lifecycle-repeat"):
             identity = self.exec(target, "id -u sandbox; getent passwd sandbox")
             self.exec(target, "printf preserve > /home/sandbox/mas-retain; usermod --shell /bin/sh sandbox")
@@ -608,7 +610,6 @@ try {
         with self.terminal([]) as terminal:
             down='\x1b[B';back='\x1b[D';parent='Container: '+target
             terminal.expect('my-ai-sandbox');terminal.send('\n')
-            terminal.expect('Container management');terminal.send('\n')
             terminal.expect('Containers')
             names=[item['name'] for item in self.manager.list()]
             terminal.send(down*names.index(target)+'\n')
@@ -625,10 +626,31 @@ try {
             terminal.expect('Completed.')
             self.menu_result(terminal,parent)
             terminal.send(back);terminal.expect('Containers')
-            terminal.send(back);terminal.expect('Container management')
             terminal.send(back);terminal.expect('my-ai-sandbox')
-            terminal.send(down*2+'\n');terminal.finish()
+            terminal.send('\x1b[A\n');terminal.finish()
         assert not self.manager.mountedfs(target) and not self.fs_root.exists()
+
+    def dependencies(self, target):
+        """Real privileged package installation, confined to this test container."""
+        from .install import dependency_script
+        script = dependency_script() + '\nmas_run_apt update && mas_run_apt install -y sshfs\n'
+        path = Path(self.workspace.name)/'dependency-probe.sh'
+        path.write_text(script)
+        remote = '/tmp/mas-dependency-probe.sh'
+        self.manager.lxd.command(['file', 'push', str(path), 'local:'+target+remote])
+        # sandbox already has the ordinary mas passwordless-sudo setup.
+        command = self.manager.lxd.prefix + ['exec', 'local:'+target, '--', 'su', '--login', 'sandbox', '-c', 'bash '+remote]
+        terminal = Terminal(command, self.timeout, self.directory/'dependency-install.log',
+            on_wait=lambda elapsed: self.output.progress(t('working', name=t('case_dependency-install'), elapsed=elapsed)))
+        try:
+            terminal.expect('Dependency preparation completed: apt-get install -y sshfs')
+            terminal.finish()
+        finally:
+            terminal.close()
+            self.output.diagnostics(terminal.buffer.decode(errors='replace'), '', failed=terminal.status != 0)
+        assert self.exec(target, 'command -v sshfs').strip()
+        versions = self.exec(target, 'sudo --version; apt-get --version')
+        self.events.append(dict(action='dependency-install', target=target, status='ok', versions=versions))
 
     def network(self, target):
         try:
@@ -649,25 +671,24 @@ try {
                 self.menu_result(terminal,parent,chinese)
             down, up, back = "\x1b[B", "\x1bOA", "\x1b[D"
             terminal.expect("my-ai-sandbox")
-            send(down + "\n", "Settings")
+            send(down * 3 + "\n", "mas Preferences")
             send("\n", "Select interface language / 请选择界面语言")
-            terminal.send("\x1b");result("Settings")
+            terminal.send("\x1b");result("mas Preferences")
             send("\n", "Select interface language / 请选择界面语言")
-            terminal.send(up + "\n");result("设置",True)
+            terminal.send(up + "\n");result("mas 选项",True)
             assert self.cli("config", "get", "language").strip() == 'zh_cn'
             send("\n", "请选择界面语言 / Select interface language")
-            terminal.send(down + "\n");result("Settings")
+            terminal.send(down + "\n");result("mas Preferences")
             send(back, "my-ai-sandbox")
-            send(up + "\x1b[C", "Container management")
-            send("\n", "No managed containers.")
-            send(back, "Container management")
+            send(up * 3 + "\x1b[C", "No managed containers.")
+            send(back, "my-ai-sandbox")
             send(down + "\n", "Enter the container name:")
-            terminal.send("\x1b");result("Container management")
+            terminal.send("\x1b");result("my-ai-sandbox")
             send("\n", "Enter the container name:")
             send(target + "\n", "Choose an image version (leave empty and press Enter to use the host Ubuntu version):")
             terminal.send("\n")
             self.wait("TUI new", lambda: self.state(target, "Stopped"), terminal)
-            result("Container management")
+            result("my-ai-sandbox")
             send(up + "\n", "Containers")
             send("\n", "Container: " + target)
             send("\n", '\"status\": \"Stopped\"')
@@ -692,24 +713,27 @@ try {
             terminal.send(down + "\n")
             self.wait("TUI delete", lambda: self.state(target, "Absent"), terminal)
             result("Containers")
-            send(back, "Container management")
+            send(back, "my-ai-sandbox")
             send(down * 2 + "\n", "Enter the name for the imported container:")
             send(imported + "\n", "Enter the path of the backup file to import:")
             terminal.send(str(backup) + "\n")
             self.wait("TUI import", lambda: self.state(imported, "Stopped"), terminal)
-            result("Container management")
+            result("my-ai-sandbox")
             send(up * 2 + "\n", "Containers")
             send("\n", "Container: " + imported)
             terminal.send(down + "\n")
             self.wait("TUI imported start", lambda: self.state(imported, "Running"), terminal)
             result("Container: " + imported)
+            extra = self.target()
+            self.cli('new', extra)
             send(back, "Containers")
-            send(back, "Container management")
-            terminal.send(down * 3 + "\n")
+            names = [item['name'] for item in self.manager.list()]
+            terminal.send(down * (len(names)-names.index(imported)) + "\n")
             self.wait("TUI stop all", lambda: self.state(imported, "Stopped"), terminal)
-            result("Container management")
+            result("Containers")
             send(back, "my-ai-sandbox")
-            terminal.send(down * 2 + "\n");terminal.finish()
+            terminal.send(up + "\n");terminal.finish()
+            self.cli('delete', extra, '--yes')
             for forbidden in (b'\x1b[?1049', b'\x1b[?1047', b'\x1b[?47', b'\x1b[2J', b'\x1b[3J', b'\x1b[H'):
                 assert forbidden not in terminal.buffer, repr(forbidden)
             assert b'"status": "Stopped"' in terminal.buffer
@@ -717,7 +741,6 @@ try {
         for stop in (False, True, None):
             with self.terminal([]) as terminal:
                 terminal.expect('my-ai-sandbox'); terminal.send('\n')
-                terminal.expect('Container management'); terminal.send('\n')
                 terminal.expect('Containers'); terminal.send('\n')
                 terminal.expect('Container: ' + imported); terminal.send(down * 2 + '\n')
                 terminal.expect('sandbox@'); self.check_shell(terminal)

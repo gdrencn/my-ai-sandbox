@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.14. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.15. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
@@ -90,3 +90,12 @@ Stages follow responsibility, not the ordering of native commands or whether cod
 Mount preparation is inside failure protection from its first journal write. `_listener_details` and `_mount_observation` only observe; process launches and registry writes live in their named steps. Listener and mount readiness consume one shared deadline after listener launch. New registry records include a boolean `work_created` to distinguish successfully created private work directories from a pre-existing collision; legacy records remain accepted. Cleanup refuses a pre-existing work directory and retains the recovery record when it cannot safely finish. Explicit unmount and failed mount recovery use the same cleanup implementation.
 
 Shared `cleanup_scope` preserves an original failure when cleanup also fails and reports the secondary failure where output remains possible. A cleanup failure on an otherwise successful path still fails the operation. Reporting callbacks are observers: their failures produce best-effort diagnostics without replacing the operation result/error. Interrupts are not converted into successful outcomes. Native client cleanup, export temporary directories, registry/config temporary files and installer temporary files reuse this policy; no lifecycle rollback, extra failure-state query or automatic failure recovery was added.
+
+
+## 0.1.15 installation and navigation
+
+The common Bash dependency helper now runs its APT/tee/renderer pipeline inside the command invoked by sudo, leaving sudo itself attached to the interactive terminal so its foreground process setup precedes APT child reads. No separate authentication command, password handling, sudoers edit or alternate sudo implementation is introduced. Redirected output supplies noninteractive EOF to the package manager; sudo retains responsibility for any authentication via its controlling terminal. Failures preserve the native output and exit status. APT fragments remain buffered across timed reads and carriage-return boundaries; known normal prefixes stay transient, while unknown prompts can be displayed before a newline and warnings/errors remain permanent.
+
+Bare mas directly opens my-ai-sandbox with list, new, import, mas preferences and exit. Chinese preferences is mas 选项; English is mas Preferences. Per-container actions remain behind container selection. Stop all containers is a non-container control on the selection page, placed before Back and shown only for more than one managed container with at least one state other than exact Stopped. Live LXD state is authoritative, including native lxc changes; query errors are not treated as empty or all stopped. The menu calls unchanged Manager.stop_all, then reloads the list. Already-stopped requests do not repair independent filesystem issues. Future host/per-container settings are placement conventions only, not new features.
+
+Deletion continues to require explicit unmount/cleanup. Its bilingual instruction now refers only to deletion; it no longer incorrectly includes start/stop.

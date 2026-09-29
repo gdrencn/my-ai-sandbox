@@ -1,0 +1,13 @@
+{
+  "sudo_version": "sudo-rs 0.2.13-0ubuntu1.2",
+  "apt_version": "apt 3.2.0 (amd64)",
+  "scope": "same-user real sudo; no package installation or credential handling",
+  "probe_source": "import os,fcntl,time,signal\np=os.fork()\nif p==0:\n fcntl.fcntl(0,fcntl.F_SETFL,fcntl.fcntl(0,fcntl.F_GETFL)|os.O_NONBLOCK)\n try: os.read(0,1)\n except BlockingIOError: pass\n os._exit(0)\nend=time.monotonic()+3\nwhile time.monotonic()<end:\n found,status=os.waitpid(p,os.WNOHANG)\n if found:\n  print(\"CHILD_FINISHED\",status,flush=True);break\n time.sleep(.05)\nelse:\n print(open('/proc/%d/status'%p).read().splitlines()[2],flush=True)\n print(\"CHILD_STOPPED_OR_STUCK\",flush=True)\n os.kill(p,signal.SIGKILL);os.waitpid(p,0)\n",
+  "observed": {
+    "pipe": "State:\tT (stopped)\nCHILD_STOPPED_OR_STUCK\n",
+    "terminal": "CHILD_FINISHED 0\n",
+    "null": "CHILD_FINISHED 0\n"
+  },
+  "fixed_regression": "tests.test_install_menu_update.AptStreamingTests.test_real_sudo_keeps_child_terminal_read_and_prompt_usable",
+  "attribution": "The original terminal-input/piped-output arrangement reproducibly stops a child; this alone does not prove upstream issue #1598 is the exact underlying defect."
+}

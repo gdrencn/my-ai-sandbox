@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.1.14 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.1.15 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -32,7 +32,7 @@ This maps the checks present in batch 0.1.14 to requirements and implementation.
 ## Current limits
 
 - Full real runs are on the current Ubuntu WSL host. Native Ubuntu/cloud hosts and other architectures still require external-machine verification.
-- Historical user logs cover a missing-LXD installation. The current batch does not remove the host LXD/Python installation to repeat fresh provisioning; sudo, package-manager failure and existing configuration behavior use controlled subprocess tests.
+- Historical user logs cover a missing-LXD installation. The current batch does not remove the host LXD/Python installation to repeat fresh provisioning; privileged host bootstrap remains unverified for this batch. Same-user real sudo/PTY checks and real root APT installation inside a disposable container now complement controlled authentication/failure tests.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
 - GPU passthrough, host-to-container resource sharing and custom networking are excluded features, not covered functionality.
@@ -98,3 +98,16 @@ This is behavior/failure-boundary coverage, not exhaustive branch coverage. Inje
 Final frozen 0.1.14 validation: 153 packaged units and all 20 report stages passed in 369.4 seconds; no skips or cleanup errors. Windows UNC passed; project, mount root and registry entries were reclaimed. Evidence: validation/V0_1_14_REPORT.json. Public-entry verification follows publication.
 
 Public 0.1.14 verification also passed 153 packaged units and all 20 report stages in 367.1 seconds, without skips or cleanup errors. Both fixed entry modes succeeded, installed hashes matched, normal installation preserved the tester, Windows UNC passed and isolated resources were reclaimed. Evidence: validation/V0_1_14_PUBLIC_REPORT.json.
+
+
+## Batch 0.1.15 installation and menu regression
+
+Nine added unit tests bring the packaged suite to 162. They cover exact top-level actions, conditional bulk-stop visibility across zero/one/multiple and stopped/running/transitional states, default first-container selection, refresh and reuse after stop-all, legal-name/control separation, query failure, preferences return selection, fragmented normal/diagnostic output, and a real same-user sudo child-terminal-read/prompt probe in interactive and redirected modes. The real sudo test exercises its actual PTY machinery without a password or host privilege change; it is not a password-authentication test. Existing controlled authentication, APT failure-log/status and package-combination tests remain.
+
+A new native dependency-install case runs the shared packaged helper inside an isolated test container as sandbox. It invokes system sudo for actual APT update and SSHFS installation, records sudo/APT versions, preserves the full PTY transcript and verifies the installed binary. This adds a 21st report stage (unit plus 20 integrations). It does not replace validation of a fresh host's complete snap/LXD/group/FUSE bootstrap.
+
+Native menu automation uses the merged entry, visits bilingual mas preferences, exercises create/import/container actions, creates a second managed container to make bulk stop eligible, then returns through the refreshed list. Existing real entered-shell exit behavior remains covered.
+
+The original same-user sudo-rs 0.2.13-0ubuntu1.2 terminal-input/piped-output probe reproduced a child stuck in T; direct terminal and noninteractive input variants completed. Source and observations are recorded in validation/V0_1_15_SUDO_REPRODUCTION.json. Related upstream issue 1598 is a diagnostic lead, not a claim that this exact stop was traced to its specific defect. Frozen local and public verification results follow after execution.
+
+Final frozen 0.1.15 validation passed 162 packaged units and all 21 report stages in 420.6 seconds, without skips or cleanup errors. The dependency fixture recorded sudo-rs 0.2.13-0ubuntu1.2 / apt 3.2.0 (amd64); Windows UNC passed and isolated resources were reclaimed. Evidence: validation/V0_1_15_REPORT.json.

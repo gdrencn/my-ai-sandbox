@@ -7,6 +7,9 @@ from .i18n import t, state
 from .presentation import format_info
 
 
+STOP_ALL = object()  # A control key cannot collide with a legal container name.
+
+
 class LeaveMenu(Exception):
     def __init__(self, error=None):
         self.error = error
@@ -117,21 +120,34 @@ class UI:
             if not items:
                 self.write(t('menu_empty'))
             rows = menu.column_rows([(item['name'], menu.status_cell(state(item['status']), item['status'])) for item in items])
-            selected = self.view.choose(t('page_list'), [(item['name'], row) for item, row in zip(items, rows)] + [(None, t('menu_back'))], default=selected or (items[0]['name'] if items else None))
+            choices = [(item['name'], row) for item, row in zip(items, rows)]
+            if len(items) > 1 and any(item['status'] != 'Stopped' for item in items):
+                choices.append((STOP_ALL, t('menu_stop_all')))
+            choices.append((None, t('menu_back')))
+            selected = self.view.choose(t('page_list'), choices, default=selected if selected is not None else (items[0]['name'] if items else None))
             if selected is None:
                 return
-            self.present(t('page_container', target=selected), lambda: self.container(selected), back=False)
+            if selected is STOP_ALL:
+                self.present(t('menu_stop_all'), self.manager.stop_all)
+            else:
+                self.present(t('page_container', target=selected), lambda: self.container(selected), back=False)
 
-    def management(self):
+    def loop(self):
         selected = 'list'
-        actions = [(key, 'menu_' + key) for key in ('list', 'new', 'import', 'stop_all', 'back')]
+        actions = [(key, 'menu_' + key) for key in ('list', 'new', 'import')]
+        actions += [('settings', 'page_settings'), ('exit', 'menu_exit')]
         while True:
-            selected = self.choose(t('page_management'), actions, selected)
-            if selected == 'back':
+            try:
+                selected = self.choose(t('page_main'), actions, selected)
+            except menu.Cancelled:
+                return
+            if selected == 'exit':
                 return
             def action():
                 if selected == 'list':
                     self.containers()
+                elif selected == 'settings':
+                    self.settings()
                 elif selected == 'new':
                     target = self.view.input(t('new_target'))
                     image = self.view.input(t('new_image'))
@@ -139,20 +155,8 @@ class UI:
                 elif selected == 'import':
                     target = self.view.input(t('import_target'))
                     self.manager.import_container(target, self.view.input(t('backup_file')))
-                else:
-                    self.manager.stop_all()
-            self.present(t('menu_' + selected), action, back=selected != 'list')
-
-    def loop(self):
-        selected = 'management'
-        while True:
-            try:
-                selected = self.choose(t('page_main'), [('management', 'page_management'), ('settings', 'page_settings'), ('exit', 'menu_exit')], selected)
-            except menu.Cancelled:
-                return
-            if selected == 'exit':
-                return
-            self.present(t('page_' + selected), self.management if selected == 'management' else self.settings, back=False)
+            title = t('page_settings' if selected == 'settings' else 'menu_' + selected)
+            self.present(title, action, back=selected not in ('list', 'settings'))
 
 
 def run(manager):

@@ -64,5 +64,6 @@
   "case_filesystems": "Filesystem mount/read/write/unmount",
   "case_filesystem-recovery": "Filesystem recovery",
   "case_filesystem-menu": "Filesystem menu",
-  "wait_filesystem-disconnect": "filesystem disconnect"
+  "wait_filesystem-disconnect": "filesystem disconnect",
+  "case_dependency-install": "Native sudo and dependency installation"
 }
