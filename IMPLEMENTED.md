@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: test version 0.1.15 is publicly released; frozen local validation and both fixed public installation modes passed. Stage 18 records the current behavior; previous stages are historical checkpoints. The version phase remains 1.
+Current result: phase 1 stable 0.1.15 is published as stable/0.1.15, with the identical v0.1.15 test prerelease preserved. Stage 19 records the final audit and promotion. Earlier stages remain historical checkpoints; no product code or version was changed for promotion.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -377,3 +377,18 @@ Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15 from 634
 Actual PTY runs of the fixed public curl/bash normal and --test entry both resolved 0.1.15. Normal installation preserved the existing tester modification time. Public --test passed 162 packaged units and all 21 report stages in 389.2 seconds, without skips or cleanup errors. It included actual sudo/APT installation in the test container, the merged navigation and Windows UNC access. Installed product/tester hashes matched the release files. Independent checks confirmed the isolated project, mount root and registry entries were reclaimed; temporary language preferences were restored, and no alternate-screen or screen/scrollback-clearing sequences were observed. Evidence: validation/V0_1_15_PUBLIC_REPORT.json.
 
 Sections 24–25 are delivered. The limits above still apply; the user's existing stopped installer remains outside this verification. Test prerelease only, no stable promotion.
+
+
+## Stage 19 — phase 1 stable 0.1.15 audit and promotion
+
+Section 26 was recorded before promotion. Reviewed REQUIREMENTS.md, implemented behavior, core/lifecycle/ownership boundaries, filesystem resource handling, installer/bootstrap/dependency orchestration, CLI/menu/config/presentation modules, packaging and failure/native test coverage. No additional product-code correction was identified as necessary for phase 1. The full review inventory and limits are in validation/STABLE_0_1_15_AUDIT.md. This is a promotion of unchanged bytes, not a new development batch or a claim of exhaustive defect absence.
+
+Final matching packaged tester run: 162 unit tests, no failures/errors/skips; all 21 reported stages passed in 394.0 seconds, no unexecuted stages or cleanup errors. Native dependency installation, lifecycle/mount restoration, abnormal filesystem recovery, Windows UNC access and inline menu/shell behavior passed. Independent checks confirmed the temporary LXD project, mount root and registry entries were reclaimed. Evidence: validation/V0_1_15_STABLE_REPORT.json.
+
+Downloaded the published v0.1.15 product, installer and tester and verified checksums, local archive equality and every included workspace source. Product/installer exclude test modules. Python 3.10 grammar and shell syntax checks passed. The fixed public entry with --release v0.1.15 completed in an actual PTY, installed the matching product and left the existing tester hash and modification time unchanged; preferences were isolated. Evidence: validation/V0_1_15_STABLE_INSTALL.json.
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15 as a non-prerelease and GitHub latest, targeting the unchanged source commit 634e37e0feddb8b97740d1c2b71e98ecc9548c46. Its three assets are mas.pyz, mas-install.pyz and SHA256SUMS; no tester or test report is attached. Product SHA-256 is bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6; installer SHA-256 is 9156ff2cec3b3e54b15d4c59d46c44c05f4d9ae3801035396f839ecc51f5d105. Public stable downloads were compared byte-for-byte with the prepared assets and matching test binaries. The seven original test assets and prerelease metadata were confirmed unchanged. Both numeric-pinned and latest-test bootstrap resolution still select v0.1.15. Evidence: validation/V0_1_15_STABLE_RELEASE.json.
+
+Stable installation is documented with --release v0.1.15; same-version validation adds --test and uses the preserved test prerelease. The existing unpinned latest-test entry was intentionally retained. There is no new channel-selection option and no product version suffix.
+
+Environment remains Ubuntu 26.04 WSL / LXD 6.9. The user's separate fresh-install log verifies successful dependency/FUSE/snap/LXD setup but stopped on a remote HTTPS connection reset before later integration cases; it is not represented as a successful complete suite. Native Ubuntu/cloud, other architectures, offline VHDX, live disk-full/daemon-outage scenarios and additional resource/security policy remain outside this verification. No source code, tester code, third-party dependency or host/container resource policy was changed during promotion.

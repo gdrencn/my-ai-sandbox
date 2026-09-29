@@ -325,3 +325,16 @@ Status: implemented, verified and delivered as test v0.1.15. Local frozen and pu
 - Final verification covers packaged units, native integrations, public normal/test entry, artifact separation and resource cleanup. Record any unverified privileged fresh-host installation boundary explicitly; do not represent a same-user sudo probe as a root package installation test.
 
 Dependency execution detail: keep the privilege boundary outside the APT output pipeline. Interactive installation retains terminal input; redirected output uses noninteractive EOF for package input, with authentication still owned by sudo. Add a real APT update/SSHFS installation case inside an isolated test container as sandbox using its standard mas sudo access. This fixture-only package installation does not change product container provisioning.
+
+
+## 26. Phase 1 stable promotion — 0.1.15
+
+Status: audited, verified and published as stable/0.1.15. The unchanged test v0.1.15 prerelease remains available. Final audit passed 162 units and all 21 report stages; pinned public installation and published asset verification passed.
+
+Review the current requirements, implemented behavior, source, packaging and test coverage before promotion. Run the frozen matching tester against the unchanged product; require all 162 units and all 21 reported stages to pass, without skips or cleanup errors. Verify published asset hashes and absence of tester modules in the product and installer. If a blocking defect is found, fix and validate a new numeric test batch before promoting it.
+
+Preserve the existing v0.1.15 test prerelease and all its assets. Publish a separate non-prerelease under the Git tag stable/0.1.15: the tag prefix identifies the distribution channel; the program version remains 0.1.15. The stable assets are mas.pyz, mas-install.pyz and SHA256SUMS only. Product and installer bytes must exactly match v0.1.15 test. No test runner, bundled tests or test report is distributed as a stable asset. The release description links the matching test release and repository validation evidence.
+
+Keep the existing latest-test entry unchanged. Document stable installation with the existing --release v0.1.15 option, which downloads only the product and installer from the matching immutable numeric release. Document stable verification with --test --release v0.1.15, which obtains the same-version tester from the preserved test prerelease. Do not claim that the unpinned installation command selects stable. Mark the separate stable release as GitHub latest. This promotion does not change product code, version numbering, host resource policy or supported features.
+
+Record audit findings, final test results, matching hashes, published asset inventory and installation verification after completion. Preserve the distinction between current WSL verification, user-reported fresh-install evidence and unverified native Ubuntu/cloud environments.

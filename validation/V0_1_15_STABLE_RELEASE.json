@@ -1,0 +1,16 @@
+{
+  "version": "0.1.15",
+  "stable_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15",
+  "stable_tag": "stable/0.1.15",
+  "github_latest": true,
+  "test_tag": "v0.1.15",
+  "test_prerelease_unchanged": true,
+  "latest_test_resolution": "v0.1.15",
+  "pinned_resolution": "v0.1.15",
+  "assets": {
+    "mas.pyz": "bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6",
+    "mas-install.pyz": "9156ff2cec3b3e54b15d4c59d46c44c05f4d9ae3801035396f839ecc51f5d105",
+    "SHA256SUMS": "b80ce16d97083f85e00c7960730cc16a9a95f5164560c2411ec781381373aad4"
+  },
+  "stable_downloads_match_test": true
+}

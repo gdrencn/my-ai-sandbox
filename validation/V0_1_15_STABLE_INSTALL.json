@@ -1,0 +1,9 @@
+{
+  "version": "0.1.15",
+  "entry": "--release v0.1.15",
+  "interactive_install": "passed",
+  "product_sha256": "bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6",
+  "existing_tester": "hash and mtime unchanged",
+  "preferences": "isolated temporary config",
+  "source": "matching numeric test release; identical stable product"
+}

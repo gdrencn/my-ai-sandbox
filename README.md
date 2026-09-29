@@ -2,6 +2,24 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和 终端文本菜单，没有第三方 Python 依赖。
 
+## 安装阶段 1 稳定版（0.1.15）
+
+[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15) 已发布；产品和安装程序与 [同版本 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15) 完全一致。安装时固定版本：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.15
+```
+
+这个命令只下载安装所需文件，不下载测试工具。稳定版附件为产品、独立安装程序和校验清单；Git tag `stable/0.1.15` 仅用于区分发布渠道，程序版本仍为 `0.1.15`。固定版本安装复用同版本数字发布中的相同文件。
+
+需要验证稳定版时，使用同版本 test 发布的自动化测试工具：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.15
+```
+
+不指定 `--release` 的原有入口仍安装最新测试版，不会因为本次 stable 发布而改变含义。发布前复核通过 162 项单元测试及全部 21 个测试环节，详情见 [审查记录](validation/STABLE_0_1_15_AUDIT.md) 与 [已实现文档](IMPLEMENTED.md)。
+
 ## 安装最新测试版
 
 在 Ubuntu 的交互式终端运行：

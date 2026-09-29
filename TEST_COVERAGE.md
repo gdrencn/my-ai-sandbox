@@ -113,3 +113,8 @@ The original same-user sudo-rs 0.2.13-0ubuntu1.2 terminal-input/piped-output pro
 Final frozen 0.1.15 validation passed 162 packaged units and all 21 report stages in 420.6 seconds, without skips or cleanup errors. The dependency fixture recorded sudo-rs 0.2.13-0ubuntu1.2 / apt 3.2.0 (amd64); Windows UNC passed and isolated resources were reclaimed. Evidence: validation/V0_1_15_REPORT.json.
 
 Public 0.1.15 normal installation and --test entry both passed. The public suite completed 162 packaged units and all 21 report stages in 389.2 seconds, without skips or cleanup errors. Real container sudo/APT, Windows UNC, merged navigation, installed hashes, normal-install tester preservation and resource reclamation passed. Evidence: validation/V0_1_15_PUBLIC_REPORT.json.
+
+
+## Phase 1 stable promotion of 0.1.15
+
+No code or coverage counts changed. A fresh frozen matching-tester run passed all 162 units and all 21 reported stages in 394.0 seconds, with no skips or cleanup errors. Independent cleanup and Windows UNC checks passed. Published product/installer/tester checksums match local archives and included source; product/installer contain no test code. Pinned public installation passed without modifying the existing tester. The stable release's three downloaded assets and unchanged test prerelease were verified, and the existing latest-test resolver was checked after promotion. Evidence: validation/V0_1_15_STABLE_REPORT.json, validation/V0_1_15_STABLE_INSTALL.json and validation/V0_1_15_STABLE_RELEASE.json. Review inventory and remaining environment limits: validation/STABLE_0_1_15_AUDIT.md. Stable status does not expand tested-platform claims.
