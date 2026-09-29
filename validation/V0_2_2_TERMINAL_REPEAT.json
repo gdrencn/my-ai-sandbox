@@ -1,0 +1,7 @@
+{
+  "rounds": 20,
+  "tests": 40,
+  "failures": 0,
+  "errors": 0,
+  "scope": "Controlled real PTY synchronization regressions; no live sudo implementation fault attribution"
+}

@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import platform
 import pty
+import re
 import select
 import signal
 import shutil
@@ -104,17 +105,25 @@ class Terminal:
         os.write(self.fd, value.encode())
 
     def expect(self, text):
-        expected = text.encode()
+        self.expect_pattern(re.escape(text.encode()), text)
+
+    def expect_pattern(self, pattern, description):
         start = time.monotonic()
         while time.monotonic() - start < self.timeout:
-            self.read()
-            index = self.buffer.find(expected, self.cursor)
-            if index != -1:
-                self.cursor = index + len(expected)
+            match = re.search(pattern, self.buffer[self.cursor:])
+            if match is not None:
+                self.cursor += match.end()
                 return
             if self.status is not None:
-                raise AssertionError(t("pty_exited", status=self.status, text=text, buffer=self.buffer[-2000:]))
-        raise AssertionError(t("pty_timeout", timeout=self.timeout, text=text, buffer=self.buffer[-2000:]))
+                raise AssertionError(t("pty_exited", status=self.status, text=description, buffer=self.buffer[-2000:]))
+            self.read()
+        raise AssertionError(t("pty_timeout", timeout=self.timeout, text=description, buffer=self.buffer[-2000:]))
+
+    def shell_ready(self):
+        # Match the visible Ubuntu sandbox prompt, not OSC window/session titles.
+        # Imported instances may retain a hostname different from their TARGET.
+        self.expect_pattern(rb"(?:\A|[\r\n]|\x07|\x1b\\)sandbox@[^\r\n\x1b\x07]*:[^\r\n\x1b\x07]*\$ ",
+                            "sandbox shell prompt")
 
     def finish(self):
         start = time.monotonic()
@@ -296,11 +305,15 @@ class Suite:
         return self.manager.lxd.command(["exec", "local:" + target, "--", "/bin/sh", "-c", script])
 
     def check_shell(self, terminal):
+        terminal.shell_ready()
         # Split literal strings so terminal input echo cannot satisfy the output match.
         terminal.send("printf 'MAS_%s\\n' SHELL; id -un; sudo -n id -u\n")
         terminal.expect("MAS_SHELL\r\n")
         terminal.expect("sandbox\r\n")
         terminal.expect("0\r\n")
+        # sudo can print its result before restoring the terminal. Wait until
+        # the shell has regained control before sending another command.
+        terminal.shell_ready()
 
     def run(self):
         target, imported, external = self.target(), self.target(), self.target()
@@ -377,7 +390,6 @@ class Suite:
             assert self.state(target, "Running")
         with self.case("enter-running-default-exit"):
             with self.terminal(["enter", target]) as terminal:
-                terminal.expect("sandbox@")
                 self.check_shell(terminal)
                 terminal.send("exit\n")
                 terminal.expect(f"Stop container {target}?")
@@ -387,7 +399,6 @@ class Suite:
         with self.case("enter-stopped-stop-exit"):
             self.cli("stop", target)
             with self.terminal(["enter", target]) as terminal:
-                terminal.expect("sandbox@")
                 self.check_shell(terminal)
                 terminal.send("exit\n")
                 terminal.expect(f"Stop container {target}?")
@@ -814,7 +825,7 @@ try {
                 terminal.expect('my-ai-sandbox'); terminal.send('\n')
                 terminal.expect('Containers'); terminal.send('\n')
                 terminal.expect('Container: ' + imported); terminal.send(down * 2 + '\n')
-                terminal.expect('sandbox@'); self.check_shell(terminal)
+                self.check_shell(terminal)
                 terminal.send('exit\n'); terminal.expect(f'Stop container {imported}?')
                 after_question = terminal.cursor
                 terminal.send('\x1b' if stop is None else (down if stop else '') + '\n')

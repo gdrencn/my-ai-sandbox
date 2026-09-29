@@ -22,6 +22,8 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 安装最新测试版
 
+当前 test 为 `0.2.2`，修复容器终端自动化测试的输入同步；功能范围仍为 `0.2.1` 的 GPU 模块及既有容器管理。
+
 在 Ubuntu 的交互式终端运行：
 
 ```bash

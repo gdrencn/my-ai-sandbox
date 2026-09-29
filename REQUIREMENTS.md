@@ -405,3 +405,13 @@ The current LXD 6.9 snap CDI probe failed with NVML Driver Not Loaded. The WSL b
 Instance metadata `user.mas.gpu` records the requested setting, backend, driver directories, exact owned LXD device definitions and the owned loader configuration path. GPU configuration edits publish devices and this record together. The runtime module manages `/etc/ld.so.conf.d/mas-gpu.conf` with fixed identifiable content and refreshes the container's dynamic linker cache. Disabling removes the owned file and devices; the linker cache is refreshed on the next start. Existing container data and unrelated configuration remain intact. Driver-directory changes on a stopped container reuse the same configuration function before startup. Detection or runtime failure is an error, not an automatic silent switch-off.
 
 Existing running containers are not silently modified. Their menu shows the default setting as pending until the next start from Stopped, or an explicit stopped-container hardware change. No new driver, CUDA toolkit, pip package, or host daemon is installed by this module. The test-only CUDA driver probe uses Python ctypes, JIT-compiles a PTX kernel, executes it as sandbox and verifies the returned value.
+
+## 29. Terminal test synchronization fix — v0.2.2
+
+Status: implemented and locally verified: 179 packaged units and 22 native stages passed; publication verification pending.
+
+- Synchronize all container-shell test interactions through shared terminal helpers. A window title or command output does not establish that the shell is ready for another command.
+- After the sandbox/sudo probe, wait for the actual interactive shell prompt before sending exit. Preserve the existing 600-second timeout; do not use fixed sleeps as synchronization.
+- Add real PTY regression coverage for delayed terminal restoration/input flushing, title/control-sequence interference, and imported-container hostnames differing from TARGET.
+- Run packaged units and the complete native LXD regression suite, update implementation/coverage/release documentation, and publish v0.2.2 test.
+- GPU active-driver-directory selection remains a separate pending investigation; this batch changes terminal test synchronization only.

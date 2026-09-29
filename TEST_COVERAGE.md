@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.2.1 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.2.2 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -35,7 +35,7 @@ This maps the checks present in batch 0.2.1 to requirements and implementation. 
 - Historical user logs cover a missing-LXD installation. The current batch does not remove the host LXD/Python installation to repeat fresh provisioning; privileged host bootstrap remains unverified for this batch. Same-user real sudo/PTY checks and real root APT installation inside a disposable container now complement controlled authentication/failure tests.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
-- GPU passthrough, host-to-container resource sharing and custom networking are excluded features, not covered functionality.
+- GPU coverage and its platform limits are described in the 0.2.1 section below. General host-resource sharing policy, restricted project/profile enforcement and custom network controls remain pending.
 
 The historical integration group identifier `tui` remains for report continuity; it now runs the inline text-menu application. New groups are `invalid-inputs`, `lifecycle-repeat` and `unmarked-import`.
 
@@ -129,3 +129,9 @@ The portable `gpu` stage creates its own random target in the isolated test proj
 Current measured GPU platform is WSL2/NVIDIA RTX 5090 Laptop GPU. Hosts without supported hardware explicitly report compute=not_run; successful non-GPU tests do not imply GPU compute coverage there. Native Ubuntu NVIDIA CDI is implemented but not hardware-verified. AMD/Intel discovery/backends are not implemented. Driver-directory refresh and broken-discovery cleanup are fault tests, not evidence of a real Windows driver upgrade. Project/profile enforcement remains outside this batch.
 
 Final 0.2.1 execution: local frozen run passed 177 units / 22 stages in 459.4 seconds; public --test passed the same counts in 462.2 seconds. Both had no skipped units, unexecuted stages or cleanup errors; GPU computation passed in both. Public normal installation and all release asset hashes were verified separately. See validation/V0_2_1_* reports.
+
+## Terminal synchronization — 0.2.2
+
+Two real PTY regressions model a sudo-like result appearing before terminal restoration/input flushing. The output-only handshake loses exit; the shared prompt-aware probe succeeds. The fixture includes OSC titles/session sequences, a fragmented visible prompt and a guest hostname independent of TARGET. Twenty repeated rounds passed all 40 checks. Sleeps occur only in the fixture to create the race, never in production synchronization. All enter tests reuse the shared probe.
+
+Packaged verification passed 179 units and all 22 native stages in 461.8 seconds, no skips or cleanup errors, including actual CLI and imported-container menu exits for all three stop answers. The controlled flush test demonstrates the failure mechanism without claiming syscall-level diagnosis on the user's host.
