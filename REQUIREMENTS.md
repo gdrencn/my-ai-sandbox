@@ -408,7 +408,7 @@ Existing running containers are not silently modified. Their menu shows the defa
 
 ## 29. Terminal test synchronization fix — v0.2.2
 
-Status: implemented and locally verified: 179 packaged units and 22 native stages passed; publication verification pending.
+Status: implemented, verified and published as test v0.2.2. Local and public-entry runs each passed 179 packaged units and all 22 native stages, with no skips or cleanup errors.
 
 - Synchronize all container-shell test interactions through shared terminal helpers. A window title or command output does not establish that the shell is ready for another command.
 - After the sandbox/sudo probe, wait for the actual interactive shell prompt before sending exit. Preserve the existing 600-second timeout; do not use fixed sleeps as synchronization.

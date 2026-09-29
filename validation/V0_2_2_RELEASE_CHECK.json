@@ -1,0 +1,42 @@
+{
+  "tag": "v0.2.2",
+  "prerelease": true,
+  "latest": "stable/0.1.15",
+  "assets": [
+    {
+      "name": "bootstrap.py",
+      "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+      "matched": true
+    },
+    {
+      "name": "install.sh",
+      "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+      "matched": true
+    },
+    {
+      "name": "mas-install.pyz",
+      "digest": "sha256:2b9390959fa153f982194ce73042ed11574a81a4151a57d40acecad12bf615bc",
+      "matched": true
+    },
+    {
+      "name": "mas-test.pyz",
+      "digest": "sha256:05c128682585696a2c86744fb5b0d91557df8d2fd235a24187b7b7fadc754d9b",
+      "matched": true
+    },
+    {
+      "name": "mas.pyz",
+      "digest": "sha256:86072162533ad8247db87133767562df2a2bbf1c12c8fa769fd25fdc8689bcc5",
+      "matched": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "digest": "sha256:b57d99e8cf1d34fd9b67f78ab75431ed14c969499b55a3979d0f76d56463f914",
+      "matched": true
+    },
+    {
+      "name": "WSL_REPORT.json",
+      "digest": "sha256:807086bfb9638457a2ebf7e3e4cf0d511f50bd850c56998d3b7edaace661a9ca",
+      "matched": true
+    }
+  ]
+}
