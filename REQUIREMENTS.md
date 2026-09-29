@@ -431,7 +431,7 @@ Status: implemented, verified and published as test v0.2.3: 189 packaged units a
 
 ## 31. GPU and diagnostic integration review — v0.2.4
 
-Status: implemented and verified: 196 packaged units and all 22 native stages passed; publication verification pending.
+Status: implemented, verified and published as test v0.2.4. All 196 packaged units and 22 native stages passed; public resolver, fixed entry and all downloaded release artifacts verified.
 
 - Use official nvidia-ctk options to disable hook generation and optional nvsandboxutils discovery for the WSL query. Specify the existing nvidia-ctk path for compatibility hook resolution; do not create/install/execute hooks. Verify selected mounts stay identical. Retain all remaining warnings and unrecognized diagnostics, without quiet mode or cross-start caching.
 - Route GPU and LXD native diagnostics through a shared callback-aware emitter and the existing permanent-output renderer. Clear transient progress before warnings. Tester direct probes and PTY query diagnostics must be retained in logs/events as well as displayed. Do not duplicate the same diagnostic from both captured stderr and event replay.
