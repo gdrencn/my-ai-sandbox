@@ -145,3 +145,5 @@ Ten added unit tests cover the official command/JSON contract, ignored hooks, bo
 The native GPU stage compares configured paths with official discovery, inventories coexisting driver directories solely inside the tester, checks excluded CUDA files are absent in the container, and records selected/excluded paths alongside actual sandbox CUDA computation. Current host selected one NVIDIA directory and excluded one historical directory. Driver updates are simulated in unit tests, not performed on Windows.
 
 Frozen run passed 189 packaged units and all 22 stages in 449.4 seconds, no skips or cleanup errors. See validation/V0_2_3_LOCAL_REPORT.json. Existing platform limits still apply.
+
+Public delivery checks for 0.2.3 verify the unpinned resolver selects the new version, all seven downloaded assets equal the validated local files, the downloaded product reports 0.2.3, and the raw fixed entry matches. Full public installation/testing was not rerun; the complete native test evidence above belongs to the identical frozen artifacts. See validation/V0_2_3_RELEASE_CHECK.json.

@@ -420,7 +420,7 @@ Status: implemented, verified and published as test v0.2.2. Local and public-ent
 
 ## 30. Active WSL GPU driver discovery — v0.2.3
 
-Status: implemented and verified: 189 packaged units and all 22 native stages passed. Publication verification pending.
+Status: implemented, verified and published as test v0.2.3: 189 packaged units and all 22 native stages passed. Public resolver, fixed entry and all downloaded release assets verified.
 
 - Replace scanning every driver-store directory with the official NVIDIA WSL discovery supplied by the installed LXD snap: nvidia-ctk cdi generate --mode=wsl --format=json. No new package installation or private DXCore implementation.
 - Treat generated JSON solely as discovery data. Never apply the CDI document or execute its hooks. Extract selected NVIDIA CUDA driver directories, validate paths/files, and reuse existing GPU device configuration and ownership records. Preserve unrelated configuration.
