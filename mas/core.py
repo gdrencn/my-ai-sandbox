@@ -14,7 +14,7 @@ import tempfile
 import time
 
 from .i18n import t, state
-from .diagnostics import cleanup_scope, notify
+from .diagnostics import cleanup_scope, notify, emit_native
 
 MANAGED = "user.mas.managed"
 DEFAULT_TIMEOUT = 600
@@ -108,11 +108,7 @@ class LXD:
             raise Error(t('lxd_query_timeout')) from exc
         if result.returncode:
             raise Error(result.stderr.strip() or result.stdout.strip() or t('lxd_failed'))
-        if result.stderr:
-            if self.diagnostic is not None:
-                notify(self.diagnostic, result.stderr.rstrip("\n"))
-            else:
-                print(result.stderr, file=sys.stderr, end="")
+        emit_native(result.stderr, self.diagnostic)
         return result.stdout
 
     def instances(self, timeout=None):

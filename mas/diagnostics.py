@@ -10,6 +10,16 @@ def diagnostic_lines(stdout, stderr):
     return stderr.splitlines() + [line for line in stdout.splitlines() if WARNING.search(line)]
 
 
+def emit_native(message, callback=None):
+    """Use the caller's active renderer; keep native content unchanged."""
+    if not message:
+        return
+    if callback is not None:
+        notify(callback, message.rstrip('\n'))
+    else:
+        from .output import Output
+        Output(sys.stderr).keep(message.rstrip('\n'))
+
 
 def warn(message, error):
     """Best-effort secondary diagnostics; never replace the primary exception."""

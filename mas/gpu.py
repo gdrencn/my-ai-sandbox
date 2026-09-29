@@ -9,12 +9,12 @@ from pathlib import Path
 import shutil
 import shlex
 import subprocess
-import sys
 import time
 from urllib.parse import quote, urlencode
 
 from .core import Error
 from .i18n import t
+from .diagnostics import emit_native
 
 KEY = 'user.mas.gpu'
 CONF = '/etc/ld.so.conf.d/mas-gpu.conf'
@@ -22,7 +22,7 @@ CONTENT = '# Managed by my-ai-sandbox GPU module\n/usr/lib/wsl/lib\n'
 CTK = '/snap/lxd/current/bin/nvidia-ctk'
 
 
-def _discovery_command(command):
+def _discovery_command(command, diagnostic=None):
     try:
         result = subprocess.run(command, capture_output=True, text=True, timeout=600)
     except subprocess.TimeoutExpired as exc:
@@ -32,38 +32,49 @@ def _discovery_command(command):
     if result.returncode == 0:
         # Native informational discovery logs are transient implementation detail;
         # retain warnings and any unrecognized diagnostics without translating.
-        for line in result.stderr.splitlines():
-            if not re.search(r'(?:^|\s)level=(?:info|debug|trace)(?:\s|$)', line):
-                print(line, file=sys.stderr)
+        lines = [line for line in result.stderr.splitlines()
+                 if not re.search(r'(?:^|\s)level=(?:info|debug|trace)(?:\s|$)', line)]
+        emit_native('\n'.join(lines), diagnostic)
     return result
 
 
-def wsl_driver_paths():
+def valid_driver_directory(path):
+    return (isinstance(path, str) and bool(re.fullmatch(r'/usr/lib/wsl/drivers/[A-Za-z0-9_.-]+', path))
+            and Path(path).name not in ('.', '..'))
+
+
+def wsl_driver_paths(diagnostic=None):
     """Use NVIDIA's DXCore-backed discovery, never guess from directory names."""
     if not Path(CTK).is_file():
         raise Error(t('gpu_discovery_tool_missing', path=CTK))
-    result = _discovery_command([CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', ''])
+    result = _discovery_command([CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', '',
+                                '--disable-hook=all', '--nvidia-cdi-hook-path=' + CTK,
+                                '--feature-flag=disable-nvsandboxutils'], diagnostic)
     if result.returncode:
         raise Error(t('gpu_detect_failed', error=result.stderr.strip() or result.stdout.strip()))
     try:
         spec = json.loads(result.stdout)
-        if spec['kind'] != 'nvidia.com/gpu':
+        if not isinstance(spec, dict) or spec['kind'] != 'nvidia.com/gpu' or not isinstance(spec['devices'], list):
             raise ValueError()
         selected = [d for d in spec['devices'] if d['name'] == 'all']
         if len(selected) != 1:
             raise ValueError()
         paths = set()
         for edits in (spec.get('containerEdits', {}), selected[0].get('containerEdits', {})):
-            for mount in edits.get('mounts', []):
+            mounts = edits.get('mounts', [])
+            if not isinstance(mounts, list):
+                raise ValueError()
+            for mount in mounts:
                 source = mount['hostPath']
                 if not isinstance(source, str):
                     raise ValueError()
                 if source.rsplit('/', 1)[-1] != 'libcuda.so.1.1':
                     continue
-                if (not re.fullmatch(r'/usr/lib/wsl/drivers/[A-Za-z0-9_.-]+/libcuda\.so\.1\.1', source)
-                        or Path(source).parent.name in ('.', '..')
+                if (not valid_driver_directory(source.rsplit('/', 1)[0])
                         or mount.get('containerPath') != source
-                        or 'ro' not in mount.get('options', [])
+                        or not isinstance(mount.get('options'), list)
+                        or any(not isinstance(option, str) for option in mount['options'])
+                        or 'ro' not in mount['options']
                         or not Path(source).is_file()
                         or str(Path(source).resolve(strict=True)) != source):
                     raise ValueError()
@@ -75,13 +86,13 @@ def wsl_driver_paths():
         raise Error(t('gpu_discovery_invalid')) from exc
 
 
-def detect():
+def detect(diagnostic=None):
     """Report NVIDIA discrete compute GPUs; no packages or configuration changes."""
     wsl = Path('/dev/dxg').exists()
     executable = '/usr/lib/wsl/lib/nvidia-smi' if wsl else shutil.which('nvidia-smi')
     if not executable or not Path(executable).is_file():
         return {'available': False, 'backend': None, 'gpus': []}
-    result = _discovery_command([executable, '--query-gpu=name,uuid', '--format=csv,noheader'])
+    result = _discovery_command([executable, '--query-gpu=name,uuid', '--format=csv,noheader'], diagnostic)
     if result.returncode == 6:
         return {'available': False, 'backend': None, 'gpus': []}
     if result.returncode:
@@ -95,7 +106,7 @@ def detect():
         raise Error(t('gpu_detect_failed', error=result.stdout.strip()))
     if wsl and not all(Path(p).is_dir() for p in ('/usr/lib/wsl/lib', '/usr/lib/wsl/drivers')):
         raise Error(t('gpu_runtime_missing'))
-    driver_paths = wsl_driver_paths() if wsl else []
+    driver_paths = wsl_driver_paths(diagnostic) if wsl else []
     return {'available': True, 'backend': 'wsl-nvidia' if wsl else 'nvidia-cdi', 'gpus': gpus, 'driver_paths': driver_paths}
 
 
@@ -118,6 +129,9 @@ class GPU:
         self.manager = manager
         self.lxd = manager.lxd
 
+    def detect(self):
+        return detect(diagnostic=self.lxd.diagnostic)
+
     def record(self, instance):
         raw = instance['config'].get(KEY)
         if raw is None:
@@ -127,12 +141,12 @@ class GPU:
             if not isinstance(item, dict):
                 raise ValueError()
             paths = item.get('driver_paths')
-            if (not isinstance(paths, list) or any(not isinstance(p, str) or not re.fullmatch(r'/usr/lib/wsl/drivers/[A-Za-z0-9_.-]+', p) or Path(p).name in ('.', '..') for p in paths)
+            if (not isinstance(paths, list) or any(not valid_driver_directory(p) for p in paths)
                     or len(paths) != len(set(paths))
                     or (item.get('backend') == 'wsl-nvidia' and not paths)
                     or (item.get('backend') == 'nvidia-cdi' and paths)):
                 raise ValueError()
-            if (not isinstance(item, dict) or item.get('version') != 1
+            if (type(item.get('version')) is not int or item['version'] != 1
                     or type(item.get('enabled')) is not bool
                     or item.get('backend') not in ('wsl-nvidia', 'nvidia-cdi')
                     or item.get('devices') != (devices(item['backend'], paths) if item['enabled'] else {})
@@ -165,9 +179,9 @@ class GPU:
 
     def status(self, target):
         instance = self.manager.require(target)
-        capability = detect()
         record = self.record(instance)
         self.check_owned(instance, record)
+        capability = self.detect()
         return {**capability, 'enabled': record['enabled'] if record else capability['available'],
                 'configured': record is not None, 'resources': record or {},
                 'state': instance['status']}
@@ -190,7 +204,7 @@ class GPU:
             instance = self.manager.require(target, stopped=True)
             record = self.record(instance)
             self.check_owned(instance, record)
-            capability = capability or ({'available': False, 'backend': record['backend']} if not enabled and record else detect())
+            capability = capability or ({'available': False, 'backend': record['backend']} if not enabled and record else self.detect())
             if enabled and not capability['available']:
                 raise Error(t('gpu_unavailable'))
             if not capability['available'] and record is None:
@@ -247,13 +261,13 @@ class GPU:
         if record is not None:
             self.check_owned(instance, record)
             if record['enabled']:
-                capability = detect()
+                capability = self.detect()
                 if not capability['available'] or capability['backend'] != record['backend']:
                     raise Error(t('gpu_unavailable'))
                 if capability.get('driver_paths', []) != record['driver_paths']:
                     self.set(target, True, capability=capability)
             return
-        capability = detect()
+        capability = self.detect()
         if capability['available']:
             self.set(target, True, capability=capability)
 
@@ -270,7 +284,8 @@ p=/etc/ld.so.conf.d/mas-gpu.conf
 if [ -L "$p" ]; then echo 'GPU loader configuration is a symlink' >&2; exit 1; fi
 '''
         if record['enabled']:
-            script += '''expected=$(printf '# Managed by my-ai-sandbox GPU module\\n/usr/lib/wsl/lib\\n')
+            script += 'expected=' + shlex.quote(CONTENT.rstrip('\n')) + '\n'
+            script += '''
 if [ -e "$p" ] && [ "$(cat "$p")" != "$expected" ]; then
  echo 'GPU loader configuration already exists with different content' >&2; exit 1
 fi

@@ -1,0 +1,38 @@
+{
+  "tool_version": "NVIDIA Container Toolkit CLI version 1.19.1\ncommit: 09ceee5dde66ba9ce25c7cc69b1ebd5e6e3266fa",
+  "old_command": [
+    "/snap/lxd/current/bin/nvidia-ctk",
+    "cdi",
+    "generate",
+    "--mode=wsl",
+    "--format=json",
+    "--output",
+    ""
+  ],
+  "new_command": [
+    "/snap/lxd/current/bin/nvidia-ctk",
+    "cdi",
+    "generate",
+    "--mode=wsl",
+    "--format=json",
+    "--output",
+    "",
+    "--disable-hook=all",
+    "--nvidia-cdi-hook-path=/snap/lxd/current/bin/nvidia-ctk",
+    "--feature-flag=disable-nvsandboxutils"
+  ],
+  "mounts_identical": true,
+  "devices_identical": true,
+  "new_hooks": [],
+  "old_warnings": [
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Failed to locate nvidia-cdi-hook: nvidia-cdi-hook: not found\"",
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Ignoring error in locating libnvidia-sandboxutils.so.1: libnvidia-sandboxutils.so.1: not found\\nlibnvidia-sandboxutils.so.1: not found\"",
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Failed to init nvsandboxutils: ERROR_LIBRARY_LOAD; ignoring\"",
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Could not determine driver version: libnvsandboxutils is not available\\nfailed to initialize nvml: Driver Not Loaded\"",
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Found multiple driver store paths: [/usr/lib/wsl/drivers/npu.inf_amd64_c174cd41587112dd /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd /usr/lib/wsl/drivers/iigd_dch.inf_amd64_b4a385d4b4e2806e]\""
+  ],
+  "new_warnings": [
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Could not determine driver version: libnvsandboxutils is not available\\nfailed to initialize nvml: Driver Not Loaded\"",
+    "time=\"2026-09-29T16:37:45-05:00\" level=warning msg=\"Found multiple driver store paths: [/usr/lib/wsl/drivers/npu.inf_amd64_c174cd41587112dd /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd /usr/lib/wsl/drivers/iigd_dch.inf_amd64_b4a385d4b4e2806e]\""
+  ]
+}

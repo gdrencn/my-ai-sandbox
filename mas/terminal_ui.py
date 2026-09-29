@@ -117,8 +117,10 @@ class UI:
                 return
 
     def hardware(self, target):
+        status = None
         while True:
-            status = self.manager.hardware(target)
+            if status is None:
+                status = self.manager.hardware(target)
             choices = []
             if status['available']:
                 if not status.get('configured', True):
@@ -130,8 +132,10 @@ class UI:
             if self.view.choose(t('page_hardware', target=target), choices, default='gpu' if status['available'] else None) is None:
                 return
             def change():
+                nonlocal status
                 enabled = self.view.choose(t('gpu_choose'), [(True, t('state_enabled')), (False, t('state_disabled'))],
                                            default=status['enabled'], radio=True)
+                status = None  # Refresh after an attempt, but not after Cancelled.
                 self.manager.hardware(target, enabled)
             self.present(t('gpu_choose'), change)
 

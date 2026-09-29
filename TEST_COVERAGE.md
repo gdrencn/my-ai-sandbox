@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.2.3 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.2.4 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -147,3 +147,9 @@ The native GPU stage compares configured paths with official discovery, inventor
 Frozen run passed 189 packaged units and all 22 stages in 449.4 seconds, no skips or cleanup errors. See validation/V0_2_3_LOCAL_REPORT.json. Existing platform limits still apply.
 
 Public delivery checks for 0.2.3 verify the unpinned resolver selects the new version, all seven downloaded assets equal the validated local files, the downloaded product reports 0.2.3, and the raw fixed entry matches. Full public installation/testing was not rerun; the complete native test evidence above belongs to the identical frozen artifacts. See validation/V0_2_3_RELEASE_CHECK.json.
+
+## GPU/diagnostic integration review — 0.2.4
+
+Seven regressions cover invalid collection/option types, record-version typing before host discovery, cancelled hardware selection without requery, observer failure isolation, direct probe progress/log/events, actual product query diagnostics through both CLI and PTY with exactly-once display, and a real PTY GPU warning clearing its transient line. The CLI/PTY query fixture uses a disposable fake lxc and does not change host containers; its product invocation is the actual selected product archive.
+
+Official command comparison verified identical device/mount lists, no generated hooks and warnings reduced from five to two on the measured LXD-bundled NVIDIA tool. Remaining warnings are retained. Frozen validation passed 196 packaged units / 22 native stages in 484.6 seconds, no skips or cleanup errors. Reports: validation/V0_2_4_LOCAL_REPORT.json and V0_2_4_DISCOVERY_CHECK.json.

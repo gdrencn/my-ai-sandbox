@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.3`，GPU 模块改用官方 WSL 探测识别当前驱动目录，启动前动态更新映射。
+当前 test 为 `0.2.4`，在官方 WSL 驱动发现基础上减少无用探测，统一诊断与进度输出，补齐测试记录并优化硬件菜单取消操作。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -195,3 +195,5 @@ WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和官方探测选中
 测试工具会验证开关、菜单、只读资源、关闭后的设备消失、重新开启，以及 sandbox 用户执行真实 CUDA 内核并读回结果。无支持设备的机器明确记录 GPU 计算未执行。此模块不安装 CUDA Toolkit、模型框架或新的宿主驱动。Project/profile 安全基线、CPU/内存/进程限制仍待后续实现。
 
 从 0.2.3 起，WSL 驱动目录由 LXD snap 已附带的 `nvidia-ctk` 以 WSL 模式探测，不扫描全部历史目录。GPU 开启时，每次实际启动前重新查询并复用 GPU 配置函数更新映射，运行期间不自动修改。工具缺失、探测失败或结果无效会报错，不继续使用旧选择。mas 只读取官方工具输出的资源清单，不应用 CDI 文档或执行 hooks，也不额外安装软件包。
+
+0.2.4 使用官方参数关闭本查询不需要的 hooks 生成和 nvsandboxutils 探测；当前实测资源清单不变，单次警告由 5 条减少为 2 条。剩余原生警告继续保留，并在输出前清除临时进度。测试中的直接诊断保存在 `native-diagnostics.log`，CLI/菜单查询诊断进入事件记录。

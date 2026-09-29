@@ -38,7 +38,9 @@ class DiscoveryTests(unittest.TestCase):
     def test_official_selected_path_and_hooks_are_not_executed(self):
         self.assertEqual(wsl_driver_paths(), [ACTIVE])
         args, kwargs = self.run.call_args
-        self.assertEqual(args[0], [CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', ''])
+        self.assertEqual(args[0], [CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', '',
+                                  '--disable-hook=all', '--nvidia-cdi-hook-path=' + CTK,
+                                  '--feature-flag=disable-nvsandboxutils'])
         self.assertEqual(kwargs['timeout'], 600)
         self.assertEqual(self.run.call_count, 1)
 

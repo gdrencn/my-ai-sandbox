@@ -164,10 +164,10 @@ class Suite:
             config.set_value("language", self.language)
         self.timeout = timeout
         self.project = random_target()
-        self.host = LXD(timeout=timeout)
+        self.host = LXD(timeout=timeout, diagnostic=self.native_diagnostic)
         self.fs_root = self.directory / "mounts"
         self.fs_state = self.directory / "mount-state"
-        self.manager = Manager(LXD(project=self.project, timeout=timeout), self.report, self.fs_root, self.fs_state)
+        self.manager = Manager(LXD(project=self.project, timeout=timeout, diagnostic=self.native_diagnostic), self.report, self.fs_root, self.fs_state)
         self.created_project = False
         self.targets = []
         self.events = []
@@ -176,6 +176,12 @@ class Suite:
         self.counter = 0
         self.unit_results = None
         self.gpu_results = {"status": "not_run"}
+
+    def native_diagnostic(self, message):
+        self.events.append(dict(action='diagnostic', status='warning', native_stderr=message))
+        with (self.directory / 'native-diagnostics.log').open('a', encoding='utf-8') as log:
+            log.write(message + '\n')
+        self.output.keep(message)
 
     def report(self, event):
         self.events.append(event)
@@ -211,8 +217,9 @@ class Suite:
                   "from mas.cli import main,Progress;from mas.core import Manager,LXD;"
                   "events=open(" + repr(str(self.event_path)) + ", 'a');"
                   "progress=Progress();report=lambda event:(events.write(json.dumps(event)+'\\n'),events.flush(),progress(event));"
+                  "diagnostic=lambda message:(events.write(json.dumps(dict(action='diagnostic',status='warning',native_stderr=message))+'\\n'),events.flush(),progress.output.keep(message));"
                   "raise SystemExit(main(manager=Manager(LXD(project=" + repr(self.project) +
-                  ",timeout=" + str(self.timeout) + ",diagnostic=progress.output.keep),report=report,fs_root=" + repr(str(self.fs_root)) + ",fs_state=" + repr(str(self.fs_state)) + "))) ")
+                  ",timeout=" + str(self.timeout) + ",diagnostic=diagnostic),report=report,fs_root=" + repr(str(self.fs_root)) + ",fs_state=" + repr(str(self.fs_state)) + "))) ")
         return [sys.executable, "-c", source, *args]
 
     def read_events(self, path, diagnostics=False):
@@ -553,8 +560,8 @@ class Suite:
         assert not json.loads(self.cli('hardware', target))['enabled']
 
     def gpu_test(self):
-        from .gpu import detect, KEY, CONF
-        capability = detect()
+        from .gpu import KEY, CONF
+        capability = self.manager.gpu.detect()
         self.gpu_results = {'capability': capability, 'compute': 'not_run'}
         if not capability['available']:
             self.gpu_results['reason'] = 'No supported discrete GPU on host'

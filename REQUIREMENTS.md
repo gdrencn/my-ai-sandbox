@@ -428,3 +428,13 @@ Status: implemented, verified and published as test v0.2.3: 189 packaged units a
 - Tool absence, timeout, native failure, invalid/empty results, unsafe paths and missing selected files fail explicitly; never fall back to directory scanning or an old cached selection. Keep native warnings/errors visible.
 - Verify exclusion of inactive coexisting driver directories, changed selections, failed discovery preventing startup, and disabled cleanup independence. Run actual sandbox CUDA computation with only selected directories. Simulated selection changes do not imply a real Windows driver upgrade was tested.
 - Update verified implementation and coverage documentation, publish v0.2.3 test, and verify the public artifacts.
+
+## 31. GPU and diagnostic integration review — v0.2.4
+
+Status: implemented and verified: 196 packaged units and all 22 native stages passed; publication verification pending.
+
+- Use official nvidia-ctk options to disable hook generation and optional nvsandboxutils discovery for the WSL query. Specify the existing nvidia-ctk path for compatibility hook resolution; do not create/install/execute hooks. Verify selected mounts stay identical. Retain all remaining warnings and unrecognized diagnostics, without quiet mode or cross-start caching.
+- Route GPU and LXD native diagnostics through a shared callback-aware emitter and the existing permanent-output renderer. Clear transient progress before warnings. Tester direct probes and PTY query diagnostics must be retained in logs/events as well as displayed. Do not duplicate the same diagnostic from both captured stderr and event replay.
+- Reuse the hardware menu's last-read state when a GPU selection is cancelled; refresh after a mutation attempt. Keep actual start resource discovery fresh.
+- Tighten official JSON collection/option validation and ownership record version typing; centralize driver-directory validation and loader-file content. Validate resource ownership before unnecessary host discovery. Preserve unrelated configuration and existing off/cleanup behavior.
+- Add focused malformed-input, menu-cancel, active-progress/diagnostic rendering, callback failure and tester-log/PTY diagnostic regressions. Run packaged units and complete real-LXD/GPU checks, update implementation docs, publish v0.2.4 test and verify public artifacts.
