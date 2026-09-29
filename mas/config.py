@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+from .diagnostics import cleanup_scope
 
 LANGUAGES = ("en_us", "zh_cn")
 DEFAULT_LANGUAGE = "zh_cn"
@@ -52,15 +53,12 @@ def set_value(key, value):
     destination = path()
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
-    try:
+    with cleanup_scope(lambda: temporary.unlink(missing_ok=True) if temporary else None):
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=destination.parent, delete=False) as output:
             temporary = Path(output.name)
             json.dump(values, output, ensure_ascii=False, indent=2)
             output.write("\n")
         temporary.replace(destination)
-    finally:
-        if temporary:
-            temporary.unlink(missing_ok=True)
 
 
 def language():

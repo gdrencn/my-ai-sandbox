@@ -127,10 +127,10 @@ from types import SimpleNamespace
 from mas import menu
 from mas.terminal_ui import UI, LeaveMenu
 original = termios.tcgetattr(0)
-def shell(target):
+def shell(target, ask):
     assert termios.tcgetattr(0) == original
     print('SHELL_OUTPUT', flush=True)
-    menu.confirm('Exit confirmation')
+    ask('Exit confirmation')
     assert termios.tcgetattr(0) == original
 manager = SimpleNamespace(enter=shell)
 def exercise(view):

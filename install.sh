@@ -158,7 +158,7 @@ from pathlib import Path
 import sys, urllib.request
 root = Path(sys.argv[1])
 base = 'https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/'
-for name in ('bootstrap.py', 'mas/config.py', 'mas/i18n.py', 'mas/menu.py', 'mas/output.py', 'mas/locales/en_us.json', 'mas/locales/zh_cn.json'):
+for name in ('bootstrap.py', 'mas/config.py', 'mas/i18n.py', 'mas/menu.py', 'mas/output.py', 'mas/diagnostics.py', 'mas/locales/en_us.json', 'mas/locales/zh_cn.json'):
     destination = root / name
     destination.parent.mkdir(parents=True, exist_ok=True)
     with urllib.request.urlopen(base + name, timeout=600) as response:

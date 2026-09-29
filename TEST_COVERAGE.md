@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.1.13 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.1.14 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -21,7 +21,7 @@ This maps the checks present in batch 0.1.13 to requirements and implementation.
 | import | backup round trip with file contents, duplicate/missing/corrupt input rejection, stopped managed result; native unmarked backup restored then marked | failed import or VM never marked; marking occurs only after import and marking failure propagates |
 | export | stopped-only guard, backup round trip, CLI overwrite Yes/default No, menu overwrite refusal | native failure, invalid archive, missing metadata, publish failure preserve existing destination; temporary cleanup; concurrent new destination is not overwritten; prompt-time state change; symlink/directory/missing-parent guards |
 | enter / on_exit | running and stopped entry as sandbox, default keep-running, explicit stop, menu terminal exit returns to the host shell after either stop decision | shared start/stop reuse; startup failure prevents shell; nonzero shell exit still invokes exit handler then reports failure |
-| Shared _operation | one-second observations and elapsed events for real commands | state success alone cannot finish live command; exit code zero alone cannot skip state; marker required; nonzero native exit, LXD Error, failed query, interruption and 300-second simulated timeout; client termination and final events |
+| Shared _run_lxd_until_state | one-second observations and elapsed events for real commands | state success alone cannot finish live command; exit code zero alone cannot skip state; marker required; nonzero native exit, LXD Error, failed query, interruption and 300-second simulated timeout; client termination and final events |
 | Text menus | complete lifecycle, classification/navigation, settings persistence, cancellation, shell return, native progress and JSON history | CSI/SS3, radio/multiple choice, defaults, UTF-8 editing, viewport resize, Ctrl-C/Escape restoration, row-redraw history preservation, no alternate-screen/screen-clear sequences |
 | Installation and packaging | separate installer invoked before final product testing; public normal/test entry; installed artifact hashes | missing snap/LXD sudo sequence, ready-system no-sudo, existing profile preservation, PATH idempotence, atomic copy-failure preservation and concurrent install publication, archive separation, mismatched version, bad download checksum prevents installation |
 | Language / configuration | CLI get/set/help, menu language changes and cancellation, installation default in PTY | exact en_us/zh_cn identifiers, catalog keys/placeholders, saved defaults, broken config protection, unrelated preferences retained |
@@ -73,3 +73,26 @@ The 0.1.12 public-entry check exposed a missing minimal-bootstrap dependency des
 Final local 0.1.13 verification passed all 134 packaged units and 20 reported stages in 365.7 seconds, with no skips or cleanup errors; see validation/V0_1_13_REPORT.json.
 
 Both public 0.1.13 entry modes passed; the public --test run passed 134 packaged units and all 20 stages in 368.5 seconds, without skips or cleanup errors. Installed hashes matched, ordinary installation preserved the tester, Windows UNC passed and isolated resources were reclaimed. Evidence: validation/V0_1_13_PUBLIC_REPORT.json.
+
+
+## Batch 0.1.14 responsibility boundaries
+
+Packaged coverage increases from 134 to 153 unit tests. Nineteen new checks cover:
+
+- Internal start success after sandbox preparation; preparation failure produces no complete-function success and no external restoration.
+- Distinct native/function success in both languages; redirected output omits normal intermediate completion while retaining final success and native warnings.
+- Import marking failure cannot produce full import success.
+- stop-all continues after OSError and names the failed target.
+- A nonzero shell result and an exit-handler failure both survive in the host-shell error.
+- A missing confirmation provider safely declines without importing menu code.
+- Reporting failure cannot mask an operation failure; client cleanup failure reports its secondary diagnostic while preserving the original error.
+- Shared resource cleanup preserves primary exceptions and interrupts, while a cleanup-only failure remains a failure.
+- Initial mount-journal failure and listener launch failure reclaim owned resources; a pre-existing work directory is preserved with a recovery record.
+- Listener/mount probes do not launch or publish; both readiness steps retain one deadline and function success follows identity publication.
+- Stop's native failure skips restoration without rewriting the error; stop's middle-unmount failure stops further calls; a state change before the locked recheck follows the no-op path without external mount coordination.
+
+Existing native cases exercise default/root and multiple-path mount restoration through both start and stop, Windows UNC access, shell exit/menu behavior, confirmations, backups, ownership isolation and cleanup. Installer/package regressions execute the shell entry's actual minimal bootstrap dependency list, including the diagnostics dependency introduced by shared config cleanup.
+
+This is behavior/failure-boundary coverage, not exhaustive branch coverage. Injected errors do not establish live disk-full or LXD-outage behavior. Native Ubuntu/cloud and fresh privileged host installation have not been rerun for this refactor. Frozen local and public-entry results follow below after execution.
+
+Final frozen 0.1.14 validation: 153 packaged units and all 20 report stages passed in 369.4 seconds; no skips or cleanup errors. Windows UNC passed; project, mount root and registry entries were reclaimed. Evidence: validation/V0_1_14_REPORT.json. Public-entry verification follows publication.

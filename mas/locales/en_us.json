@@ -194,5 +194,9 @@
   "page_result": "Operation result",
   "page_action": "{action}: {target}",
   "lifecycle_unmount_failed": "Container {target} {action} was not performed: unmount failed for {path}: {error}\nUnmounted: {completed}\nNot attempted: {pending}\nFinish unmounting manually, then retry the container operation.",
-  "lifecycle_restore_failed": "Container {target} is now {status}, but these mounts could not be restored. Recover these paths manually:\n{errors}"
+  "lifecycle_restore_failed": "Container lifecycle operation completed: {target} is now {status}. Restore these failed mounts manually:\n{errors}",
+  "state_native_done": "Native step complete",
+  "report_failed": "Warning: reporting failed: {error}",
+  "cleanup_secondary": "Cleanup also failed: {error}",
+  "state_warning": "Warning"
 }

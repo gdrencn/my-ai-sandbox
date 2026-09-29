@@ -17,6 +17,7 @@ class FilesystemTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name)
         self.manager = Mock(lxd=SimpleNamespace(project='default', timeout=300, command=Mock()))
+        self.manager.emit = self.manager.report
         self.fs = Filesystems(self.manager, self.base/'root', self.base/'state')
 
     def test_path_identity_and_overlap(self):
@@ -124,7 +125,7 @@ class FilesystemTests(unittest.TestCase):
 
     def test_state_transition_guard_leaves_mounts_untouched(self):
         with patch.object(self.fs, 'list', return_value=[dict(path='/')]), patch.object(self.fs, '_remove') as remove:
-            with self.assertRaises(Error): self.fs.guard_transition('demo')
+            with self.assertRaises(Error): self.fs.require_no_mounts('demo')
             with self.assertRaises(Error): self.fs.guard_delete('demo')
             remove.assert_not_called()
 
@@ -184,13 +185,13 @@ class FilesystemTests(unittest.TestCase):
 
     def test_transition_holds_real_lock_and_refuses_records(self):
         import fcntl
-        with self.fs.transition('demo'):
+        with self.fs.deletion_guard('demo'):
             with (self.fs.state/'lock').open('rb') as other:
                 with self.assertRaises(BlockingIOError):fcntl.flock(other,fcntl.LOCK_EX|fcntl.LOCK_NB)
         with self.fs.locked() as data:
             data['mounts'].append(self.entry());self.fs._save(data)
         with self.assertRaises(Error):
-            with self.fs.transition('demo'):self.fail('must refuse')
+            with self.fs.deletion_guard('demo'):self.fail('must refuse')
 
     def test_mount_rechecks_owner_after_lock(self):
         self.manager.require.side_effect=[{},Error('replaced')]

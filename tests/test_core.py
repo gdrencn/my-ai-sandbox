@@ -26,7 +26,7 @@ class BehaviorTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         manager = Manager(lxd, fs_state=Path(temporary.name)/"state")
-        manager._operation = Mock()
+        manager._run_lxd_until_state = Mock()
         return manager
 
     def test_confirmation_defaults_and_explicit_yes(self):
@@ -39,9 +39,9 @@ class BehaviorTests(unittest.TestCase):
     def test_delete_requires_consent_and_rechecks_state(self):
         manager = self.manager()
         self.assertFalse(manager.delete("demo", lambda _: ""))
-        manager._operation.assert_not_called()
+        manager._run_lxd_until_state.assert_not_called()
         self.assertTrue(manager.delete("demo", lambda _: "y"))
-        manager._operation.assert_called_once()
+        manager._run_lxd_until_state.assert_called_once()
 
     def test_delete_detects_state_change_during_prompt(self):
         manager = self.manager()
@@ -50,7 +50,7 @@ class BehaviorTests(unittest.TestCase):
             return "y"
         with self.assertRaises(Error):
             manager.delete("demo", ask)
-        manager._operation.assert_not_called()
+        manager._run_lxd_until_state.assert_not_called()
 
     def test_running_delete_and_export_refused_before_prompt(self):
         manager = self.manager("Running")
@@ -68,7 +68,7 @@ class BehaviorTests(unittest.TestCase):
             path.write_bytes(b"original")
             self.assertFalse(manager.export("demo", path, lambda _: ""))
             self.assertEqual(path.read_bytes(), b"original")
-        manager._operation.assert_not_called()
+        manager._run_lxd_until_state.assert_not_called()
 
     def test_unmanaged_rejected(self):
         manager = self.manager(owned=False)
@@ -76,7 +76,7 @@ class BehaviorTests(unittest.TestCase):
         for method in (manager.start, manager.stop, manager.info, manager.enter, manager.delete):
             with self.subTest(method=method.__name__), self.assertRaises(Error):
                 method("demo")
-        manager._operation.assert_not_called()
+        manager._run_lxd_until_state.assert_not_called()
 
     def test_query_failure_is_not_absence(self):
         manager = self.manager()
@@ -148,7 +148,7 @@ class BehaviorTests(unittest.TestCase):
         with patch("mas.core.subprocess.Popen", return_value=process), \
                 patch("mas.core.time.monotonic", side_effect=lambda: clock[0]), \
                 patch("mas.core.time.sleep", side_effect=lambda seconds: clock.__setitem__(0, clock[0] + seconds)) as sleep:
-            manager._operation("start", "demo", ["start", "local:demo"], "Running")
+            manager._run_lxd_until_state("start", "demo", ["start", "local:demo"], "Running")
         self.assertEqual(manager.find.call_count, 3)
         self.assertEqual([call.args[0] for call in sleep.call_args_list], [1, 1])
         self.assertEqual(manager.report.call_args.args[0]["elapsed"], 2)
@@ -164,7 +164,7 @@ class BehaviorTests(unittest.TestCase):
                 patch("mas.core.time.monotonic", side_effect=lambda: clock[0]), \
                 patch("mas.core.time.sleep", side_effect=lambda seconds: clock.__setitem__(0, clock[0] + seconds)):
             with self.assertRaisesRegex(Error, "last state: Stopped"):
-                manager._operation("start", "demo", ["start", "local:demo"], "Running")
+                manager._run_lxd_until_state("start", "demo", ["start", "local:demo"], "Running")
         process.kill.assert_called_once()
         self.assertEqual(manager.report.call_args.args[0]["elapsed"], 300)
         self.assertEqual(manager.report.call_args.args[0]["status"], "error")

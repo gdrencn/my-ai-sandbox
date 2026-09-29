@@ -1,10 +1,10 @@
 """Inline text-menu application; operations reuse the ordinary CLI backend."""
-import json
 import sys
 from . import config, menu
 from .core import Error, ShellExitError
 from .output import before_output
 from .i18n import t, state
+from .presentation import format_info
 
 
 class LeaveMenu(Exception):
@@ -59,11 +59,11 @@ class UI:
             self.present(t('language_title'), change_language)
 
     def info(self, target):
-        self.write(json.dumps(self.manager.info(target), indent=2))
+        self.write(format_info(self.manager.info(target)))
 
     def enter(self, target):
         try:
-            self.manager.enter(target)
+            self.manager.enter(target, self.view.confirm)
         except ShellExitError as exc:
             raise LeaveMenu(exc) from exc
         raise LeaveMenu()
@@ -85,11 +85,10 @@ class UI:
                     destination = self.manager.mountfs(target, path or None)
                     self.write(t('fs_mounted_at', path=destination))
                 elif selected in ('mountedfs', 'unmountfs'):
-                    from .cli import show_mounts
+                    from .presentation import show_mounts
                     entries = self.manager.mountedfs(target)
                     if selected == 'mountedfs' or not entries:
-                        before_output()
-                        show_mounts(entries)
+                        show_mounts(entries, self.write)
                     if selected == 'unmountfs' and entries:
                         status_column = any(e['status'] != 'mounted' for e in entries)
                         rows = menu.column_rows([(e['path'], menu.status_cell(state(e['status']), e['status'])) if status_column else (e['path'],) for e in entries])

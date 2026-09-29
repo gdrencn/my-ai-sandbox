@@ -127,4 +127,4 @@ class RunnerTests(unittest.TestCase):
         suite.manager.find.side_effect=find
         suite.cleanup()
         self.assertEqual(suite.cleanup_errors,[])
-        suite.manager._operation.assert_not_called()
+        suite.manager._run_lxd_until_state.assert_not_called()

@@ -149,7 +149,7 @@ class DistributionTests(unittest.TestCase):
         events=[]
         manager=Manager(Mock(prefix=[sys.executable], timeout=300), events.append)
         manager.find=Mock(return_value={"name":"demo","status":"Stopped","type":"container","config":{MANAGED:"true"}})
-        manager._operation("new", "demo", ["-c", "import sys;print('normal native output');print('native notice',file=sys.stderr)"], "Stopped")
+        manager._run_lxd_until_state("new", "demo", ["-c", "import sys;print('normal native output');print('native notice',file=sys.stderr)"], "Stopped")
         event=events[-1]
         self.assertIn('normal native output',event['native_stdout'])
         self.assertIn('native notice',event['native_stderr'])

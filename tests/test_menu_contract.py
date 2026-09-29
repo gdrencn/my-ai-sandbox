@@ -53,7 +53,7 @@ class MenuContractTests(unittest.TestCase):
                        dict(path='/b', destination='/host/b', status='residual' if abnormal else 'mounted')]
             manager.mountedfs.return_value = entries
             view.choose.side_effect = ['unmountfs', '/a', None, 'back']
-            with patch('mas.terminal_ui.sys.stdout', io.StringIO()), patch('mas.cli.show_mounts') as table:
+            with patch('mas.terminal_ui.sys.stdout', io.StringIO()), patch('mas.presentation.show_mounts') as table:
                 UI(view, manager).container('demo')
             table.assert_not_called()
             options = view.choose.call_args_list[1].args[1]

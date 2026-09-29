@@ -38,9 +38,9 @@ class FailureTests(unittest.TestCase):
                 patch('mas.core.time.sleep', side_effect=lambda delay: clock.__setitem__(0, clock[0]+delay)):
             if error:
                 with self.assertRaises(error):
-                    manager._operation('start', 'test-fault', ['start', 'local:test-fault'], expected)
+                    manager._run_lxd_until_state('start', 'test-fault', ['start', 'local:test-fault'], expected)
             else:
-                manager._operation('start', 'test-fault', ['start', 'local:test-fault'], expected)
+                manager._run_lxd_until_state('start', 'test-fault', ['start', 'local:test-fault'], expected)
         return manager, process, clock[0]
 
     def test_state_success_still_waits_for_native_completion(self):
@@ -94,21 +94,21 @@ class FailureTests(unittest.TestCase):
 
     def test_running_start_prepares_user_but_does_not_restart(self):
         manager = self.manager(instance('Running'))
-        manager._operation = Mock()
+        manager._run_lxd_until_state = Mock()
         manager.start('test-fault')
-        self.assertEqual([call.args[0] for call in manager._operation.call_args_list], ['prepare-user'])
+        self.assertEqual([call.args[0] for call in manager._run_lxd_until_state.call_args_list], ['prepare-user'])
 
     def test_stopped_stop_is_noop_and_transitional_states_are_rejected(self):
         manager = self.manager()
-        manager._operation = Mock()
+        manager._run_lxd_until_state = Mock()
         manager.stop('test-fault')
-        manager._operation.assert_not_called()
+        manager._run_lxd_until_state.assert_not_called()
         for state in ('Frozen', 'Starting', 'Stopping', 'Error'):
             manager.lxd.instances.return_value = [instance(state)]
             for method in (manager.start, manager.stop):
                 with self.subTest(state=state,method=method.__name__), self.assertRaises(Error):
                     method('test-fault')
-        manager._operation.assert_not_called()
+        manager._run_lxd_until_state.assert_not_called()
 
     def test_stop_all_continues_and_aggregates_failures(self):
         manager = self.manager()
@@ -148,19 +148,19 @@ class FailureTests(unittest.TestCase):
             backup=Path(directory)/'backup';backup.write_bytes(b'fixture')
             for result in (Error('import failed'), instance(kind='virtual-machine')):
                 manager=self.manager();manager.lxd.instances.return_value=[]
-                manager._operation=Mock(side_effect=result if isinstance(result,Exception) else None,return_value=result)
+                manager._run_lxd_until_state=Mock(side_effect=result if isinstance(result,Exception) else None,return_value=result)
                 with self.subTest(result=result),self.assertRaises(Error):
                     manager.import_container('test-fault',backup)
-                self.assertEqual(manager._operation.call_count,1)
+                self.assertEqual(manager._run_lxd_until_state.call_count,1)
 
     def test_import_marks_only_after_success_and_checks_final_marker(self):
         with tempfile.TemporaryDirectory() as directory:
             backup=Path(directory)/'backup';backup.touch()
             manager=self.manager();manager.lxd.instances.return_value=[]
-            manager._operation=Mock(side_effect=[instance(owned=False),Error('mark failed')])
+            manager._run_lxd_until_state=Mock(side_effect=[instance(owned=False),Error('mark failed')])
             with self.assertRaisesRegex(Error,'mark failed'):
                 manager.import_container('test-fault',backup)
-            calls=manager._operation.call_args_list
+            calls=manager._run_lxd_until_state.call_args_list
             self.assertEqual([call.args[0] for call in calls],['import','mark-import'])
             self.assertFalse(calls[0].kwargs['require_marker'])
             self.assertNotIn('require_marker',calls[1].kwargs)
@@ -182,7 +182,7 @@ class FailureTests(unittest.TestCase):
                         backup.write_bytes(b'partial');raise Error('native failed')
                     if failure=='corrupt':backup.write_bytes(b'not an archive')
                     else:self.archive(backup,metadata=failure!='metadata')
-                manager._operation=Mock(side_effect=export)
+                manager._run_lxd_until_state=Mock(side_effect=export)
                 with patch('mas.core.os.replace',side_effect=OSError('publish failed')) if failure=='publish' else contextlib.nullcontext():
                     with self.assertRaises(Error):manager.export('test-fault',destination,lambda _:True)
                 self.assertEqual(destination.read_bytes(),b'original')
@@ -194,7 +194,7 @@ class FailureTests(unittest.TestCase):
             manager=self.manager()
             def export(action,target,args,expected):
                 self.archive(Path(args[-1]));destination.write_bytes(b'concurrent file')
-            manager._operation=Mock(side_effect=export)
+            manager._run_lxd_until_state=Mock(side_effect=export)
             with self.assertRaises(Error):manager.export('test-fault',destination)
             self.assertEqual(destination.read_bytes(),b'concurrent file')
             self.assertEqual(list(Path(directory).iterdir()),[destination])
@@ -202,12 +202,12 @@ class FailureTests(unittest.TestCase):
     def test_export_rechecks_state_and_rejects_unsafe_paths(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);destination=root/'backup';destination.write_bytes(b'original')
-            manager=self.manager();manager._operation=Mock()
+            manager=self.manager();manager._run_lxd_until_state=Mock()
             def confirm(_):manager.lxd.instances.return_value=[instance('Running')];return True
             with self.assertRaises(Error):manager.export('test-fault',destination,confirm)
             manager.lxd.instances.return_value=[instance()]
             link=root/'link';link.symlink_to(destination)
             for path in (root,link,root/'missing'/'backup'):
                 with self.subTest(path=path),self.assertRaises(Error):manager.export('test-fault',path,lambda _:True)
-            manager._operation.assert_not_called()
+            manager._run_lxd_until_state.assert_not_called()
             self.assertEqual(destination.read_bytes(),b'original')

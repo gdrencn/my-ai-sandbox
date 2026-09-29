@@ -23,7 +23,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 安装指定版本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.13
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.14
 ```
 
 ## 语言和配置
@@ -117,7 +117,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 指定版本及结果目录：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.13 --output ./mas-results
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.14 --output ./mas-results
 ```
 
 已安装环境可直接运行 `mas-test`。测试工具与产品版本配套，测试使用独立 LXD project 和 `test-<唯一随机码>` 容器，通过真实 lxc 操作和伪终端测试 CLI/终端文本菜单；只清理本次创建的资源。原有容器不参与 `stop --all` 测试。语言测试使用临时配置，不修改用户偏好。英文界面测试的原始输出保留在详细日志中；面向用户的说明、阶段名称和总结始终使用选择的语言，外部程序的原始警告和错误不翻译。
@@ -150,3 +150,6 @@ python3 dist/mas.pyz --version
 
 
 测试覆盖范围与未验证环境见 [TEST_COVERAGE.md](TEST_COVERAGE.md)。基础操作在原生命令前后增加的逻辑见 [CORE_BEHAVIOR.md](CORE_BEHAVIOR.md)。测试报告的 `unit_tests` 字段记录单元测试数量、模块、测试标识和跳过原因；测试组结果仍单独记录。请勿用 Python `-O` 或 `PYTHONOPTIMIZE` 运行测试，它们会禁用断言。
+
+
+内部按职责区分外部前处理、完整的 mas 功能、外部后处理。启动中的 sandbox 用户准备属于启动内部，成功后才恢复挂载；原生启动成功本身不代表 mas 启动完成。其它基础功能的职责和成功条件见 [CORE_BEHAVIOR.md](CORE_BEHAVIOR.md)。不需要外部处理的功能不增加空阶段。

@@ -194,5 +194,9 @@
   "page_result": "操作结果",
   "page_action": "{action}：{target}",
   "lifecycle_unmount_failed": "未执行容器 {target} 的{action}：卸载 {path} 失败：{error}\n已卸载：{completed}\n未尝试：{pending}\n请手动完成卸载后，再重新启停容器。",
-  "lifecycle_restore_failed": "容器 {target} 当前状态为{status}，但以下路径恢复挂载失败，请手动处理：\n{errors}"
+  "lifecycle_restore_failed": "容器 {target} 的启停已完成，当前为{status}；以下路径恢复挂载失败，请手动挂载：\n{errors}",
+  "state_native_done": "原生步骤完成",
+  "report_failed": "警告：输出报告失败：{error}",
+  "cleanup_secondary": "清理同时失败：{error}",
+  "state_warning": "警告"
 }

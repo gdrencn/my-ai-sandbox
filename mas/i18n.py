@@ -28,7 +28,7 @@ def state(value):
 
 
 def progress_text(event):
-    return t("progress", status=state(event["status"]), action=catalog(config.language()).get("action_" + event["action"], event["action"]),
+    return t("progress", status=state("native_done" if event.get("scope") == "native" and event["status"] == "ok" else event["status"]), action=catalog(config.language()).get("action_" + event["action"], event["action"]),
              target=event["target"], observation=state(event["observation"]), elapsed=event["elapsed"])
 
 

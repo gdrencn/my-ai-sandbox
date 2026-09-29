@@ -17,6 +17,7 @@ import uuid
 
 from .core import Error, validate_target
 from .i18n import t
+from .diagnostics import cleanup_scope
 
 
 def fuse_access_ready(path=Path('/etc/fuse.conf')):
@@ -99,7 +100,7 @@ class Filesystems:
             for entry in data['mounts']:
                 if not isinstance(entry, dict) or not re.fullmatch('[a-f0-9]{32}', entry['id']):
                     raise ValueError('entry')
-                if set(entry) - {'id', 'target', 'project', 'path', 'destination', 'source', 'default', 'prepared', 'created', 'listener', 'sshfs', 'mount_id'}:
+                if set(entry) - {'id', 'target', 'project', 'path', 'destination', 'source', 'default', 'prepared', 'created', 'listener', 'sshfs', 'mount_id', 'work_created'}:
                     raise ValueError('unknown field')
                 if entry['id'] in seen:
                     raise ValueError('duplicate id')
@@ -107,6 +108,8 @@ class Filesystems:
                 validate_target(entry['target'])
                 if type(entry['default']) is not bool or entry['source'] not in ('', 'mas-' + entry['id'] + '@127.0.0.1:' + entry['path']):
                     raise ValueError('source/default')
+                if 'work_created' in entry and type(entry['work_created']) is not bool:
+                    raise ValueError('work directory ownership')
                 if 'prepared' in entry and type(entry['prepared']) is not bool:
                     raise ValueError('prepared')
                 if 'mount_id' in entry and (type(entry['mount_id']) is not int or entry['mount_id'] <= 0):
@@ -130,7 +133,7 @@ class Filesystems:
 
     def _save(self, data):
         fd, name = tempfile.mkstemp(dir=self.state, prefix='.mounts-')
-        try:
+        with cleanup_scope(lambda: Path(name).unlink(missing_ok=True)):
             with os.fdopen(fd, 'w') as stream:
                 json.dump(data, stream)
                 stream.flush()
@@ -141,8 +144,6 @@ class Filesystems:
                 os.fsync(directory)
             finally:
                 os.close(directory)
-        finally:
-            Path(name).unlink(missing_ok=True)
 
     @contextmanager
     def locked(self):
@@ -274,38 +275,39 @@ class Filesystems:
             return [dict(path=e['path'], destination=e['destination'], status=self._status(e), default=e['default']) for e in self._entries(data, target)]
 
     def guard_delete(self, target):
-        self.guard_transition(target)
+        self.require_no_mounts(target)
 
-    def guard_transition(self, target):
+    def require_no_mounts(self, target):
         if self.list(target):
             raise Error(t('fs_before_transition', target=target))
 
     @contextmanager
-    def transition(self, target):
+    def deletion_guard(self, target):
         with self.locked() as data:
             if self._entries(data, target):
                 raise Error(t('fs_before_transition', target=target))
             yield
 
-    def _wait(self, action, target, probe, diagnostics=None, final=True):
-        started = time.monotonic()
+    def _wait(self, action, target, probe, diagnostics=None, final=True, *, started=None, deadline=None, ready_state=None):
+        started = time.monotonic() if started is None else started
+        deadline = started + self.timeout if deadline is None else deadline
         outcome = 'error'
         observation = 'waiting'
         try:
             while True:
                 tick = time.monotonic()
-                if tick - started >= self.timeout:
+                if tick >= deadline:
                     raise Error(t('fs_timeout', target=target))
                 done = probe()
-                observation = 'mounted' if action == 'mountfs' and done else 'unmounted' if done else 'waiting'
-                self.manager.report(dict(action=action, target=target, status='waiting', observation=observation, elapsed=time.monotonic()-started))
+                observation = (ready_state or ('mounted' if action == 'mountfs' else 'unmounted')) if done else 'waiting'
+                self.manager.emit(dict(action=action, target=target, status='waiting', observation=observation, elapsed=time.monotonic()-started))
                 if done:
                     outcome = 'ok'
-                    return
-                time.sleep(max(0, 1-(time.monotonic()-tick)))
+                    return done
+                time.sleep(max(0, min(1-(time.monotonic()-tick), deadline-time.monotonic())))
         finally:
             if final:
-                self.manager.report(dict(action=action, target=target, status=outcome, observation=observation, elapsed=time.monotonic()-started, native_stderr=diagnostics() if diagnostics and outcome == 'ok' else ''))
+                self.manager.emit(dict(action=action, target=target, status=outcome, observation=observation, elapsed=time.monotonic()-started, native_stderr=diagnostics() if diagnostics and outcome == 'ok' else ''))
 
     def _spawn(self, args, out, err, password=None):
         with out.open('ab') as stdout, err.open('ab') as stderr:
@@ -339,6 +341,56 @@ class Filesystems:
             except ChildProcessError:
                 pass
 
+    def _prepare_mount(self, data, entry, work):
+        """Journal intent before creating owned resources, within failure protection."""
+        data['mounts'].append(entry)
+        self._save(data)
+        work.mkdir(mode=0o700)
+        entry['work_created'] = True
+        self._save(data)
+        self._make(data, Path(entry['destination']), entry)
+        entry['prepared'] = True
+        self._save(data)
+
+    def _start_listener(self, data, entry, work):
+        username = 'mas-' + entry['id']
+        entry['source'] = username + '@127.0.0.1:' + entry['path']
+        listener = self._spawn(self.manager.lxd.prefix + ['file', 'mount', 'local:'+entry['target'],
+            '--listen', '127.0.0.1:0', '--auth-user', username], work/'listener.out', work/'listener.err')
+        entry['listener'] = process_identity(listener.pid)
+        self._save(data)
+        return listener
+
+    def _listener_details(self, listener, work):
+        if listener.poll() is not None:
+            raise Error((work/'listener.err').read_text().strip() or t('fs_listener_failed'))
+        output = (work/'listener.out').read_text()
+        port = re.search(r'SSH SFTP listening on 127\.0\.0\.1:(\d+)', output)
+        password = re.search(r'password "([^"\n]+)"', output)
+        return (port[1], password[1]) if port and password else None
+
+    def _start_sshfs(self, data, entry, work, connection):
+        port, password = connection
+        known_hosts = str(work/'known_hosts').replace('\\', '\\\\').replace('"', '\\"')
+        sshfs = self._spawn(['sshfs', entry['source'], entry['destination'], '-f', '-p', port,
+            '-o', 'password_stdin', '-o', 'allow_root', '-o', 'StrictHostKeyChecking=accept-new',
+            '-o', 'UserKnownHostsFile="'+known_hosts+'"', '-o', 'GlobalKnownHostsFile=/dev/null',
+            '-o', 'IdentityAgent=none', '-o', 'PubkeyAuthentication=no', '-o', 'PreferredAuthentications=password'],
+            work/'sshfs.out', work/'sshfs.err', password)
+        entry['sshfs'] = process_identity(sshfs.pid)
+        self._save(data)
+        return sshfs
+
+    def _mount_observation(self, entry, listener, sshfs, work):
+        if listener.poll() is not None:
+            raise Error((work/'listener.err').read_text().strip() or t('fs_listener_failed'))
+        if sshfs.poll() is not None:
+            raise Error((work/'sshfs.err').read_text().strip() or t('fs_mount_failed'))
+        actual = self._actual(entry)
+        if actual and not self._matching(entry, actual):
+            raise Error(t('fs_conflict', path=entry['destination']))
+        return actual[0] if actual else None
+
     def mount(self, target, path=None, *, default_home=False):
         self._target(target)
         for program in ('sshfs', 'fusermount3'):
@@ -358,55 +410,31 @@ class Filesystems:
             if any(overlaps(str(destination), item['destination']) for item in mounts() if item['destination'] != '/' and str(self.root) in (item['destination'], *[str(p) for p in Path(item['destination']).parents])):
                 raise Error(t('fs_conflict', path=destination))
             entry = dict(id=uuid.uuid4().hex, project=self.project, target=target, path=path,
-                         destination=str(destination), default=default, source='')
-            data['mounts'].append(entry)
-            self._save(data)
+                         destination=str(destination), default=default, source='', work_created=False)
             work = self.state / entry['id']
-            work.mkdir(mode=0o700)
+            started = time.monotonic()
             try:
-                self._make(data, destination, entry)
-                entry['prepared'] = True
+                self._prepare_mount(data, entry, work)
+                listener = self._start_listener(data, entry, work)
+                # Both readiness waits consume the same original timeout budget.
+                waiting = time.monotonic()
+                deadline = waiting + self.timeout
+                connection = self._wait('mountfs', target, lambda: self._listener_details(listener, work),
+                    final=False, started=waiting, deadline=deadline, ready_state='waiting')
+                sshfs = self._start_sshfs(data, entry, work, connection)
+                actual = self._wait('mountfs', target, lambda: self._mount_observation(entry, listener, sshfs, work),
+                    final=False, started=waiting, deadline=deadline)
+                entry['mount_id'] = actual['id']
                 self._save(data)
-                username = 'mas-' + entry['id']
-                entry['source'] = username + '@127.0.0.1:' + path
-                listener = self._spawn(self.manager.lxd.prefix + ['file', 'mount', 'local:'+target, '--listen', '127.0.0.1:0', '--auth-user', username], work/'listener.out', work/'listener.err')
-                entry['listener'] = process_identity(listener.pid)
-                self._save(data)
-                sshfs = None
-                def ready():
-                    nonlocal sshfs
-                    if listener.poll() is not None:
-                        raise Error((work/'listener.err').read_text().strip() or t('fs_listener_failed'))
-                    if sshfs is None:
-                        output = (work/'listener.out').read_text()
-                        port = re.search(r'SSH SFTP listening on 127\.0\.0\.1:(\d+)', output)
-                        password = re.search(r'password "([^"\n]+)"', output)
-                        if not port or not password:
-                            return False
-                        sshfs = self._spawn(['sshfs', entry['source'], str(destination), '-f', '-p', port[1],
-                            '-o', 'password_stdin', '-o', 'allow_root', '-o', 'StrictHostKeyChecking=accept-new',
-                            '-o', 'UserKnownHostsFile="'+str(work/'known_hosts').replace('\\', '\\\\').replace('"', '\\"')+'"', '-o', 'GlobalKnownHostsFile=/dev/null',
-                            '-o', 'IdentityAgent=none', '-o', 'PubkeyAuthentication=no', '-o', 'PreferredAuthentications=password'],
-                            work/'sshfs.out', work/'sshfs.err', password[1])
-                        entry['sshfs'] = process_identity(sshfs.pid)
-                        self._save(data)
-                    if sshfs.poll() is not None:
-                        raise Error((work/'sshfs.err').read_text().strip() or t('fs_mount_failed'))
-                    actual = self._actual(entry)
-                    if actual and not self._matching(entry, actual):
-                        raise Error(t('fs_conflict', path=destination))
-                    if actual:
-                        entry['mount_id'] = actual[0]['id']
-                        self._save(data)
-                        return True
-                    return False
-                self._wait('mountfs', target, ready, lambda: ''.join((work/name).read_text() for name in ('listener.err', 'sshfs.err') if (work/name).exists()))
+                diagnostics = ''.join((work/name).read_text() for name in ('listener.err', 'sshfs.err') if (work/name).exists())
             except BaseException:
+                self.manager.emit(dict(action='mountfs', target=target, status='error', observation='residual', elapsed=time.monotonic()-started))
                 try:
                     self._remove(data, entry)
                 except (Error, OSError) as exc:
-                    self.manager.report(dict(action='mountfs', target=target, status='error', observation='residual', elapsed=0, native_stderr=str(exc)))
+                    self.manager.emit(dict(action='mountfs', target=target, status='error', observation='residual', elapsed=0, native_stderr=str(exc)))
                 raise
+            self.manager.emit(dict(action='mountfs', target=target, status='ok', scope='function', observation='mounted', elapsed=time.monotonic()-started, native_stderr=diagnostics))
         return str(destination)
 
     def _owned_helper(self, pid, entry, kind):
@@ -441,7 +469,7 @@ class Filesystems:
             self._cleanup(data, entry, started)
             outcome = 'ok'
         finally:
-            self.manager.report(dict(action='unmountfs', target=entry['target'], status=outcome,
+            self.manager.emit(dict(action='unmountfs', target=entry['target'], status=outcome, scope='function',
                 observation='unmounted' if outcome == 'ok' else 'residual', elapsed=time.monotonic()-started))
 
     def _cleanup(self, data, entry, started):
@@ -458,17 +486,19 @@ class Filesystems:
                 raise Error(result.stderr.strip() or t('fs_unmount_failed'))
             self._wait('unmountfs', entry['target'], lambda: not self._actual(entry), final=False)
             if result.stderr:
-                self.manager.report(dict(action='unmountfs', target=entry['target'], status='waiting', observation='unmounted', elapsed=0, native_stderr=result.stderr))
+                self.manager.emit(dict(action='unmountfs', target=entry['target'], status='waiting', observation='unmounted', elapsed=0, native_stderr=result.stderr))
         for kind in ('sshfs', 'listener'):
             for identity in helpers[kind]:
                 if self._owned_helper(identity['pid'], entry, kind):
-                    self._terminate(identity, lambda: self.manager.report(dict(action='unmountfs', target=entry['target'], status='waiting', observation='waiting', elapsed=time.monotonic()-started)))
+                    self._terminate(identity, lambda: self.manager.emit(dict(action='unmountfs', target=entry['target'], status='waiting', observation='waiting', elapsed=time.monotonic()-started)))
         if entry.get('prepared'):
             self._reclaim(data, Path(entry['destination']))
         elif entry.get('created'):
             self._reclaim(data, Path(entry['created'][-1]))
         work = self.state / entry['id']
         if work.exists():
+            if not entry.get('work_created', True):
+                raise Error(t('fs_conflict', path=work))
             # Only the private per-mount connection files, never container data.
             for name in ('listener.out', 'listener.err', 'sshfs.out', 'sshfs.err', 'known_hosts'):
                 (work/name).unlink(missing_ok=True)

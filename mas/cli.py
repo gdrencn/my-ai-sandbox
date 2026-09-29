@@ -7,33 +7,9 @@ import sys
 from . import __version__
 from . import config
 from .core import Error, LXD, Manager
-from .diagnostics import diagnostic_lines
-from .output import Output
+from .presentation import Progress, show_mounts, format_info
 
-from .i18n import t, state, progress_text, Parser
-
-
-class Progress:
-    """One reporter shared by CLI commands and the inline menu application."""
-    def __init__(self, stream=None):
-        self.output = Output(stream if stream is not None else sys.stderr)
-
-    def __call__(self, event):
-        message = progress_text(event)
-        if event["status"] == "waiting":
-            self.output.progress(message)
-        else:
-            self.output.keep(message)
-        if not event.get("native_failure"):
-            for line in diagnostic_lines(event.get("native_stdout", ""), event.get("native_stderr", "")):
-                self.output.keep(line)
-
-
-def show_mounts(entries):
-    if not entries:
-        print(t("fs_empty"))
-    for entry in entries:
-        print(f"{entry['path']}\t{entry['destination']}\t{state(entry['status'])}")
+from .i18n import t, state, Parser
 
 
 def parser():
@@ -85,7 +61,8 @@ def main(argv=None, manager=None):
             else:
                 print(json.dumps(config.load(), ensure_ascii=False, indent=2))
             return 0
-        ask = input if getattr(args, "consent", None) is None else lambda _: args.consent
+        from .menu import confirm as ask_menu
+        ask = ask_menu if getattr(args, "consent", None) is None else lambda _: args.consent
         manager = manager or Manager(LXD(timeout=args.timeout, diagnostic=progress.output.keep), report=progress)
         if args.command is None:
             from .terminal_ui import run
@@ -94,7 +71,7 @@ def main(argv=None, manager=None):
             for item in manager.list():
                 print(f"{item['name']}\t{state(item['status'])}")
         elif args.command == "info":
-            print(json.dumps(manager.info(args.target), indent=2))
+            print(format_info(manager.info(args.target)))
         elif args.command in ("mountfs", "unmountfs"):
             result = getattr(manager, args.command)(args.target, args.path)
             print(t("fs_mounted_at", path=result) if args.command == "mountfs" else t("menu_done"))

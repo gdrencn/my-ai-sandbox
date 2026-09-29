@@ -428,8 +428,8 @@ class Suite:
             native_backup = Path(self.workspace.name)/'native-unmarked.tar.gz'
             self.manager.lxd.command(['config', 'unset', 'local:'+target, 'user.mas.managed'])
             assert not self.manager.managed(self.manager.find(target))
-            self.manager._operation('export', target, ['export', 'local:'+target, str(native_backup)], 'Stopped', require_marker=False)
-            self.manager._operation('delete', target, ['delete', 'local:'+target], 'Absent', require_marker=False)
+            self.manager._run_lxd_until_state('export', target, ['export', 'local:'+target, str(native_backup)], 'Stopped', require_marker=False)
+            self.manager._run_lxd_until_state('delete', target, ['delete', 'local:'+target], 'Absent', require_marker=False)
             self.cli('import', target, str(native_backup))
             restored = self.manager.info(target)
             assert restored['config']['user.mas.managed'] == 'true' and restored['status'] == 'Stopped'
@@ -745,9 +745,9 @@ try {
                 item = self.manager.find(target)
                 if item:
                     if item["status"] != "Stopped":
-                        self.manager._operation("cleanup-stop", target, ["stop", "local:" + target,
+                        self.manager._run_lxd_until_state("cleanup-stop", target, ["stop", "local:" + target,
                                                 "--timeout", str(self.timeout)], "Stopped", require_marker=False)
-                    self.manager._operation("cleanup-delete", target, ["delete", "local:" + target],
+                    self.manager._run_lxd_until_state("cleanup-delete", target, ["delete", "local:" + target],
                                             "Absent", require_marker=False)
             except Exception as exc:
                 self.cleanup_errors.append(f"{target}: {exc}")

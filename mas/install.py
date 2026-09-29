@@ -17,6 +17,7 @@ import tempfile
 from .core import Error, LXD
 
 from .i18n import t, Parser
+from .diagnostics import cleanup_scope
 from . import __version__
 
 
@@ -67,7 +68,7 @@ def enable_fuse_access(path=Path('/etc/fuse.conf')):
     original = path.read_text() if path.exists() else ''
     mode = path.stat().st_mode & 0o777 if path.exists() else 0o644
     fd, temporary = tempfile.mkstemp(dir=path.parent, prefix='.mas-fuse-')
-    try:
+    with cleanup_scope(lambda: Path(temporary).unlink(missing_ok=True)):
         with os.fdopen(fd, 'w') as stream:
             stream.write(original + ('\n' if original and not original.endswith('\n') else '') + 'user_allow_other\n')
             stream.flush()
@@ -77,8 +78,6 @@ def enable_fuse_access(path=Path('/etc/fuse.conf')):
             info = path.stat()
             os.chown(temporary, info.st_uid, info.st_gid)
         os.replace(temporary, path)
-    finally:
-        Path(temporary).unlink(missing_ok=True)
 
 
 def prepare_fuse_access():
@@ -186,15 +185,13 @@ def install_file(source, destination):
     destination.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix="." + destination.name + ".", dir=destination.parent)
     temporary = Path(name)
-    try:
+    with cleanup_scope(lambda: temporary.unlink(missing_ok=True)):
         with os.fdopen(fd, "wb") as output, open(source, "rb") as incoming:
             shutil.copyfileobj(incoming, output)
             output.flush()
             os.fsync(output.fileno())
         temporary.chmod(0o755)
         temporary.replace(destination)
-    finally:
-        temporary.unlink(missing_ok=True)
 
 
 def group_refresh_required():
