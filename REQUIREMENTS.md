@@ -307,14 +307,14 @@ Status: implemented, verified and delivered as test v0.1.14. Frozen local and pu
 
 ## 24. Pending changes — deletion guard wording
 
-Status: implemented and locally verified in batch 0.1.15.
+Status: implemented, verified and delivered in test v0.1.15.
 
 - [x] Correct the deletion guard's obsolete instruction about manually unmounting before start/stop. The message must specifically instruct the user to unmount and clean recorded mounts before deleting the target. Start/stop already coordinate unmount and restoration through the shared foundations.
 - [x] Update both zh_cn and en_us messages and affected test expectations. Preserve the deletion guard and existing start/stop behavior; this change is wording only.
 
 ## 25. Batch 0.1.15 — dependency installation and a flatter main menu
 
-Status: implementation and frozen local verification complete: 162 packaged units and all 21 report stages passed. Requirements were recorded before product changes, and IMPLEMENTED.md was updated after verification. Test 0.1.15 publication and both public entry checks follow.
+Status: implemented, verified and delivered as test v0.1.15. Local frozen and public --test runs each passed 162 packaged units and all 21 report stages; both fixed public entry modes succeeded. Requirements were recorded before product changes, and IMPLEMENTED.md was updated after verification.
 
 - Reproduce and fix dependency installation hanging with sudo-rs 0.2.13 and terminal input/piped output. Preserve native sudo authentication and required package-manager interaction without password handling, separate sudo -v, keepalive, global sudo configuration changes or replacing system sudo. Validate the execution arrangement using real sudo and terminal/process-group behavior; do not rely exclusively on a fake sudo executable. A minimal process probe must not install packages or leave paused child processes behind. Distinguish reproduced behavior from a proven upstream patch attribution.
 - Fix normal APT fragments persisting as permanent output when reads time out before a newline. Handle fragmented lines and carriage-return updates while keeping normal progress transient, preserving warnings/errors/unknown output and making prompts without newlines usable. Keep one shared dependency implementation for bootstrap and installer, including environments where Python is not yet available. Preserve failure status and complete failure logs.

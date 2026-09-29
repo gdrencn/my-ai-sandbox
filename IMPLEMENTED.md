@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: version 0.1.15 implementation and frozen-package validation are complete; test publication/public-entry checks follow below. Stage 18 records the current behavior; previous stages are historical checkpoints. The version phase remains 1.
+Current result: test version 0.1.15 is publicly released; frozen local validation and both fixed public installation modes passed. Stage 18 records the current behavior; previous stages are historical checkpoints. The version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -368,3 +368,12 @@ An exploratory integration run was deliberately interrupted after a review caugh
 Final frozen validation: 162 packaged units with zero failures/errors/skips; all 21 report stages (unit plus 20 integrations) passed in 420.6 seconds. The new merged menu, eligible bulk stop, native dependencies, lifecycle/mount recovery, Windows UNC operations and terminal exit passed. Independent checks confirmed the isolated project, mount root and registry entries were reclaimed. Report: validation/V0_1_15_REPORT.json. Product SHA-256: bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6. Packaged sources match the workspace and repeated builds are byte-identical; Python 3.10 grammar, shell syntax and diff checks passed.
 
 Limits: the full fresh-host snap/LXD/group/FUSE installation was not repeated. Actual password entry remains a user/system boundary, tested with controlled prompt fixtures; the new live sudo probe uses the same user and the container installation uses standard mas passwordless sudo. Native Ubuntu/cloud, other architectures and offline VHDX remain unverified. The user's already-paused old installer was not resumed or terminated. No stable promotion. Public verification follows publication.
+
+
+### 0.1.15 publication and public-entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15 from 634e37e0feddb8b97740d1c2b71e98ecc9548c46 with seven frozen assets: product, separate installer/tester, bootstrap, shell entry, checksums and WSL_REPORT.json. Earlier release assets remain unchanged.
+
+Actual PTY runs of the fixed public curl/bash normal and --test entry both resolved 0.1.15. Normal installation preserved the existing tester modification time. Public --test passed 162 packaged units and all 21 report stages in 389.2 seconds, without skips or cleanup errors. It included actual sudo/APT installation in the test container, the merged navigation and Windows UNC access. Installed product/tester hashes matched the release files. Independent checks confirmed the isolated project, mount root and registry entries were reclaimed; temporary language preferences were restored, and no alternate-screen or screen/scrollback-clearing sequences were observed. Evidence: validation/V0_1_15_PUBLIC_REPORT.json.
+
+Sections 24–25 are delivered. The limits above still apply; the user's existing stopped installer remains outside this verification. Test prerelease only, no stable promotion.
