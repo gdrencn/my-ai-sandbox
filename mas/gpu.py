@@ -9,6 +9,7 @@ from pathlib import Path
 import shutil
 import shlex
 import subprocess
+import sys
 import time
 from urllib.parse import quote, urlencode
 
@@ -18,6 +19,60 @@ from .i18n import t
 KEY = 'user.mas.gpu'
 CONF = '/etc/ld.so.conf.d/mas-gpu.conf'
 CONTENT = '# Managed by my-ai-sandbox GPU module\n/usr/lib/wsl/lib\n'
+CTK = '/snap/lxd/current/bin/nvidia-ctk'
+
+
+def _discovery_command(command):
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired as exc:
+        raise Error(t('gpu_detect_timeout')) from exc
+    except OSError as exc:
+        raise Error(t('gpu_detect_failed', error=str(exc))) from exc
+    if result.returncode == 0:
+        # Native informational discovery logs are transient implementation detail;
+        # retain warnings and any unrecognized diagnostics without translating.
+        for line in result.stderr.splitlines():
+            if not re.search(r'(?:^|\s)level=(?:info|debug|trace)(?:\s|$)', line):
+                print(line, file=sys.stderr)
+    return result
+
+
+def wsl_driver_paths():
+    """Use NVIDIA's DXCore-backed discovery, never guess from directory names."""
+    if not Path(CTK).is_file():
+        raise Error(t('gpu_discovery_tool_missing', path=CTK))
+    result = _discovery_command([CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', ''])
+    if result.returncode:
+        raise Error(t('gpu_detect_failed', error=result.stderr.strip() or result.stdout.strip()))
+    try:
+        spec = json.loads(result.stdout)
+        if spec['kind'] != 'nvidia.com/gpu':
+            raise ValueError()
+        selected = [d for d in spec['devices'] if d['name'] == 'all']
+        if len(selected) != 1:
+            raise ValueError()
+        paths = set()
+        for edits in (spec.get('containerEdits', {}), selected[0].get('containerEdits', {})):
+            for mount in edits.get('mounts', []):
+                source = mount['hostPath']
+                if not isinstance(source, str):
+                    raise ValueError()
+                if source.rsplit('/', 1)[-1] != 'libcuda.so.1.1':
+                    continue
+                if (not re.fullmatch(r'/usr/lib/wsl/drivers/[A-Za-z0-9_.-]+/libcuda\.so\.1\.1', source)
+                        or Path(source).parent.name in ('.', '..')
+                        or mount.get('containerPath') != source
+                        or 'ro' not in mount.get('options', [])
+                        or not Path(source).is_file()
+                        or str(Path(source).resolve(strict=True)) != source):
+                    raise ValueError()
+                paths.add(str(Path(source).parent))
+        if not paths:
+            raise ValueError()
+        return sorted(paths)
+    except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
+        raise Error(t('gpu_discovery_invalid')) from exc
 
 
 def detect():
@@ -26,11 +81,7 @@ def detect():
     executable = '/usr/lib/wsl/lib/nvidia-smi' if wsl else shutil.which('nvidia-smi')
     if not executable or not Path(executable).is_file():
         return {'available': False, 'backend': None, 'gpus': []}
-    try:
-        result = subprocess.run([executable, '--query-gpu=name,uuid', '--format=csv,noheader'],
-                                capture_output=True, text=True, timeout=600)
-    except subprocess.TimeoutExpired as exc:
-        raise Error(t('gpu_detect_timeout')) from exc
+    result = _discovery_command([executable, '--query-gpu=name,uuid', '--format=csv,noheader'])
     if result.returncode == 6:
         return {'available': False, 'backend': None, 'gpus': []}
     if result.returncode:
@@ -44,9 +95,7 @@ def detect():
         raise Error(t('gpu_detect_failed', error=result.stdout.strip()))
     if wsl and not all(Path(p).is_dir() for p in ('/usr/lib/wsl/lib', '/usr/lib/wsl/drivers')):
         raise Error(t('gpu_runtime_missing'))
-    driver_paths = sorted({str(p.parent) for p in Path('/usr/lib/wsl/drivers').glob('*/libcuda.so.1.1') if p.is_file()}) if wsl else []
-    if wsl and not driver_paths:
-        raise Error(t('gpu_runtime_missing'))
+    driver_paths = wsl_driver_paths() if wsl else []
     return {'available': True, 'backend': 'wsl-nvidia' if wsl else 'nvidia-cdi', 'gpus': gpus, 'driver_paths': driver_paths}
 
 

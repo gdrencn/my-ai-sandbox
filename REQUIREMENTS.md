@@ -398,6 +398,8 @@ Status: implemented, verified and published as test v0.2.1. Local and public --t
 
 ### 28.1. Validated implementation choice and platform boundary
 
+Historical 0.2.1 implementation below; section 30 supersedes its driver-directory scanning with official active-driver discovery in 0.2.3.
+
 The initial implementation targets NVIDIA CUDA GPUs. WSL2 NVIDIA is the current real validation environment; native Ubuntu NVIDIA uses LXD CDI and has not been GPU-tested here. AMD and Intel discrete GPU discovery/backends remain unimplemented, not implicitly covered by the NVIDIA checks. Hosts without a supported NVIDIA device do not show the GPU switch.
 
 The current LXD 6.9 snap CDI probe failed with NVML Driver Not Loaded. The WSL backend therefore uses LXD's native unix-char device for `/dev/dxg`, mode 0666 inside the container, and read-only disk devices for `/usr/lib/wsl/lib` and only driver-store subdirectories containing `libcuda.so.1.1`. It does not map the complete `/usr/lib/wsl/drivers` directory. These GPU driver resources originate from the Windows/WSL driver infrastructure and are the authorized GPU exception, not general Windows filesystem access. DXG access is shared WSL GPU access, not per-adapter isolation.
@@ -415,3 +417,14 @@ Status: implemented, verified and published as test v0.2.2. Local and public-ent
 - Add real PTY regression coverage for delayed terminal restoration/input flushing, title/control-sequence interference, and imported-container hostnames differing from TARGET.
 - Run packaged units and the complete native LXD regression suite, update implementation/coverage/release documentation, and publish v0.2.2 test.
 - GPU active-driver-directory selection remains a separate pending investigation; this batch changes terminal test synchronization only.
+
+## 30. Active WSL GPU driver discovery — v0.2.3
+
+Status: implemented and verified: 189 packaged units and all 22 native stages passed. Publication verification pending.
+
+- Replace scanning every driver-store directory with the official NVIDIA WSL discovery supplied by the installed LXD snap: nvidia-ctk cdi generate --mode=wsl --format=json. No new package installation or private DXCore implementation.
+- Treat generated JSON solely as discovery data. Never apply the CDI document or execute its hooks. Extract selected NVIDIA CUDA driver directories, validate paths/files, and reuse existing GPU device configuration and ownership records. Preserve unrelated configuration.
+- Requery before every actual start with GPU enabled. Refresh changed paths before native startup; do not modify live mappings. Explicit off continues to bypass required driver discovery during startup and cleanup.
+- Tool absence, timeout, native failure, invalid/empty results, unsafe paths and missing selected files fail explicitly; never fall back to directory scanning or an old cached selection. Keep native warnings/errors visible.
+- Verify exclusion of inactive coexisting driver directories, changed selections, failed discovery preventing startup, and disabled cleanup independence. Run actual sandbox CUDA computation with only selected directories. Simulated selection changes do not imply a real Windows driver upgrade was tested.
+- Update verified implementation and coverage documentation, publish v0.2.3 test, and verify the public artifacts.

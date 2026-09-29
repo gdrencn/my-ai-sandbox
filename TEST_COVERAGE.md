@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.2.2 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.2.3 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -137,3 +137,11 @@ Two real PTY regressions model a sudo-like result appearing before terminal rest
 Packaged verification passed 179 units and all 22 native stages in 461.8 seconds, no skips or cleanup errors, including actual CLI and imported-container menu exits for all three stop answers. The controlled flush test demonstrates the failure mechanism without claiming syscall-level diagnosis on the user's host.
 
 Published-entry verification also passed 179 packaged units and all 22 native stages in 487.6 seconds, with no skips or cleanup errors. Its menu stage passed in 83.3 seconds. Public product/tester hashes and all release asset digests match local validated archives. See validation/V0_2_2_PUBLIC_REPORT.json and V0_2_2_RELEASE_CHECK.json.
+
+## Official WSL driver discovery — 0.2.3
+
+Ten added unit tests cover the official command/JSON contract, ignored hooks, both CDI mount locations, deduplication, requery without caching, missing/failing/timed-out tool, invalid results, path/file validation, diagnostic retention, failed discovery preserving records/preventing native startup, off-mode independence and legacy multiple-directory replacement. Tests forbid production directory scanning.
+
+The native GPU stage compares configured paths with official discovery, inventories coexisting driver directories solely inside the tester, checks excluded CUDA files are absent in the container, and records selected/excluded paths alongside actual sandbox CUDA computation. Current host selected one NVIDIA directory and excluded one historical directory. Driver updates are simulated in unit tests, not performed on Windows.
+
+Frozen run passed 189 packaged units and all 22 stages in 449.4 seconds, no skips or cleanup errors. See validation/V0_2_3_LOCAL_REPORT.json. Existing platform limits still apply.

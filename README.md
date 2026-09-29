@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.2`，修复容器终端自动化测试的输入同步；功能范围仍为 `0.2.1` 的 GPU 模块及既有容器管理。
+当前 test 为 `0.2.3`，GPU 模块改用官方 WSL 探测识别当前驱动目录，启动前动态更新映射。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -175,7 +175,7 @@ python3 dist/mas.pyz --version
 内部按职责区分外部前处理、完整的 mas 功能、外部后处理。启动中的 sandbox 用户准备属于启动内部，成功后才恢复挂载；原生启动成功本身不代表 mas 启动完成。其它基础功能的职责和成功条件见 [CORE_BEHAVIOR.md](CORE_BEHAVIOR.md)。不需要外部处理的功能不增加空阶段。
 
 
-## GPU 硬件选项（0.2.1 test）
+## GPU 硬件选项（0.2.x test）
 
 选中容器后进入“硬件选项”，第一个选项为 GPU 开关。有受支持的独立显卡时默认开启，可以手动关闭；没有受支持设备时不显示此开关。目前接入实现针对 NVIDIA，已实测 WSL2 + RTX 5090 Laptop GPU；原生 Ubuntu NVIDIA 使用 LXD CDI 路径，尚未实机验证。AMD/Intel 独立显卡尚未实现自动识别和接入。
 
@@ -190,6 +190,8 @@ mas start TARGET
 
 修改 GPU 配置要求容器已停止，不会自动停止正在运行的任务。显式关闭会跨启停保留。新建容器自动配置默认 GPU；已有或导入的未配置容器在下一次从停止状态启动时应用默认值，已运行的旧容器不会被静默热修改。菜单会标明尚未应用的默认值。
 
-WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和含 CUDA 驱动的 NVIDIA 驱动子目录；不映射整个 Windows 驱动目录。WSL DXG 访问不是逐卡隔离。设备清单、驱动目录、配置值和运行库配置文件路径记录在 `user.mas.gpu`。模块管理容器内 `/etc/ld.so.conf.d/mas-gpu.conf`，启动时刷新动态链接库缓存；关闭时删除该文件及设备，下一次启动刷新缓存。检测到资源配置漂移或文件冲突会报错，不覆盖不属于模块的资源。GPU 库路径可供普通 sandbox 用户加载；WSL 的诊断工具可通过 `/usr/lib/wsl/lib/nvidia-smi` 调用。
+WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和官方探测选中的当前 NVIDIA 驱动子目录；不映射整个 Windows 驱动目录。WSL DXG 访问不是逐卡隔离。设备清单、驱动目录、配置值和运行库配置文件路径记录在 `user.mas.gpu`。模块管理容器内 `/etc/ld.so.conf.d/mas-gpu.conf`，启动时刷新动态链接库缓存；关闭时删除该文件及设备，下一次启动刷新缓存。检测到资源配置漂移或文件冲突会报错，不覆盖不属于模块的资源。GPU 库路径可供普通 sandbox 用户加载；WSL 的诊断工具可通过 `/usr/lib/wsl/lib/nvidia-smi` 调用。
 
 测试工具会验证开关、菜单、只读资源、关闭后的设备消失、重新开启，以及 sandbox 用户执行真实 CUDA 内核并读回结果。无支持设备的机器明确记录 GPU 计算未执行。此模块不安装 CUDA Toolkit、模型框架或新的宿主驱动。Project/profile 安全基线、CPU/内存/进程限制仍待后续实现。
+
+从 0.2.3 起，WSL 驱动目录由 LXD snap 已附带的 `nvidia-ctk` 以 WSL 模式探测，不扫描全部历史目录。GPU 开启时，每次实际启动前重新查询并复用 GPU 配置函数更新映射，运行期间不自动修改。工具缺失、探测失败或结果无效会报错，不继续使用旧选择。mas 只读取官方工具输出的资源清单，不应用 CDI 文档或执行 hooks，也不额外安装软件包。

@@ -134,6 +134,39 @@ class GPUTests(unittest.TestCase):
         record = self.gpu.record(self.item)
         self.assertEqual(record['driver_paths'], changed['driver_paths'])
         self.assertEqual(len(self.edits), 2)
+        self.assertNotIn(CAP['driver_paths'][0], str(self.item['devices']))
+
+    def test_discovery_failure_preserves_record_and_off_bypasses_discovery(self):
+        self.gpu.ensure('test-unit')
+        before = copy.deepcopy(self.item)
+        with patch('mas.gpu.detect', side_effect=Error('official query failed')) as query:
+            with self.assertRaises(Error): self.gpu.ensure('test-unit')
+            self.assertEqual(self.item, before)
+            self.gpu.set('test-unit', False)
+            query.reset_mock()
+            self.gpu.ensure('test-unit')
+            query.assert_not_called()
+
+    def test_legacy_multiple_directories_are_replaced_by_official_selection(self):
+        old = {**CAP, 'driver_paths': CAP['driver_paths'] + ['/usr/lib/wsl/drivers/old']}
+        self.gpu.set('test-unit', True, capability=old)
+        self.assertIn('mas-gpu-driver-1', self.item['devices'])
+        self.gpu.ensure('test-unit')
+        self.assertEqual(self.gpu.record(self.item)['driver_paths'], CAP['driver_paths'])
+        self.assertNotIn('mas-gpu-driver-1', self.item['devices'])
+
+    def test_discovery_failure_prevents_native_start_and_post_processing(self):
+        from mas.core import Manager
+        manager = Manager(Mock(timeout=600))
+        manager.require = Mock(return_value=self.item)
+        manager.filesystems.locked = Mock(side_effect=contextlib.nullcontext)
+        manager.mountedfs = Mock(return_value=[])
+        manager.gpu.ensure = Mock(side_effect=Error('official query failed'))
+        manager._execute_lifecycle = Mock()
+        manager._after_lifecycle = Mock()
+        with self.assertRaises(Error): manager.start('test-unit')
+        manager._execute_lifecycle.assert_not_called()
+        manager._after_lifecycle.assert_not_called()
 
     def test_cleanup_does_not_depend_on_working_host_discovery(self):
         self.gpu.set('test-unit', True)

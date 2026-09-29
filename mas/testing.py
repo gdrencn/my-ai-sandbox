@@ -564,6 +564,7 @@ class Suite:
         self.cli('new', target)
         initial = json.loads(self.cli('hardware', target))
         assert initial['enabled'] and initial['configured']
+        assert initial['resources']['driver_paths'] == capability['driver_paths']
         self.gpu_results['resources'] = initial['resources']
         before = self.manager.info(target)
         assert before.get('expanded_config', before['config']).get('security.privileged', 'false') == 'false'
@@ -582,6 +583,15 @@ class Suite:
             self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", "import os; assert os.statvfs('/usr/lib/wsl/lib').f_flag & os.ST_RDONLY"])
             for path in initial['resources']['driver_paths']:
                 self.manager.lxd.command(['exec', 'local:' + target, '--', 'python3', '-c', 'import os; assert os.statvfs(' + repr(path) + ').f_flag & os.ST_RDONLY'])
+            # Test-only inventory demonstrates that inactive historical driver
+            # directories are absent. Production discovery never scans them.
+            candidates = {str(p.parent) for p in Path('/usr/lib/wsl/drivers').glob('*/libcuda.so.1.1')}
+            excluded = sorted(candidates - set(capability['driver_paths']))
+            for path in excluded:
+                self.manager.lxd.command(['exec', 'local:' + target, '--', 'python3', '-c',
+                    'import os; assert not os.path.exists(' + repr(path + '/libcuda.so.1.1') + ')'])
+            self.gpu_results['driver_selection'] = dict(selected=capability['driver_paths'],
+                                                        excluded=excluded)
         self.cli('stop', target)
         self.gpu_menu(target)
         self.cli('hardware', target, 'gpu', 'off')

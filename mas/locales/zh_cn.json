@@ -217,5 +217,7 @@
   "gpu_record_changed": "GPU 配置已被其他操作修改；请重新检查后重试。",
   "gpu_wait_failed": "等待 GPU 配置生效超时，请检查实际配置。",
   "gpu_pending": "GPU 默认开启，尚未配置；下次从停止状态启动时应用。",
-  "gpu_detect_timeout": "GPU 探测超过 600 秒，请检查宿主驱动状态。"
+  "gpu_detect_timeout": "GPU 探测超过 600 秒，请检查宿主驱动状态。",
+  "gpu_discovery_tool_missing": "缺少 LXD 附带的 GPU 探测工具：{path}。请检查 LXD snap 安装。",
+  "gpu_discovery_invalid": "NVIDIA 官方探测未返回有效且可访问的 WSL 驱动路径；不会使用旧路径或扫描候选目录。"
 }
