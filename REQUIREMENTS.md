@@ -384,7 +384,7 @@ GPU and the hardware menu are delivered by section 28; CPU, memory and process c
 
 ## 28. Phase 2 first batch — independent GPU module
 
-Status: implemented and locally verified in test batch 0.2.1; publication/public-entry verification pending. Project/profile hardening and CPU/memory/process limits remain pending; retain current network behavior.
+Status: implemented, verified and published as test v0.2.1. Local and public --test each passed 177 packaged units and all 22 stages; both public installation modes succeeded. Project/profile hardening and CPU/memory/process limits remain pending; retain current network behavior.
 
 - [x] Implement GPU as a shared, independent module with capability detection, status, enable, disable, resource inventory and verified cleanup. Use LXD-supported GPU/device operations. Preserve unrelated devices/configuration and refuse ambiguous ownership or configuration drift.
 - [x] Expose `mas hardware TARGET` for hardware status and `mas hardware TARGET gpu [on|off]` to query/change GPU configuration. The container menu gains Hardware options, with GPU as its first option only when a supported discrete GPU is available. No CPU, memory, process-limit or network controls in this batch.
@@ -394,7 +394,7 @@ Status: implemented and locally verified in test batch 0.2.1; publication/public
 - [x] Use official LXD CDI where usable. Any compatibility alternative must use LXD device primitives, retain non-privileged operation, limit read-only mappings to necessary GPU runtime resources, and document actual exposure. No additional packages without explicit approval.
 - [x] Test default enablement, explicit off, repeated operations, unavailable hardware, unmanaged containers, conflicting devices, metadata corruption, and native failure handling. Native GPU tests must verify sandbox access, CUDA initialization and device memory transfer/computation rather than enumeration alone, absence after disable, restoration after re-enable, resource inventory and preserved non-GPU configuration. Record unavailable-host GPU compute coverage explicitly.
 - [x] Verify terminal menu and CLI reuse, translated output, existing lifecycle/filesystem behavior, and packaged tests; update implementation/coverage/release documentation.
-- [ ] Publish the test release and verify the public entry.
+- [x] Publish the test release and verify the public entry.
 
 ### 28.1. Validated implementation choice and platform boundary
 

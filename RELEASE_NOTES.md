@@ -6,7 +6,7 @@
 - 新增真实 CUDA 内核、普通 sandbox 用户访问、菜单关闭、设备撤销、重新开启和只读映射测试。177 项打包单元测试、22 个本地实机测试环节全部通过，耗时 459.4 秒。
 - 实测 WSL2 + NVIDIA RTX 5090 Laptop GPU。原生 Ubuntu NVIDIA CDI 路径未实机验证；AMD/Intel 独立显卡尚未支持。Project/profile 加固和其他硬件限制留待后续，网络保持原状。
 
-阶段 1 stable/0.1.15 保持不变。完整验证与范围见 IMPLEMENTED.md、TEST_COVERAGE.md 和 WSL_REPORT.json。
+公开普通安装与 --test 入口均已验证，公开测试再次通过 177 项单元测试和 22 个环节，耗时 462.2 秒，无跳过或清理错误。阶段 1 stable/0.1.15 保持不变。完整验证与范围见 IMPLEMENTED.md、TEST_COVERAGE.md 和 WSL_REPORT.json。
 
 # 0.1.15 — 阶段 1 Stable
 

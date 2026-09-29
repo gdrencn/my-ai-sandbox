@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: phase 2 GPU batch 0.2.1 is implemented and locally verified; publication/public-entry verification is pending below. Phase 1 stable/0.1.15 remains unchanged. Stage 20 records the GPU implementation; earlier stages remain historical checkpoints.
+Current result: phase 2 GPU batch 0.2.1 is implemented, verified and published as test v0.2.1. Both public installation modes are verified. Phase 1 stable/0.1.15 remains unchanged. Stage 20 records the GPU implementation; earlier stages remain historical checkpoints.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -408,4 +408,4 @@ Development checkpoints: an early native probe corrected an unsupported lxc conf
 
 Boundaries: current hardware discovery/backends target NVIDIA. WSL2 RTX 5090 Laptop GPU was tested; native Ubuntu NVIDIA CDI is implemented but not hardware-verified. AMD/Intel discrete GPUs remain unsupported. WSL DXG access is not per-adapter isolation. Windows driver-update scenarios are covered by fault tests, not an actual driver upgrade. No restricted project/profile policy, CPU/memory/process limits or network controls are implemented by this batch. Stage 1 stable remains available and unchanged.
 
-Publication/public verification: pending.
+Publication/public verification: published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.1 with all seven standard test assets. Public normal installation resolved 0.2.1, installed the matching product hash and left the existing tester byte-for-byte and mtime unchanged. Public --test resolved 0.2.1 and passed all 177 packaged units and 22 report stages in 462.2 seconds, including real GPU computation and menu switching, with no skips or cleanup errors. The installed product matches the frozen local product hash. Reports: validation/V0_2_1_PUBLIC_REPORT.json, V0_2_1_INSTALL_CHECK.json and V0_2_1_RELEASE_CHECK.json. All seven release asset digests match local files; repeated builds reproduce the same SHA256SUMS. Product/installer archives contain no tester or tests. GitHub latest remains stable/0.1.15; earlier release assets remain unchanged. User language preferences were preserved using an isolated XDG_CONFIG_HOME for public checks.

@@ -1,0 +1,42 @@
+{
+  "release": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.1",
+  "prerelease": true,
+  "github_latest": "stable/0.1.15",
+  "assets": [
+    {
+      "name": "bootstrap.py",
+      "sha256": "40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/bootstrap.py"
+    },
+    {
+      "name": "install.sh",
+      "sha256": "8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/install.sh"
+    },
+    {
+      "name": "mas-install.pyz",
+      "sha256": "bc796bc0263a61a6d5678309fcfb128dc3b971fbf56aab43de83f4c662d5f53b",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/mas-install.pyz"
+    },
+    {
+      "name": "mas-test.pyz",
+      "sha256": "b14f8a8e837cf7accc8b3e93339e692d3ee1803ce3f36f6d27ad8adc7f3b7acd",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/mas-test.pyz"
+    },
+    {
+      "name": "mas.pyz",
+      "sha256": "4eb61ee5e3b0e726c4c166bc959f4f63ee9b430dc48c4987a83c8721c10dddcc",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/mas.pyz"
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "87dd7295d21a9abdb4432c66d7ec5e546b91ace32df9689ed74c6a2a3c1f985f",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/SHA256SUMS"
+    },
+    {
+      "name": "WSL_REPORT.json",
+      "sha256": "c69175b17310ddfdd1ed4edc307ed5b7828f1224a35d71957f5d1a7d952967c1",
+      "url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/WSL_REPORT.json"
+    }
+  ]
+}
