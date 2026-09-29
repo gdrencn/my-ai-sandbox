@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: version 0.1.14 implementation and frozen-package validation are complete; public release/entry checks follow below. Stage 17 records the current behavior. Earlier stages are historical checkpoints, including superseded interfaces. Checkpoint numbers are not version phase numbers; the version phase remains 1.
+Current result: test version 0.1.14 is publicly released; final frozen-package validation and both public installation entry modes passed. Stage 17 records the current behavior. Earlier stages are historical checkpoints, including superseded interfaces. Checkpoint numbers are not version phase numbers; the version phase remains 1.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -339,3 +339,12 @@ Validation: 153 packaged unit tests, zero failures/errors/skips; all 20 reported
 Repeated builds matched byte-for-byte; packaged source matched the workspace. Python 3.10 grammar, shell syntax and diff checks passed. Unit discovery outside the archive retains its expected single archive-only skip; final packaged tests had none.
 
 Limits: current Ubuntu 26.04 WSL/LXD 6.9 host. Native Ubuntu/cloud, other architectures, fresh privileged installation, offline VHDX and additional ACL cases were not rerun. Failure branches use controlled injection, not a live disk-full or daemon-outage campaign. Windows UNC API checks are distinct from manually inspecting File Explorer. No new third-party dependency, resource exposure, 0.2.x configuration policy or stable promotion was introduced. Publication and public-entry results follow after execution.
+
+
+### 0.1.14 publication and public-entry verification
+
+Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.14 from c752147e7e0c072f97bbe7876bda5e18a372eaad with seven assets: mas.pyz, mas-install.pyz, mas-test.pyz, bootstrap.py, install.sh, SHA256SUMS and WSL_REPORT.json. Earlier releases/assets remain unchanged.
+
+Both fixed curl/bash modes resolved 0.1.14 and succeeded in actual PTYs. Ordinary installation preserved the existing tester modification time. Public --test passed all 153 packaged units and all 20 report stages in 367.1 seconds, without skips or cleanup errors. Installed product/tester hashes matched the frozen release files; the Windows UNC event passed. Independent checks confirmed the isolated project, mount root and registry entries were reclaimed. Language preferences were isolated and restored; no alternate-screen, screen-clear or scrollback-clear sequences were observed. Evidence: validation/V0_1_14_PUBLIC_REPORT.json.
+
+This completes section 23, including test publication and public-entry verification. The above environment/coverage limits remain; no stable promotion occurred.

@@ -291,7 +291,7 @@ Sections 19–22 are implemented, verified and delivered in test v0.1.13. Both f
 
 ## 23. Batch 0.1.14 — explicit operation responsibilities
 
-Status: implementation and frozen local verification complete (153 packaged units, all 20 report stages); test publication and public-entry verification follow. No stable promotion or 0.2.x configuration features.
+Status: implemented, verified and delivered as test v0.1.14. Frozen local and public --test runs each passed 153 packaged units and all 20 report stages; both public entry modes succeeded. No stable promotion or 0.2.x configuration features.
 
 - Define stages by responsibility, not position relative to a native command or location on the host. Internal work includes validation, native execution, required success/failure branches, completion checks and owned-resource cleanup. External pre/post-processing coordinates other functionality; post-processing only follows successful completion of the complete internal mas operation.
 - In start, native Running is an intermediate success. sandbox provisioning and passwordless-sudo verification remain in the internal successful-start branch; provisioning failure means mas start failed and prevents mount restoration. Preserve the original internal failure propagation without extra state queries, rollback or recovery handlers.

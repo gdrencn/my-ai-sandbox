@@ -96,3 +96,5 @@ Existing native cases exercise default/root and multiple-path mount restoration 
 This is behavior/failure-boundary coverage, not exhaustive branch coverage. Injected errors do not establish live disk-full or LXD-outage behavior. Native Ubuntu/cloud and fresh privileged host installation have not been rerun for this refactor. Frozen local and public-entry results follow below after execution.
 
 Final frozen 0.1.14 validation: 153 packaged units and all 20 report stages passed in 369.4 seconds; no skips or cleanup errors. Windows UNC passed; project, mount root and registry entries were reclaimed. Evidence: validation/V0_1_14_REPORT.json. Public-entry verification follows publication.
+
+Public 0.1.14 verification also passed 153 packaged units and all 20 report stages in 367.1 seconds, without skips or cleanup errors. Both fixed entry modes succeeded, installed hashes matched, normal installation preserved the tester, Windows UNC passed and isolated resources were reclaimed. Evidence: validation/V0_1_14_PUBLIC_REPORT.json.
