@@ -20,6 +20,7 @@ class StageTests(unittest.TestCase):
         language.start(); self.addCleanup(language.stop)
         self.events = []
         self.manager = Manager(Mock(timeout=300, prefix=['lxc']), self.events.append)
+        self.manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
         self.manager.require = Mock(return_value=instance('Running'))
 
     def test_user_preparation_failure_has_no_function_completion_or_external_post(self):

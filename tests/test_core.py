@@ -26,6 +26,7 @@ class BehaviorTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         manager = Manager(lxd, fs_state=Path(temporary.name)/"state")
+        manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
         manager._run_lxd_until_state = Mock()
         return manager
 
@@ -139,6 +140,7 @@ class BehaviorTests(unittest.TestCase):
     def test_success_exit_code_does_not_skip_state_wait(self):
         lxd = Mock(prefix=["lxc"], timeout=600)
         manager = Manager(lxd, Mock())
+        manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
         manager.find = Mock(side_effect=[
             {"status": state, "type": "container", "config": {MANAGED: "true"}}
             for state in ("Stopped", "Stopped", "Running")])
@@ -156,6 +158,7 @@ class BehaviorTests(unittest.TestCase):
     def test_wait_timeout_reports_last_state_and_stops_client(self):
         lxd = Mock(prefix=["lxc"], timeout=300)
         manager = Manager(lxd, Mock())
+        manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
         manager.find = Mock(return_value={"status": "Stopped", "type": "container", "config": {MANAGED: "true"}})
         process = Mock()
         process.poll.return_value = None

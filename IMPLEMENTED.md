@@ -1,6 +1,6 @@
 # Implementation status
 
-Current result: phase 1 stable 0.1.15 is published as stable/0.1.15, with the identical v0.1.15 test prerelease preserved. Stage 19 records the final audit and promotion. Earlier stages remain historical checkpoints; no product code or version was changed for promotion.
+Current result: phase 2 GPU batch 0.2.1 is implemented and locally verified; publication/public-entry verification is pending below. Phase 1 stable/0.1.15 remains unchanged. Stage 20 records the GPU implementation; earlier stages remain historical checkpoints.
 
 ## Stage 1 — shared operations and interfaces (2026-09-27)
 
@@ -392,3 +392,20 @@ Published https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15 as
 Stable installation is documented with --release v0.1.15; same-version validation adds --test and uses the preserved test prerelease. The existing unpinned latest-test entry was intentionally retained. There is no new channel-selection option and no product version suffix.
 
 Environment remains Ubuntu 26.04 WSL / LXD 6.9. The user's separate fresh-install log verifies successful dependency/FUSE/snap/LXD setup but stopped on a remote HTTPS connection reset before later integration cases; it is not represented as a successful complete suite. Native Ubuntu/cloud, other architectures, offline VHDX, live disk-full/daemon-outage scenarios and additional resource/security policy remain outside this verification. No source code, tester code, third-party dependency or host/container resource policy was changed during promotion.
+
+
+## Stage 20 — independent GPU hardware option (0.2.1)
+
+Verified against REQUIREMENTS.md sections 27–28 before this update. `mas/gpu.py` owns capability discovery, settings, exact resource records, configuration validation, atomic native configuration publication/readback, runtime-file cleanup and runtime preparation. CLI `mas hardware TARGET [gpu [on|off]]` and the per-container Hardware options menu reuse Manager.hardware. GPU is the first and currently only hardware option. Default-on configuration applies to new supported containers and stopped-to-running legacy/imported containers; explicit off persists. Running-container mutation is rejected; there is no implicit stop or hot removal.
+
+Measured WSL backend: `/dev/dxg`, read-only `/usr/lib/wsl/lib`, and two NVIDIA driver-store subdirectories containing libcuda.so.1.1. The complete Windows/WSL driver store is not exposed. An initial native LXD 6.9 CDI probe failed with NVML Driver Not Loaded; WSL therefore uses native LXD unix-char/disk devices explicitly. The prototype was stopped and deleted. No additional host/container package was installed for GPU support or CUDA verification. Resource records are stored in user.mas.gpu. The module owns /etc/ld.so.conf.d/mas-gpu.conf and runs ldconfig inside the container; ordinary data, unrelated devices, host drivers and network policy remain unchanged.
+
+Start's external pre-processing reuses GPU.ensure after filesystem unmounts. Required GPU runtime preparation is part of internal successful start after sandbox preparation; failure prevents complete start success and filesystem restoration. GPU set reuses the existing shared mutation lock. Native configuration and the corresponding ownership record are published together. Invalid records, changed devices, conflicting runtime files and native failures are refused without a false success result. Cleanup of recorded access remains available when host discovery fails. Driver directory refresh reuses the same setter.
+
+Frozen local validation: **177 packaged units, all 22 report stages passed, 459.4 seconds, no skipped units, no unexecuted stages or cleanup errors**. GPU testing used the actual product CLI and a real terminal menu, sandbox CUDA initialization, PTX JIT/kernel execution and host readback of 42, read-only mapping checks, disable/restart access denial, re-enable/restart computation, and preservation of non-GPU devices. Report: validation/V0_2_1_LOCAL_REPORT.json. Product SHA-256: 4eb61ee5e3b0e726c4c166bc959f4f63ee9b430dc48c4987a83c8721c10dddcc.
+
+Development checkpoints: an early native probe corrected an unsupported lxc config show --format assumption; JSON instance queries are used instead. A real PTY caught the hardware submenu initially focusing Back because its key matched the unspecified default; the explicit default now selects GPU. Two intermediate full runs were intentionally interrupted to incorporate corrections and additional guards; their temporary resources were cleaned. They are not counted as successful release validation.
+
+Boundaries: current hardware discovery/backends target NVIDIA. WSL2 RTX 5090 Laptop GPU was tested; native Ubuntu NVIDIA CDI is implemented but not hardware-verified. AMD/Intel discrete GPUs remain unsupported. WSL DXG access is not per-adapter isolation. Windows driver-update scenarios are covered by fault tests, not an actual driver upgrade. No restricted project/profile policy, CPU/memory/process limits or network controls are implemented by this batch. Stage 1 stable remains available and unchanged.
+
+Publication/public verification: pending.

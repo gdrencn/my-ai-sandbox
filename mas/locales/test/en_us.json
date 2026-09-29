@@ -65,5 +65,7 @@
   "case_filesystem-recovery": "Filesystem recovery",
   "case_filesystem-menu": "Filesystem menu",
   "wait_filesystem-disconnect": "filesystem disconnect",
-  "case_dependency-install": "Native sudo and dependency installation"
+  "case_dependency-install": "Native sudo and dependency installation",
+  "case_gpu": "GPU access, computation and switch",
+  "gpu_test_unavailable": "No supported discrete GPU on host; real GPU computation was not tested."
 }

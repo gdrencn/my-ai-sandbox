@@ -1,0 +1,5602 @@
+{
+  "version": "0.2.1",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+  "product": "/home/gordon/my-ai-sandbox/dist/mas.pyz",
+  "product_sha256": "4eb61ee5e3b0e726c4c166bc959f4f63ee9b430dc48c4987a83c8721c10dddcc",
+  "os_release": "PRETTY_NAME=\"Ubuntu 26.04.1 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"26.04\"\nVERSION=\"26.04.1 LTS (Resolute Raccoon)\"\nVERSION_CODENAME=resolute\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=resolute\nLOGO=ubuntu-logo\n",
+  "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+  "project": "test-b79bc31ad727485db2b84ed52c944d48",
+  "targets": [
+    "test-1fac7341979b4fcd93d9f162905ff9f1",
+    "test-88ef81e73d1e431cba294a2ee34d2b9e",
+    "test-98ff6b0378124c8a818a04ae4f58a879",
+    "test-5e1fc92a9aa54fbeafed760f5a7bcfab",
+    "test-2252bce42e08404fb9cc4bd227ebc077",
+    "test-be266326c6fe47828f0a8ff2b18729b8",
+    "test-5a163d5363bd4ad5a92ceae984c58301",
+    "test-943824f3278e4bf79e6a4de154df83c5",
+    "test-6e89468c876d4f2cbfee0b415865199b"
+  ],
+  "cases": {
+    "unit": {
+      "status": "passed",
+      "elapsed": 4.640864150998823
+    },
+    "new-default": {
+      "status": "passed",
+      "elapsed": 4.254342210999312
+    },
+    "missing-image": {
+      "status": "passed",
+      "elapsed": 2.092371896000259
+    },
+    "list-info": {
+      "status": "passed",
+      "elapsed": 3.004085122000106
+    },
+    "start-user-network": {
+      "status": "passed",
+      "elapsed": 7.870363022000674
+    },
+    "running-guards": {
+      "status": "passed",
+      "elapsed": 2.0891437669997686
+    },
+    "enter-running-default-exit": {
+      "status": "passed",
+      "elapsed": 2.7509079790033866
+    },
+    "enter-stopped-stop-exit": {
+      "status": "passed",
+      "elapsed": 12.975794553000014
+    },
+    "export-import": {
+      "status": "passed",
+      "elapsed": 55.20575290799752
+    },
+    "overwrite-confirmation": {
+      "status": "passed",
+      "elapsed": 28.509319215001597
+    },
+    "ownership-and-stop-all": {
+      "status": "passed",
+      "elapsed": 13.47177779899721
+    },
+    "delete-confirmation": {
+      "status": "passed",
+      "elapsed": 3.694505504998233
+    },
+    "language-config": {
+      "status": "passed",
+      "elapsed": 7.007025001999864
+    },
+    "tui": {
+      "status": "passed",
+      "elapsed": 84.38590491099967
+    },
+    "invalid-inputs": {
+      "status": "passed",
+      "elapsed": 11.181287269999302
+    },
+    "lifecycle-repeat": {
+      "status": "passed",
+      "elapsed": 13.887111981999624
+    },
+    "unmarked-import": {
+      "status": "passed",
+      "elapsed": 36.50467953900079
+    },
+    "filesystems": {
+      "status": "passed",
+      "elapsed": 70.43876043100317
+    },
+    "filesystem-recovery": {
+      "status": "passed",
+      "elapsed": 27.567087415998685
+    },
+    "filesystem-menu": {
+      "status": "passed",
+      "elapsed": 3.440457073997095
+    },
+    "dependency-install": {
+      "status": "passed",
+      "elapsed": 8.24926984099875
+    },
+    "gpu": {
+      "status": "passed",
+      "elapsed": 48.794976641001995
+    }
+  },
+  "events": [
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.083,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.264,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.084,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-1fac7341979b4fcd93d9f162905ff9f1\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "observation": "enabled",
+      "elapsed": 0.2132283360006113
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 3.3815864080024767
+    },
+    {
+      "action": "new",
+      "target": "test-5e1fc92a9aa54fbeafed760f5a7bcfab",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.081,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-5e1fc92a9aa54fbeafed760f5a7bcfab",
+      "status": "error",
+      "scope": "native",
+      "elapsed": 1.001,
+      "observation": "Absent",
+      "native_stdout": "Creating test-5e1fc92a9aa54fbeafed760f5a7bcfab\n",
+      "native_stderr": "Error: Failed instance creation: Failed getting remote image info: Failed getting image: The requested image could not be found for fingerprint \"mas-missing-362a33e12c2944b2b669b1500c46b152\"\n",
+      "native_failure": true
+    },
+    {
+      "action": "import",
+      "target": "test-2252bce42e08404fb9cc4bd227ebc077",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.091,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-2252bce42e08404fb9cc4bd227ebc077",
+      "status": "error",
+      "scope": "native",
+      "elapsed": 1.001,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "Error: Unsupported compression\n",
+      "native_failure": true
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.087,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.093,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 3.093,
+      "observation": "Running",
+      "native_stdout": "........status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.1,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.101,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.101,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 5.451901696000277
+    },
+    {
+      "action": "test-wait",
+      "target": "outbound HTTPS",
+      "status": "ok",
+      "elapsed": 0.6227433409985679
+    },
+    {
+      "action": "new",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.105,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.299,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.098,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.099,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-be266326c6fe47828f0a8ff2b18729b8\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "observation": "enabled",
+      "elapsed": 0.2261645110011159
+    },
+    {
+      "action": "new",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 3.6273158289986895
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.095,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.081,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.081,
+      "observation": "Running",
+      "native_stdout": ".....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.093,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.4409681870019995
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.11,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.181,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 3.093,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 3.179278970001178
+    },
+    {
+      "action": "gpu",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "observation": "disabled",
+      "elapsed": 0.19924109099883935
+    },
+    {
+      "action": "gpu",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "observation": "disabled",
+      "elapsed": 0.22644881299856934
+    },
+    {
+      "action": "gpu",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "observation": "disabled",
+      "elapsed": 0.20792672000243329
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.104,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.104,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.091,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.119,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.119,
+      "observation": "Running",
+      "native_stdout": "..status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.132,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.097,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.097,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 3.504680214002292
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.094,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.102,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 4.086,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 4.18039459099964
+    },
+    {
+      "action": "gpu",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "observation": "enabled",
+      "elapsed": 0.22999514599723625
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.097,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.097,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.101,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.093,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.094,
+      "observation": "Running",
+      "native_stdout": "....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.11,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.454997664997791
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.113,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.107,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 4.093,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 4.17052781899838
+    },
+    {
+      "action": "delete",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.085,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.085,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-be266326c6fe47828f0a8ff2b18729b8",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Absent",
+      "elapsed": 1.2737142690020846
+    },
+    {
+      "action": "dependency-install",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "versions": "sudo-rs 0.2.13-0ubuntu1.2\napt 3.2.0 (amd64)\nSupported modules:\n*Ver: Standard .deb\n Pkg:  Debian APT solver interface (Priority -1000)\n Pkg:  Debian APT planner interface (Priority -1000)\n*Pkg:  Debian dpkg interface (Priority 30)\n S.L: 'deb' Debian binary tree\n S.L: 'deb-src' Debian source tree\n Idx: EDSP scenario file\n Idx: EIPP scenario file\n Idx: Debian Source Index\n Idx: Debian Package Index\n Idx: Debian Translation Index\n Idx: Debian dpkg status file\n Idx: Debian deb file\n Idx: Debian dsc file\n Idx: Debian control file\n"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.105,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.084,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.085,
+      "observation": "Running",
+      "native_stdout": "status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.095,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.079,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.08,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 2.249072836999403
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.086,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.087,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.184702724996896
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 1.5509976947214454e-06
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.091,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.091,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.11,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.078,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.098,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.098,
+      "observation": "Running",
+      "native_stdout": "...status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.092,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.444671705998189
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.093,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.089,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.089,
+      "observation": "Running",
+      "native_stdout": "status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.105,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 2.276368334001745
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.078,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.094,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.188111161998677
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.091,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.091,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.089,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.104,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.104,
+      "observation": "Running",
+      "native_stdout": "....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.103,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.081,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.081,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.464052728002571
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.089,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.089,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 4.091,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 4.174036120999517
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.079,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.084,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.08,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 6.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 7.081,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 8.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 9.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 10.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 11.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 12.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 13.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 14.082,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 15.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 16.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 17.101,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 18.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 19.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 20.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 21.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 22.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 23.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 24.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 25.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 26.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 27.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 28.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 29.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 30.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 31.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 32.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 33.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 33.087,
+      "observation": "Stopped",
+      "native_stdout": "\rBackup exported successfully!\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 33.26267359399935
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Absent",
+      "elapsed": 1.268699223997828
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.088,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.087,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.083,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.092,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 6.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 6.095,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "mark-import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "import",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 7.294804613000451
+    },
+    {
+      "action": "start",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.084,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.1,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.1,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.095,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.072,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.099,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.099,
+      "observation": "Running",
+      "native_stdout": "...status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.091,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.482712872002594
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.084,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.223,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.095,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-1fac7341979b4fcd93d9f162905ff9f1\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "observation": "enabled",
+      "elapsed": 0.27611159599837265
+    },
+    {
+      "action": "new",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 3.470665734999784
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.105,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 6.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 7.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 8.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 9.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 10.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 11.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 12.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 13.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 14.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 15.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 16.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 17.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 18.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 19.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 20.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 21.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 22.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 23.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 24.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 25.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 26.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 27.108,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 28.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 28.097,
+      "observation": "Stopped",
+      "native_stdout": "\rBackup exported successfully!\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 28.268354485997406
+    },
+    {
+      "action": "test-wait",
+      "target": "external running",
+      "status": "ok",
+      "elapsed": 0.07085736999943038
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 1.5080004232004285e-06
+    },
+    {
+      "action": "stop",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.108,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.097,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.1828145920007955
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.101,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 6.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 7.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 8.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 9.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 10.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 11.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 12.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 13.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 14.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 15.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 16.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 17.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 18.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 19.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 20.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 21.102,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 22.103,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 23.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 24.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 25.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 26.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 27.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 28.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 28.1,
+      "observation": "Stopped",
+      "native_stdout": "\rBackup exported successfully!\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.102,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.095,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.095,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.084,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.093,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.096,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.101,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 5.09,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "mark-import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.114,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "import",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 6.280341474001034
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.09,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.09,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.091,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 3.091,
+      "observation": "Running",
+      "native_stdout": ".......status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.107,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.1,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.1,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 5.4776445230018
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0002334929995413404
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0002784739990602
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0094792199997755
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.068632829003036,
+      "native_stderr": ""
+    },
+    {
+      "action": "filesystem-windows-unc",
+      "status": "ok",
+      "path": "\\\\wsl.localhost\\codex\\home\\gordon\\my-ai-sandbox\\test-results\\v0.2.1-release\\mounts\\test-1fac7341979b4fcd93d9f162905ff9f1\\home\\sandbox",
+      "operations": [
+        "list",
+        "read",
+        "create",
+        "edit",
+        "delete",
+        "mkdir",
+        "rmdir"
+      ]
+    },
+    {
+      "action": "filesystem-native-metadata",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "existing": "1001:1001:600",
+      "created": "0:0:644"
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00018990800163010135
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0003167520007992
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.009242546002497
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.059832806000486,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.0002460830000927672
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005979228000796866
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0277691579976818
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00017832600133260712
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005307301002176246
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0394046290020924
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.083,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.086,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.1779126729998097
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0001740260013320949
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0002614140030346
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0092189250026422
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.071049801998015,
+      "native_stderr": ""
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 7.064199962769635e-05
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.000591349999013
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0093156119983178
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.057232531999034,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00022285899831331335
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0058708690012281295
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.026836586999707
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00014847200145595707
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.004711055000370834
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.038582609999139
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.094,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.094,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.094,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.083,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.083,
+      "observation": "Running",
+      "native_stdout": ".....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.104,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.459917800999392
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0001910520004457794
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0005693180028175
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.008439442000963
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0697181369978352,
+      "native_stderr": "Warning: Permanently added '[127.0.0.1]:38523' (ECDSA) to the list of known hosts.\n"
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 6.121400292613544e-05
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0005310110027494
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0096118660003413
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0573980019980809,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00015335300122387707
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005650718001561472
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0297945999991498
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00019001600230694748
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0006227520025277
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0095671420021972
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0588690930017037,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00021302000095602125
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.004760515002999455
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.027619730000879
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00022380699738278054
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005699638997612055
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0399004430000787
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.092,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.096,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.1843249179983104
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0002135739996447228
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0003624179989856
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0090876329995808
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0561172620000434,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00015956200149958022
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005932587999268435
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0273816259978048
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.103,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.1,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.099,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.099,
+      "observation": "Running",
+      "native_stdout": "..status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.078,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 3.4678729490005935
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00017304400171269663
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0003833119990304
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0089820339999278
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0568083809994278,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.0002179750008508563
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.004852149999351241
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0268390239980363
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.081,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.085,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.105,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 4.086,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 4.173758852000901
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00018182300118496642
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.000543584999832
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0093433700021706
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.059713651000493,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00020176699763396755
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005558521002967609
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.02762598100162
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "error",
+      "observation": "residual",
+      "elapsed": 0.015516683000896592
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 0.008340470001712674
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0001966599993465934
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0006218189992069
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0097843980001926
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0702184549991216,
+      "native_stderr": ""
+    },
+    {
+      "action": "test-wait",
+      "target": "filesystem-disconnect",
+      "status": "ok",
+      "elapsed": 1.0014592049992643
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0015907529996184167
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.049152078001498
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00023383100051432848
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0008648950024508
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0098895260016434
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0722413760013296,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.000205943997571012
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005194153000047663
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0404997100013134
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.101,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.101,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.097,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running",
+      "native_stdout": "..status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.101,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 3.479630993002502
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00018757799989543855
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.000504790001287
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0118089800016605
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0873239840002498,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.0002676539988897275
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005003705002309289
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.040105604002747
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.09,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.081,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.089,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.089,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.1883193380017474
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.00019840599998133257
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.000665254003252
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0104613350013096
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0749931189966446,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.0002191989988205023
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0046769149994361214
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.0399376239984122
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.0002005500027735252
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 1.0003272860012657
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "mounted",
+      "elapsed": 1.0087800680012151
+    },
+    {
+      "action": "mountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "mounted",
+      "elapsed": 1.0707588439981919,
+      "native_stderr": ""
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "unmounted",
+      "elapsed": 0.00029686299967579544
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "observation": "waiting",
+      "elapsed": 0.005463978999614483
+    },
+    {
+      "action": "unmountfs",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "unmounted",
+      "elapsed": 1.041118668999843
+    },
+    {
+      "action": "delete",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.089,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.089,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-88ef81e73d1e431cba294a2ee34d2b9e",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Absent",
+      "elapsed": 1.2691225430025952
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.1,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.101,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-1fac7341979b4fcd93d9f162905ff9f1",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Absent",
+      "elapsed": 1.2846310479981184
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI new",
+      "status": "ok",
+      "elapsed": 1.400846308999462
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI start",
+      "status": "ok",
+      "elapsed": 2.2579808780028543
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI stop",
+      "status": "ok",
+      "elapsed": 4.468122651000158
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI export",
+      "status": "ok",
+      "elapsed": 29.01193168499958
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI delete",
+      "status": "ok",
+      "elapsed": 1.1759041450022778
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI import",
+      "status": "ok",
+      "elapsed": 4.444829717001994
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI imported start",
+      "status": "ok",
+      "elapsed": 1.1588745720000588
+    },
+    {
+      "action": "new",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.073,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.308,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.103,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.103,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-6e89468c876d4f2cbfee0b415865199b\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "ok",
+      "observation": "enabled",
+      "elapsed": 0.31078973100011353
+    },
+    {
+      "action": "new",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 3.51377248299832
+    },
+    {
+      "action": "test-wait",
+      "target": "TUI stop all",
+      "status": "ok",
+      "elapsed": 2.424863734999235
+    },
+    {
+      "action": "delete",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.101,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.094,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.095,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Absent",
+      "elapsed": 1.280718046000402
+    },
+    {
+      "action": "new",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.098,
+      "observation": "Absent"
+    },
+    {
+      "action": "new",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.306,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "new",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.093,
+      "observation": "Stopped",
+      "native_stdout": "Creating test-5a163d5363bd4ad5a92ceae984c58301\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "observation": "enabled",
+      "elapsed": 0.20411772299848963
+    },
+    {
+      "action": "new",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 3.4041340919975482
+    },
+    {
+      "action": "start",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.1,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.111,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.111,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.09,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.076,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.086,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.087,
+      "observation": "Running",
+      "native_stdout": ".....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.121,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.098,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.478121957999974
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.096,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.087,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.096,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 4.097,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 4.190196809999179
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.109,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.09,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.104,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 6.098,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 7.106,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 8.093,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 9.085,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 10.104,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 11.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 12.083,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 13.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 14.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 15.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 16.088,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 17.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 18.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 19.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 20.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 21.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 22.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 23.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 24.098,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 25.095,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 26.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 27.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 28.107,
+      "observation": "Stopped"
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 28.107,
+      "observation": "Stopped",
+      "native_stdout": "\rBackup exported successfully!\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "export",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 28.295801705000486
+    },
+    {
+      "action": "delete",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.098,
+      "observation": "Stopped"
+    },
+    {
+      "action": "delete",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.083,
+      "observation": "Absent"
+    },
+    {
+      "action": "delete",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.083,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "delete",
+      "target": "test-5a163d5363bd4ad5a92ceae984c58301",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Absent",
+      "elapsed": 1.2777040139990277
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.09,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.087,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 3.079,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 4.08,
+      "observation": "Absent"
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 5.087,
+      "observation": "Stopped"
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 5.087,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "mark-import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.099,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.105,
+      "observation": "Stopped"
+    },
+    {
+      "action": "mark-import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.105,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "import",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 6.269590531999711
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.084,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.118,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.119,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.102,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.082,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.082,
+      "observation": "Running",
+      "native_stdout": "..status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.087,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 3.4635072849996504
+    },
+    {
+      "action": "stop",
+      "target": "test-6e89468c876d4f2cbfee0b415865199b",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 1.0889998520724475e-06
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.101,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.089,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.081,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.081,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.1679161049978575
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.097,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.091,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.113,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.086,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.11,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.111,
+      "observation": "Running",
+      "native_stdout": "....status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.098,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.092,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.467074177999166
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.09,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.084,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.084,
+      "observation": "Running",
+      "native_stdout": "status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.102,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 2.2815134179982124
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.099,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.09,
+      "observation": "Running"
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.096,
+      "observation": "Stopped"
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.096,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Stopped",
+      "elapsed": 2.185412578000978
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.086,
+      "observation": "Stopped"
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running"
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.096,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.111,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.093,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.099,
+      "observation": "Running"
+    },
+    {
+      "action": "prepare-user",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.1,
+      "observation": "Running",
+      "native_stdout": "...status: done\n/etc/sudoers.d/90-mas-sandbox.tmp: parsed OK\n",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.116,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.08,
+      "observation": "Running"
+    },
+    {
+      "action": "gpu-runtime",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.08,
+      "observation": "Running",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "start",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "function",
+      "observation": "Running",
+      "elapsed": 4.43579396199857
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.098,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.092,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.092,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.104,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-98ff6b0378124c8a818a04ae4f58a879",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.088,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.099,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.099,
+      "observation": "Running"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 2.079,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-stop",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 2.08,
+      "observation": "Stopped",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 0.091,
+      "observation": "Stopped"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "waiting",
+      "scope": "native",
+      "elapsed": 1.077,
+      "observation": "Absent"
+    },
+    {
+      "action": "cleanup-delete",
+      "target": "test-943824f3278e4bf79e6a4de154df83c5",
+      "status": "ok",
+      "scope": "native",
+      "elapsed": 1.078,
+      "observation": "Absent",
+      "native_stdout": "",
+      "native_stderr": "",
+      "native_failure": false
+    }
+  ],
+  "cleanup_errors": [],
+  "unit_tests": {
+    "tests_run": 177,
+    "failures": 0,
+    "errors": 0,
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": [],
+    "successful": true,
+    "modules": [
+      "tests.test_core",
+      "tests.test_distribution",
+      "tests.test_failures",
+      "tests.test_filesystems",
+      "tests.test_gpu",
+      "tests.test_i18n",
+      "tests.test_install_menu_update",
+      "tests.test_lifecycle_mounts",
+      "tests.test_menu",
+      "tests.test_menu_contract",
+      "tests.test_progress",
+      "tests.test_runner",
+      "tests.test_shared_setup",
+      "tests.test_stage_boundaries"
+    ],
+    "test_ids": [
+      "tests.test_core.BehaviorTests.test_bare_cli_opens_tui",
+      "tests.test_core.BehaviorTests.test_cli_rejects_bad_stop_and_timeout",
+      "tests.test_core.BehaviorTests.test_collision_applies_to_unmanaged_targets",
+      "tests.test_core.BehaviorTests.test_confirmation_defaults_and_explicit_yes",
+      "tests.test_core.BehaviorTests.test_delete_detects_state_change_during_prompt",
+      "tests.test_core.BehaviorTests.test_delete_requires_consent_and_rechecks_state",
+      "tests.test_core.BehaviorTests.test_enter_and_exit_reuse_shared_functions",
+      "tests.test_core.BehaviorTests.test_existing_lxd_configuration_is_preserved",
+      "tests.test_core.BehaviorTests.test_export_decline_preserves_file",
+      "tests.test_core.BehaviorTests.test_fresh_install_authenticates_snap_seed_wait",
+      "tests.test_core.BehaviorTests.test_host_release_selection",
+      "tests.test_core.BehaviorTests.test_newest_stable_channel_not_default_lts",
+      "tests.test_core.BehaviorTests.test_query_failure_is_not_absence",
+      "tests.test_core.BehaviorTests.test_remote_and_snapshot_targets_rejected",
+      "tests.test_core.BehaviorTests.test_running_delete_and_export_refused_before_prompt",
+      "tests.test_core.BehaviorTests.test_stop_all_only_managed",
+      "tests.test_core.BehaviorTests.test_success_exit_code_does_not_skip_state_wait",
+      "tests.test_core.BehaviorTests.test_timeout_minimum",
+      "tests.test_core.BehaviorTests.test_unmanaged_rejected",
+      "tests.test_core.BehaviorTests.test_wait_timeout_reports_last_state_and_stops_client",
+      "tests.test_distribution.DistributionTests.test_bootstrap_downloads_tester_only_when_requested",
+      "tests.test_distribution.DistributionTests.test_first_install_defaults_chinese_and_saved_english_wins",
+      "tests.test_distribution.DistributionTests.test_installer_refreshes_using_installer_code",
+      "tests.test_distribution.DistributionTests.test_installer_rejects_mismatched_product_before_setup",
+      "tests.test_distribution.DistributionTests.test_interactive_progress_cleared_before_summary",
+      "tests.test_distribution.DistributionTests.test_minimal_bootstrap_downloads_all_shared_menu_dependencies",
+      "tests.test_distribution.DistributionTests.test_network_retry_retains_warning_and_report_event",
+      "tests.test_distribution.DistributionTests.test_packaged_product_excludes_tests_and_installer",
+      "tests.test_distribution.DistributionTests.test_path_is_persistent_idempotent_and_quoted",
+      "tests.test_distribution.DistributionTests.test_plain_output_hides_only_progress_and_retains_diagnostics",
+      "tests.test_distribution.DistributionTests.test_successful_native_command_keeps_diagnostics_and_raw_output",
+      "tests.test_distribution.DistributionTests.test_tester_installs_before_testing_and_stops_on_install_failure",
+      "tests.test_distribution.DistributionTests.test_zsh_startup_selection",
+      "tests.test_failures.FailureTests.test_enter_start_failure_prevents_shell_and_exit_handler",
+      "tests.test_failures.FailureTests.test_error_state_and_failed_query_stop_live_client",
+      "tests.test_failures.FailureTests.test_export_does_not_overwrite_file_created_during_export",
+      "tests.test_failures.FailureTests.test_export_failures_preserve_destination_and_remove_temporary_files",
+      "tests.test_failures.FailureTests.test_export_rechecks_state_and_rejects_unsafe_paths",
+      "tests.test_failures.FailureTests.test_import_failure_or_vm_never_adds_marker",
+      "tests.test_failures.FailureTests.test_import_marks_only_after_success_and_checks_final_marker",
+      "tests.test_failures.FailureTests.test_interrupt_stops_client_and_retains_failure_event",
+      "tests.test_failures.FailureTests.test_list_sorts_and_rejects_vm_and_profile_only_marker",
+      "tests.test_failures.FailureTests.test_native_failure_wins_over_apparent_success",
+      "tests.test_failures.FailureTests.test_query_timeout_and_nonzero_exit_are_explicit_errors",
+      "tests.test_failures.FailureTests.test_running_start_prepares_user_but_does_not_restart",
+      "tests.test_failures.FailureTests.test_shell_failure_still_runs_exit_handler_before_reporting",
+      "tests.test_failures.FailureTests.test_state_success_still_waits_for_native_completion",
+      "tests.test_failures.FailureTests.test_stop_all_continues_and_aggregates_failures",
+      "tests.test_failures.FailureTests.test_stopped_stop_is_noop_and_transitional_states_are_rejected",
+      "tests.test_failures.FailureTests.test_structurally_invalid_list_data_is_an_explicit_error",
+      "tests.test_failures.FailureTests.test_success_requires_instance_local_marker",
+      "tests.test_filesystems.FilesystemTests.test_atomic_installer_preserves_product_on_copy_failure",
+      "tests.test_filesystems.FilesystemTests.test_cleanup_preserves_other_mount_parents_and_nonempty_leaf",
+      "tests.test_filesystems.FilesystemTests.test_concurrent_installers_publish_complete_files",
+      "tests.test_filesystems.FilesystemTests.test_corrupt_record_not_replaced",
+      "tests.test_filesystems.FilesystemTests.test_default_unmount_uses_original_recorded_home",
+      "tests.test_filesystems.FilesystemTests.test_directory_identity_uses_filesystem_not_boot_device_number",
+      "tests.test_filesystems.FilesystemTests.test_existing_leaf_empty_directory_file_or_symlink_preserved",
+      "tests.test_filesystems.FilesystemTests.test_existing_lxd_uses_shared_dependency_preparation_without_preauth",
+      "tests.test_filesystems.FilesystemTests.test_failed_attempt_cannot_reclaim_preexisting_tracked_destination",
+      "tests.test_filesystems.FilesystemTests.test_missing_default_user_and_symlink_directory_are_rejected",
+      "tests.test_filesystems.FilesystemTests.test_mount_rechecks_owner_after_lock",
+      "tests.test_filesystems.FilesystemTests.test_mount_table_identity_checks",
+      "tests.test_filesystems.FilesystemTests.test_path_identity_and_overlap",
+      "tests.test_filesystems.FilesystemTests.test_precise_unmount_refuses_child_without_cleanup",
+      "tests.test_filesystems.FilesystemTests.test_process_identity_prevents_pid_reuse_signal",
+      "tests.test_filesystems.FilesystemTests.test_recovery_never_queries_replacement_container",
+      "tests.test_filesystems.FilesystemTests.test_replaced_mountpoint_never_reclaimed",
+      "tests.test_filesystems.FilesystemTests.test_schema_damage_preserves_original_file",
+      "tests.test_filesystems.FilesystemTests.test_state_transition_guard_leaves_mounts_untouched",
+      "tests.test_filesystems.FilesystemTests.test_transition_holds_real_lock_and_refuses_records",
+      "tests.test_filesystems.FilesystemTests.test_unmount_conflict_retains_records_and_does_not_signal",
+      "tests.test_filesystems.FilesystemTests.test_unmount_timeout_and_cleanup_failure_never_report_success",
+      "tests.test_filesystems.FilesystemTests.test_untracked_parent_and_parent_symlink_refused",
+      "tests.test_filesystems.FilesystemTests.test_valid_token_for_unrelated_process_is_not_authority",
+      "tests.test_gpu.GPUTests.test_bad_driver_paths_cannot_authorize_host_files",
+      "tests.test_gpu.GPUTests.test_cleanup_does_not_depend_on_working_host_discovery",
+      "tests.test_gpu.GPUTests.test_conflicts_and_corrupt_records_preserved",
+      "tests.test_gpu.GPUTests.test_default_enable_disable_and_preserve_other_devices",
+      "tests.test_gpu.GPUTests.test_device_drift_and_foreign_runtime_file_preserved",
+      "tests.test_gpu.GPUTests.test_driver_refresh_reuses_atomic_set",
+      "tests.test_gpu.GPUTests.test_failed_atomic_edit_does_not_publish_success",
+      "tests.test_gpu.GPUTests.test_gpu_prepare_failure_prevents_start_completion",
+      "tests.test_gpu.GPUTests.test_menu_switch_reuses_manager_and_no_gpu_has_only_back",
+      "tests.test_gpu.GPUTests.test_missing_host_gpu_still_allows_owned_cleanup",
+      "tests.test_gpu.GPUTests.test_no_hardware_has_no_side_effect_and_rejects_enable",
+      "tests.test_gpu.GPUTests.test_repeat_and_runtime_preparation",
+      "tests.test_gpu.GPUTests.test_running_and_unmanaged_rejected",
+      "tests.test_gpu.GPUTests.test_runtime_removal_is_observed_before_config_publication",
+      "tests.test_gpu.GPUTests.test_unrecorded_runtime_file_is_not_overwritten",
+      "tests.test_i18n.LanguageTests.test_broken_config_is_not_overwritten",
+      "tests.test_i18n.LanguageTests.test_catalogs_have_matching_keys_and_placeholders",
+      "tests.test_i18n.LanguageTests.test_chinese_progress_and_display_width",
+      "tests.test_i18n.LanguageTests.test_cli_config_without_lxd_and_preserves_other_preferences",
+      "tests.test_i18n.LanguageTests.test_install_language_prompt_uses_saved_default",
+      "tests.test_i18n.LanguageTests.test_language_selection_in_real_terminal",
+      "tests.test_i18n.LanguageTests.test_numeric_release_resolution_and_pin",
+      "tests.test_i18n.LanguageTests.test_ready_system_needs_no_sudo",
+      "tests.test_install_menu_update.AptStreamingTests.test_fragmented_normal_output_is_not_promoted_to_permanent_lines",
+      "tests.test_install_menu_update.AptStreamingTests.test_fragmented_unknown_prompt_and_diagnostic_are_retained_once",
+      "tests.test_install_menu_update.AptStreamingTests.test_real_sudo_keeps_child_terminal_read_and_prompt_usable",
+      "tests.test_install_menu_update.NavigationTests.test_main_menu_direct_entries_and_exit",
+      "tests.test_install_menu_update.NavigationTests.test_preferences_returns_to_same_top_level_selection",
+      "tests.test_install_menu_update.NavigationTests.test_query_failure_is_not_an_empty_list",
+      "tests.test_install_menu_update.NavigationTests.test_stop_all_container_name_does_not_collide",
+      "tests.test_install_menu_update.NavigationTests.test_stop_all_reuses_foundation_and_refreshes_visibility",
+      "tests.test_install_menu_update.NavigationTests.test_stop_all_visibility_uses_count_and_exact_stopped_state",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_native_failure_is_unchanged_and_does_not_run_suffix",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_no_state_change_leaves_mounts_alone",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_prepare_failure_uses_original_error_without_restoration",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_reentrant_lock_reloads_records_and_keeps_outer_exclusivity",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_restore_failure_attempts_every_remaining_path_and_keeps_state",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_state_changed_before_lock_recheck_skips_external_processing",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_stop_failure_keeps_original_error_and_skips_restoration",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_stop_unmount_failure_prevents_native_call_and_remaining_paths",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_success_preserves_order_exact_paths_and_default_flag",
+      "tests.test_lifecycle_mounts.LifecycleMountTests.test_unmount_failure_stops_immediately_without_lifecycle_or_rollback",
+      "tests.test_menu.MenuTests.test_cancel_and_interrupt_restore_terminal",
+      "tests.test_menu.MenuTests.test_confirm_defaults_no_escape_and_explicit_yes",
+      "tests.test_menu.MenuTests.test_csi_language_radio_and_saved_default",
+      "tests.test_menu.MenuTests.test_explicit_cli_consent_is_mutually_exclusive",
+      "tests.test_menu.MenuTests.test_function_failure_stays_visible_until_explicit_return",
+      "tests.test_menu.MenuTests.test_multi_select_space_toggles_independent_of_focus",
+      "tests.test_menu.MenuTests.test_nonterminal_confirmation_declines",
+      "tests.test_menu.MenuTests.test_resize_keeps_selection_and_viewport_valid",
+      "tests.test_menu.MenuTests.test_shell_and_operations_receive_normal_terminal_mode",
+      "tests.test_menu.MenuTests.test_ss3_up_and_chinese_default",
+      "tests.test_menu.MenuTests.test_text_backspace",
+      "tests.test_menu.MenuTests.test_unicode_and_cursor_editing",
+      "tests.test_menu.MenuTests.test_wrap_navigation_in_real_terminal",
+      "tests.test_menu_contract.MenuContractTests.test_columns_left_align_by_display_width_and_preserve_status_color",
+      "tests.test_menu_contract.MenuContractTests.test_core_marks_only_post_shell_failures",
+      "tests.test_menu_contract.MenuContractTests.test_long_input_instruction_keeps_all_text",
+      "tests.test_menu_contract.MenuContractTests.test_preentry_failure_keeps_ordinary_result_page",
+      "tests.test_menu_contract.MenuContractTests.test_rendered_spacing_in_real_terminals_for_both_languages",
+      "tests.test_menu_contract.MenuContractTests.test_shared_output_emits_one_boundary_gap_not_one_per_result",
+      "tests.test_menu_contract.MenuContractTests.test_shell_finish_leaves_menu_even_when_cleanup_failed",
+      "tests.test_menu_contract.MenuContractTests.test_unmount_selection_has_no_duplicate_table_and_uniform_columns",
+      "tests.test_progress.ProgressTests.test_localized_narrow_line_does_not_wrap",
+      "tests.test_progress.ProgressTests.test_plain_stream_keeps_results_and_diagnostics_only",
+      "tests.test_progress.ProgressTests.test_pty_waits_disappear_but_results_errors_and_menus_survive",
+      "tests.test_progress.ProgressTests.test_query_warning_without_newline_survives_refresh",
+      "tests.test_progress.ProgressTests.test_width_uses_actual_output_terminal",
+      "tests.test_runner.RunnerTests.test_bootstrap_checksum_failure_prevents_installation",
+      "tests.test_runner.RunnerTests.test_cleanup_failure_cannot_report_overall_success",
+      "tests.test_runner.RunnerTests.test_cleanup_recovers_mounts_before_querying_missing_target",
+      "tests.test_runner.RunnerTests.test_failure_and_interrupt_preserve_not_run_and_cleanup",
+      "tests.test_runner.RunnerTests.test_optimized_python_refuses_to_run_verification",
+      "tests.test_runner.RunnerTests.test_report_failure_causes_nonzero_exit",
+      "tests.test_runner.RunnerTests.test_success_records_each_group",
+      "tests.test_runner.RunnerTests.test_unit_discovery_includes_new_modules_and_identifiers",
+      "tests.test_runner.RunnerTests.test_unit_report_records_skips_failures_errors_and_test_ids",
+      "tests.test_shared_setup.SharedSetupTests.test_apt_failure_keeps_full_log_and_exit_status",
+      "tests.test_shared_setup.SharedSetupTests.test_apt_tty_progress_and_normal_privilege_prompt",
+      "tests.test_shared_setup.SharedSetupTests.test_dependencies_detect_all_combinations_and_install_once",
+      "tests.test_shared_setup.SharedSetupTests.test_fuse_gate_preserves_settings_mode_and_is_idempotent",
+      "tests.test_shared_setup.SharedSetupTests.test_ready_dependency_preparation_does_not_request_privilege",
+      "tests.test_shared_setup.SharedSetupTests.test_redirected_apt_keeps_diagnostics_not_normal_output",
+      "tests.test_shared_setup.SharedSetupTests.test_refresh_failure_never_starts_install",
+      "tests.test_shared_setup.SharedSetupTests.test_shared_result_return_orders_success_failure_and_cancel",
+      "tests.test_shared_setup.SharedSetupTests.test_shared_selection_wraps_without_changing_checked_values",
+      "tests.test_stage_boundaries.MountBoundaryTests.test_initial_journal_failure_is_inside_cleanup_boundary",
+      "tests.test_stage_boundaries.MountBoundaryTests.test_listener_launch_failure_reclaims_prepared_directories",
+      "tests.test_stage_boundaries.MountBoundaryTests.test_mount_readiness_uses_one_deadline_and_publishes_before_success",
+      "tests.test_stage_boundaries.MountBoundaryTests.test_preexisting_work_directory_is_preserved_with_recovery_record",
+      "tests.test_stage_boundaries.MountBoundaryTests.test_probes_only_observe_without_launching_or_publishing",
+      "tests.test_stage_boundaries.StageTests.test_cleanup_preserves_primary_and_interrupt_but_propagates_standalone_failure",
+      "tests.test_stage_boundaries.StageTests.test_client_cleanup_failure_keeps_original_error_and_reports_secondary",
+      "tests.test_stage_boundaries.StageTests.test_enter_preserves_shell_and_exit_handler_failures",
+      "tests.test_stage_boundaries.StageTests.test_import_mark_failure_never_reports_full_import_success",
+      "tests.test_stage_boundaries.StageTests.test_internal_start_completion_follows_user_preparation",
+      "tests.test_stage_boundaries.StageTests.test_native_and_function_success_are_distinct_in_both_languages",
+      "tests.test_stage_boundaries.StageTests.test_no_confirmation_provider_declines_without_loading_menu",
+      "tests.test_stage_boundaries.StageTests.test_redirected_progress_retains_function_success_and_native_warning_only",
+      "tests.test_stage_boundaries.StageTests.test_reporting_failure_does_not_replace_operation_failure",
+      "tests.test_stage_boundaries.StageTests.test_stop_all_continues_after_os_error_and_names_failed_target",
+      "tests.test_stage_boundaries.StageTests.test_user_preparation_failure_has_no_function_completion_or_external_post"
+    ]
+  },
+  "gpu": {
+    "capability": {
+      "available": true,
+      "backend": "wsl-nvidia",
+      "gpus": [
+        {
+          "name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+          "uuid": "GPU-73967445-0219-03f4-0592-f4784b0d6ce0"
+        }
+      ],
+      "driver_paths": [
+        "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+        "/usr/lib/wsl/drivers/nvrzi.inf_amd64_94140ac3dbff22dd"
+      ]
+    },
+    "compute": "passed",
+    "resources": {
+      "backend": "wsl-nvidia",
+      "devices": {
+        "mas-gpu-driver-0": {
+          "path": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "readonly": "true",
+          "source": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "type": "disk"
+        },
+        "mas-gpu-driver-1": {
+          "path": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_94140ac3dbff22dd",
+          "readonly": "true",
+          "source": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_94140ac3dbff22dd",
+          "type": "disk"
+        },
+        "mas-gpu-dxg": {
+          "mode": "0666",
+          "path": "/dev/dxg",
+          "source": "/dev/dxg",
+          "type": "unix-char"
+        },
+        "mas-gpu-lib": {
+          "path": "/usr/lib/wsl/lib",
+          "readonly": "true",
+          "source": "/usr/lib/wsl/lib",
+          "type": "disk"
+        }
+      },
+      "driver_paths": [
+        "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+        "/usr/lib/wsl/drivers/nvrzi.inf_amd64_94140ac3dbff22dd"
+      ],
+      "enabled": true,
+      "runtime_file": "/etc/ld.so.conf.d/mas-gpu.conf",
+      "version": 1
+    },
+    "first_compute": {
+      "devices": 1,
+      "computed": 42
+    },
+    "second_compute": {
+      "devices": 1,
+      "computed": 42
+    }
+  },
+  "elapsed": 459.385354324997
+}

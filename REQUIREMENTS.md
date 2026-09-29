@@ -1,5 +1,7 @@
 # my-ai-sandbox Requirements
 
+Sections 1–26 describe the phase 1 requirements and delivery history. Section 27 records the phase 2 plan and section 28 its first implemented GPU batch; its configuration changes supersede phase 1 defaults only when implemented and verified.
+
 ## 1. Scope
 
 Python wrapper around LXD, with a complete CLI (`mas`) and a standard-library terminal text menu. Support Ubuntu on WSL2 and native Ubuntu, including cloud servers. Use the current WSL environment for development and real integration testing. Native Ubuntu verification must be reported separately.
@@ -338,3 +340,68 @@ Preserve the existing v0.1.15 test prerelease and all its assets. Publish a sepa
 Keep the existing latest-test entry unchanged. Document stable installation with the existing --release v0.1.15 option, which downloads only the product and installer from the matching immutable numeric release. Document stable verification with --test --release v0.1.15, which obtains the same-version tester from the preserved test prerelease. Do not claim that the unpinned installation command selects stable. Mark the separate stable release as GitHub latest. This promotion does not change product code, version numbering, host resource policy or supported features.
 
 Record audit findings, final test results, matching hashes, published asset inventory and installation verification after completion. Preserve the distinction between current WSL verification, user-reported fresh-install evidence and unverified native Ubuntu/cloud environments.
+
+## 27. Phase 2 — pending container isolation and hardware configuration
+
+Status: project/profile policies and non-GPU hardware controls remain pending. GPU implementation and measured scope are recorded in section 28. The earlier requirements-only update did not authorize runtime changes; the user subsequently authorized the GPU implementation and tests.
+
+The isolation goal is to protect the Linux/WSL host and its Windows host from unauthorized container access through host resources. Container workloads and in-container administrative activity are outside mas policy. Use LXD's supported isolation mechanisms first; host changes require a demonstrated need. Upstream Windows, WSL, Linux, LXD, LXC and GPU-driver vulnerabilities remain upstream responsibilities. Retain the current default network behavior in this batch; additional network controls and login policy are deferred.
+
+### 27.1. Project configuration — fixed security policy
+
+- [ ] Use a dedicated mas project with `features.profiles=true` and `restricted=true`. Project naming and migration of phase 1 containers remain to be confirmed.
+- [ ] Set `restricted.containers.privilege=isolated`, `restricted.containers.lowlevel=block`, `restricted.containers.nesting=block`, and `restricted.containers.interception=block`.
+- [ ] Set `restricted.backups=allow` to retain export functionality.
+- [ ] Set `restricted.devices.unix-block=block`, `restricted.devices.unix-hotplug=block`, `restricted.devices.usb=block`, `restricted.devices.pci=block`, and `restricted.devices.infiniband=block`.
+- [ ] Use `restricted.devices.proxy=block` as the baseline; revisit only in the separate network design. NIC/network policy remains to be confirmed.
+- [ ] Use `restricted.devices.disk=block` as the root-disk-only baseline. If GPU runtime libraries require host disk devices, define the necessary `allow` policy and `restricted.devices.disk.paths` prefixes, together with read-only device configuration, before implementation.
+- [ ] Resolve `restricted.devices.gpu` and `restricted.devices.unix-char` according to the verified GPU implementation. Allow only the categories required by that implementation; category permission does not constitute an exact device/path whitelist. GPU category permissions belong to project policy; actual per-container GPU allocation belongs to hardware configuration.
+- [ ] Treat project policy as fixed mas-managed configuration. Provide no user-editable project settings in the terminal menu or a general mas CLI escape hatch for altering the baseline. This does not claim to prevent a host LXD administrator from using native administrative tools.
+
+### 27.2. Profile configuration — fixed container security baseline
+
+- [ ] Use a dedicated mas profile with `security.privileged=false`, `security.idmap.isolated=true`, `security.nesting=false`, and `security.syscalls.deny_default=true`.
+- [ ] Leave `raw.idmap`, `raw.lxc`, and `raw.apparmor` unset; retain LXD-managed identity mapping and confinement. Check the effective configuration including inherited values.
+- [ ] Determine `security.devlxd` after checking dependencies and the guest-interface scope. Its value remains to be confirmed; distinguish `/dev/lxd` from the host administrative socket.
+- [ ] Treat this baseline as fixed mas-managed configuration, without user-editable profile settings in the terminal menu or a general mas CLI escape hatch. CPU, memory and process limits, and GPU allocation are not fixed profile policy; they belong to section 27.3.
+
+### 27.3. Hardware configuration — editable per container
+
+GPU and the hardware menu are delivered by section 28; CPU, memory and process controls remain pending. GPU defaults and CLI semantics below are superseded by section 28 where specified.
+
+- [ ] Add a `硬件选项` / `Hardware options` menu item after selecting a container. It contains GPU allocation, CPU limits (`limits.cpu`), memory limits (`limits.memory`), and process-count limits (`limits.processes`). These controls are per-container configuration, not global mas preferences.
+- [ ] Provide equivalent CLI operations through the same shared configuration functions. CLI syntax, value ranges, defaults, reset behavior, running-container change semantics, and menu ordering remain to be confirmed.
+- [ ] GPU access is authorized by default when a supported discrete host GPU is available; the user can explicitly disable it. Record the devices and runtime-library resources necessary for that allocation. Preserve the fixed security baseline; resolve any conflict before implementation. GPU support must cover the intended WSL compute use case; native Ubuntu uses its applicable LXD-supported mechanism and requires separate validation.
+- [ ] Prefer LXD's existing GPU/device mechanisms and vendor-supported resource discovery. Any additional third-party dependency still requires explicit approval. GPU compute support does not implicitly authorize WSLg display, audio, Windows drive mappings, host home directories, or host management sockets.
+
+### 27.4. Validation and unresolved integration work
+
+- [ ] Audit expanded instance configuration, project restrictions, and actual runtime confinement in the current WSL environment. Record supported protections and measured limitations rather than inferring them solely from successful startup.
+- [ ] Validate real GPU computation in a non-privileged container using the selected official mechanism. Verify access as `sandbox`, actual device/library exposure, read-only runtime mappings where applicable, and the effective GPU selection scope. Device enumeration alone is insufficient.
+- [ ] Before implementation, resolve phase 1 migration, imported configuration handling, baseline drift handling, GPU enable/disable lifecycle, and hardware defaults/CLI semantics. Preserve managed-container ownership boundaries and existing filesystem/lifecycle reuse.
+- [ ] After authorized development, verify CLI/menu equivalence, baseline enforcement, hardware changes and GPU computation; update IMPLEMENTED.md only with completed and verified behavior. Publish the resulting development batch through the established test-release process.
+
+
+## 28. Phase 2 first batch — independent GPU module
+
+Status: implemented and locally verified in test batch 0.2.1; publication/public-entry verification pending. Project/profile hardening and CPU/memory/process limits remain pending; retain current network behavior.
+
+- [x] Implement GPU as a shared, independent module with capability detection, status, enable, disable, resource inventory and verified cleanup. Use LXD-supported GPU/device operations. Preserve unrelated devices/configuration and refuse ambiguous ownership or configuration drift.
+- [x] Expose `mas hardware TARGET` for hardware status and `mas hardware TARGET gpu [on|off]` to query/change GPU configuration. The container menu gains Hardware options, with GPU as its first option only when a supported discrete GPU is available. No CPU, memory, process-limit or network controls in this batch.
+- [x] Default GPU to enabled on supported hosts for newly created containers; persist an explicit off setting across starts. Handle existing/imported containers through the same module before startup. Missing hardware hides the menu switch; CLI mutation reports unavailable rather than claiming success. Never silently replace another GPU configuration.
+- [x] Store the requested GPU setting and module-owned resource inventory in instance metadata. Inventory includes native device configuration and any explicit library mappings. Verify native automatic resource handling through integration tests. A failed operation must retain actionable evidence and must not be reported as successful.
+- [x] Require a stopped container for configuration changes in this first batch, avoiding removal while tasks hold GPU handles. Query is available in either state. Do not automatically stop a running container. Configure default access before native startup; GPU setup failure prevents startup and its external post-processing.
+- [x] Use official LXD CDI where usable. Any compatibility alternative must use LXD device primitives, retain non-privileged operation, limit read-only mappings to necessary GPU runtime resources, and document actual exposure. No additional packages without explicit approval.
+- [x] Test default enablement, explicit off, repeated operations, unavailable hardware, unmanaged containers, conflicting devices, metadata corruption, and native failure handling. Native GPU tests must verify sandbox access, CUDA initialization and device memory transfer/computation rather than enumeration alone, absence after disable, restoration after re-enable, resource inventory and preserved non-GPU configuration. Record unavailable-host GPU compute coverage explicitly.
+- [x] Verify terminal menu and CLI reuse, translated output, existing lifecycle/filesystem behavior, and packaged tests; update implementation/coverage/release documentation.
+- [ ] Publish the test release and verify the public entry.
+
+### 28.1. Validated implementation choice and platform boundary
+
+The initial implementation targets NVIDIA CUDA GPUs. WSL2 NVIDIA is the current real validation environment; native Ubuntu NVIDIA uses LXD CDI and has not been GPU-tested here. AMD and Intel discrete GPU discovery/backends remain unimplemented, not implicitly covered by the NVIDIA checks. Hosts without a supported NVIDIA device do not show the GPU switch.
+
+The current LXD 6.9 snap CDI probe failed with NVML Driver Not Loaded. The WSL backend therefore uses LXD's native unix-char device for `/dev/dxg`, mode 0666 inside the container, and read-only disk devices for `/usr/lib/wsl/lib` and only driver-store subdirectories containing `libcuda.so.1.1`. It does not map the complete `/usr/lib/wsl/drivers` directory. These GPU driver resources originate from the Windows/WSL driver infrastructure and are the authorized GPU exception, not general Windows filesystem access. DXG access is shared WSL GPU access, not per-adapter isolation.
+
+Instance metadata `user.mas.gpu` records the requested setting, backend, driver directories, exact owned LXD device definitions and the owned loader configuration path. GPU configuration edits publish devices and this record together. The runtime module manages `/etc/ld.so.conf.d/mas-gpu.conf` with fixed identifiable content and refreshes the container's dynamic linker cache. Disabling removes the owned file and devices; the linker cache is refreshed on the next start. Existing container data and unrelated configuration remain intact. Driver-directory changes on a stopped container reuse the same configuration function before startup. Detection or runtime failure is an error, not an automatic silent switch-off.
+
+Existing running containers are not silently modified. Their menu shows the default setting as pending until the next start from Stopped, or an explicit stopped-container hardware change. No new driver, CUDA toolkit, pip package, or host daemon is installed by this module. The test-only CUDA driver probe uses Python ctypes, JIT-compiles a PTX kernel, executes it as sandbox and verifies the returned value.

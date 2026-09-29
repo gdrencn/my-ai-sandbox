@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.1.15 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in batch 0.2.1 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -118,3 +118,12 @@ Public 0.1.15 normal installation and --test entry both passed. The public suite
 ## Phase 1 stable promotion of 0.1.15
 
 No code or coverage counts changed. A fresh frozen matching-tester run passed all 162 units and all 21 reported stages in 394.0 seconds, with no skips or cleanup errors. Independent cleanup and Windows UNC checks passed. Published product/installer/tester checksums match local archives and included source; product/installer contain no test code. Pinned public installation passed without modifying the existing tester. The stable release's three downloaded assets and unchanged test prerelease were verified, and the existing latest-test resolver was checked after promotion. Evidence: validation/V0_1_15_STABLE_REPORT.json, validation/V0_1_15_STABLE_INSTALL.json and validation/V0_1_15_STABLE_RELEASE.json. Review inventory and remaining environment limits: validation/STABLE_0_1_15_AUDIT.md. Stable status does not expand tested-platform claims.
+
+
+## GPU coverage — 0.2.1
+
+Fifteen GPU unit tests cover default enable/explicit off, absent hardware, unmanaged/running guards, inherited-device conflicts, corrupt metadata, unsafe driver paths, changed devices, foreign runtime files, atomic-edit failures, delayed file removal, driver-directory refresh, cleanup with broken discovery, internal start failure propagation, and shared hardware-menu behavior. Existing operation-unit fixtures mock the GPU module explicitly; GPU behavior is tested in its own fixtures and native integration.
+
+The portable `gpu` stage creates its own random target in the isolated test project. It invokes the actual product CLI and terminal menu, verifies non-privileged configuration, evaluates a real CUDA PTX kernel as sandbox via Python ctypes, checks read-only WSL runtime mounts, disables through the menu, confirms access is absent after restart, re-enables through CLI, and repeats computation. Non-GPU devices must remain unchanged. Resource inventory and computation results are saved under `gpu` in report.json. Test source lives only in the tester archive. No CUDA toolkit or Python package is installed for this probe.
+
+Current measured GPU platform is WSL2/NVIDIA RTX 5090 Laptop GPU. Hosts without supported hardware explicitly report compute=not_run; successful non-GPU tests do not imply GPU compute coverage there. Native Ubuntu NVIDIA CDI is implemented but not hardware-verified. AMD/Intel discovery/backends are not implemented. Driver-directory refresh and broken-discovery cleanup are fault tests, not evidence of a real Windows driver upgrade. Project/profile enforcement remains outside this batch.

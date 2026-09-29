@@ -73,11 +73,14 @@ class UI:
 
     def container(self, target):
         selected = 'info'
-        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'mountedfs', 'mountfs', 'unmountfs', 'back')]
+        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'mountedfs', 'mountfs', 'unmountfs', 'hardware', 'back')]
         while True:
             selected = self.choose(t('page_container', target=target), actions, selected)
             if selected == 'back':
                 return
+            if selected == 'hardware':
+                self.present(t('page_hardware', target=target), lambda: self.hardware(target), back=False)
+                continue
             deleted = False
             def action():
                 nonlocal deleted
@@ -112,6 +115,25 @@ class UI:
             self.present(t('page_action', action=t('menu_' + selected), target=target), action)
             if deleted:
                 return
+
+    def hardware(self, target):
+        while True:
+            status = self.manager.hardware(target)
+            choices = []
+            if status['available']:
+                if not status.get('configured', True):
+                    self.write(t('gpu_pending'))
+                choices.append(('gpu', t('gpu_switch', value=t('state_enabled' if status['enabled'] else 'state_disabled'))))
+            else:
+                self.write(t('gpu_unavailable'))
+            choices.append((None, t('menu_back')))
+            if self.view.choose(t('page_hardware', target=target), choices, default='gpu' if status['available'] else None) is None:
+                return
+            def change():
+                enabled = self.view.choose(t('gpu_choose'), [(True, t('state_enabled')), (False, t('state_disabled'))],
+                                           default=status['enabled'], radio=True)
+                self.manager.hardware(target, enabled)
+            self.present(t('gpu_choose'), change)
 
     def containers(self):
         selected = None

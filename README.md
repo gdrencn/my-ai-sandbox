@@ -86,7 +86,7 @@ mas import restored demo.tar.gz
 - 删除和导出要求容器已停止。CLI 和 终端文本菜单 删除都要确认；导出文件存在时询问是否覆盖，默认选“否”。导入要求目标名称不存在。
 - 仅管理本地 LXD 默认 project 内标记为 `user.mas.managed=true` 的容器；不接管原生 lxc 创建的其他容器。该标记用于管理范围区分，不是对拥有 LXD 管理权限的用户的安全隔离。
 - 每秒探测一次，默认每个底层操作最多等待 10 分钟。可使用 `mas --timeout 1800 start demo` 延长，最小 300 秒。明确失败立即返回，成功必须同时满足原生命令完成和目标状态。
-- 本版不配置 GPU、宿主目录向容器内的共享或自定义端口映射。容器使用标准默认 profile，宿主网络配置必须允许外网访问。
+- 阶段 1 稳定版不配置 GPU。0.2.1 测试版新增下述 GPU 模块；网络仍使用原有默认配置，不增加端口映射或网络控制。
 
 **备份是恢复用途，并非克隆模板。** LXD 导出会保留网卡 MAC。源容器与导入副本同时存在时，LXD 可能拒绝启动副本。恢复前先处理原容器；mas 不静默改写备份中的网络身份。
 
@@ -148,7 +148,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 开发与发布
 
-从 `0.1.3` 起统一使用 `a.b.c`：主版本 `a` 当前固定为 `0`，仅用户明确允许时才能改为 `1`；`b` 为阶段号，目前为 `1`；`c` 为提交批次号，每批递增一次，同一批中的多个 Git commit 不重复递增。不再使用 `-test.x` 后缀，GitHub prerelease 属性单独保留。
+从 `0.1.3` 起统一使用 `a.b.c`：主版本 `a` 当前固定为 `0`，仅用户明确允许时才能改为 `1`；`b` 为阶段号，当前测试开发进入 `2`（阶段 1 稳定版仍为 `0.1.15`）；`c` 为提交批次号，每批递增一次，同一批中的多个 Git commit 不重复递增。不再使用 `-test.x` 后缀，GitHub prerelease 属性单独保留。
 
 
 ```bash
@@ -160,7 +160,7 @@ python3 dist/mas.pyz --version
 
 `dist/mas.pyz` 为产品，不包含安装模块、测试代码或测试专用文案；`dist/mas-install.pyz` 为独立安装程序；`dist/mas-test.pyz` 为独立测试工具。三个文件版本一致。测试工具通过安装程序完成安装，安装程序不负责启动测试。仅使用标准库生成可重复构建的 zipapp，适用于已具备受支持 Python 运行时的架构。
 
-发布前核验 [REQUIREMENTS.md](REQUIREMENTS.md) 并更新 [IMPLEMENTED.md](IMPLEMENTED.md)。GitHub prerelease 保留版本资产、安装脚本、校验清单及测试报告。第一版没有 GPU 或模型工具自动安装功能。
+发布前核验 [REQUIREMENTS.md](REQUIREMENTS.md) 并更新 [IMPLEMENTED.md](IMPLEMENTED.md)。GitHub prerelease 保留版本资产、安装脚本、校验清单及测试报告。阶段 1 没有 GPU 接入功能；0.2.1 新增 GPU 模块，不自动安装模型工具。
 
 `install.sh` 由 `scripts/install.template.sh` 和语言文案生成；修改后运行 `python3 scripts/build.py`，避免手工维护重复提示文案。
 
@@ -171,3 +171,23 @@ python3 dist/mas.pyz --version
 
 
 内部按职责区分外部前处理、完整的 mas 功能、外部后处理。启动中的 sandbox 用户准备属于启动内部，成功后才恢复挂载；原生启动成功本身不代表 mas 启动完成。其它基础功能的职责和成功条件见 [CORE_BEHAVIOR.md](CORE_BEHAVIOR.md)。不需要外部处理的功能不增加空阶段。
+
+
+## GPU 硬件选项（0.2.1 test）
+
+选中容器后进入“硬件选项”，第一个选项为 GPU 开关。有受支持的独立显卡时默认开启，可以手动关闭；没有受支持设备时不显示此开关。目前接入实现针对 NVIDIA，已实测 WSL2 + RTX 5090 Laptop GPU；原生 Ubuntu NVIDIA 使用 LXD CDI 路径，尚未实机验证。AMD/Intel 独立显卡尚未实现自动识别和接入。
+
+```bash
+mas hardware TARGET             # 查询能力、配置值及资源清单
+mas hardware TARGET gpu         # 查询同一 GPU 配置
+mas stop TARGET
+mas hardware TARGET gpu off     # 关闭并撤销模块提供的资源
+mas hardware TARGET gpu on      # 开启
+mas start TARGET
+```
+
+修改 GPU 配置要求容器已停止，不会自动停止正在运行的任务。显式关闭会跨启停保留。新建容器自动配置默认 GPU；已有或导入的未配置容器在下一次从停止状态启动时应用默认值，已运行的旧容器不会被静默热修改。菜单会标明尚未应用的默认值。
+
+WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和含 CUDA 驱动的 NVIDIA 驱动子目录；不映射整个 Windows 驱动目录。WSL DXG 访问不是逐卡隔离。设备清单、驱动目录、配置值和运行库配置文件路径记录在 `user.mas.gpu`。模块管理容器内 `/etc/ld.so.conf.d/mas-gpu.conf`，启动时刷新动态链接库缓存；关闭时删除该文件及设备，下一次启动刷新缓存。检测到资源配置漂移或文件冲突会报错，不覆盖不属于模块的资源。GPU 库路径可供普通 sandbox 用户加载；WSL 的诊断工具可通过 `/usr/lib/wsl/lib/nvidia-smi` 调用。
+
+测试工具会验证开关、菜单、只读资源、关闭后的设备消失、重新开启，以及 sandbox 用户执行真实 CUDA 内核并读回结果。无支持设备的机器明确记录 GPU 计算未执行。此模块不安装 CUDA Toolkit、模型框架或新的宿主驱动。Project/profile 安全基线、CPU/内存/进程限制仍待后续实现。

@@ -17,6 +17,10 @@ def parser():
     result.add_argument("--version", action="version", version=__version__, help=t("help_version"))
     result.add_argument("--timeout", type=int, default=600, help=t('help_timeout'))
     commands = result.add_subparsers(dest="command")
+    hardware = commands.add_parser("hardware", help=t("help_hardware"))
+    hardware.add_argument("target", metavar="TARGET")
+    hardware.add_argument("item", nargs="?", choices=["gpu"])
+    hardware.add_argument("value", nargs="?", choices=["on", "off"])
     settings = commands.add_parser("config", help=t("help_config"))
     actions = settings.add_subparsers(dest="config_action")
     for action in ("get", "set"):
@@ -67,6 +71,9 @@ def main(argv=None, manager=None):
         if args.command is None:
             from .terminal_ui import run
             run(manager)
+        elif args.command == "hardware":
+            result = manager.hardware(args.target, None if args.value is None else args.value == "on")
+            print(json.dumps(result, ensure_ascii=False, indent=2))
         elif args.command == "list":
             for item in manager.list():
                 print(f"{item['name']}\t{state(item['status'])}")

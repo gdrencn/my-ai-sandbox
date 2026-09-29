@@ -1,0 +1,238 @@
+"""Owned GPU access, independent of UI and container lifecycle orchestration.
+
+One atomic LXD configuration edit publishes devices and their ownership record.
+WSL uses native device primitives because LXD 6.9 snap CDI selects NVML there.
+"""
+import json
+import re
+from pathlib import Path
+import shutil
+import shlex
+import subprocess
+import time
+from urllib.parse import quote, urlencode
+
+from .core import Error
+from .i18n import t
+
+KEY = 'user.mas.gpu'
+CONF = '/etc/ld.so.conf.d/mas-gpu.conf'
+CONTENT = '# Managed by my-ai-sandbox GPU module\n/usr/lib/wsl/lib\n'
+
+
+def detect():
+    """Report NVIDIA discrete compute GPUs; no packages or configuration changes."""
+    wsl = Path('/dev/dxg').exists()
+    executable = '/usr/lib/wsl/lib/nvidia-smi' if wsl else shutil.which('nvidia-smi')
+    if not executable or not Path(executable).is_file():
+        return {'available': False, 'backend': None, 'gpus': []}
+    try:
+        result = subprocess.run([executable, '--query-gpu=name,uuid', '--format=csv,noheader'],
+                                capture_output=True, text=True, timeout=600)
+    except subprocess.TimeoutExpired as exc:
+        raise Error(t('gpu_detect_timeout')) from exc
+    if result.returncode == 6:
+        return {'available': False, 'backend': None, 'gpus': []}
+    if result.returncode:
+        raise Error(t('gpu_detect_failed', error=result.stderr.strip() or result.stdout.strip()))
+    gpus = []
+    for line in result.stdout.splitlines():
+        name, separator, identity = line.partition(',')
+        if separator and identity.strip().startswith('GPU-'):
+            gpus.append({'name': name.strip(), 'uuid': identity.strip()})
+    if not gpus:
+        raise Error(t('gpu_detect_failed', error=result.stdout.strip()))
+    if wsl and not all(Path(p).is_dir() for p in ('/usr/lib/wsl/lib', '/usr/lib/wsl/drivers')):
+        raise Error(t('gpu_runtime_missing'))
+    driver_paths = sorted({str(p.parent) for p in Path('/usr/lib/wsl/drivers').glob('*/libcuda.so.1.1') if p.is_file()}) if wsl else []
+    if wsl and not driver_paths:
+        raise Error(t('gpu_runtime_missing'))
+    return {'available': True, 'backend': 'wsl-nvidia' if wsl else 'nvidia-cdi', 'gpus': gpus, 'driver_paths': driver_paths}
+
+
+def devices(backend, driver_paths=()):
+    if backend == 'wsl-nvidia':
+        result = {
+            'mas-gpu-dxg': {'type': 'unix-char', 'source': '/dev/dxg', 'path': '/dev/dxg', 'mode': '0666'},
+            'mas-gpu-lib': {'type': 'disk', 'source': '/usr/lib/wsl/lib', 'path': '/usr/lib/wsl/lib', 'readonly': 'true'},
+        }
+        for index, path in enumerate(driver_paths):
+            result['mas-gpu-driver-' + str(index)] = {'type': 'disk', 'source': path, 'path': path, 'readonly': 'true'}
+        return result
+    if backend == 'nvidia-cdi':
+        return {'mas-gpu': {'type': 'gpu', 'gputype': 'physical', 'id': 'nvidia.com/gpu=all'}}
+    raise Error(t('gpu_record_invalid'))
+
+
+class GPU:
+    def __init__(self, manager):
+        self.manager = manager
+        self.lxd = manager.lxd
+
+    def record(self, instance):
+        raw = instance['config'].get(KEY)
+        if raw is None:
+            return None
+        try:
+            item = json.loads(raw)
+            if not isinstance(item, dict):
+                raise ValueError()
+            paths = item.get('driver_paths')
+            if (not isinstance(paths, list) or any(not isinstance(p, str) or not re.fullmatch(r'/usr/lib/wsl/drivers/[A-Za-z0-9_.-]+', p) or Path(p).name in ('.', '..') for p in paths)
+                    or len(paths) != len(set(paths))
+                    or (item.get('backend') == 'wsl-nvidia' and not paths)
+                    or (item.get('backend') == 'nvidia-cdi' and paths)):
+                raise ValueError()
+            if (not isinstance(item, dict) or item.get('version') != 1
+                    or type(item.get('enabled')) is not bool
+                    or item.get('backend') not in ('wsl-nvidia', 'nvidia-cdi')
+                    or item.get('devices') != (devices(item['backend'], paths) if item['enabled'] else {})
+                    or item.get('runtime_file') != (CONF if item['enabled'] and item['backend'] == 'wsl-nvidia' else None)):
+                raise ValueError()
+            return item
+        except (ValueError, TypeError, KeyError) as exc:
+            raise Error(t('gpu_record_invalid')) from exc
+
+    def check_owned(self, instance, record):
+        owned = record['devices'] if record else {}
+        local = instance.get('devices', {})
+        expanded = instance.get('expanded_devices', local)
+        for name, definition in owned.items():
+            if local.get(name) != definition or expanded.get(name) != definition:
+                raise Error(t('gpu_conflict', device=name))
+        for name, definition in expanded.items():
+            if name in owned:
+                continue
+            path = definition.get('path', '')
+            source = definition.get('source', '')
+            if (name.startswith('mas-gpu') or definition.get('type') == 'gpu'
+                    or path == '/dev/dxg' or source == '/dev/dxg'
+                    or path == CONF or path == '/etc/ld.so.conf.d'
+                    or path == '/etc'
+                    or path == '/usr' or path == '/usr/lib'
+                    or path == '/usr/lib/wsl' or path.startswith('/usr/lib/wsl/')
+                    or source.startswith('/usr/lib/wsl/')):
+                raise Error(t('gpu_conflict', device=name))
+
+    def status(self, target):
+        instance = self.manager.require(target)
+        capability = detect()
+        record = self.record(instance)
+        self.check_owned(instance, record)
+        return {**capability, 'enabled': record['enabled'] if record else capability['available'],
+                'configured': record is not None, 'resources': record or {},
+                'state': instance['status']}
+
+    def _runtime_file(self, target):
+        endpoint = '/1.0/instances/' + quote(target, safe='') + '/files?' + urlencode(
+            {'project': self.lxd.project, 'path': '/etc/ld.so.conf.d'})
+        entries = json.loads(self.lxd.command(['query', endpoint]))
+        if CONF.rsplit('/', 1)[1] not in entries:
+            return None
+        content = self.lxd.command(['file', 'pull', 'local:' + target + CONF, '-'])
+        if content != CONTENT:
+            raise Error(t('gpu_runtime_conflict', path=CONF))
+        return content
+
+    def set(self, target, enabled, *, capability=None):
+        if type(enabled) is not bool:
+            raise ValueError('enabled must be bool')
+        with self.manager.filesystems.locked():
+            instance = self.manager.require(target, stopped=True)
+            record = self.record(instance)
+            self.check_owned(instance, record)
+            capability = capability or ({'available': False, 'backend': record['backend']} if not enabled and record else detect())
+            if enabled and not capability['available']:
+                raise Error(t('gpu_unavailable'))
+            if not capability['available'] and record is None:
+                raise Error(t('gpu_unavailable'))
+            backend = capability['backend'] if enabled else (record['backend'] if record else capability['backend'])
+            if record and record['enabled'] and record['backend'] != backend:
+                raise Error(t('gpu_backend_changed'))
+            # Validate/remove only our exact internal loader file. A failed removal
+            # leaves the old ownership record intact and can safely be retried.
+            if backend == 'wsl-nvidia' or (record and record['enabled'] and record['backend'] == 'wsl-nvidia'):
+                content = self._runtime_file(target)
+                if not enabled and content is not None:
+                    self.lxd.command(['file', 'delete', 'local:' + target + CONF])
+                    deadline = time.monotonic() + self.lxd.timeout
+                    while self._runtime_file(target) is not None:
+                        if time.monotonic() >= deadline:
+                            raise Error(t('gpu_wait_failed'))
+                        time.sleep(1)
+            driver_paths = capability.get('driver_paths', []) if enabled else (record['driver_paths'] if record else capability.get('driver_paths', []))
+            definition = devices(backend, driver_paths) if enabled else {}
+            desired = {'version': 1, 'enabled': enabled, 'backend': backend, 'driver_paths': driver_paths,
+                       'devices': definition, 'runtime_file': CONF if enabled and backend == 'wsl-nvidia' else None}
+            endpoint = '/1.0/instances/' + quote(target, safe='') + '?' + urlencode({'project': self.lxd.project})
+            snapshot = json.loads(self.lxd.command(['query', endpoint]))
+            current = {key: snapshot[key] for key in ('architecture', 'config', 'devices', 'ephemeral', 'profiles', 'description') if key in snapshot}
+            # Recheck immediately before publication, including expanded profile devices.
+            instance = self.manager.require(target, stopped=True)
+            if self.record(instance) != record:
+                raise Error(t('gpu_record_changed'))
+            self.check_owned(instance, record)
+            for name in (record or {}).get('devices', {}):
+                current['devices'].pop(name)
+            current['devices'].update(definition)
+            current['config'][KEY] = json.dumps(desired, sort_keys=True)
+            start = time.monotonic()
+            self.lxd.command(['config', 'edit', 'local:' + target], input_data=json.dumps(current))
+            while True:
+                observed = self.manager.require(target, stopped=True)
+                self.check_owned(observed, self.record(observed))
+                elapsed = time.monotonic() - start
+                matches = self.record(observed) == desired
+                self.manager.emit(dict(action='gpu', target=target, status='ok' if matches else 'waiting',
+                                       observation='enabled' if enabled else 'disabled', elapsed=elapsed))
+                if matches:
+                    return desired
+                if elapsed >= self.lxd.timeout:
+                    raise Error(t('gpu_wait_failed'))
+                time.sleep(1)
+
+    def ensure(self, target):
+        """Default access on stopped new/legacy containers; explicit off persists."""
+        instance = self.manager.require(target)
+        record = self.record(instance)
+        if record is not None:
+            self.check_owned(instance, record)
+            if record['enabled']:
+                capability = detect()
+                if not capability['available'] or capability['backend'] != record['backend']:
+                    raise Error(t('gpu_unavailable'))
+                if capability.get('driver_paths', []) != record['driver_paths']:
+                    self.set(target, True, capability=capability)
+            return
+        capability = detect()
+        if capability['available']:
+            self.set(target, True, capability=capability)
+
+    def prepare(self, target):
+        """Required internal GPU runtime preparation, after native start."""
+        instance = self.manager.require(target)
+        record = self.record(instance)
+        if not record or record['backend'] != 'wsl-nvidia':
+            return
+        self.check_owned(instance, record)
+        # Shell literals are fixed module constants, never container/user input.
+        script = '''set -eu
+p=/etc/ld.so.conf.d/mas-gpu.conf
+if [ -L "$p" ]; then echo 'GPU loader configuration is a symlink' >&2; exit 1; fi
+'''
+        if record['enabled']:
+            script += '''expected=$(printf '# Managed by my-ai-sandbox GPU module\\n/usr/lib/wsl/lib\\n')
+if [ -e "$p" ] && [ "$(cat "$p")" != "$expected" ]; then
+ echo 'GPU loader configuration already exists with different content' >&2; exit 1
+fi
+printf '%s\\n' "$expected" > "$p"
+test -c /dev/dxg
+test -r /usr/lib/wsl/lib/libcuda.so.1
+ldconfig
+'''
+        else:
+            script += 'ldconfig\n'
+        for message in ('GPU loader configuration is a symlink', 'GPU loader configuration already exists with different content'):
+            script = script.replace("'" + message + "'", shlex.quote(t('gpu_runtime_conflict', path=CONF)))
+        self.manager._run_lxd_until_state('gpu-runtime', target,
+            ['exec', 'local:' + target, '--', '/bin/sh', '-c', script], 'Running')

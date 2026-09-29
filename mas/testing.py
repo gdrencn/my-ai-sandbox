@@ -135,7 +135,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -166,6 +166,7 @@ class Suite:
         self.cleanup_errors = []
         self.counter = 0
         self.unit_results = None
+        self.gpu_results = {"status": "not_run"}
 
     def report(self, event):
         self.events.append(event)
@@ -351,6 +352,8 @@ class Suite:
             assert self.exec(target, "su --login sandbox -c 'id -un; sudo -n id -u'").splitlines() == ["sandbox", "0"]
             self.wait("outbound HTTPS", lambda: self.network(target))
             self.exec(target, "printf '%s' mas-roundtrip-data > /home/sandbox/mas-proof")
+        with self.case("gpu"):
+            self.gpu_test()
         with self.case("dependency-install"):
             self.dependencies(target)
         with self.case("lifecycle-repeat"):
@@ -520,6 +523,74 @@ class Suite:
         for invalid in ('relative','/home/../etc','/var/run'):
             self.cli('mountfs',target,invalid,code=1)
         assert self.state(target,'Stopped')
+
+    def gpu_menu(self, target):
+        with self.terminal([]) as terminal:
+            down, back = '\x1b[B', '\x1b[D'
+            terminal.expect('my-ai-sandbox'); terminal.send('\n')
+            terminal.expect('Containers')
+            names = [item['name'] for item in self.manager.list()]
+            terminal.send(down * names.index(target) + '\n')
+            terminal.expect('Container: ' + target); terminal.send(down * 9 + '\n')
+            terminal.expect('GPU: Enabled'); terminal.send('\n')
+            terminal.expect('Choose GPU access'); terminal.send(down + '\n')
+            self.menu_result(terminal, 'Hardware options: ' + target)
+            terminal.expect('GPU: Disabled'); terminal.send(back)
+            terminal.expect('Container: ' + target); terminal.send(back)
+            terminal.expect('Containers'); terminal.send(back)
+            terminal.expect('my-ai-sandbox'); terminal.send('\x1b[A\n'); terminal.finish()
+        assert not json.loads(self.cli('hardware', target))['enabled']
+
+    def gpu_test(self):
+        from .gpu import detect, KEY, CONF
+        capability = detect()
+        self.gpu_results = {'capability': capability, 'compute': 'not_run'}
+        if not capability['available']:
+            self.gpu_results['reason'] = 'No supported discrete GPU on host'
+            self.output.keep(t('gpu_test_unavailable'))
+            return
+        target = self.target()
+        self.cli('new', target)
+        initial = json.loads(self.cli('hardware', target))
+        assert initial['enabled'] and initial['configured']
+        self.gpu_results['resources'] = initial['resources']
+        before = self.manager.info(target)
+        assert before.get('expanded_config', before['config']).get('security.privileged', 'false') == 'false'
+        self.cli('start', target)
+        self.cli('hardware', target, 'gpu', 'off', code=1)
+        script = files('tests').joinpath('gpu_compute.py').read_text()
+        def compute():
+            result = self.manager.lxd.command(['exec', 'local:' + target, '--',
+                'runuser', '-u', 'sandbox', '--', 'python3', '-c', script])
+            parsed = json.loads(result)
+            assert parsed['computed'] == 42 and parsed['devices'] > 0
+            return parsed
+        self.gpu_results['first_compute'] = compute()
+        if capability['backend'] == 'wsl-nvidia':
+            self.exec(target, 'test -c /dev/dxg; test -r /usr/lib/wsl/lib/libcuda.so.1')
+            self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", "import os; assert os.statvfs('/usr/lib/wsl/lib').f_flag & os.ST_RDONLY"])
+            for path in initial['resources']['driver_paths']:
+                self.manager.lxd.command(['exec', 'local:' + target, '--', 'python3', '-c', 'import os; assert os.statvfs(' + repr(path) + ').f_flag & os.ST_RDONLY'])
+        self.cli('stop', target)
+        self.gpu_menu(target)
+        self.cli('hardware', target, 'gpu', 'off')
+        self.cli('hardware', target, 'gpu', 'off')
+        disabled = json.loads(self.cli('hardware', target))
+        assert not disabled['enabled'] and not disabled['resources']['devices']
+        self.cli('start', target)
+        if capability['backend'] == 'wsl-nvidia':
+            self.exec(target, 'test ! -e /dev/dxg; test ! -e ' + CONF)
+        self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", 'import ctypes\ntry: lib=ctypes.CDLL("libcuda.so.1")\nexcept OSError: pass\nelse: assert lib.cuInit(0) != 0'])
+        self.cli('stop', target)
+        self.cli('hardware', target, 'gpu', 'on')
+        self.cli('start', target)
+        self.gpu_results['second_compute'] = compute()
+        self.gpu_results['compute'] = 'passed'
+        self.cli('stop', target)
+        after = self.manager.info(target)
+        assert {k:v for k,v in before.get('expanded_devices', before['devices']).items() if not k.startswith('mas-gpu')} == {k:v for k,v in after.get('expanded_devices', after['devices']).items() if not k.startswith('mas-gpu')}
+        assert after['devices']['mas-gpu' if capability['backend'] == 'nvidia-cdi' else 'mas-gpu-dxg'] == before['devices']['mas-gpu' if capability['backend'] == 'nvidia-cdi' else 'mas-gpu-dxg']
+        self.cli('delete', target, answer='y')
 
     def windows_filesystem(self, home):
         """Exercise the actual Windows UNC access route when WSL interop exists."""
@@ -787,7 +858,7 @@ try {
             "os_release": Path("/etc/os-release").read_text(), "python": sys.version,
             "project": self.project, "targets": self.targets, "cases": self.results,
             "events": self.events, "cleanup_errors": self.cleanup_errors,
-            "unit_tests": self.unit_results,
+            "unit_tests": self.unit_results, "gpu": self.gpu_results,
             "elapsed": time.monotonic() - self.started,
         }, indent=2))
 

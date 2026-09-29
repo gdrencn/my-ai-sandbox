@@ -1,3 +1,13 @@
+# 0.2.1 — GPU 硬件选项（test）
+
+- 新增独立 GPU 模块和容器“硬件选项”菜单，GPU 为首项；提供 `mas hardware TARGET [gpu [on|off]]`。
+- 受支持 NVIDIA GPU 默认开启，显式关闭跨启停保留。修改前须停止容器；配置冲突或资源漂移报错，不覆盖外部配置。
+- WSL 使用 LXD 原生 DXG 设备和只读 GPU 运行库映射，记录资源清单并支持撤销；不映射整个 Windows 驱动目录，不安装额外 GPU 软件包。
+- 新增真实 CUDA 内核、普通 sandbox 用户访问、菜单关闭、设备撤销、重新开启和只读映射测试。177 项打包单元测试、22 个本地实机测试环节全部通过，耗时 459.4 秒。
+- 实测 WSL2 + NVIDIA RTX 5090 Laptop GPU。原生 Ubuntu NVIDIA CDI 路径未实机验证；AMD/Intel 独立显卡尚未支持。Project/profile 加固和其他硬件限制留待后续，网络保持原状。
+
+阶段 1 stable/0.1.15 保持不变。完整验证与范围见 IMPLEMENTED.md、TEST_COVERAGE.md 和 WSL_REPORT.json。
+
 # 0.1.15 — 阶段 1 Stable
 
 完成需求、实现、代码及测试覆盖复核，原有 0.1.15 程序不变。本次重新运行 162 项单元测试及全部 21 个测试环节，耗时 394.0 秒，全部通过，无跳过或清理错误。

@@ -98,11 +98,12 @@ class LXD:
         self.diagnostic = diagnostic
         self.timeout = timeout
 
-    def command(self, args, timeout=None):
+    def command(self, args, timeout=None, input_data=None):
         try:
             prefix = [self.prefix[0], "--force-local"] if args and args[0] == "query" else self.prefix
             result = subprocess.run(prefix + args, text=True, capture_output=True,
-                                    stdin=subprocess.DEVNULL, timeout=timeout or self.timeout)
+                                    input=input_data, **({"stdin": subprocess.DEVNULL} if input_data is None else {}),
+                                    timeout=timeout or self.timeout)
         except subprocess.TimeoutExpired as exc:
             raise Error(t('lxd_query_timeout')) from exc
         if result.returncode:
@@ -148,6 +149,14 @@ class Manager:
     def filesystems(self):
         from .filesystems import Filesystems
         return Filesystems(self, self.fs_root, self.fs_state)
+
+    @cached_property
+    def gpu(self):
+        from .gpu import GPU
+        return GPU(self)
+
+    def hardware(self, target, enabled=None):
+        return self.gpu.status(target) if enabled is None else self.gpu.set(target, enabled)
 
     def mountfs(self, target, path=None, *, default_home=False):
         return self.filesystems.mount(target, path, default_home=default_home)
@@ -249,6 +258,7 @@ class Manager:
             raise Error(t('invalid_image'))
         result = self._run_lxd_until_state("new", target,
                                ["init", image, "local:" + target, "-c", MANAGED + "=true"], "Stopped")
+        self.gpu.ensure(target)
         self._completed('new', target, 'Stopped', started)
         return result
 
@@ -295,6 +305,8 @@ class Manager:
                               path=entry['path'], error=exc, completed=', '.join(completed) or '—',
                               pending=', '.join(e['path'] for e in entries[index+1:]) or '—')) from exc
             completed.append(entry['path'])
+        if action == 'start':
+            self.gpu.ensure(target)
         return entries
 
     def _execute_lifecycle(self, target, action, already=None):
@@ -310,6 +322,7 @@ class Manager:
             result = self._run_lxd_until_state(action, target, command, expected)
         if action == 'start':
             result = self._prepare_user(target)
+            self.gpu.prepare(target)
         self._completed(action, target, expected, started)
         return result
 

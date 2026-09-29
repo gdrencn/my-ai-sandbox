@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of batch 0.1.15, promoted unchanged to phase 1 stable 0.1.15. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of test batch 0.2.1. Phase 1 stable remains the unchanged 0.1.15 release. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
@@ -18,11 +18,11 @@ CLI and text-menu waiting events share the tester's terminal-line renderer: norm
 
 | Operation | Before native execution | Native execution | After / alternate branch |
 | --- | --- | --- | --- |
-| new | Validate TARGET; reject any existing name; choose ubuntu:<host VERSION_ID> from Ubuntu /etc/os-release unless overridden; reject an image starting with '-' | lxc init IMAGE local:TARGET -c user.mas.managed=true | Wait for native completion and a stopped managed container. Do not start it or provision sandbox here. |
+| new | Validate TARGET; reject any existing name; choose ubuntu:<host VERSION_ID> from Ubuntu /etc/os-release unless overridden; reject an image starting with '-' | lxc init IMAGE local:TARGET -c user.mas.managed=true | Wait for native completion and a stopped managed container, then reuse the GPU module to configure default access when supported. Do not start it or provision sandbox here. |
 | list | Query structured local instance data | lxc list local: --format=json | Filter to owned containers and sort by name. No mutation. |
 | info | Validate TARGET; query structured instance data | Same list query, not a separate lxc info call | Find target, reject absent/unowned instance and return its complete record. CLI/menu formats JSON. |
-| start | Require owned target; allow Stopped or Running only; before a real transition sequentially call shared unmountfs for recorded paths | Stopped: lxc start local:TARGET; then lxc exec runs USER_SETUP | Wait Running before setup. Already Running skips native start but still runs USER_SETUP. Wait for setup command completion and Running afterward; after a real transition restore captured mounts through shared mountfs. |
-| stop | Require owned target; allow Running or Stopped only; before a real transition sequentially call shared unmountfs for recorded paths | Running: lxc stop local:TARGET --timeout TIMEOUT | Wait Stopped and restore captured mounts through shared mountfs. Already Stopped returns success with negligible elapsed and issues no stop command. |
+| start | Require owned target; allow Stopped or Running only; before a real transition sequentially call shared unmountfs for recorded paths; before start also reuse GPU.ensure | Stopped: lxc start local:TARGET; then lxc exec runs USER_SETUP | Wait Running before setup. Already Running skips native start but still runs USER_SETUP. GPU.prepare performs required internal runtime preparation for recorded WSL GPU settings; its failure prevents complete start success and mount restoration. Wait for setup command completion and Running afterward; after a real transition restore captured mounts through shared mountfs. |
+| stop | Require owned target; allow Running or Stopped only; before a real transition sequentially call shared unmountfs for recorded paths; before start also reuse GPU.ensure | Running: lxc stop local:TARGET --timeout TIMEOUT | Wait Stopped and restore captured mounts through shared mountfs. Already Stopped returns success with negligible elapsed and issues no stop command. |
 | stop --all | Get sorted owned list | Call shared stop for each target | Continue after individual Error/OSError exceptions; aggregate failures and report them after attempting the list. |
 | delete | Require owned, stopped target; confirm; recheck ownership and stopped state after confirmation | lxc delete local:TARGET | Wait for native completion and confirmed absence. Decline causes no mutation. |
 | import | Require absent TARGET; expand '~' and make FILE absolute; require a file | lxc import local: FILE TARGET | First wait for native completion and Stopped without requiring a marker. Reject non-container result and leave it unmanaged. Then lxc config set local:TARGET user.mas.managed=true and wait for stopped managed result. Marking failure is reported; no rollback/deletion is invented. |
@@ -41,7 +41,7 @@ In order:
 5. Validate with visudo, set rule mode 0440 and move it to /etc/sudoers.d/90-mas-sandbox, replacing the mas-owned rule.
 6. Verify passwordless sudo through sandbox's login session using sudo -n /usr/bin/true.
 
-Root's password is not set to empty. The ownership marker and this user/sudo preparation are the only mas-specific container configuration. No GPU mapping, host-directory sharing, network policy, port forwarding or custom profile is added. Fresh-host storage/network initialization, LXD installation, sudo authentication and host PATH setup belong to mas/install.py, not to container operation hooks.
+Root's password is not set to empty. The ownership marker, user/sudo preparation and the independently managed GPU resources below are mas-specific container configuration. GPU driver mappings are read-only; general host-directory sharing, network policy, port forwarding and custom profiles are not added. Fresh-host storage/network initialization, LXD installation, sudo authentication and host PATH setup belong to mas/install.py, not to container operation hooks.
 
 
 ## Filesystem extension (0.1.9–0.1.12)
@@ -99,3 +99,12 @@ The common Bash dependency helper now runs its APT/tee/renderer pipeline inside 
 Bare mas directly opens my-ai-sandbox with list, new, import, mas preferences and exit. Chinese preferences is mas 选项; English is mas Preferences. Per-container actions remain behind container selection. Stop all containers is a non-container control on the selection page, placed before Back and shown only for more than one managed container with at least one state other than exact Stopped. Live LXD state is authoritative, including native lxc changes; query errors are not treated as empty or all stopped. The menu calls unchanged Manager.stop_all, then reloads the list. Already-stopped requests do not repair independent filesystem issues. Future host/per-container settings are placement conventions only, not new features.
 
 Deletion continues to require explicit unmount/cleanup. Its bilingual instruction now refers only to deletion; it no longer incorrectly includes start/stop.
+
+
+## GPU module — 0.2.1
+
+`Manager.hardware` is the shared CLI/menu entry to `mas/gpu.py`. `GPU.status`, `GPU.set`, `GPU.ensure` and `GPU.prepare` separate queries, stopped-container resource configuration, default/driver refresh orchestration, and required internal runtime preparation. GPU configuration shares the lifecycle/filesystem lock. Configuration and exact ownership metadata are published in one native LXD config edit; structured readback must match before success. Disabling verifies removal of the owned loader file, then removes owned devices and saves explicit off. Native errors preserve actionable state rather than publishing success.
+
+WSL NVIDIA uses an owned unix-char `/dev/dxg` (container mode 0666), read-only `/usr/lib/wsl/lib`, and read-only individual driver-store directories containing `libcuda.so.1.1`. The complete driver-store parent is not shared. Loader configuration is fixed-content `/etc/ld.so.conf.d/mas-gpu.conf`; `ldconfig` runs inside the container. Foreign content and conflicting or modified devices are refused. Empty native mount-point directories or stale linker-cache references are not GPU access; the next start refreshes the cache. No arbitrary container data is removed and no host package/driver is installed.
+
+The current detector supports NVIDIA; native Ubuntu uses LXD's nvidia.com/gpu=all CDI device and remains unverified on native hardware. WSL CDI failed discovery on the measured LXD snap, so WSL explicitly uses the native device path above, not automatic fallback after partially modifying a container. A missing supported GPU hides the menu switch; actual discovery errors remain errors. Closing recorded access remains possible through CLI even if discovery is broken. The module does not implement the pending project/profile hardening.
