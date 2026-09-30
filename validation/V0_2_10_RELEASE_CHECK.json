@@ -1,0 +1,140 @@
+{
+  "selected": "v0.2.10",
+  "prerelease": true,
+  "assets": [
+    {
+      "name": "bootstrap.py",
+      "sha256": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+      "matched": true
+    },
+    {
+      "name": "install-stable.sh",
+      "sha256": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "matched": true
+    },
+    {
+      "name": "install-test.sh",
+      "sha256": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "matched": true
+    },
+    {
+      "name": "install.sh",
+      "sha256": "9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+      "matched": true
+    },
+    {
+      "name": "mas-install.pyz",
+      "sha256": "8dd34aa73757dc152517f3b9ffa8ab5f7c91b991fe46c09110dc6e4f448cf5b2",
+      "matched": true
+    },
+    {
+      "name": "mas-test.pyz",
+      "sha256": "fbae85ab96fb5c22bc47db4ac61733aabb41248fec90fec62e75d97b37c43126",
+      "matched": true
+    },
+    {
+      "name": "mas.pyz",
+      "sha256": "3fc85866d4c14860798aab90d3b26fba5c295f6ef55f0899da0958694d79efaf",
+      "matched": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "090f401fc7d78f4a464af9a087e0567a38a2fa2f93d943709c7fffd898f3cb3c",
+      "matched": true
+    },
+    {
+      "name": "test-stable.sh",
+      "sha256": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "matched": true
+    },
+    {
+      "name": "test.sh",
+      "sha256": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "matched": true
+    },
+    {
+      "name": "WSL_REPORT.json",
+      "sha256": "ef8f12c0245e25f324e7a87af901ce12754119f7a16fd81034a76f58f0fb68d9",
+      "matched": true
+    }
+  ],
+  "public_entry": "test/test.sh",
+  "public_test_cwd": "/tmp",
+  "normal_install": {
+    "entry": "test/install.sh",
+    "success": true,
+    "version": "0.2.10",
+    "product_matches": true,
+    "tester_unchanged": true,
+    "stdout": "正在安装 v0.2.10\nmas 已安装到 /home/gordon/.local/bin/mas\n已配置 shell PATH，请打开新终端后直接运行 mas。\n",
+    "stderr": ""
+  },
+  "entries": [
+    {
+      "path": "stable/install.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "stable",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/install.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "test",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/test.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "test",
+        "--test",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/test-stable.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "stable",
+        "--test",
+        "--output",
+        "path with spaces"
+      ]
+    }
+  ],
+  "latest": "stable/0.1.15",
+  "stable_test_pair": "v0.1.15",
+  "stable_pair_checksums_match": true,
+  "stable_pair_hashes": {
+    "mas.pyz": "bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6",
+    "mas-install.pyz": "9156ff2cec3b3e54b15d4c59d46c44c05f4d9ae3801035396f839ecc51f5d105"
+  },
+  "full_public_test_rerun": true,
+  "public_test": {
+    "version": "0.2.10",
+    "elapsed": 481.56356419798976,
+    "unit_tests": 254,
+    "report_stages": 23,
+    "native_integration_stages": 22,
+    "passed": true,
+    "skipped_units": [],
+    "cleanup_errors": [],
+    "report": "validation/V0_2_10_PUBLIC_REPORT.json",
+    "isolated_project_reclaimed": true
+  },
+  "installed_hashes": {
+    "mas.pyz": "3fc85866d4c14860798aab90d3b26fba5c295f6ef55f0899da0958694d79efaf",
+    "mas-test.pyz": "fbae85ab96fb5c22bc47db4ac61733aabb41248fec90fec62e75d97b37c43126"
+  }
+}
