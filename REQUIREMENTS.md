@@ -441,7 +441,7 @@ Status: implemented, verified and published as test v0.2.4. All 196 packaged uni
 
 ## 32. Portable Python test subprocesses — v0.2.5
 
-Status: implemented and verified outside the checkout: 197 packaged units and all 22 native stages passed in 452.2 seconds, with no skips or cleanup errors. Publication verification follows.
+Status: implemented and verified outside the checkout: 197 packaged units and all 22 native stages passed in 452.2 seconds, with no skips or cleanup errors. Published as test v0.2.5. The public installer/test entry also passed all 197 units and 22 stages from /tmp in 450.7 seconds, without skips or cleanup errors.
 
 - Centralize Python test-child startup with an explicit import root derived from the running tester module, supporting both checkout and zipapp. Do not rely on the caller's working directory or PYTHONPATH. Reuse it for module-dependent PTY fixtures.
 - Preserve generic Terminal execution and intentionally independent bootstrap/standard-library fixtures. No product GPU behavior change.
