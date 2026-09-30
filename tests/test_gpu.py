@@ -3,10 +3,12 @@ import contextlib
 import io
 import json
 import unittest
+from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 from unittest.mock import Mock, patch
 
 from mas.core import Error, MANAGED
-from mas.gpu import GPU, KEY, CONF, CONTENT, devices
+from mas.gpu import GPU, KEY, CONF, CONTENT, PROFILE, PROFILE_CONTENT, devices
 from mas.terminal_ui import UI
 
 CAP = {'available': True, 'backend': 'wsl-nvidia', 'gpus': [{'name': 'NVIDIA test', 'uuid': 'GPU-test'}], 'driver_paths': ['/usr/lib/wsl/drivers/nvidia-test']}
@@ -23,6 +25,7 @@ class GPUTests(unittest.TestCase):
         self.manager.require.side_effect = self.require
         self.manager.filesystems.locked.side_effect = contextlib.nullcontext
         self.manager.lxd.command.side_effect = self.command
+        self.profile = None
         self.file = None
         self.edits = []
         self.gpu = GPU(self.manager)
@@ -39,10 +42,48 @@ class GPUTests(unittest.TestCase):
             return json.dumps({k: self.item[k] for k in ('config','devices')})
         if args[:2] == ['config', 'edit']:
             self.edits.append(json.loads(input_data)); self.item.update(self.edits[-1]);return ''
-        if args[0] == 'query': return json.dumps(['mas-gpu.conf'] if self.file is not None else [])
-        if args[:2] == ['file','pull']: return self.file
-        if args[:2] == ['file','delete']: self.file = None;return ''
+        if args[0] == 'query':
+            parent = parse_qs(urlparse(args[1]).query)['path'][0]
+            value, name = (self.file, 'mas-gpu.conf') if parent.endswith('ld.so.conf.d') else (self.profile, 'mas-gpu.sh')
+            return json.dumps([name] if value is not None else [])
+        if args[:2] == ['file','pull']:
+            value = self.profile if args[2].endswith(PROFILE) else self.file
+            Path(args[3]).write_text(value)
+            return ''
+        if args[:2] == ['file','delete']:
+            if args[2].endswith(PROFILE): self.profile = None
+            else: self.file = None
+            return ''
         raise AssertionError(args)
+
+    def test_profile_cleanup_and_legacy_upgrade(self):
+        self.gpu.set('test-unit', True)
+        record = self.gpu.record(self.item)
+        record.pop('runtime_profile')
+        self.item['config'][KEY] = json.dumps(record)
+        self.gpu.ensure('test-unit')
+        self.assertEqual(self.gpu.record(self.item)['runtime_profile'], PROFILE)
+        self.file, self.profile = CONTENT, PROFILE_CONTENT
+        self.gpu.set('test-unit', False)
+        self.assertIsNone(self.file)
+        self.assertIsNone(self.profile)
+        self.assertIsNone(self.gpu.record(self.item)['runtime_profile'])
+
+    def test_foreign_profile_and_symlink_preserved_before_cleanup(self):
+        self.gpu.set('test-unit', True)
+        self.file, self.profile = CONTENT, 'user-owned profile'
+        with self.assertRaises(Error): self.gpu.set('test-unit', False)
+        self.assertEqual(self.file, CONTENT)
+        self.assertEqual(self.profile, 'user-owned profile')
+        original = self.command
+        def symlink(args, **kw):
+            if args[:2] == ['file', 'pull'] and args[2].endswith(PROFILE):
+                Path(args[3]).symlink_to('/not-a-managed-file')
+                return ''
+            return original(args, **kw)
+        self.manager.lxd.command.side_effect = symlink
+        with self.assertRaises(Error): self.gpu.set('test-unit', False)
+        self.assertEqual(self.file, CONTENT)
 
     def test_default_enable_disable_and_preserve_other_devices(self):
         self.gpu.ensure('test-unit')

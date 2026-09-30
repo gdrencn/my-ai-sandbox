@@ -1,3 +1,13 @@
+# 0.2.6 — WSL GPU 运行库与独立发布入口（test）
+
+- 显式指定 WSL 库搜索路径，解决 NVML 误选 Linux 库产生的 Driver Not Loaded。
+- 已确认的多驱动目录提示在产品成功探测后不显示，自动测试继续保留，其他诊断不变。
+- 容器登录 shell 可直接运行 nvidia-smi；GPU 模块管理并清理专用 profile 文件，保护非自有内容和符号链接。
+- 独立验证宿主实际加载的驱动路径与容器映射一致；旧 GPU 记录平滑补齐 profile 管理。
+- 新增 stable/install.sh、test/install.sh、test/test.sh、test/test-stable.sh 固定入口，共用下载、校验和安装实现；旧命令继续兼容。
+- stable 测试严格匹配同版本产品和安装包，stable 产品保持 0.1.15。
+- 仓库外完整验证：201 项单元测试、22 个实机环节全部通过（452.2 秒），无跳过或清理错误。
+
 # 0.2.5 — 修复测试包子进程导入（test）
 
 修复 v0.2.4 测试工具从源码仓库外运行时，GPU 诊断 PTY 测试子进程报 `ModuleNotFoundError: No module named mas` 的问题。

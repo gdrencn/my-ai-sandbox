@@ -10,6 +10,7 @@ import shutil
 import shlex
 import subprocess
 import time
+import tempfile
 from urllib.parse import quote, urlencode
 
 from .core import Error
@@ -19,23 +20,33 @@ from .diagnostics import emit_native
 KEY = 'user.mas.gpu'
 CONF = '/etc/ld.so.conf.d/mas-gpu.conf'
 CONTENT = '# Managed by my-ai-sandbox GPU module\n/usr/lib/wsl/lib\n'
+PROFILE = '/etc/profile.d/mas-gpu.sh'
+PROFILE_CONTENT = '# Managed by my-ai-sandbox GPU module\nexport PATH="/usr/lib/wsl/lib:$PATH"\n'
+RUNTIME_FILES = {CONF: CONTENT, PROFILE: PROFILE_CONTENT}
 CTK = '/snap/lxd/current/bin/nvidia-ctk'
 
 
-def _discovery_command(command, diagnostic=None):
+def _discovery_command(command, diagnostic=None, *, defer_diagnostics=False):
     try:
         result = subprocess.run(command, capture_output=True, text=True, timeout=600)
     except subprocess.TimeoutExpired as exc:
         raise Error(t('gpu_detect_timeout')) from exc
     except OSError as exc:
         raise Error(t('gpu_detect_failed', error=str(exc))) from exc
-    if result.returncode == 0:
-        # Native informational discovery logs are transient implementation detail;
-        # retain warnings and any unrecognized diagnostics without translating.
-        lines = [line for line in result.stderr.splitlines()
-                 if not re.search(r'(?:^|\s)level=(?:info|debug|trace)(?:\s|$)', line)]
-        emit_native('\n'.join(lines), diagnostic)
+    if result.returncode == 0 and not defer_diagnostics:
+        _emit_discovery(result.stderr, diagnostic)
     return result
+
+
+def _emit_discovery(stderr, diagnostic=None, *, hide_multiple=False):
+    # Native informational discovery logs are transient implementation detail;
+    # retain warnings and any unrecognized diagnostics without translating.
+    lines = [line for line in stderr.splitlines()
+             if not re.search(r'(?:^|\s)level=(?:info|debug|trace)(?:\s|$)', line)]
+    if hide_multiple:
+        lines = [line for line in lines if not re.fullmatch(
+            r'time="[^"]+" level=warning msg="Found multiple driver store paths: \[[^\r\n\"]+\]"', line)]
+    emit_native('\n'.join(lines), diagnostic)
 
 
 def valid_driver_directory(path):
@@ -43,15 +54,17 @@ def valid_driver_directory(path):
             and Path(path).name not in ('.', '..'))
 
 
-def wsl_driver_paths(diagnostic=None):
+def wsl_driver_paths(diagnostic=None, *, keep_known_warnings=False):
     """Use NVIDIA's DXCore-backed discovery, never guess from directory names."""
     if not Path(CTK).is_file():
         raise Error(t('gpu_discovery_tool_missing', path=CTK))
     result = _discovery_command([CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', '',
                                 '--disable-hook=all', '--nvidia-cdi-hook-path=' + CTK,
-                                '--feature-flag=disable-nvsandboxutils'], diagnostic)
+                                '--feature-flag=disable-nvsandboxutils',
+                                '--library-search-path=/usr/lib/wsl/lib'], diagnostic, defer_diagnostics=True)
     if result.returncode:
         raise Error(t('gpu_detect_failed', error=result.stderr.strip() or result.stdout.strip()))
+    validated = False
     try:
         spec = json.loads(result.stdout)
         if not isinstance(spec, dict) or spec['kind'] != 'nvidia.com/gpu' or not isinstance(spec['devices'], list):
@@ -81,12 +94,15 @@ def wsl_driver_paths(diagnostic=None):
                 paths.add(str(Path(source).parent))
         if not paths:
             raise ValueError()
+        validated = True
         return sorted(paths)
     except (ValueError, KeyError, TypeError, AttributeError, OSError, RuntimeError) as exc:
         raise Error(t('gpu_discovery_invalid')) from exc
+    finally:
+        _emit_discovery(result.stderr, diagnostic, hide_multiple=validated and not keep_known_warnings)
 
 
-def detect(diagnostic=None):
+def detect(diagnostic=None, *, keep_known_warnings=False):
     """Report NVIDIA discrete compute GPUs; no packages or configuration changes."""
     wsl = Path('/dev/dxg').exists()
     executable = '/usr/lib/wsl/lib/nvidia-smi' if wsl else shutil.which('nvidia-smi')
@@ -106,7 +122,7 @@ def detect(diagnostic=None):
         raise Error(t('gpu_detect_failed', error=result.stdout.strip()))
     if wsl and not all(Path(p).is_dir() for p in ('/usr/lib/wsl/lib', '/usr/lib/wsl/drivers')):
         raise Error(t('gpu_runtime_missing'))
-    driver_paths = wsl_driver_paths(diagnostic) if wsl else []
+    driver_paths = wsl_driver_paths(diagnostic, keep_known_warnings=keep_known_warnings) if wsl else []
     return {'available': True, 'backend': 'wsl-nvidia' if wsl else 'nvidia-cdi', 'gpus': gpus, 'driver_paths': driver_paths}
 
 
@@ -128,9 +144,10 @@ class GPU:
     def __init__(self, manager):
         self.manager = manager
         self.lxd = manager.lxd
+        self.keep_known_warnings = False
 
     def detect(self):
-        return detect(diagnostic=self.lxd.diagnostic)
+        return detect(diagnostic=self.lxd.diagnostic, keep_known_warnings=self.keep_known_warnings)
 
     def record(self, instance):
         raw = instance['config'].get(KEY)
@@ -150,6 +167,7 @@ class GPU:
                     or type(item.get('enabled')) is not bool
                     or item.get('backend') not in ('wsl-nvidia', 'nvidia-cdi')
                     or item.get('devices') != (devices(item['backend'], paths) if item['enabled'] else {})
+                    or item.get('runtime_profile') not in (None, PROFILE if item['enabled'] and item['backend'] == 'wsl-nvidia' else None)
                     or item.get('runtime_file') != (CONF if item['enabled'] and item['backend'] == 'wsl-nvidia' else None)):
                 raise ValueError()
             return item
@@ -170,7 +188,7 @@ class GPU:
             source = definition.get('source', '')
             if (name.startswith('mas-gpu') or definition.get('type') == 'gpu'
                     or path == '/dev/dxg' or source == '/dev/dxg'
-                    or path == CONF or path == '/etc/ld.so.conf.d'
+                    or path in RUNTIME_FILES or path in ('/etc/ld.so.conf.d', '/etc/profile.d')
                     or path == '/etc'
                     or path == '/usr' or path == '/usr/lib'
                     or path == '/usr/lib/wsl' or path.startswith('/usr/lib/wsl/')
@@ -186,15 +204,21 @@ class GPU:
                 'configured': record is not None, 'resources': record or {},
                 'state': instance['status']}
 
-    def _runtime_file(self, target):
+    def _runtime_file(self, target, path=CONF):
         endpoint = '/1.0/instances/' + quote(target, safe='') + '/files?' + urlencode(
-            {'project': self.lxd.project, 'path': '/etc/ld.so.conf.d'})
+            {'project': self.lxd.project, 'path': path.rsplit('/', 1)[0]})
         entries = json.loads(self.lxd.command(['query', endpoint]))
-        if CONF.rsplit('/', 1)[1] not in entries:
+        if path.rsplit('/', 1)[1] not in entries:
             return None
-        content = self.lxd.command(['file', 'pull', 'local:' + target + CONF, '-'])
-        if content != CONTENT:
-            raise Error(t('gpu_runtime_conflict', path=CONF))
+        # Pull preserves the native file type. Never follow a guest symlink on the host.
+        with tempfile.TemporaryDirectory(prefix='mas-gpu-file-') as directory:
+            local = Path(directory) / 'runtime'
+            self.lxd.command(['file', 'pull', 'local:' + target + path, str(local)])
+            if local.is_symlink() or not local.is_file():
+                raise Error(t('gpu_runtime_conflict', path=path))
+            content = local.read_text()
+        if content != RUNTIME_FILES[path]:
+            raise Error(t('gpu_runtime_conflict', path=path))
         return content
 
     def set(self, target, enabled, *, capability=None):
@@ -215,18 +239,23 @@ class GPU:
             # Validate/remove only our exact internal loader file. A failed removal
             # leaves the old ownership record intact and can safely be retried.
             if backend == 'wsl-nvidia' or (record and record['enabled'] and record['backend'] == 'wsl-nvidia'):
-                content = self._runtime_file(target)
-                if not enabled and content is not None:
-                    self.lxd.command(['file', 'delete', 'local:' + target + CONF])
-                    deadline = time.monotonic() + self.lxd.timeout
-                    while self._runtime_file(target) is not None:
-                        if time.monotonic() >= deadline:
-                            raise Error(t('gpu_wait_failed'))
-                        time.sleep(1)
+                # Check every file before removing any; module owns exact fixed content.
+                existing = {path: self._runtime_file(target, path) for path in RUNTIME_FILES}
+                if not enabled:
+                    for path, content in existing.items():
+                        if content is None:
+                            continue
+                        self.lxd.command(['file', 'delete', 'local:' + target + path])
+                        deadline = time.monotonic() + self.lxd.timeout
+                        while self._runtime_file(target, path) is not None:
+                            if time.monotonic() >= deadline:
+                                raise Error(t('gpu_wait_failed'))
+                            time.sleep(1)
             driver_paths = capability.get('driver_paths', []) if enabled else (record['driver_paths'] if record else capability.get('driver_paths', []))
             definition = devices(backend, driver_paths) if enabled else {}
             desired = {'version': 1, 'enabled': enabled, 'backend': backend, 'driver_paths': driver_paths,
-                       'devices': definition, 'runtime_file': CONF if enabled and backend == 'wsl-nvidia' else None}
+                       'devices': definition, 'runtime_file': CONF if enabled and backend == 'wsl-nvidia' else None,
+                       'runtime_profile': PROFILE if enabled and backend == 'wsl-nvidia' else None}
             endpoint = '/1.0/instances/' + quote(target, safe='') + '?' + urlencode({'project': self.lxd.project})
             snapshot = json.loads(self.lxd.command(['query', endpoint]))
             current = {key: snapshot[key] for key in ('architecture', 'config', 'devices', 'ephemeral', 'profiles', 'description') if key in snapshot}
@@ -264,7 +293,8 @@ class GPU:
                 capability = self.detect()
                 if not capability['available'] or capability['backend'] != record['backend']:
                     raise Error(t('gpu_unavailable'))
-                if capability.get('driver_paths', []) != record['driver_paths']:
+                if (capability.get('driver_paths', []) != record['driver_paths']
+                        or record['backend'] == 'wsl-nvidia' and record.get('runtime_profile') != PROFILE):
                     self.set(target, True, capability=capability)
             return
         capability = self.detect()
@@ -278,25 +308,18 @@ class GPU:
         if not record or record['backend'] != 'wsl-nvidia':
             return
         self.check_owned(instance, record)
-        # Shell literals are fixed module constants, never container/user input.
-        script = '''set -eu
-p=/etc/ld.so.conf.d/mas-gpu.conf
-if [ -L "$p" ]; then echo 'GPU loader configuration is a symlink' >&2; exit 1; fi
-'''
+        # Validate both files before writing either. All paths/content are constants.
+        script = 'set -eu\n'
         if record['enabled']:
-            script += 'expected=' + shlex.quote(CONTENT.rstrip('\n')) + '\n'
-            script += '''
-if [ -e "$p" ] && [ "$(cat "$p")" != "$expected" ]; then
- echo 'GPU loader configuration already exists with different content' >&2; exit 1
-fi
-printf '%s\\n' "$expected" > "$p"
-test -c /dev/dxg
-test -r /usr/lib/wsl/lib/libcuda.so.1
-ldconfig
-'''
-        else:
-            script += 'ldconfig\n'
-        for message in ('GPU loader configuration is a symlink', 'GPU loader configuration already exists with different content'):
-            script = script.replace("'" + message + "'", shlex.quote(t('gpu_runtime_conflict', path=CONF)))
+            for path, content in RUNTIME_FILES.items():
+                script += 'p=' + shlex.quote(path) + '\nexpected=' + shlex.quote(content.rstrip('\n')) + '\n'
+                message = shlex.quote(t('gpu_runtime_conflict', path=path))
+                script += ('if [ -L "$p" ] || { [ -e "$p" ] && { [ ! -f "$p" ] || '
+                           '[ "$(cat "$p")" != "$expected" ]; }; }; then echo ' + message + ' >&2; exit 1; fi\n')
+            for path, content in RUNTIME_FILES.items():
+                script += "printf '%s\\n' " + shlex.quote(content.rstrip('\n')) + ' > ' + shlex.quote(path) + '\n'
+                script += 'chmod 0644 ' + shlex.quote(path) + '\n'
+            script += 'test -c /dev/dxg\ntest -r /usr/lib/wsl/lib/libcuda.so.1\n'
+        script += 'ldconfig\n'
         self.manager._run_lxd_until_state('gpu-runtime', target,
             ['exec', 'local:' + target, '--', '/bin/sh', '-c', script], 'Running')

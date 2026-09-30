@@ -23,7 +23,14 @@ def download(url):
         return response.read()
 
 
-def release(version=None):
+def release(version=None, *, channel="test"):
+    if channel == "stable":
+        result = json.loads(download(f"https://api.github.com/repos/{REPOSITORY}/releases/latest"))
+        if result.get("draft") or result.get("prerelease") or not re.fullmatch(r"stable/\d+\.\d+\.\d+", result.get("tag_name", "")):
+            raise RuntimeError(t("no_release"))
+        if version and result["tag_name"].split("/")[-1] != version.removeprefix("v"):
+            raise RuntimeError(t("stable_version_mismatch"))
+        return result
     base = f"https://api.github.com/repos/{REPOSITORY}/releases"
     if version:
         if not re.fullmatch(r"v?\d+\.\d+\.\d+", version):
@@ -44,22 +51,40 @@ def release(version=None):
     raise RuntimeError(t("no_release"))
 
 
+def asset_urls(selected):
+    return {asset['name']: asset['browser_download_url'] for asset in selected['assets']}
+
+
+def release_checksums(assets):
+    result = {}
+    for line in download(assets['SHA256SUMS']).decode().splitlines():
+        digest, name = line.split(maxsplit=1)
+        result[name.lstrip('*')] = digest
+    return result
+
+
 def main():
     parser = Parser()
     parser.add_argument("--test", action="store_true", help=t("help_install_test"))
+    parser.add_argument("--channel", choices=("test", "stable"), default="test", help=t("help_channel"))
     parser.add_argument("--release", help=t("help_release"))
     parser.add_argument("--language", choices=config.LANGUAGES, default=os.environ.get("MAS_LANGUAGE"), help=t("help_language"))
     args, test_args = parser.parse_known_args()
     choose_language(args.language)
     if test_args and not args.test:
         parser.error(t("extra_test_args"))
-    selected = release(args.release)
+    selected = release(args.release) if args.channel == "test" else release(args.release, channel="stable")
+    stable_product = selected if args.channel == "stable" and args.test else None
+    if stable_product is not None:
+        selected = release(stable_product["tag_name"].split("/")[-1])
     print(t("installing", version=selected["tag_name"]), flush=True)
-    assets = {asset["name"]: asset["browser_download_url"] for asset in selected["assets"]}
-    checksums = {}
-    for line in download(assets["SHA256SUMS"]).decode().splitlines():
-        digest, name = line.split(maxsplit=1)
-        checksums[name.lstrip("*")] = digest
+    assets = asset_urls(selected)
+    checksums = release_checksums(assets)
+    if stable_product is not None:
+        stable_sums = release_checksums(asset_urls(stable_product))
+        if any(not stable_sums.get(name) or stable_sums[name] != checksums.get(name)
+               for name in ('mas.pyz', 'mas-install.pyz')):
+            raise RuntimeError(t('stable_version_mismatch'))
     with tempfile.TemporaryDirectory(prefix="mas-install-") as directory:
         paths = {}
         legacy = "mas-install.pyz" not in assets

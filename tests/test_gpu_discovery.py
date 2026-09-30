@@ -40,7 +40,7 @@ class DiscoveryTests(unittest.TestCase):
         args, kwargs = self.run.call_args
         self.assertEqual(args[0], [CTK, 'cdi', 'generate', '--mode=wsl', '--format=json', '--output', '',
                                   '--disable-hook=all', '--nvidia-cdi-hook-path=' + CTK,
-                                  '--feature-flag=disable-nvsandboxutils'])
+                                  '--feature-flag=disable-nvsandboxutils', '--library-search-path=/usr/lib/wsl/lib'])
         self.assertEqual(kwargs['timeout'], 600)
         self.assertEqual(self.run.call_count, 1)
 

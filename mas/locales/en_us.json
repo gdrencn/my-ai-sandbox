@@ -219,5 +219,7 @@
   "gpu_pending": "GPU defaults to enabled but is not configured yet; it will be applied on the next start from stopped.",
   "gpu_detect_timeout": "GPU discovery exceeded 600 seconds; check the host driver.",
   "gpu_discovery_tool_missing": "The GPU discovery tool supplied by LXD is missing: {path}. Check the LXD snap installation.",
-  "gpu_discovery_invalid": "NVIDIA discovery did not return valid accessible WSL driver paths; cached paths and directory scanning will not be used."
+  "gpu_discovery_invalid": "NVIDIA discovery did not return valid accessible WSL driver paths; cached paths and directory scanning will not be used.",
+  "help_channel": "Select release channel",
+  "stable_version_mismatch": "Stable product and its matching test release differ; installation and testing were not started."
 }

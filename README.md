@@ -4,47 +4,62 @@
 
 ## 安装阶段 1 稳定版（0.1.15）
 
-[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15) 已发布；产品和安装程序与 [同版本 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15) 完全一致。安装时固定版本：
+[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15) 已发布；产品和安装程序与 [同版本 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15) 完全一致。固定入口安装最新 stable：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.15
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/stable/install.sh | bash
 ```
 
-这个命令只下载安装所需文件，不下载测试工具。稳定版附件为产品、独立安装程序和校验清单；Git tag `stable/0.1.15` 仅用于区分发布渠道，程序版本仍为 `0.1.15`。固定版本安装复用同版本数字发布中的相同文件。
+这个命令只下载安装所需文件，不下载测试工具。稳定版附件为产品、独立安装程序和校验清单；Git tag `stable/0.1.15` 仅用于区分发布渠道，程序版本仍为 `0.1.15`。stable 入口从 GitHub latest 解析当前稳定发布；产品版本与发布通道分开。
 
 需要验证稳定版时，使用同版本 test 发布的自动化测试工具：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.15
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash
 ```
 
 不指定 `--release` 的原有入口仍安装最新测试版，不会因为本次 stable 发布而改变含义。发布前复核通过 162 项单元测试及全部 21 个测试环节，详情见 [审查记录](validation/STABLE_0_1_15_AUDIT.md) 与 [已实现文档](IMPLEMENTED.md)。
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.5`，修复测试工具在仓库外运行时，Python 子进程找不到 `mas` 的问题。
+当前 test 为 `0.2.6`，修正 WSL GPU 库查找、提供容器登录 shell 的 nvidia-smi 命令，并新增独立发布入口。
 
 在 Ubuntu 的交互式终端运行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash
 ```
 
 安装位置：`~/.local/bin/mas`。安装程序自动配置实际安装目录的 PATH，保留已有配置，重复安装不会重复添加。安装后打开新终端，直接运行 `mas`；不需要手动执行 `export`。
 
-普通安装只下载产品和独立安装程序，不下载或安装测试工具。`--test` 才额外下载 `mas-test.pyz`，由测试工具调用同版本安装程序完成安装，再运行完整测试，并安装 `~/.local/bin/mas-test`。
+普通安装只下载产品和独立安装程序，不下载或安装测试工具。`test/test.sh`（或旧入口 `--test`）才额外下载 `mas-test.pyz`，由测试工具调用同版本安装程序完成安装，再运行完整测试，并安装 `~/.local/bin/mas-test`。
 
 安装脚本自动安装缺失的 Python 3、snapd、最新稳定渠道的 LXD 及其 lxc 客户端，以及宿主 SSHFS，先统一检测缺失依赖，需要 APT 时只刷新一次索引并合并安装；不再单独执行 `sudo -v`，由实际提权命令触发系统认证。正常 APT 进度在终端原地刷新，保留环节总结、警告和错误。sudo 自身连接终端，APT 的输出处理管道位于其内部命令中；重定向输出时软件包输入按非交互 EOF 处理，认证仍由系统 sudo 负责。全新 LXD 使用原生自动初始化（dir 存储和默认桥接网络）；已有环境不自动升级或覆盖配置。新增 lxd 用户组权限后，安装过程通过一个刷新用户组的用户进程继续运行，日常使用请打开新终端。
 
 宿主支持范围：Ubuntu 22.04 及更新版本（原生系统和 WSL2），Python 3.10+，需要可运行 snapd 的 systemd 环境。WSL 未启用 systemd 时，安装脚本会给出启用及重启提示。云服务器必须允许容器运行所需的内核功能。当前实际验证环境见 [IMPLEMENTED.md](IMPLEMENTED.md)，不能把支持目标视为所有环境已实测。
 
-入口使用公开 GitHub Releases API 查找最高的 `a.b.c` 数字版本（包含 prerelease），并从该版本下载产品、测试工具和 SHA-256 校验清单。它不会使用忽略 prerelease 的 `/releases/latest`。
+test 入口使用公开 GitHub Releases API 查找最高的 `a.b.c` 数字版本（包含 prerelease），并从该版本下载产品、测试工具和 SHA-256 校验清单。test 入口不使用 `/releases/latest`；stable 入口使用它选择 stable 产品，stable 测试入口再选择同一数字版本的测试发布，校验产品及安装包一致后执行，缺失或不一致均报错。
 
 安装指定版本：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.15
 ```
+
+## 固定发布入口
+
+| 入口 | 行为 |
+|---|---|
+| `stable/install.sh` | 安装最新 stable |
+| `test/install.sh` | 安装最新 test，不运行测试 |
+| `test/test.sh` | 安装并测试最新 test |
+| `test/test-stable.sh` | 安装并测试当前 stable 的同版本产品 |
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
+```
+
+这些入口由同一个模板生成，仅转发通道和动作到共享安装入口。原 `main/install.sh` 及其 `--test`、`--release` 参数继续兼容。发布附件同时提供 `install-stable.sh`、`install-test.sh`、`test.sh`、`test-stable.sh`，固定入口始终解析当前通道版本。
 
 ## 语言和配置
 
@@ -199,3 +214,5 @@ WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和官方探测选中
 从 0.2.3 起，WSL 驱动目录由 LXD snap 已附带的 `nvidia-ctk` 以 WSL 模式探测，不扫描全部历史目录。GPU 开启时，每次实际启动前重新查询并复用 GPU 配置函数更新映射，运行期间不自动修改。工具缺失、探测失败或结果无效会报错，不继续使用旧选择。mas 只读取官方工具输出的资源清单，不应用 CDI 文档或执行 hooks，也不额外安装软件包。
 
 0.2.4 使用官方参数关闭本查询不需要的 hooks 生成和 nvsandboxutils 探测；当前实测资源清单不变，单次警告由 5 条减少为 2 条。剩余原生警告继续保留，并在输出前清除临时进度。测试中的直接诊断保存在 `native-diagnostics.log`，CLI/菜单查询诊断进入事件记录。
+
+0.2.6 的 WSL 探测显式设置 `--library-search-path=/usr/lib/wsl/lib`，避免 NVML 误选普通 Linux 驱动库。产品在探测成功并通过资源校验后不显示已知的多个驱动目录提示；自动化测试保留原文，其他诊断不受影响。GPU 模块另管理容器内 `/etc/profile.d/mas-gpu.sh`，新登录 shell 可直接运行 `nvidia-smi`；关闭时清理模块自有文件，不修改宿主或用户 `.bashrc`。实际生效目录通过宿主 CUDA 加载映射与容器配置独立对比验证。

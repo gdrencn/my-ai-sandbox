@@ -27,6 +27,17 @@ def main():
             installer = installer.replace('@' + key.upper() + '_' + suffix + '@', shlex.quote(catalog[key]))
     (ROOT / "install.sh").write_text(installer)
 
+    entries = {"stable/install.sh": ("--channel", "stable"),
+               "test/install.sh": ("--channel", "test"),
+               "test/test.sh": ("--channel", "test", "--test"),
+               "test/test-stable.sh": ("--channel", "stable", "--test")}
+    for path, arguments in entries.items():
+        wrapper = (ROOT / 'scripts/channel.template.sh').read_text().replace('@ARGUMENTS@', shlex.join(arguments))
+        target = ROOT / path
+        target.parent.mkdir(exist_ok=True)
+        target.write_text(wrapper)
+        target.chmod(0o755)
+
     for filename, entry in (("mas.pyz", "mas.cli:main"),
                             ("mas-install.pyz", "mas.install:main"),
                             ("mas-test.pyz", "mas.testing:main")):
@@ -58,7 +69,11 @@ def main():
             archive.chmod(0o755)
     for name in ("bootstrap.py", "install.sh"):
         shutil.copyfile(ROOT / name, DIST / name)
-    names = ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh")
+    entry_assets = {"install-stable.sh": "stable/install.sh", "install-test.sh": "test/install.sh",
+                    "test.sh": "test/test.sh", "test-stable.sh": "test/test-stable.sh"}
+    for name, path in entry_assets.items():
+        shutil.copyfile(ROOT / path, DIST / name)
+    names = ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh", *entry_assets)
     (DIST / "SHA256SUMS").write_text("".join(
         hashlib.sha256((DIST / name).read_bytes()).hexdigest() + "  " + name + "\n" for name in names))
     print("Built " + ", ".join(names))

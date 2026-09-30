@@ -447,3 +447,14 @@ Status: implemented and verified outside the checkout: 197 packaged units and al
 - Preserve generic Terminal execution and intentionally independent bootstrap/standard-library fixtures. No product GPU behavior change.
 - Reproduce the reported failure from an unrelated directory; add regression coverage for unrelated working directories and misleading import paths. Validate packaged units and all native stages outside the checkout.
 - Update implementation and coverage documentation after validation; publish v0.2.5 test and verify the public installer/test flow outside the checkout.
+
+## 33. WSL GPU runtime and channel entry adaptation — v0.2.6
+
+Status: implemented and verified locally outside the checkout: 201 units and all 22 native stages passed in 452.2 seconds; no skips or cleanup errors. Public release verification follows.
+
+- Explicitly select /usr/lib/wsl/lib for nvidia-ctk library lookup in WSL. Preserve official per-start active-driver discovery and narrow read-only directory mappings; do not scan for the newest-looking directory or map the whole driver store.
+- After successful discovery and resource validation, omit only the recognized multiple-driver-store-path warning in product UI/CLI. Tester invocations retain it. Preserve all other diagnostics and all failure diagnostics; no requirement that this warning appear on any host.
+- Manage /etc/profile.d/mas-gpu.sh inside the container, adding /usr/lib/wsl/lib to login-shell PATH. Reuse runtime-file ownership, conflict checks and cleanup; reject foreign files/symlinks. Preserve host and user shell configuration. Support existing GPU records from 0.2.5. Disabled GPU removes the owned profile file.
+- Independently observe the host NVIDIA runtime's actual loaded driver path and compare it with container GPU mappings. Validate login-shell nvidia-smi, CUDA compute, disable cleanup and re-enable. Do not infer active drivers from directory timestamps or highest version names. Multi-GPU and additional identity coverage remain out of scope.
+- Provide fixed stable/install.sh, test/install.sh, test/test.sh and test/test-stable.sh entry URLs. Reuse bootstrap resolution, checksum, installation and testing logic; preserve legacy install.sh --test. Stable testing selects the exact numeric version matching the current stable product and verifies product identity; no fallback to a different version. Stable product remains unchanged.
+- Validate packaged tests outside the checkout, publish 0.2.6 test and verify public entry routing. Update implemented and coverage documents after verification.

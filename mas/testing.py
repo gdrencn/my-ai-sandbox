@@ -175,6 +175,7 @@ class Suite:
         self.fs_root = self.directory / "mounts"
         self.fs_state = self.directory / "mount-state"
         self.manager = Manager(LXD(project=self.project, timeout=timeout, diagnostic=self.native_diagnostic), self.report, self.fs_root, self.fs_state)
+        self.manager.gpu.keep_known_warnings = True
         self.created_project = False
         self.targets = []
         self.events = []
@@ -225,8 +226,8 @@ class Suite:
                   "events=open(" + repr(str(self.event_path)) + ", 'a');"
                   "progress=Progress();report=lambda event:(events.write(json.dumps(event)+'\\n'),events.flush(),progress(event));"
                   "diagnostic=lambda message:(events.write(json.dumps(dict(action='diagnostic',status='warning',native_stderr=message))+'\\n'),events.flush(),progress.output.keep(message));"
-                  "raise SystemExit(main(manager=Manager(LXD(project=" + repr(self.project) +
-                  ",timeout=" + str(self.timeout) + ",diagnostic=diagnostic),report=report,fs_root=" + repr(str(self.fs_root)) + ",fs_state=" + repr(str(self.fs_state)) + "))) ")
+                  "manager=Manager(LXD(project=" + repr(self.project) +
+                  ",timeout=" + str(self.timeout) + ",diagnostic=diagnostic),report=report,fs_root=" + repr(str(self.fs_root)) + ",fs_state=" + repr(str(self.fs_state)) + ");manager.gpu.keep_known_warnings=True;raise SystemExit(main(manager=manager))")
         return [sys.executable, "-c", source, *args]
 
     def read_events(self, path, diagnostics=False):
@@ -567,7 +568,7 @@ class Suite:
         assert not json.loads(self.cli('hardware', target))['enabled']
 
     def gpu_test(self):
-        from .gpu import KEY, CONF
+        from .gpu import KEY, CONF, PROFILE
         capability = self.manager.gpu.detect()
         self.gpu_results = {'capability': capability, 'compute': 'not_run'}
         if not capability['available']:
@@ -593,7 +594,26 @@ class Suite:
             return parsed
         self.gpu_results['first_compute'] = compute()
         if capability['backend'] == 'wsl-nvidia':
+            # Observe real host driver loading independently of CTK/product discovery.
+            host_probe = """import ctypes,json,pathlib
+lib=ctypes.CDLL('/usr/lib/wsl/lib/libcuda.so.1')
+assert lib.cuInit(0)==0, 'host CUDA initialization failed'
+paths=set()
+for line in pathlib.Path('/proc/self/maps').read_text().splitlines():
+    fields=line.split(maxsplit=5)
+    if len(fields)==6:
+        path=pathlib.Path(fields[5])
+        if str(path).startswith('/usr/lib/wsl/drivers/') and path.name=='libcuda.so.1.1':
+            paths.add(str(path.parent))
+assert paths, 'active host CUDA path unavailable'
+print(json.dumps(sorted(paths)))
+"""
+            loaded = json.loads(subprocess.check_output([sys.executable, '-I', '-c', host_probe], text=True, timeout=self.timeout))
+            assert loaded == initial['resources']['driver_paths'], ('host runtime differs from container mappings', loaded, initial['resources'])
+            self.gpu_results['host_loaded_driver_paths'] = loaded
             self.exec(target, 'test -c /dev/dxg; test -r /usr/lib/wsl/lib/libcuda.so.1')
+            self.manager.lxd.command(['exec', 'local:' + target, '--', 'runuser', '-l', 'sandbox', '-c',
+                'test "$(command -v nvidia-smi)" = /usr/lib/wsl/lib/nvidia-smi && nvidia-smi -L'])
             self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", "import os; assert os.statvfs('/usr/lib/wsl/lib').f_flag & os.ST_RDONLY"])
             for path in initial['resources']['driver_paths']:
                 self.manager.lxd.command(['exec', 'local:' + target, '--', 'python3', '-c', 'import os; assert os.statvfs(' + repr(path) + ').f_flag & os.ST_RDONLY'])
@@ -614,7 +634,7 @@ class Suite:
         assert not disabled['enabled'] and not disabled['resources']['devices']
         self.cli('start', target)
         if capability['backend'] == 'wsl-nvidia':
-            self.exec(target, 'test ! -e /dev/dxg; test ! -e ' + CONF)
+            self.exec(target, 'test ! -e /dev/dxg; test ! -e ' + CONF + '; test ! -e ' + PROFILE)
         self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", 'import ctypes\ntry: lib=ctypes.CDLL("libcuda.so.1")\nexcept OSError: pass\nelse: assert lib.cuInit(0) != 0'])
         self.cli('stop', target)
         self.cli('hardware', target, 'gpu', 'on')
