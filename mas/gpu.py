@@ -15,7 +15,7 @@ from urllib.parse import quote, urlencode
 
 from .core import Error
 from .i18n import t
-from .diagnostics import emit_native
+from .diagnostics import emit_native, failure_text
 
 KEY = 'user.mas.gpu'
 CONF = '/etc/ld.so.conf.d/mas-gpu.conf'
@@ -63,7 +63,7 @@ def wsl_driver_paths(diagnostic=None, *, keep_known_warnings=False):
                                 '--feature-flag=disable-nvsandboxutils',
                                 '--library-search-path=/usr/lib/wsl/lib'], diagnostic, defer_diagnostics=True)
     if result.returncode:
-        raise Error(t('gpu_detect_failed', error=result.stderr.strip() or result.stdout.strip()))
+        raise Error(t('gpu_detect_failed', error=failure_text(result.stdout, result.stderr)))
     validated = False
     try:
         spec = json.loads(result.stdout)
@@ -112,7 +112,7 @@ def detect(diagnostic=None, *, keep_known_warnings=False):
     if result.returncode == 6:
         return {'available': False, 'backend': None, 'gpus': []}
     if result.returncode:
-        raise Error(t('gpu_detect_failed', error=result.stderr.strip() or result.stdout.strip()))
+        raise Error(t('gpu_detect_failed', error=failure_text(result.stdout, result.stderr)))
     gpus = []
     for line in result.stdout.splitlines():
         name, separator, identity = line.partition(',')
@@ -256,12 +256,10 @@ class GPU:
             desired = {'version': 1, 'enabled': enabled, 'backend': backend, 'driver_paths': driver_paths,
                        'devices': definition, 'runtime_file': CONF if enabled and backend == 'wsl-nvidia' else None,
                        'runtime_profile': PROFILE if enabled and backend == 'wsl-nvidia' else None}
-            endpoint = '/1.0/instances/' + quote(target, safe='') + '?' + urlencode({'project': self.lxd.project})
-            snapshot = json.loads(self.lxd.command(['query', endpoint]))
-            current = {key: snapshot[key] for key in ('architecture', 'config', 'devices', 'ephemeral', 'profiles', 'description') if key in snapshot}
+            current, etag = self.lxd.configuration.read(target)
             # Recheck immediately before publication, including expanded profile devices.
             instance = self.manager.require(target, stopped=True)
-            if self.record(instance) != record:
+            if self.record(instance) != record or self.record(current) != record:
                 raise Error(t('gpu_record_changed'))
             self.check_owned(instance, record)
             for name in (record or {}).get('devices', {}):
@@ -269,7 +267,9 @@ class GPU:
             current['devices'].update(definition)
             current['config'][KEY] = json.dumps(desired, sort_keys=True)
             start = time.monotonic()
-            self.lxd.command(['config', 'edit', 'local:' + target], input_data=json.dumps(current))
+            self.lxd.configuration.write(target, current, etag,
+                on_wait=lambda elapsed: self.manager.emit(dict(action='gpu', target=target,
+                    status='waiting', observation='not yet observed', elapsed=elapsed)))
             while True:
                 observed = self.manager.require(target, stopped=True)
                 self.check_owned(observed, self.record(observed))

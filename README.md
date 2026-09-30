@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.8`，修复 LXD socket 重建或 WSL 重启后属组错误导致普通用户无法访问的问题。
+当前 test 为 `0.2.9`，完成配置并发更新保护、测试收尾与诊断、PATH 检查、CLI 帮助及共享界面能力的九项审查改进。完整范围和验证记录见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 

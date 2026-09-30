@@ -10,6 +10,11 @@ def diagnostic_lines(stdout, stderr):
     return stderr.splitlines() + [line for line in stdout.splitlines() if WARNING.search(line)]
 
 
+def failure_text(stdout, stderr):
+    """Preserve both native streams, with a boundary even without newlines."""
+    return '\n'.join(value.strip() for value in (stdout or '', stderr or '') if value.strip())
+
+
 def emit_native(message, callback=None):
     """Use the caller's active renderer; keep native content unchanged."""
     if not message:

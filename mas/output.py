@@ -3,7 +3,7 @@ from contextvars import ContextVar
 import os
 import shutil
 import sys
-import unicodedata
+from .text import clipped
 
 
 boundary = ContextVar('mas_output_boundary', default=None)
@@ -35,14 +35,7 @@ class Output:
             columns = os.get_terminal_size(self.stream.fileno()).columns
         except (AttributeError, OSError, ValueError):
             columns = shutil.get_terminal_size().columns
-        width = max(0, columns - 1)
-        text, used = '', 0
-        for char in message.replace('\n', ' '):
-            size = 0 if unicodedata.combining(char) else 2 if unicodedata.east_asian_width(char) in ('W', 'F') else 1
-            if used + size > width:
-                break
-            text += char
-            used += size
+        text = clipped(message, max(0, columns - 1))
         self.stream.write('\r\033[2K' + text)
         self.stream.flush()
         self.active = True
@@ -51,4 +44,3 @@ class Output:
         before_output()
         self.clear()
         print(message, file=self.stream, flush=True)
-

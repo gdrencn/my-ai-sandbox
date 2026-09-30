@@ -14,7 +14,7 @@ import tempfile
 import time
 
 from .i18n import t, state
-from .diagnostics import cleanup_scope, notify, emit_native
+from .diagnostics import cleanup_scope, notify, emit_native, failure_text
 
 MANAGED = "user.mas.managed"
 DEFAULT_TIMEOUT = 600
@@ -107,7 +107,7 @@ class LXD:
         except subprocess.TimeoutExpired as exc:
             raise Error(t('lxd_query_timeout')) from exc
         if result.returncode:
-            raise Error(result.stderr.strip() or result.stdout.strip() or t('lxd_failed'))
+            raise Error(failure_text(result.stdout, result.stderr) or t('lxd_failed'))
         emit_native(result.stderr, self.diagnostic)
         return result.stdout
 
@@ -122,6 +122,11 @@ class LXD:
             return instances
         except (ValueError, TypeError) as exc:
             raise Error(t('lxd_invalid_data')) from exc
+
+    @cached_property
+    def configuration(self):
+        from .lxd_config import Configuration
+        return Configuration(self)
 
 
 class Manager:

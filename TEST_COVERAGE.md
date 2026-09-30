@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in batch 0.2.4 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.9 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -32,10 +32,10 @@ This maps the checks present in batch 0.2.4 to requirements and implementation. 
 ## Current limits
 
 - Full real runs are on the current Ubuntu WSL host. Native Ubuntu/cloud hosts and other architectures still require external-machine verification.
-- Historical user logs cover a missing-LXD installation. The current batch does not remove the host LXD/Python installation to repeat fresh provisioning; privileged host bootstrap remains unverified for this batch. Same-user real sudo/PTY checks and real root APT installation inside a disposable container now complement controlled authentication/failure tests.
+- Fresh installation, socket recreation and WSL restarts were verified in a separate Ubuntu 24.04 WSL fixture in 0.2.8. Batch 0.2.9 verifies prepared-host installation and PATH behavior; it does not repeat destructive provisioning on the development host. Same-user sudo/PTY checks and actual APT inside disposable containers complement controlled installer/failure tests. Non-Snap installation-policy support remains outside this audit batch.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
-- GPU coverage and its platform limits are described in the 0.2.1 section below. General host-resource sharing policy, restricted project/profile enforcement and custom network controls remain pending.
+- GPU coverage and its platform limits are described in the 0.2.1–0.2.9 sections below. General host-resource sharing policy, restricted project/profile enforcement and custom network controls remain pending.
 
 The historical integration group identifier `tui` remains for report continuity; it now runs the inline text-menu application. New groups are `invalid-inputs`, `lifecycle-repeat` and `unmarked-import`.
 
@@ -179,3 +179,12 @@ Public installation/test from /tmp passed 204 units and all 22 native stages in 
 214 packaged units and all 22 native stages passed from /tmp (456.9 seconds), no skips/cleanup errors. Ten socket/install regressions cover group parsing, repair, ready no-sudo behavior, effective metadata/conflicts, timeouts and failure preventing publication. A separate disposable WSL validation reproduces the root:root denial and tests installer repair, socket recreation, default/custom-group reboots and no-sudo ready reinstall. The boot regression is a separate developer script because restarting the user's WSL in the ordinary tester would be disruptive. Reports: validation/V0_2_8_LOCAL_REPORT.json and validation/V0_2_8_WSL_SOCKET_REPORT.json.
 
 Public 0.2.8 validation retained both attempts: the first had a Windows UNC Write mismatch (16 passed, 1 failed, 5 not run; successful cleanup); the unchanged-artifact full recheck passed 214 units and 22 stages in 449.3 seconds with no skips/cleanup errors. The first mismatch is an unresolved observation, not silently retried inside the suite. See validation/V0_2_8_PUBLIC_FIRST_ATTEMPT.json, V0_2_8_PUBLIC_REPORT.json and V0_2_8_RELEASE_CHECK.json.
+
+
+## Reliability/interface audit — 0.2.9
+
+Current count: 236 packaged units and 23 reported integration stages. The new configuration-concurrency stage obtains a real LXD ETag, changes a key and device through native lxc, verifies rejection of the stale update, and verifies that a fresh conditional update preserves both changes. GPU CLI/menu flows exercise the same writer in the separately supplied product.
+
+Twenty-two additional units cover real Unix HTTP conditional requests and project parameters, preservation of writable fields, missing/invalid ETag, rejected writes without retry, native operation failure/timeout/malformed responses, local socket selection, concurrent GPU changes, damaged PATH markers, atomic publication failure/content/mode/idempotence, symlink preservation, captured diagnostics and both failure streams, TERM-ignoring real PTY processes, bounded unconfirmed KILL, child exec failure, cleanup failure/primary exception/final events/language restoration, fragmented JSONL/exactly-once diagnostics, live PTY warning order, recorded native failures, Windows UNC failure evidence and bilingual help for all commands. Existing menu/progress Unicode/width tests and isolated minimal-bootstrap verification cover shared text utilities.
+
+Final frozen validation passed all units and stages in 483.2 seconds with no skips, unexecuted cases or cleanup errors. Windows UNC read/create/edit/delete/mkdir/rmdir and real GPU computation passed. Reports: validation/V0_2_9_LOCAL_REPORT.json and the preserved corrected packaging regression in validation/V0_2_9_PACKAGING_FIRST_ATTEMPT.json. Actual resource exhaustion and kernel-uninterruptible processes use fault tests rather than destructive host experiments. The old UNC mismatch remains unresolved; no retry was introduced. Public entry verification follows publication.

@@ -17,7 +17,7 @@ import tempfile
 from .core import Error, LXD
 
 from .i18n import t, Parser
-from .diagnostics import cleanup_scope
+from .diagnostics import cleanup_scope, emit_native, diagnostic_lines, failure_text
 from . import __version__
 
 
@@ -40,7 +40,9 @@ def run(args, privileged=False, capture=False, display=True, label=None):
         if tty:
             tty.close()
     if result.returncode:
-        raise Error((result.stderr or "").strip() or t("setup_failed", command=label or " ".join(args)))
+        raise Error(failure_text(result.stdout, result.stderr) or t("setup_failed", command=label or " ".join(args)))
+    if capture:
+        emit_native('\n'.join(diagnostic_lines(result.stdout or '', result.stderr or '')))
     return result.stdout or ""
 
 
@@ -184,13 +186,38 @@ def configure_path(home=None, shell=None):
     begin, end = "# >>> my-ai-sandbox PATH >>>", "# <<< my-ai-sandbox PATH <<<"
     block = (begin + "\ncase \":${PATH-}:\" in\n    *" + shlex.quote(":" + str(destination) + ":") +
              "*) ;;\n    *) export PATH=" + shlex.quote(str(destination)) + ':"${PATH-}" ;;\nesac\n' + end + "\n")
+    plans = []
     for path in files:
+        if path.is_symlink():
+            raise Error(t('path_startup_conflict', path=path))
         original = path.read_text() if path.exists() else ""
-        pattern = re.escape(begin) + r".*?" + re.escape(end) + r"\n?"
-        updated = re.sub(pattern, lambda _: block, original, flags=re.S) if begin in original else original.rstrip("\n") + "\n\n" + block
+        if begin in original or end in original:
+            lines = original.splitlines()
+            if (lines.count(begin) != 1 or lines.count(end) != 1
+                    or original.count(begin) != 1 or original.count(end) != 1
+                    or lines.index(begin) >= lines.index(end)):
+                raise Error(t('path_block_invalid', path=path))
+            pattern = '^' + re.escape(begin) + r"\n.*?^" + re.escape(end) + r"(?:\n|$)"
+            updated = re.sub(pattern, lambda _: block, original, flags=re.S | re.M)
+        else:
+            updated = original.rstrip("\n") + "\n\n" + block
+        plans.append((path, original, updated))
+    for path, original, updated in plans:
         if updated != original:
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(updated)
+            fd, name = tempfile.mkstemp(prefix='.' + path.name + '.mas-', dir=path.parent)
+            with cleanup_scope(lambda: Path(name).unlink(missing_ok=True)):
+                with os.fdopen(fd, 'w') as output:
+                    output.write(updated)
+                    output.flush()
+                    os.fsync(output.fileno())
+                info = path.stat() if path.exists() else None
+                os.chmod(name, info.st_mode & 0o777 if info else 0o644)
+                if info:
+                    os.chown(name, info.st_uid, info.st_gid)
+                if path.is_symlink() or (path.read_text() if path.exists() else '') != original:
+                    raise Error(t('path_startup_conflict', path=path))
+                os.replace(name, path)
     os.environ["PATH"] = str(destination) + os.pathsep + os.environ.get("PATH", "")
 
 

@@ -35,6 +35,7 @@ from .test_output import Output
 from .core import Error, LXD, Manager, MANAGED, host_image
 
 from .i18n import t, Parser, catalog, progress_text
+from .diagnostics import cleanup_scope
 
 
 PRODUCT_UNDER_TEST = None
@@ -74,19 +75,35 @@ def random_target():
 
 
 class Terminal:
-    def __init__(self, command, timeout, transcript, on_wait=None):
+    def __init__(self, command, timeout, transcript, on_wait=None, on_read=None):
         self.timeout = timeout
         self.on_wait = on_wait
+        self.on_read = on_read
         self.started = self.last_update = time.monotonic()
         self.buffer = b""
         self.cursor = 0
         self.status = None
         self.transcript = transcript.open("wb")
-        self.pid, self.fd = pty.fork()
+        try:
+            self.pid, self.fd = pty.fork()
+        except BaseException:
+            self.transcript.close()
+            raise
         if self.pid == 0:
-            os.environ["TERM"] = "xterm"
-            os.execvpe(command[0], command, os.environ)
-        fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack("HHHH", 40, 200, 0, 0))
+            try:
+                os.environ["TERM"] = "xterm"
+                os.execvpe(command[0], command, os.environ)
+            except Exception:
+                # A test runner may have redirected Python's sys.stderr to its
+                # unit log. Child diagnostics belong to this PTY's descriptor.
+                with os.fdopen(os.dup(2), 'w') as errors:
+                    traceback.print_exc(file=errors)
+                os._exit(127)
+        try:
+            fcntl.ioctl(self.fd, termios.TIOCSWINSZ, struct.pack("HHHH", 40, 200, 0, 0))
+        except BaseException:
+            with cleanup_scope(self.close):
+                raise
 
     def read(self):
         now = time.monotonic()
@@ -107,6 +124,8 @@ class Terminal:
             pid, status = os.waitpid(self.pid, os.WNOHANG)
             if pid:
                 self.status = os.waitstatus_to_exitcode(status)
+        if self.on_read:
+            self.on_read()
 
     def send(self, value):
         os.write(self.fd, value.encode())
@@ -140,18 +159,48 @@ class Terminal:
             raise AssertionError(t("pty_status", status=self.status, buffer=self.buffer[-2000:]))
 
     def close(self):
-        if self.status is None:
-            with contextlib.suppress(ProcessLookupError):
-                os.killpg(self.pid, signal.SIGTERM)
-            os.waitpid(self.pid, 0)
-        os.close(self.fd)
-        self.transcript.close()
+        if self.fd is None:
+            return
+        # Final event consumption is owned by Suite even if it fails. It must
+        # not prevent process termination and descriptor release here.
+        self.on_read = None
+        try:
+            self.read()
+            for sig in (signal.SIGTERM, signal.SIGKILL):
+                if self.status is not None:
+                    break
+                with contextlib.suppress(ProcessLookupError):
+                    os.killpg(self.pid, sig)
+                deadline = time.monotonic() + self.timeout
+                while self.status is None and time.monotonic() < deadline:
+                    self.read()
+            if self.status is None:
+                raise Error(t('pty_cleanup_timeout', pid=self.pid, timeout=self.timeout))
+            # Reaping can precede the last buffered PTY bytes. Drain without
+            # waiting for EOF from unrelated descendants retaining the terminal.
+            while select.select([self.fd], [], [], 0)[0]:
+                try:
+                    chunk = os.read(self.fd, 65536)
+                except OSError as exc:
+                    if exc.errno != errno.EIO:
+                        raise
+                    break
+                if not chunk:
+                    break
+                self.buffer += chunk
+                self.transcript.write(chunk)
+        finally:
+            try:
+                os.close(self.fd)
+            finally:
+                self.fd = None
+                self.transcript.close()
 
 
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu", "configuration-concurrency"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -182,11 +231,13 @@ class Suite:
         self.results = {case: {"status": "not_run"} for case in self.CASES}
         self.cleanup_errors = []
         self.counter = 0
+        self.event_offsets = {}
         self.unit_results = None
         self.gpu_results = {"status": "not_run"}
 
     def native_diagnostic(self, message):
-        self.events.append(dict(action='diagnostic', status='warning', native_stderr=message))
+        self.events.append(dict(action='diagnostic', status='warning', native_stderr=message,
+                                case=getattr(self, 'current_case', None), source='direct'))
         with (self.directory / 'native-diagnostics.log').open('a', encoding='utf-8') as log:
             log.write(message + '\n')
         self.output.keep(message)
@@ -231,12 +282,27 @@ class Suite:
         return [sys.executable, "-c", source, *args]
 
     def read_events(self, path, diagnostics=False):
+        displayed = []
         if path.exists():
-            events = [json.loads(line) for line in path.read_text().splitlines() if line]
+            offsets = self.__dict__.setdefault('event_offsets', {})
+            with path.open('rb') as stream:
+                stream.seek(offsets.get(str(path), 0))
+                raw = stream.read()
+            complete = raw.rfind(b'\n') + 1
+            offsets[str(path)] = offsets.get(str(path), 0) + complete
+            events = [json.loads(line) for line in raw[:complete].splitlines() if line]
+            for event in events:
+                event.setdefault('case', getattr(self, 'current_case', None))
+                event.setdefault('source', path.name)
             self.events.extend(events)
             if diagnostics:
                 for event in events:
-                    self.output.diagnostics(event.get("native_stdout", ""), event.get("native_stderr", ""))
+                    # The failed command's final stderr contains its native
+                    # failure text. Retain the event, display that text once.
+                    if event.get('native_failure'):
+                        continue
+                    displayed.extend(self.output.diagnostics(event.get("native_stdout", ""), event.get("native_stderr", "")))
+        return displayed
 
     def cli(self, *args, answer=None, code=0):
         start = time.monotonic()
@@ -249,6 +315,9 @@ class Suite:
         stdout_path = self.directory / f"cli-{self.counter}.stdout.log"
         stderr_path = self.directory / f"cli-{self.counter}.stderr.log"
         action = catalog(self.language).get("action_" + args[0], args[0])
+        if code != 0:
+            self.output.keep(t("expected_error", command=" ".join(args)))
+        displayed = []
         with stdout_path.open("w+") as stdout, stderr_path.open("w+") as stderr:
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=stdout, stderr=stderr, text=True)
             try:
@@ -258,6 +327,7 @@ class Suite:
                 except BrokenPipeError:
                     pass
                 while process.poll() is None:
+                    displayed.extend(self.read_events(event_path, diagnostics=True))
                     elapsed = time.monotonic() - start
                     if elapsed >= self.timeout * 3:
                         raise Error(t("wait_timeout", label=" ".join(args), timeout=self.timeout*3))
@@ -267,13 +337,11 @@ class Suite:
                 if process.poll() is None:
                     process.kill()
                 process.wait()
-                self.read_events(event_path)
+                displayed.extend(self.read_events(event_path, diagnostics=True))
                 stdout.seek(0)
                 stderr.seek(0)
                 out, err = stdout.read(), stderr.read()
-                if process.returncode != 0 and code != 0:
-                    self.output.keep(t("expected_error", command=" ".join(args)))
-                self.output.diagnostics(out, err, failed=process.returncode != 0)
+                self.output.diagnostics(out, err, failed=process.returncode != 0, exclude=displayed)
         if process.returncode != code:
             raise AssertionError(t("cli_failed", args=args, expected=code, actual=process.returncode, stdout=out, stderr=err))
         return out
@@ -285,16 +353,30 @@ class Suite:
         with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
             previous = config.get("language")
             config.set_value("language", "en_us")
-        terminal = Terminal(self.command(args), self.timeout, self.directory / f"terminal-{self.counter}.log",
-                            on_wait=lambda elapsed: self.output.progress(t("working", name=t("case_" + self.current_case), elapsed=elapsed)))
-        event_path = self.event_path
-        try:
-            yield terminal
-        finally:
-            terminal.close()
-            self.read_events(event_path, diagnostics=True)
+        terminal = None
+        event_path = None
+        def restore_language():
             with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
                 config.set_value("language", previous)
+        def finish_session():
+            errors = []
+            for cleanup in (lambda: terminal.close() if terminal else None,
+                            lambda: self.read_events(event_path, diagnostics=True) if event_path else None, restore_language):
+                try:
+                    cleanup()
+                except Exception as exc:
+                    errors.append(str(exc))
+                    self.cleanup_errors.append(str(exc))
+                    self.output.keep(t('cleanup_secondary', error=exc))
+            if errors:
+                raise Error('\n'.join(errors))
+        with cleanup_scope(finish_session, lambda exc: None):
+            command = self.command(args)
+            event_path = self.event_path
+            terminal = Terminal(command, self.timeout, self.directory / f"terminal-{self.counter}.log",
+                                on_wait=lambda elapsed: self.output.progress(t("working", name=t("case_" + self.current_case), elapsed=elapsed)),
+                                on_read=lambda: self.read_events(event_path, diagnostics=True))
+            yield terminal
 
     def wait(self, label, probe, terminal=None):
         start = time.monotonic()
@@ -358,6 +440,34 @@ class Suite:
             missing = self.target()
             self.cli("new", missing, "--image", "ubuntu:mas-missing-" + uuid.uuid4().hex, code=1)
             assert self.state(missing, "Absent"), t("image_unexpected")
+        with self.case('configuration-concurrency'):
+            configuration = self.manager.lxd.configuration
+            snapshot, etag = configuration.read(target)
+            self.manager.lxd.command(['config', 'set', 'local:' + target, 'user.mas.test.concurrent=native-change'])
+            self.manager.lxd.command(['config', 'device', 'add', 'local:' + target, 'mas-test-concurrent', 'none'])
+            snapshot['config']['user.mas.test.stale'] = 'must-not-publish'
+            self.output.keep(t('expected_error', command='PUT If-Match stale ETag'))
+            try:
+                configuration.write(target, snapshot, etag)
+            except Error as exc:
+                assert str(exc) == t('lxd_config_changed'), str(exc)
+                self.output.keep(str(exc))
+            else:
+                raise AssertionError('LXD accepted a stale ETag')
+            current, fresh = configuration.read(target)
+            assert current['config']['user.mas.test.concurrent'] == 'native-change'
+            assert current['devices']['mas-test-concurrent'] == {'type': 'none'}
+            assert 'user.mas.test.stale' not in current['config']
+            current['config']['user.mas.test.conditional'] = 'published'
+            configuration.write(target, current, fresh,
+                on_wait=lambda elapsed: self.output.progress(t('working', name=t('case_configuration-concurrency'), elapsed=elapsed)))
+            observed, _ = configuration.read(target)
+            assert observed['config']['user.mas.test.conditional'] == 'published'
+            assert observed['config']['user.mas.test.concurrent'] == 'native-change'
+            assert observed['devices']['mas-test-concurrent'] == {'type': 'none'}
+            self.events.append(dict(action='configuration-concurrency', target=target, status='ok',
+                                    stale_rejected=True, concurrent_config_preserved=True,
+                                    concurrent_device_preserved=True, conditional_update_observed=True))
         with self.case("list-info"):
             assert target in self.cli("list")
             assert json.loads(self.cli("info", target))["status"] == "Stopped"
@@ -660,28 +770,74 @@ print(json.dumps(sorted(paths)))
         script = """[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
 $ErrorActionPreference='Stop'
 $path=WINDOWS_PATH
+$step='list'
+function Check-Content($file, $expected, $operation) {
+    $actual=[IO.File]::ReadAllText($file)
+    $bytes=[IO.File]::ReadAllBytes($file)
+    @{step=$operation;path=$file;expected=$expected;observed=$actual;
+      expected_length=$expected.Length;observed_length=$actual.Length;
+      byte_length=$bytes.Length;bytes_base64=[Convert]::ToBase64String($bytes)} | ConvertTo-Json -Compress
+    if ($actual -ne $expected) { throw ($operation+' mismatch') }
+}
 try {
     $entries=[IO.Directory]::GetFileSystemEntries($path)
-    if ([IO.File]::ReadAllText((Join-Path $path 'mas-secret')) -ne 'container secret') { throw 'Read mismatch' }
+    @{step=$step;entries=$entries} | ConvertTo-Json -Compress
+    $step='read'
+    Check-Content (Join-Path $path 'mas-secret') 'container secret' $step
     $file=Join-Path $path 'windows-created'
+    $step='write'
     [IO.File]::WriteAllText($file,'from Windows')
-    if ([IO.File]::ReadAllText($file) -ne 'from Windows') { throw 'Write mismatch' }
+    Check-Content $file 'from Windows' $step
+    $step='edit'
     [IO.File]::AppendAllText($file,' edited')
-    if ([IO.File]::ReadAllText($file) -ne 'from Windows edited') { throw 'Edit mismatch' }
+    Check-Content $file 'from Windows edited' $step
+    $step='delete'
     [IO.File]::Delete($file)
     $dir=Join-Path $path 'windows-directory'
+    $step='mkdir'
     [IO.Directory]::CreateDirectory($dir) | Out-Null
+    $step='rmdir'
     [IO.Directory]::Delete($dir)
     Write-Output 'WINDOWS_UNC_OK'
-} catch { Write-Output $_.Exception.Message; exit 1 }
+} catch {
+    @{step=$step;error=$_.Exception.Message;exception=$_.Exception.GetType().FullName} | ConvertTo-Json -Compress
+    exit 1
+}
 """.replace('WINDOWS_PATH', "'" + windows.replace("'", "''") + "'")
-        result = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-EncodedCommand',
-                                 base64.b64encode(script.encode('utf-16le')).decode()],
-                                capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=self.timeout)
-        assert result.returncode == 0 and 'WINDOWS_UNC_OK' in result.stdout, result.stdout + result.stderr
-        assert not (home/'windows-created').exists() and not (home/'windows-directory').exists()
-        self.events.append(dict(action='filesystem-windows-unc', status='ok', path=windows,
-                                operations=['list', 'read', 'create', 'edit', 'delete', 'mkdir', 'rmdir']))
+        try:
+            result = subprocess.run([powershell, '-NoProfile', '-NonInteractive', '-EncodedCommand',
+                                     base64.b64encode(script.encode('utf-16le')).decode()],
+                                    capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=self.timeout)
+            stdout, stderr, code = result.stdout, result.stderr, result.returncode
+        except subprocess.TimeoutExpired as exc:
+            def decoded(value):
+                return value.decode('utf-8', errors='replace') if isinstance(value, bytes) else value or ''
+            stdout, stderr, code = decoded(exc.stdout), decoded(exc.stderr), None
+        (self.directory/'windows-unc.stdout.log').write_text(stdout)
+        (self.directory/'windows-unc.stderr.log').write_text(stderr)
+        evidence = dict(action='filesystem-windows-unc', status='error', path=windows,
+                        returncode=code, native_stdout=stdout, native_stderr=stderr,
+                        operations=['list', 'read', 'create', 'edit', 'delete', 'mkdir', 'rmdir'], steps=[])
+        for line in stdout.splitlines():
+            if line.startswith('{'):
+                evidence['steps'].append(json.loads(line))
+        self.events.append(evidence)
+        success = code == 0 and 'WINDOWS_UNC_OK' in stdout and not (home/'windows-created').exists() and not (home/'windows-directory').exists()
+        if not success:
+            evidence['linux'] = {}
+            for name in ('mas-secret', 'windows-created', 'windows-directory'):
+                try:
+                    path = home/name
+                    info = path.lstat()
+                    item = dict(uid=info.st_uid, gid=info.st_gid, mode=oct(info.st_mode), size=info.st_size,
+                                inode=info.st_ino, mtime_ns=info.st_mtime_ns)
+                    if path.is_file():
+                        item['bytes_hex'] = path.read_bytes()[:4096].hex()
+                    evidence['linux'][name] = item
+                except OSError as exc:
+                    evidence['linux'][name] = {'error': str(exc)}
+            raise AssertionError(t('windows_unc_failed', code=code, details=stdout + stderr))
+        evidence['status'] = 'ok'
 
     def filesystem_recovery(self, target):
         self.cli('mountfs',target,'/var/log')

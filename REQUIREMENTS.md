@@ -1,6 +1,8 @@
 # my-ai-sandbox Requirements
 
-Sections 1–26 describe the phase 1 requirements and delivery history. Section 27 records the phase 2 plan and section 28 its first implemented GPU batch; its configuration changes supersede phase 1 defaults only when implemented and verified.
+Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–37 describe phase 2 plans and subsequent batches. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
+
+Current baseline: locally verified test batch 0.2.9; public test publication is the remaining delivery step. Stable remains stable/0.1.15. Section 37 records the audit improvements. Restricted project/profile policy, CPU/memory/process controls, network-policy changes and the stable-only release branch are still pending under sections 27 and 34.
 
 ## 1. Scope
 
@@ -76,7 +78,7 @@ Cover new/list/start/stop/delete/info/import/export, default host-matching image
 
 ## 8. GitHub and releases
 
-Publish every completed and validated development batch as a test prerelease to the public my-ai-sandbox repository. Test publication is a mandatory completion step, not an optional follow-up and does not require repeated approval. Verify that the fixed public installation/test entry resolves the new version. Stable promotion is separate; do not defer a completed test release while discussing future features or stable publication. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 1); c is the complete submission-batch number, incremented once per batch, not per individual Git commit. The current development batch is 0.1.15, covering the pending deletion wording and section 25 installation/menu changes. Filesystem mounts in section 16 are included. Product, installer and tester share each release version. A local version number does not imply publication. GitHub prerelease status is independent of the numeric version. Fixed installation selects the highest published numeric version, including prereleases. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
+Publish every completed and validated development batch as a test prerelease to the public my-ai-sandbox repository. Test publication is a mandatory completion step, not an optional follow-up and does not require repeated approval. Verify that the fixed public installation/test entry resolves the new version. Stable promotion is separate; do not defer a completed test release while discussing future features or stable publication. Versions use a.b.c without a test suffix: a remains 0 unless the user explicitly authorizes 1; b is the project phase (currently 2); c is the phase's submission-batch number, incremented once per batch, not per individual Git commit. The current authorized development batch is 0.2.9 (section 37). Product, installer and tester share each release version. A local version number does not imply publication. GitHub prerelease status is independent of the numeric version. Fixed test installation selects the highest published numeric test version; stable installation selects the latest promoted stable release. Preserve earlier release assets. Include checksums, installation instructions, tested environment and results.
 
 ## 8.1. Language and user configuration
 
@@ -94,7 +96,7 @@ Keep REQUIREMENTS.md and IMPLEMENTED.md inside this project. Before updating IMP
 
 ## 10. Exclusions
 
-No GPU passthrough, host-directory sharing into containers, resource whitelist, model installation, model service management, custom port forwarding, non-Ubuntu support, plugins or general diagnostic framework in this version. Container-to-host filesystem mounting is now an approved requirement in section 16, implemented in 0.1.9. A general container package-preinstallation feature has no agreed package list or installation policy and is not required by filesystem mounting; its priority and scope remain to be confirmed. The existing installation of sudo when needed for the sandbox user remains authorized.
+Historical phase 1 exclusions were GPU access, host-directory sharing into containers, a general resource whitelist, model installation, model service management, custom port forwarding, non-Ubuntu support, plugins and a general diagnostic framework. Section 16 subsequently added container-to-host filesystem mounting, and section 28 added the independent GPU module and its explicitly recorded resource mappings. General host-directory sharing, a general resource whitelist, model installation/service management, custom port forwarding, non-Ubuntu support and plugins remain outside the implemented scope. A general container package-preinstallation feature has no agreed package list or installation policy and is not required by filesystem mounting; its priority and scope remain to be confirmed. The existing installation of sudo when needed for the sandbox user remains authorized.
 
 
 ## 11. Batch 0.1.4 acceptance criteria
@@ -252,7 +254,7 @@ Status: implemented and verified in batch 0.1.12. Final local evidence is record
 The user reports that access through the previously problematic Windows File Explorer route now succeeds with the current mounting functionality. Record this as user-reported validation, distinct from the earlier automated Windows UNC API checks. The previously reported access failure is no longer an outstanding issue in this checklist. This confirmation does not establish additional Windows/WSL version coverage, ACL coverage or offline VHDX support. The subsequently agreed start/stop mount orchestration is specified in section 20. No additional resource exposure or permission changes are authorized by this confirmation.
 
 
-## 20. Pending changes — reuse single-path mounts around start/stop
+## 20. Delivered changes — reuse single-path mounts around start/stop
 
 Status: implemented and verified in batch 0.1.12. This section supersedes the existing requirement to refuse a start/stop state transition solely because this user has mas-managed mounts. Deletion guards and explicitly invoked mountfs/unmountfs behavior remain outside that change.
 
@@ -307,7 +309,7 @@ Status: implemented, verified and delivered as test v0.1.14. Frozen local and pu
 - Review every basic function (new, list, info, start, stop, delete, import, export, mountfs, unmountfs, mountedfs), composed function (enter, on_exit, stop-all), settings and installation for responsibility/completion boundaries. Do not mechanically introduce empty stage functions or a generic hook framework. Correct the current documentation overview while preserving clearly identified historical records.
 - Add focused boundary tests for both start and stop, locked/no-op paths, early mount failures, pure mount probes, preserved deadlines, native-step versus function success, dual shell/exit failures, aggregate OSError handling, reporting/cleanup failures and confirmation injection. Retain real product and public installation tests, and verify isolated resource cleanup, packaged dependency completeness and reproducible builds.
 
-## 24. Pending changes — deletion guard wording
+## 24. Delivered changes — deletion guard wording
 
 Status: implemented, verified and delivered in test v0.1.15.
 
@@ -490,3 +492,19 @@ Status: implemented and verified locally: 214 packaged units and 22 native stage
 - Reload systemd after configuration changes; repair the existing verified root-owned LXD socket's group when needed, without restarting the LXD daemon or user containers. Validate effective socket configuration and observed socket metadata. A ready environment needs no privilege request.
 - Verify native LXD access under the installation user's credentials before publishing installation success. Keep native sudo authentication and existing group-refresh behavior; normal mas operations do not gain privilege or repair host settings.
 - Test persistent socket recreation and a separate WSL restart using an isolated environment, including ordinary-user access. Add custom-group, idempotence, conflict and failure regressions. Preserve the current stable release. Update implementation/coverage documents after verification and publish v0.2.8 test.
+## 37. Reliability and interface audit — v0.2.9
+
+Status: implemented and locally verified: 236 packaged units and all 23 native stages passed from /tmp in 483.2 seconds, with no skips or cleanup errors. Public test publication and entry verification follow.
+
+- Use LXD's documented GET ETag / PUT If-Match mechanism for the shared container configuration update capability. Read the configuration and its ETag together; publish only against that exact version. Preserve all writable instance fields, unrelated configuration keys and unrelated devices.
+- Integrate GPU configuration publication with this shared capability. Publish GPU devices and their ownership record in one conditional update. Preserve the existing ownership, managed-container, stopped-state and runtime-file checks.
+- If LXD rejects a stale ETag, report a localized configuration-change error and ask the user to repeat the operation. Do not retry automatically, overwrite the concurrent change, or fall back to an unconditional update. Missing ETags must fail before publication.
+- Use LXD's local API through Python's standard library because non-interactive `lxc config edit` does not send an ETag. No new packages, host privilege requirements or remote-server support. Match the applicable native local socket selection and preserve project scope.
+- Wait for the native configuration operation to reach explicit success or failure; poll once per second with the existing timeout (default 600 seconds, minimum 300). An accepted asynchronous request alone is not completion. Retain the GPU module's final configuration observation and elapsed-time feedback.
+- Verify successful conditional updates, preservation of unrelated fields, native concurrent changes rejected by LXD, absent/invalid ETags, API/operation failures and timeouts, and GPU failure preventing native startup and external post-processing. Run packaged tests and full real-LXD regression, update verified implementation and coverage documentation, publish v0.2.9 test and verify the public entry.
+- The user subsequently authorized all nine audit items in this batch. Also bound test-terminal cleanup using the existing timeout and TERM/KILL escalation; preserve primary failures, collect final events and restore temporary language preferences even when cleanup fails.
+- Validate incomplete/duplicate managed PATH blocks before writing shell startup files, retain their unrelated content and permissions, and publish changes atomically. Never report PATH configuration success after a damaged block was silently ignored.
+- Preserve captured successful native diagnostics and both output streams on failure using shared presentation helpers. Stream test subprocess diagnostics in occurrence order, record context and display each diagnostic once; retain native text and the known test-only multiple-driver warning when it occurs.
+- Record Windows UNC read/write steps, expected and observed content/length, native stdout/stderr and Linux-side file evidence on failure. Keep immediate correctness assertions; do not hide unexplained failures with automatic retries.
+- Add localized CLI command descriptions, argument/default/restriction help and useful examples without changing interfaces. Share terminal display-width/clipping functions between menu and progress output; include the shared dependency in the minimal bootstrap.
+- Reconcile current requirement, implementation, behavior and coverage baselines while preserving delivery history and unresolved validation boundaries. Project/profile security baseline, non-GPU hardware controls, non-Snap installation-policy changes and the future stable-only release branch remain outside this batch.

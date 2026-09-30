@@ -13,37 +13,37 @@ from .i18n import t, state, Parser
 
 
 def parser():
-    result = Parser(prog="mas", description=t('cli_description'))
+    result = Parser(prog="mas", description=t('cli_description'), epilog=t('cli_examples'))
     result.add_argument("--version", action="version", version=__version__, help=t("help_version"))
     result.add_argument("--timeout", type=int, default=600, help=t('help_timeout'))
     commands = result.add_subparsers(dest="command")
-    hardware = commands.add_parser("hardware", help=t("help_hardware"))
-    hardware.add_argument("target", metavar="TARGET")
-    hardware.add_argument("item", nargs="?", choices=["gpu"])
-    hardware.add_argument("value", nargs="?", choices=["on", "off"])
-    settings = commands.add_parser("config", help=t("help_config"))
+    hardware = commands.add_parser("hardware", help=t("help_hardware"), description=t('help_cmd_hardware'), epilog=t('example_hardware'))
+    hardware.add_argument("target", metavar="TARGET", help=t('help_target'))
+    hardware.add_argument("item", nargs="?", choices=["gpu"], help=t('help_hardware_item'))
+    hardware.add_argument("value", nargs="?", choices=["on", "off"], help=t('help_hardware_value'))
+    settings = commands.add_parser("config", help=t("help_config"), description=t('help_cmd_config'), epilog=t('example_config'))
     actions = settings.add_subparsers(dest="config_action")
     for action in ("get", "set"):
-        item = actions.add_parser(action)
-        item.add_argument("key", choices=["language"])
+        item = actions.add_parser(action, help=t('help_config_' + action), description=t('help_config_' + action))
+        item.add_argument("key", choices=["language"], help=t('help_config_key'))
         if action == "set":
-            item.add_argument("value", choices=config.LANGUAGES)
+            item.add_argument("value", choices=config.LANGUAGES, help=t('help_language_value'))
     for name in ("new", "list", "start", "stop", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs"):
-        command = commands.add_parser(name)
+        command = commands.add_parser(name, help=t('help_cmd_' + name), description=t('help_cmd_' + name), epilog=t('example_' + name))
         if name != "list":
-            command.add_argument("target", metavar="TARGET", **({"nargs": "?"} if name == "stop" else {}))
+            command.add_argument("target", metavar="TARGET", help=t('help_target'), **({"nargs": "?"} if name == "stop" else {}))
         if name in ("delete", "export", "enter"):
             consent = command.add_mutually_exclusive_group()
             consent.add_argument("--yes", dest="consent", action="store_const", const=True, help=t("help_yes"))
             consent.add_argument("--no", dest="consent", action="store_const", const=False, help=t("help_no"))
         if name in ("mountfs", "unmountfs"):
-            command.add_argument("path", metavar="PATH", nargs="?", help=t("help_fs_path"))
+            command.add_argument("path", metavar="PATH", nargs="?", help=t("help_" + name + "_path"))
         if name == "stop":
             command.add_argument("--all", action="store_true", help=t('help_all'))
         if name == "new":
             command.add_argument("--image", help=t('help_image'))
         if name in ("import", "export"):
-            command.add_argument("file", metavar="FILE")
+            command.add_argument("file", metavar="FILE", help=t('help_' + name + '_file'))
     return result
 
 

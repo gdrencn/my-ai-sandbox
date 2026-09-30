@@ -1,3 +1,3 @@
 """A small LXD container manager with shared CLI and text-menu operations."""
 
-__version__ = "0.2.8"
+__version__ = "0.2.9"

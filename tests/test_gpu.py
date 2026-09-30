@@ -25,6 +25,8 @@ class GPUTests(unittest.TestCase):
         self.manager.require.side_effect = self.require
         self.manager.filesystems.locked.side_effect = contextlib.nullcontext
         self.manager.lxd.command.side_effect = self.command
+        self.manager.lxd.configuration.read.side_effect = self.read_config
+        self.manager.lxd.configuration.write.side_effect = self.write_config
         self.profile = None
         self.file = None
         self.edits = []
@@ -38,10 +40,6 @@ class GPUTests(unittest.TestCase):
         return copy.deepcopy(self.item)
 
     def command(self, args, input_data=None):
-        if args[0] == 'query' and '/files?' not in args[1]:
-            return json.dumps({k: self.item[k] for k in ('config','devices')})
-        if args[:2] == ['config', 'edit']:
-            self.edits.append(json.loads(input_data)); self.item.update(self.edits[-1]);return ''
         if args[0] == 'query':
             parent = parse_qs(urlparse(args[1]).query)['path'][0]
             value, name = (self.file, 'mas-gpu.conf') if parent.endswith('ld.so.conf.d') else (self.profile, 'mas-gpu.sh')
@@ -55,6 +53,18 @@ class GPUTests(unittest.TestCase):
             else: self.file = None
             return ''
         raise AssertionError(args)
+
+    def config_etag(self):
+        return json.dumps(self.item, sort_keys=True)
+
+    def read_config(self, target):
+        return copy.deepcopy(self.item), self.config_etag()
+
+    def write_config(self, target, value, etag, **kwargs):
+        if etag != self.config_etag():
+            raise Error('configuration changed')
+        self.edits.append(copy.deepcopy(value))
+        self.item.update(self.edits[-1])
 
     def test_profile_cleanup_and_legacy_upgrade(self):
         self.gpu.set('test-unit', True)
@@ -133,13 +143,24 @@ class GPUTests(unittest.TestCase):
         self.assertEqual(len(self.edits),1)
 
     def test_failed_atomic_edit_does_not_publish_success(self):
-        original=self.command
-        def fail(args, **kw):
-            if args[:2]==['config','edit']:raise Error('native failure')
-            return original(args,**kw)
-        self.manager.lxd.command.side_effect=fail
+        self.manager.lxd.configuration.write.side_effect=Error('native failure')
         with self.assertRaises(Error):self.gpu.set('test-unit',True)
         self.assertNotIn(KEY,self.item['config'])
+        self.manager.emit.assert_not_called()
+
+    def test_concurrent_non_gpu_changes_are_preserved_without_success(self):
+        original = self.write_config
+        def concurrent(target, value, etag, **kwargs):
+            self.item['config']['limits.memory'] = '16GiB'
+            self.item['devices']['external'] = {'type': 'none'}
+            return original(target, value, etag)
+        self.manager.lxd.configuration.write.side_effect = concurrent
+        with self.assertRaisesRegex(Error, 'configuration changed'):
+            self.gpu.set('test-unit', True)
+        self.assertEqual(self.item['config']['limits.memory'], '16GiB')
+        self.assertEqual(self.item['devices']['external'], {'type': 'none'})
+        self.assertNotIn(KEY, self.item['config'])
+        self.assertEqual(self.edits, [])
         self.manager.emit.assert_not_called()
 
     def test_missing_host_gpu_still_allows_owned_cleanup(self):
