@@ -195,11 +195,11 @@ class GPU:
                     or source.startswith('/usr/lib/wsl/')):
                 raise Error(t('gpu_conflict', device=name))
 
-    def status(self, target):
+    def status(self, target, *, capability=None):
         instance = self.manager.require(target)
         record = self.record(instance)
         self.check_owned(instance, record)
-        capability = self.detect()
+        capability = self.detect() if capability is None else capability
         return {**capability, 'enabled': record['enabled'] if record else capability['available'],
                 'configured': record is not None, 'resources': record or {},
                 'state': instance['status']}

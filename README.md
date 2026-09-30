@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.6`，修正 WSL GPU 库查找、提供容器登录 shell 的 nvidia-smi 命令，并新增独立发布入口。
+当前 test 为 `0.2.7`，优化硬件菜单和 GPU 测试流程中的探测结果复用，减少不必要的重复探测；创建和启动的探测时机保持不变。
 
 在 Ubuntu 的交互式终端运行：
 

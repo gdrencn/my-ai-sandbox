@@ -53,6 +53,18 @@ class ReviewTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):UI(view,manager).hardware('test-example')
         manager.hardware.assert_called_once_with('test-example')
 
+    def test_menu_refresh_failure_preserves_primary_error_and_leaves(self):
+        view, manager = Mock(), Mock()
+        manager.hardware.side_effect = [
+            {'available': True, 'enabled': True, 'configured': True},
+            Error('original mutation failure'), Error('configuration read failure')]
+        view.choose.side_effect = ['gpu', False, None]
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            UI(view, manager).hardware('test-example')
+        self.assertEqual(manager.hardware.call_count, 3)
+        self.assertIn('original mutation failure', err.getvalue())
+        self.assertIn('configuration read failure', err.getvalue())
+
     def test_gpu_diagnostic_observer_failure_does_not_replace_result(self):
         result=subprocess.CompletedProcess([],0,'result','unknown native diagnostic')
         output=io.StringIO()

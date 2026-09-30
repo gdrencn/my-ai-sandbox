@@ -135,9 +135,23 @@ class UI:
                 nonlocal status
                 enabled = self.view.choose(t('gpu_choose'), [(True, t('state_enabled')), (False, t('state_disabled'))],
                                            default=status['enabled'], radio=True)
-                status = None  # Refresh after an attempt, but not after Cancelled.
-                self.manager.hardware(target, enabled)
+                capability = status
+                try:
+                    record = self.manager.hardware(target, enabled, capability=capability)
+                except (Error, OSError):
+                    # Configuration may have changed before the failure. Observe it
+                    # again, without repeating host discovery for this menu flow.
+                    status = None
+                    try:
+                        status = self.manager.hardware(target, capability=capability)
+                    except (Error, OSError) as refresh_error:
+                        self.write(t('error', error=refresh_error), error=True)
+                    raise
+                status = {**capability, 'enabled': record['enabled'],
+                          'configured': True, 'resources': record}
             self.present(t('gpu_choose'), change)
+            if status is None:
+                return
 
     def containers(self):
         selected = None

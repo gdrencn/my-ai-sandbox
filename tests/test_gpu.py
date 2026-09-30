@@ -165,7 +165,40 @@ class GPUTests(unittest.TestCase):
             with patch('mas.terminal_ui.sys.stdout',io.StringIO()):UI(view,manager).hardware('test-unit')
             choices=view.choose.call_args_list[0].args[1]
             self.assertEqual(len(choices),2 if available else 1)
-            if available: self.assertIn(unittest.mock.call('test-unit',False), manager.hardware.call_args_list)
+            if available: self.assertIn(unittest.mock.call('test-unit',False, capability={'available':True,'enabled':True}), manager.hardware.call_args_list)
+
+    def test_menu_reuses_discovery_for_switches_and_refresh(self):
+        self.gpu.ensure('test-unit')
+        from mas.core import Manager
+        self.manager.gpu = self.gpu
+        self.manager.hardware.side_effect = lambda *a, **kw: Manager.hardware(self.manager, *a, **kw)
+        view = Mock()
+        view.choose.side_effect = ['gpu', False, None, 'gpu', True, None, None]
+        with patch('mas.gpu.detect', return_value=CAP) as detect, contextlib.redirect_stdout(io.StringIO()):
+            UI(view, self.manager).hardware('test-unit')
+        self.assertEqual(detect.call_count, 1)
+        defaults = [c.kwargs['default'] for c in view.choose.call_args_list if c.kwargs.get('radio')]
+        self.assertEqual(defaults, [True, False])
+        self.assertTrue(self.gpu.record(self.item)['enabled'])
+
+    def test_menu_failure_reads_actual_configuration_without_discovery(self):
+        self.gpu.ensure('test-unit')
+        from mas.core import Manager
+        self.manager.gpu = self.gpu
+        def hardware(target, enabled=None, **kwargs):
+            result = Manager.hardware(self.manager, target, enabled, **kwargs)
+            if enabled is not None:
+                raise Error('failure after configuration changed')
+            return result
+        self.manager.hardware.side_effect = hardware
+        view = Mock()
+        view.choose.side_effect = ['gpu', False, None, 'gpu', True, None, None]
+        with patch('mas.gpu.detect', return_value=CAP) as detect, contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            UI(view, self.manager).hardware('test-unit')
+        self.assertEqual(detect.call_count, 1)
+        defaults = [c.kwargs['default'] for c in view.choose.call_args_list if c.kwargs.get('radio')]
+        self.assertEqual(defaults, [True, False])
+        self.assertIn('failure after configuration changed', err.getvalue())
 
     def test_driver_refresh_reuses_atomic_set(self):
         self.gpu.ensure('test-unit')

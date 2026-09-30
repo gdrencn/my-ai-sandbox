@@ -151,8 +151,9 @@ class Manager:
         from .gpu import GPU
         return GPU(self)
 
-    def hardware(self, target, enabled=None):
-        return self.gpu.status(target) if enabled is None else self.gpu.set(target, enabled)
+    def hardware(self, target, enabled=None, *, capability=None):
+        return (self.gpu.status(target, capability=capability) if enabled is None
+                else self.gpu.set(target, enabled, capability=capability))
 
     def mountfs(self, target, path=None, *, default_home=False):
         return self.filesystems.mount(target, path, default_home=default_home)

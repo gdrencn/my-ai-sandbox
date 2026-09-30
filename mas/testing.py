@@ -565,7 +565,8 @@ class Suite:
             terminal.expect('Container: ' + target); terminal.send(back)
             terminal.expect('Containers'); terminal.send(back)
             terminal.expect('my-ai-sandbox'); terminal.send('\x1b[A\n'); terminal.finish()
-        assert not json.loads(self.cli('hardware', target))['enabled']
+        record = self.manager.gpu.record(self.manager.info(target))
+        assert record is not None and not record['enabled']
 
     def gpu_test(self):
         from .gpu import KEY, CONF, PROFILE
@@ -628,10 +629,10 @@ print(json.dumps(sorted(paths)))
                                                         excluded=excluded)
         self.cli('stop', target)
         self.gpu_menu(target)
-        self.cli('hardware', target, 'gpu', 'off')
-        self.cli('hardware', target, 'gpu', 'off')
-        disabled = json.loads(self.cli('hardware', target))
-        assert not disabled['enabled'] and not disabled['resources']['devices']
+        for _ in range(2):
+            disabled = json.loads(self.cli('hardware', target, 'gpu', 'off'))
+            assert not disabled['enabled'] and not disabled['devices']
+        assert self.manager.gpu.record(self.manager.info(target)) == disabled
         self.cli('start', target)
         if capability['backend'] == 'wsl-nvidia':
             self.exec(target, 'test ! -e /dev/dxg; test ! -e ' + CONF + '; test ! -e ' + PROFILE)
