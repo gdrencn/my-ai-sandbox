@@ -483,7 +483,7 @@ Status: implemented and locally verified: 204 packaged units and 22 native stage
 
 ## 36. Persistent LXD socket group access — v0.2.8
 
-Status: implemented and verified locally: 214 packaged units and 22 native stages passed from /tmp in 456.9 seconds; isolated WSL socket repair, recreation, two post-install restarts, custom-group access and unprivileged ready reinstall passed. Public test publication/verification follows.
+Status: implemented and verified locally: 214 packaged units and 22 native stages passed from /tmp in 456.9 seconds; isolated WSL socket repair, recreation, two post-install restarts, custom-group access and unprivileged ready reinstall passed. Published v0.2.8 test. Public artifact verification and unchanged-artifact full recheck passed (214 units, 22 stages, 449.3 seconds). The first public attempt hit an unrelated Windows UNC readback mismatch; both attempts and the unresolved observation are recorded in IMPLEMENTED.md.
 
 - During installation, read the LXD snap's generated daemon group configuration (default lxd), validate that group, and use it consistently for user membership and group refresh.
 - Add a managed systemd drop-in for snap.lxd.daemon.unix.socket specifying SocketGroup, without editing generated units or widening mode 0660. Preserve unrelated configuration and reject conflicting or symlinked managed paths.
