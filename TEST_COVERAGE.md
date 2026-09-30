@@ -155,3 +155,7 @@ Seven regressions cover invalid collection/option types, record-version typing b
 Official command comparison verified identical device/mount lists, no generated hooks and warnings reduced from five to two on the measured LXD-bundled NVIDIA tool. Remaining warnings are retained. Frozen validation passed 196 packaged units / 22 native stages in 484.6 seconds, no skips or cleanup errors. Reports: validation/V0_2_4_LOCAL_REPORT.json and V0_2_4_DISCOVERY_CHECK.json.
 
 Public delivery checks verified all seven downloaded artifacts, latest-test selection, fixed entry and downloaded product version. No second full suite through public installation was run; released files match those used in frozen validation. See validation/V0_2_4_RELEASE_CHECK.json.
+
+## Portable subprocess regression — 0.2.5
+
+Reproduced the 0.2.4 missing-mas failure using its existing archive from /tmp. Module-dependent PTY fixtures now reuse testing.python_command. The new runner regression checks unrelated cwd, a shadow mas.py, misleading parent sys.path[0] and PYTHONPATH isolation. The complete frozen tester was launched from /tmp with absolute archive paths and Python isolated mode: 197 units, 22 native stages passed in 452.2 seconds, no skips or cleanup errors. Evidence: validation/V0_2_5_LOCAL_REPORT.json. Checkout-only success and public byte equality are insufficient portability checks; published installation is verified separately.

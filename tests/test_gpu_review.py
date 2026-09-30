@@ -14,7 +14,7 @@ from mas.core import Error
 from mas.gpu import _discovery_command, GPU, KEY
 from mas.menu import Cancelled
 from mas.terminal_ui import UI
-from mas.testing import Suite, Terminal
+from mas.testing import Suite, Terminal, python_command
 from mas.test_output import Output
 from tests.test_gpu_discovery import DiscoveryTests, spec
 from tests.test_menu import MenuTests
@@ -103,7 +103,7 @@ with patch('mas.gpu.subprocess.run',return_value=subprocess.CompletedProcess([],
 print('FINISHED')
 """
         with tempfile.TemporaryDirectory() as directory:
-            terminal=Terminal([sys.executable,'-c',source],300,Path(directory)/'terminal.log')
+            terminal=Terminal(python_command(source),300,Path(directory)/'terminal.log')
             try:
                 terminal.expect('FINISHED');terminal.finish()
                 history=MenuTests().render_history(terminal.buffer)

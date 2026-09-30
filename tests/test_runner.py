@@ -1,6 +1,7 @@
 """Verify that the verifier cannot silently report failed work as successful."""
 import contextlib
 import io
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -94,9 +95,27 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(summary['skipped'][0]['reason'],'unavailable fixture')
         self.assertEqual(len(summary['test_ids']),4)
 
+    def test_python_fixture_uses_tester_origin_outside_checkout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            # Neither cwd nor PYTHONPATH may shadow the archive being tested.
+            Path(directory, 'mas.py').write_text('raise RuntimeError("wrong mas")')
+            Path(directory, 'shadow_only.py').write_text('VALUE = True')
+            source = (
+                'import importlib.util, mas.testing; '
+                'print(mas.testing.__file__); '
+                'assert importlib.util.find_spec("shadow_only") is None'
+            )
+            with patch.object(sys, 'path', [directory, *sys.path]):
+                command = testing.python_command(source)
+            result = subprocess.run(command, cwd=directory,
+                                    env={**os.environ, 'PYTHONPATH': directory},
+                                    capture_output=True, text=True, timeout=300)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), testing.__file__)
+
     def test_optimized_python_refuses_to_run_verification(self):
-        source='import sys;sys.path.insert(0,'+repr(sys.path[0])+');from mas.testing import main;main([])'
-        result=subprocess.run([sys.executable,'-O','-c',source],capture_output=True,text=True,timeout=300)
+        source='from mas.testing import main;main([])'
+        result=subprocess.run(testing.python_command(source, '-O'),capture_output=True,text=True,timeout=300)
         self.assertEqual(result.returncode,2)
         self.assertIn('PYTHONOPTIMIZE',result.stderr)
 

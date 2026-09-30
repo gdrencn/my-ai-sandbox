@@ -105,11 +105,11 @@ class LanguageTests(unittest.TestCase):
             bootstrap.release("v0.1.3-test.1")
 
     def test_language_selection_in_real_terminal(self):
-        from mas.testing import Terminal
+        from mas.testing import Terminal, python_command
         import sys
-        source = ("import sys;sys.path.insert(0," + repr(sys.path[0]) + ");"
+        source = ("import sys;"
                   "from mas.i18n import choose_language;print(choose_language())")
-        terminal = Terminal([sys.executable, "-c", source], 300, Path(os.environ["XDG_CONFIG_HOME"]) / "terminal.log")
+        terminal = Terminal(python_command(source), 300, Path(os.environ["XDG_CONFIG_HOME"]) / "terminal.log")
         try:
             terminal.expect("English (en_us)")
             terminal.send("\n")

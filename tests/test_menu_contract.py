@@ -95,7 +95,7 @@ class MenuContractTests(unittest.TestCase):
         from pathlib import Path
         import sys
         import tempfile
-        from mas.testing import Terminal
+        from mas.testing import Terminal, python_command
         from tests.test_menu import MenuTests
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CONFIG_HOME': directory}):
             for language in ('zh_cn', 'en_us'):
@@ -103,7 +103,6 @@ class MenuContractTests(unittest.TestCase):
                     with self.subTest(language=language, case=case):
                         source = """
 import sys
-sys.path.insert(0, ARCHIVE)
 from mas import config, menu
 from mas.terminal_ui import UI
 from mas.output import Output
@@ -128,8 +127,8 @@ def exercise(view):
     ui.present('ACTION_SENTINEL', action)
     print('HOST_SENTINEL', flush=True)
 menu.interactive(exercise)
-""".replace('ARCHIVE', repr(sys.path[0])).replace('LANGUAGE', repr(language)).replace('CASE', repr(case))
-                        terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'spacing.log')
+""".replace('LANGUAGE', repr(language)).replace('CASE', repr(case))
+                        terminal = Terminal(python_command(source), 300, Path(directory)/'spacing.log')
                         try:
                             terminal.expect('ACTION_SENTINEL')
                             if case == 'create':

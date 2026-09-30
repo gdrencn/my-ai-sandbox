@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.4`，在官方 WSL 驱动发现基础上减少无用探测，统一诊断与进度输出，补齐测试记录并优化硬件菜单取消操作。
+当前 test 为 `0.2.5`，修复测试工具在仓库外运行时，Python 子进程找不到 `mas` 的问题。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -161,6 +161,8 @@ python3 dist/mas.pyz --version
 ```
 
 `dist/mas.pyz` 为产品，不包含安装模块、测试代码或测试专用文案；`dist/mas-install.pyz` 为独立安装程序；`dist/mas-test.pyz` 为独立测试工具。三个文件版本一致。测试工具通过安装程序完成安装，安装程序不负责启动测试。仅使用标准库生成可重复构建的 zipapp，适用于已具备受支持 Python 运行时的架构。
+
+发布验证必须从仓库外的临时工作目录运行打包后的测试工具，使用产品及测试包的绝对路径；不能只在源码目录验证。Python 测试子进程统一使用 `mas.testing.python_command` 显式指定当前测试包来源，不依赖工作目录或 `PYTHONPATH`。
 
 发布前核验 [REQUIREMENTS.md](REQUIREMENTS.md) 并更新 [IMPLEMENTED.md](IMPLEMENTED.md)。GitHub prerelease 保留版本资产、安装脚本、校验清单及测试报告。阶段 1 没有 GPU 接入功能；0.2.1 新增 GPU 模块，不自动安装模型工具。
 

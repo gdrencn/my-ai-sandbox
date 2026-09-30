@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 from mas.cli import Progress
 from mas.output import Output
-from mas.testing import Terminal
+from mas.testing import Terminal, python_command
 from tests import test_menu
 
 
@@ -95,9 +95,8 @@ manager.start = broken
 assert main(['start', 'test-demo'], manager=manager) == 130
 print('AFTER_INTERRUPT')
 '''
-        source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CONFIG_HOME': directory}):
-            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'progress.log')
+            terminal = Terminal(python_command(source), 300, Path(directory)/'progress.log')
             try:
                 terminal.expect('NEXT_MENU')
                 terminal.send('\n')

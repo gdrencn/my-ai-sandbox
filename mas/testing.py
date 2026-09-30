@@ -39,6 +39,13 @@ from .i18n import t, Parser, catalog, progress_text
 
 PRODUCT_UNDER_TEST = None
 
+
+def python_command(source, *options):
+    """Run a Python fixture against this tester, independent of cwd/user imports."""
+    root = str(Path(__file__).resolve().parent.parent)
+    preamble = f"import sys; sys.path.insert(0, {root!r})\n"
+    return [sys.executable, '-I', *options, '-c', preamble + source]
+
 def unit_modules():
     return [importlib.import_module('tests.' + item.name[:-3])
             for item in sorted(files('tests').iterdir(), key=lambda item: item.name)

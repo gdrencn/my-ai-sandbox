@@ -7,17 +7,17 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from mas import config, menu
-from mas.testing import Terminal
+from mas.testing import Terminal, python_command
 
 
 class MenuTests(unittest.TestCase):
     def terminal_case(self, expression, keys, expected):
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CONFIG_HOME': directory}):
             config.set_value('language', 'en_us')
-            source = ('import sys,json;sys.path.insert(0,' + repr(sys.path[0]) + ');'
+            source = ('import sys,json;'
                       'from mas import menu;result=menu.interactive(lambda ui:' + expression + ');'
                       'print("RESULT="+json.dumps(result))')
-            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'pty.log')
+            terminal = Terminal(python_command(source), 300, Path(directory)/'pty.log')
             try:
                 terminal.expect('English (en_us)' if 'language' in expression else 'Menu test')
                 terminal.send(keys)
@@ -67,8 +67,7 @@ def exercise(view):
 menu.interactive(exercise)
 """
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {'XDG_CONFIG_HOME': directory}):
-            source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
-            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'failure.log')
+            terminal = Terminal(python_command(source), 300, Path(directory)/'failure.log')
             try:
                 terminal.expect('NATIVE_FAILURE_SENTINEL')
                 terminal.expect('Operation result')
@@ -106,10 +105,10 @@ menu.interactive(exercise)
         import struct
         import termios
         with tempfile.TemporaryDirectory() as directory:
-            source = ('import sys,json;sys.path.insert(0,' + repr(sys.path[0]) + ');from mas import menu;'
+            source = ('import sys,json;from mas import menu;'
                       'result=menu.interactive(lambda ui:ui.choose("Resize menu",[(i,str(i)) for i in range(30)]));'
                       'print("RESULT="+str(result))')
-            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'resize.log')
+            terminal = Terminal(python_command(source), 300, Path(directory)/'resize.log')
             try:
                 terminal.expect('Resize menu')
                 fcntl.ioctl(terminal.fd, termios.TIOCSWINSZ, struct.pack('HHHH', 8, 32, 0, 0))
@@ -145,9 +144,8 @@ def exercise(view):
 print('HISTORY_SENTINEL', end='', flush=True)
 print('RESULT=' + menu.interactive(exercise))
 """
-        source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
         with tempfile.TemporaryDirectory() as directory:
-            terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'return.log')
+            terminal = Terminal(python_command(source), 300, Path(directory)/'return.log')
             try:
                 terminal.expect('Before operation')
                 terminal.send('\n')
@@ -186,9 +184,8 @@ except (menu.Cancelled, KeyboardInterrupt):
 assert termios.tcgetattr(0) == original
 print('RESTORED')
 """
-            source = 'import sys;sys.path.insert(0,' + repr(sys.path[0]) + ')\n' + source
             with tempfile.TemporaryDirectory() as directory:
-                terminal = Terminal([sys.executable, '-c', source], 300, Path(directory)/'mode.log')
+                terminal = Terminal(python_command(source), 300, Path(directory)/'mode.log')
                 try:
                     terminal.expect('Mode check')
                     terminal.send(key)
