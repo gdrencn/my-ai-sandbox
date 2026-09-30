@@ -2,7 +2,7 @@
 
 Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–37 describe phase 2 plans and subsequent batches. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: locally verified test batch 0.2.9; public test publication is the remaining delivery step. Stable remains stable/0.1.15. Section 37 records the audit improvements. Restricted project/profile policy, CPU/memory/process controls, network-policy changes and the stable-only release branch are still pending under sections 27 and 34.
+Current baseline: published and publicly verified test batch 0.2.9. Stable remains stable/0.1.15. Section 37 records the audit improvements. Restricted project/profile policy, CPU/memory/process controls, network-policy changes and the stable-only release branch are still pending under sections 27 and 34.
 
 ## 1. Scope
 
@@ -494,7 +494,7 @@ Status: implemented and verified locally: 214 packaged units and 22 native stage
 - Test persistent socket recreation and a separate WSL restart using an isolated environment, including ordinary-user access. Add custom-group, idempotence, conflict and failure regressions. Preserve the current stable release. Update implementation/coverage documents after verification and publish v0.2.8 test.
 ## 37. Reliability and interface audit — v0.2.9
 
-Status: implemented and locally verified: 236 packaged units and all 23 native stages passed from /tmp in 483.2 seconds, with no skips or cleanup errors. Public test publication and entry verification follow.
+Status: implemented, published and verified. All 236 packaged units and 23 report stages (the unit stage plus 22 real integration stages) passed from /tmp locally in 483.2 seconds and through the public installation/test entry in 488.9 seconds, with no skips, unexecuted stages or cleanup errors. All eleven published assets match the validated files; ordinary installation and all four entry routes were checked. Evidence: validation/V0_2_9_LOCAL_REPORT.json, validation/V0_2_9_PUBLIC_REPORT.json and validation/V0_2_9_RELEASE_CHECK.json.
 
 - Use LXD's documented GET ETag / PUT If-Match mechanism for the shared container configuration update capability. Read the configuration and its ETag together; publish only against that exact version. Preserve all writable instance fields, unrelated configuration keys and unrelated devices.
 - Integrate GPU configuration publication with this shared capability. Publish GPU devices and their ownership record in one conditional update. Preserve the existing ownership, managed-container, stopped-state and runtime-file checks.

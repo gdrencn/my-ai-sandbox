@@ -1,0 +1,136 @@
+{
+  "selected": "v0.2.9",
+  "prerelease": true,
+  "assets": [
+    {
+      "name": "SHA256SUMS",
+      "sha256": "0bba8ad299f9d2cafbd747ef561a09f8a795effe22f4a559b5b15deefd597429",
+      "matched": true
+    },
+    {
+      "name": "WSL_REPORT.json",
+      "sha256": "9b5deac3935c66a609a9def7eb57b72f94217f7d9c08bbc43d6d0859332a9113",
+      "matched": true
+    },
+    {
+      "name": "bootstrap.py",
+      "sha256": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+      "matched": true
+    },
+    {
+      "name": "install-stable.sh",
+      "sha256": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "matched": true
+    },
+    {
+      "name": "install-test.sh",
+      "sha256": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "matched": true
+    },
+    {
+      "name": "install.sh",
+      "sha256": "9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+      "matched": true
+    },
+    {
+      "name": "mas-install.pyz",
+      "sha256": "8b16a7100d6774c716e589f06be3efa7cbd1859ed9dd9e9c7f3033bb7354badc",
+      "matched": true
+    },
+    {
+      "name": "mas-test.pyz",
+      "sha256": "ae79a30b13e69fcd3cd99c1bd4322977bf028169bed3f626fb4aa3f5adeeb752",
+      "matched": true
+    },
+    {
+      "name": "mas.pyz",
+      "sha256": "d39e4c1a0e1525f629bd925725f911e9258e45a80c79b497038fc877a83afc2c",
+      "matched": true
+    },
+    {
+      "name": "test-stable.sh",
+      "sha256": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "matched": true
+    },
+    {
+      "name": "test.sh",
+      "sha256": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "matched": true
+    }
+  ],
+  "latest": "stable/0.1.15",
+  "public_entry": "test/test.sh",
+  "public_test_cwd": "/tmp",
+  "full_public_test_rerun": true,
+  "entries": [
+    {
+      "path": "stable/install.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "stable",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/install.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "test",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/test.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "test",
+        "--test",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/test-stable.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "stable",
+        "--test",
+        "--output",
+        "path with spaces"
+      ]
+    }
+  ],
+  "stable_test_pair": "v0.1.15",
+  "stable_pair_checksums_match": true,
+  "normal_install": {
+    "entry": "test/install.sh",
+    "success": true,
+    "version": "0.2.9",
+    "product_matches": true,
+    "tester_unchanged": true,
+    "stdout": "\u6b63\u5728\u5b89\u88c5 v0.2.9\nmas \u5df2\u5b89\u88c5\u5230 /home/gordon/.local/bin/mas\n\u5df2\u914d\u7f6e shell PATH\uff0c\u8bf7\u6253\u5f00\u65b0\u7ec8\u7aef\u540e\u76f4\u63a5\u8fd0\u884c mas\u3002\n",
+    "stderr": ""
+  },
+  "public_test": {
+    "version": "0.2.9",
+    "elapsed": 488.86129134500516,
+    "unit_tests": 236,
+    "report_stages": 23,
+    "native_integration_stages": 22,
+    "passed": true,
+    "skipped_units": [],
+    "cleanup_errors": [],
+    "report": "validation/V0_2_9_PUBLIC_REPORT.json",
+    "isolated_project_reclaimed": true
+  },
+  "installed_hashes": {
+    "mas.pyz": "d39e4c1a0e1525f629bd925725f911e9258e45a80c79b497038fc877a83afc2c",
+    "mas-test.pyz": "ae79a30b13e69fcd3cd99c1bd4322977bf028169bed3f626fb4aa3f5adeeb752"
+  }
+}
