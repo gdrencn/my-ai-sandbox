@@ -81,7 +81,7 @@ class LanguageTests(unittest.TestCase):
             if str(path) == "/etc/os-release": return "ID=ubuntu\n"
             if str(path) == "/proc/1/comm": return "systemd\n"
             return original(path, *args, **kwargs)
-        with patch("mas.install.prepare_dependencies"), patch("mas.install.prepare_fuse_access"), patch.object(Path, "read_text", read), \
+        with patch("mas.install.prepare_dependencies"), patch("mas.install.prepare_fuse_access"), patch("mas.install.prepare_socket_access", return_value=SimpleNamespace(gr_name="lxd", gr_gid=986, gr_mem=["tester"])), patch.object(Path, "read_text", read), \
                 patch("mas.install.shutil.which", return_value="/snap/bin/lxd"), \
                 patch("mas.install.os.geteuid", return_value=1000), \
                 patch("mas.install.os.getgid", return_value=1000), \

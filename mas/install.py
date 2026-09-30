@@ -90,6 +90,20 @@ def prepare_fuse_access():
     run([sys.executable, '-c', code], privileged=True, display=False, label=t('fuse_setup'))
 
 
+def prepare_socket_access():
+    from .socket_access import daemon_group, properties, ready
+    group = daemon_group()
+    if ready(group, properties(run)):
+        return group
+    print(t('socket_setup'), flush=True)
+    code = ('import sys;sys.path.insert(0,' + repr(str(Path(__file__).resolve().parent.parent)) + ');'
+            'from mas.install import run;from mas.socket_access import configure;configure(run)')
+    run([sys.executable, '-c', code], privileged=True, display=False, label=t('socket_setup'))
+    if not ready(group, properties(run)):
+        raise Error(t('socket_wait_failed'))
+    return group
+
+
 def stable_channel(info):
     candidates = []
     for line in info.splitlines():
@@ -118,11 +132,11 @@ def prepare_system():
         run(["snap", "wait", "system", "seed.loaded"], privileged=True)
         channel = stable_channel(run(["snap", "info", "lxd"], capture=True))
         run(["snap", "install", "lxd", "--channel=" + channel], privileged=True)
+    group = prepare_socket_access()
     if os.geteuid() != 0:
         username = pwd.getpwuid(os.getuid()).pw_name
-        group = grp.getgrnam("lxd")
         if username not in group.gr_mem and os.getgid() != group.gr_gid:
-            run(["usermod", "-aG", "lxd", username], privileged=True)
+            run(["usermod", "-aG", group.gr_name, username], privileged=True)
         return group.gr_gid not in os.getgroups() and os.getgid() != group.gr_gid
     return False
 
@@ -197,7 +211,8 @@ def install_file(source, destination):
 def group_refresh_required():
     if os.geteuid() == 0:
         return False
-    group = grp.getgrnam("lxd")
+    from .socket_access import daemon_group
+    group = daemon_group()
     return group.gr_gid not in os.getgroups() and os.getgid() != group.gr_gid
 
 

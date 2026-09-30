@@ -480,3 +480,13 @@ Status: implemented and locally verified: 204 packaged units and 22 native stage
 - Within a hardware-menu interaction, reuse the acquired host capability for configuration and display refresh. Use successful configuration results for the new displayed state. After failure, read and validate actual container configuration rather than publishing the requested state; reuse the host information for that read.
 - In the GPU test flow, use switch command return values and independent LXD configuration reads where only container settings need verification. Retain standalone hardware CLI coverage, repeated-off coverage and native configuration verification.
 - Add focused regressions for discovery count, successful on/off display, cancellation and failure refresh. Validate packaged tests outside the checkout and the real LXD/GPU suite, update implementation documents after verification and publish v0.2.7 test. Section 34 remains pending until the next stable publication.
+
+## 36. Persistent LXD socket group access — v0.2.8
+
+Status: implemented and verified locally: 214 packaged units and 22 native stages passed from /tmp in 456.9 seconds; isolated WSL socket repair, recreation, two post-install restarts, custom-group access and unprivileged ready reinstall passed. Public test publication/verification follows.
+
+- During installation, read the LXD snap's generated daemon group configuration (default lxd), validate that group, and use it consistently for user membership and group refresh.
+- Add a managed systemd drop-in for snap.lxd.daemon.unix.socket specifying SocketGroup, without editing generated units or widening mode 0660. Preserve unrelated configuration and reject conflicting or symlinked managed paths.
+- Reload systemd after configuration changes; repair the existing verified root-owned LXD socket's group when needed, without restarting the LXD daemon or user containers. Validate effective socket configuration and observed socket metadata. A ready environment needs no privilege request.
+- Verify native LXD access under the installation user's credentials before publishing installation success. Keep native sudo authentication and existing group-refresh behavior; normal mas operations do not gain privilege or repair host settings.
+- Test persistent socket recreation and a separate WSL restart using an isolated environment, including ordinary-user access. Add custom-group, idempotence, conflict and failure regressions. Preserve the current stable release. Update implementation/coverage documents after verification and publish v0.2.8 test.

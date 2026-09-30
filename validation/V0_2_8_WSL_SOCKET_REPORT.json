@@ -1,0 +1,713 @@
+{
+  "distro": "test-6d344f2a52b84332910c443ef9404e08",
+  "image_sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+  "steps": [
+    {
+      "command": [
+        "wsl.exe",
+        "--import",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "C:\\Users\\Gordon\\AppData\\Local\\Temp\\mas-wsl-socket-n26tjsnq\\distro",
+        "\\\\wsl.localhost\\codex\\tmp\\mas028-wsl-image\\rootfs.tar.gz",
+        "--version",
+        "2"
+      ],
+      "code": 0,
+      "elapsed": 5.428910028000246,
+      "stdout": "�d\\O\u0010b�R�[\u0010b\u00020 \u0000\n\u0000\n\u0000",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; set -e; useradd -m -s /bin/bash mascheck; usermod -aG sudo mascheck; printf 'mascheck ALL=(ALL) NOPASSWD: ALL\\n' > /etc/sudoers.d/mascheck; chmod 440 /etc/sudoers.d/mascheck; printf '[boot]\\nsystemd=true\\n[user]\\ndefault=mascheck\\n' > /etc/wsl.conf"
+      ],
+      "code": 0,
+      "elapsed": 3.4697663050028495,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "--terminate",
+        "test-6d344f2a52b84332910c443ef9404e08"
+      ],
+      "code": 0,
+      "elapsed": 3.247993558004964,
+      "stdout": "�d\\O\u0010b�R�[\u0010b\u00020 \u0000\n\u0000\n\u0000",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(cat /proc/1/comm)\" = systemd"
+      ],
+      "code": 0,
+      "elapsed": 1.2458084579993738,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; apt-get update; apt-get install --only-upgrade -y snapd; snap version"
+      ],
+      "code": 0,
+      "elapsed": 5.903059830998245,
+      "stdout": "Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease\nGet:2 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]\nGet:3 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]\nGet:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]\nGet:5 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [15.0 MB]\nGet:6 http://archive.ubuntu.com/ubuntu noble/universe Translation-en [5982 kB]\nGet:7 http://security.ubuntu.com/ubuntu noble-security/main amd64 Packages [1066 kB]\nGet:8 http://archive.ubuntu.com/ubuntu noble/universe amd64 Components [3871 kB]\nGet:9 http://archive.ubuntu.com/ubuntu noble/universe amd64 c-n-f Metadata [301 kB]\nGet:10 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Packages [269 kB]\nGet:11 http://archive.ubuntu.com/ubuntu noble/multiverse Translation-en [118 kB]\nGet:12 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Components [35.0 kB]\nGet:13 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 c-n-f Metadata [8328 B]\nGet:14 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1322 kB]\nGet:15 http://archive.ubuntu.com/ubuntu noble-updates/main Translation-en [299 kB]\nGet:16 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]\nGet:17 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1699 kB]\nGet:18 http://archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [341 kB]\nGet:19 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]\nGet:20 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 c-n-f Metadata [34.9 kB]\nGet:21 http://archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1662 kB]\nGet:22 http://archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [379 kB]\nGet:23 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [45.7 kB]\nGet:24 http://archive.ubuntu.com/ubuntu noble-updates/multiverse Translation-en [13.1 kB]\nGet:25 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]\nGet:26 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 c-n-f Metadata [656 B]\nGet:27 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [40.6 kB]\nGet:28 http://archive.ubuntu.com/ubuntu noble-backports/main Translation-en [9172 B]\nGet:29 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5760 B]\nGet:30 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 c-n-f Metadata [368 B]\nGet:31 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [31.0 kB]\nGet:32 http://archive.ubuntu.com/ubuntu noble-backports/universe Translation-en [18.6 kB]\nGet:33 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]\nGet:34 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 c-n-f Metadata [1588 B]\nGet:35 http://archive.ubuntu.com/ubuntu noble-backports/restricted amd64 Components [212 B]\nGet:36 http://archive.ubuntu.com/ubuntu noble-backports/restricted amd64 c-n-f Metadata [116 B]\nGet:37 http://archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Packages [748 B]\nGet:38 http://archive.ubuntu.com/ubuntu noble-backports/multiverse Translation-en [340 B]\nGet:39 http://archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Components [212 B]\nGet:40 http://archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 c-n-f Metadata [116 B]\nGet:41 http://security.ubuntu.com/ubuntu noble-security/main Translation-en [220 kB]\nGet:42 http://security.ubuntu.com/ubuntu noble-security/main amd64 Components [46.4 kB]\nGet:43 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1216 kB]\nGet:44 http://security.ubuntu.com/ubuntu noble-security/universe Translation-en [244 kB]\nGet:45 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]\nGet:46 http://security.ubuntu.com/ubuntu noble-security/universe amd64 c-n-f Metadata [24.2 kB]\nGet:47 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1566 kB]\nGet:48 http://security.ubuntu.com/ubuntu noble-security/restricted Translation-en [361 kB]\nGet:49 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [40.3 kB]\nGet:50 http://security.ubuntu.com/ubuntu noble-security/multiverse Translation-en [11.3 kB]\nGet:51 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Components [208 B]\nGet:52 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 c-n-f Metadata [468 B]\nFetched 37.4 MB in 4s (10.5 MB/s)\nReading package lists...\nReading package lists...\nBuilding dependency tree...\nReading state information...\nsnapd is already the newest version (2.76.3+ubuntu24.04).\n0 upgraded, 0 newly installed, 0 to remove and 52 not upgraded.\nsnap          2.76.3+ubuntu24.04\nsnapd         2.76.3+ubuntu24.04\nseries        16\nubuntu        24.04\nkernel        6.18.40.1-microsoft-standard-WSL2\narchitecture  amd64\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; set -e; mkdir -p /opt/mas-test; cp /mnt/c/Users/Gordon/AppData/Local/Temp/mas-wsl-socket-n26tjsnq/mas.pyz /mnt/c/Users/Gordon/AppData/Local/Temp/mas-wsl-socket-n26tjsnq/mas-install.pyz /opt/mas-test/; chmod 644 /opt/mas-test/*"
+      ],
+      "code": 0,
+      "elapsed": 0.13750396899558837,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; python3 /opt/mas-test/mas-install.pyz --product /opt/mas-test/mas.pyz"
+      ],
+      "code": 0,
+      "elapsed": 34.24287647700112,
+      "stdout": "环境准备: apt-get update\n依赖准备完成: apt-get update\n环境准备: apt-get install -y sshfs\n依赖准备完成: apt-get install -y sshfs\n准备宿主 FUSE 配置，允许挂载用户及 root 访问。\n环境准备：sudo systemctl enable --now snapd.socket\n环境准备：sudo snap wait system seed.loaded\n环境准备：snap info lxd\n环境准备：sudo snap install lxd --channel=6/stable\n2026-09-30T04:15:49-05:00 INFO Waiting for automatic snapd restart...\n2026-09-30T04:15:50-05:00 INFO Waiting for automatic snapd restart...\n2026-09-30T04:15:51-05:00 INFO Waiting for automatic snapd restart...\n2026-09-30T04:15:52-05:00 INFO Waiting for automatic snapd restart...\nlxd (6/stable) 6.9-bf243da from Canonical** installed\n准备 LXD socket 的持久用户组权限。\n环境准备：sudo usermod -aG lxd mascheck\n环境准备：sudo -u mascheck -- env XDG_CONFIG_HOME=/home/mascheck/.config /usr/bin/python3 -c import sys;sys.path.insert(0,'/opt/mas-test/mas-install.pyz');from mas.install import finish;raise SystemExit(finish('/opt/mas-test/mas.pyz'))\n环境准备：/snap/bin/lxd init --auto --storage-backend=dir\nmas 已安装到 /home/mascheck/.local/bin/mas\n已配置 shell PATH，请打开新终端后直接运行 mas。\n请打开新终端，使新的 LXD 用户组权限生效。\n",
+      "stderr": "If this is your first time running LXD on this machine, you should also run: lxd init\nTo start your first container, try: lxc launch ubuntu:24.04\nOr for a virtual machine: lxc launch ubuntu:24.04 --vm\n"
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 0.3027353929937817,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = lxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.12328122799954144,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; rm /etc/systemd/system/snap.lxd.daemon.unix.socket.d/mas.conf; systemctl daemon-reload"
+      ],
+      "code": 0,
+      "elapsed": 0.23921839299873682,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; set -e; systemctl stop snap.lxd.daemon.service snap.lxd.daemon.unix.socket; rm -f /var/snap/lxd/common/lxd/unix.socket; systemctl start snap.lxd.daemon.unix.socket"
+      ],
+      "code": 0,
+      "elapsed": 1.446587564998481,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; stat -c \"%U:%G %a\" /var/snap/lxd/common/lxd/unix.socket; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = root"
+      ],
+      "code": 0,
+      "elapsed": 0.12482214600458974,
+      "stdout": "root:root 660\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; LXD_DIR=/var/snap/lxd/common/lxd /snap/bin/lxc list"
+      ],
+      "code": 1,
+      "elapsed": 0.14538872899720445,
+      "stdout": "",
+      "stderr": "Error: LXD unix socket \"/var/snap/lxd/common/lxd/unix.socket\" not accessible: permission denied\n"
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; python3 /opt/mas-test/mas-install.pyz --product /opt/mas-test/mas.pyz"
+      ],
+      "code": 0,
+      "elapsed": 4.09808803100168,
+      "stdout": "准备 LXD socket 的持久用户组权限。\nmas 已安装到 /home/mascheck/.local/bin/mas\n已配置 shell PATH，请打开新终端后直接运行 mas。\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 0.2775949100032449,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = lxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.12852699599898187,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; set -e; systemctl stop snap.lxd.daemon.service snap.lxd.daemon.unix.socket; rm -f /var/snap/lxd/common/lxd/unix.socket; systemctl start snap.lxd.daemon.unix.socket"
+      ],
+      "code": 0,
+      "elapsed": 1.2463185520027764,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 2.676967241000966,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = lxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.13611617199785542,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "--terminate",
+        "test-6d344f2a52b84332910c443ef9404e08"
+      ],
+      "code": 0,
+      "elapsed": 4.435125690004497,
+      "stdout": "�d\\O\u0010b�R�[\u0010b\u00020 \u0000\n\u0000\n\u0000",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(cat /proc/1/comm)\" = systemd"
+      ],
+      "code": 0,
+      "elapsed": 3.0529019360037637,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 5.273803317002603,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = lxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.13416025499464013,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; groupadd maslxd; snap set lxd daemon.group=maslxd"
+      ],
+      "code": 0,
+      "elapsed": 0.37757752600009553,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; python3 /opt/mas-test/mas-install.pyz --product /opt/mas-test/mas.pyz"
+      ],
+      "code": 0,
+      "elapsed": 0.8001726279981085,
+      "stdout": "准备 LXD socket 的持久用户组权限。\n环境准备：sudo usermod -aG maslxd mascheck\n环境准备：sudo -u mascheck -- env XDG_CONFIG_HOME=/home/mascheck/.config /usr/bin/python3 -c import sys;sys.path.insert(0,'/opt/mas-test/mas-install.pyz');from mas.install import finish;raise SystemExit(finish('/opt/mas-test/mas.pyz'))\nmas 已安装到 /home/mascheck/.local/bin/mas\n已配置 shell PATH，请打开新终端后直接运行 mas。\n请打开新终端，使新的 LXD 用户组权限生效。\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 0.2762029579971568,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd),1001(maslxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = maslxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.1315862979972735,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; set -e; systemctl stop snap.lxd.daemon.service snap.lxd.daemon.unix.socket; rm -f /var/snap/lxd/common/lxd/unix.socket; systemctl start snap.lxd.daemon.unix.socket"
+      ],
+      "code": 0,
+      "elapsed": 1.4855124530004105,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 2.680219402995135,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd),1001(maslxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = maslxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.12972612099838443,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "--terminate",
+        "test-6d344f2a52b84332910c443ef9404e08"
+      ],
+      "code": 0,
+      "elapsed": 4.423751401001937,
+      "stdout": "�d\\O\u0010b�R�[\u0010b\u00020 \u0000\n\u0000\n\u0000",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(cat /proc/1/comm)\" = systemd"
+      ],
+      "code": 0,
+      "elapsed": 1.2423550129969954,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 6.654613013000926,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),27(sudo),989(lxd),1001(maslxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = maslxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.12403969600563869,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; rm /etc/sudoers.d/mascheck; gpasswd -d mascheck sudo"
+      ],
+      "code": 0,
+      "elapsed": 0.13190555799519643,
+      "stdout": "Removing user mascheck from group sudo\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; python3 /opt/mas-test/mas-install.pyz --product /opt/mas-test/mas.pyz"
+      ],
+      "code": 0,
+      "elapsed": 0.4303856829938013,
+      "stdout": "mas 已安装到 /home/mascheck/.local/bin/mas\n已配置 shell PATH，请打开新终端后直接运行 mas。\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "mascheck",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; id; /snap/bin/lxc list; \"$HOME/.local/bin/mas\" list"
+      ],
+      "code": 0,
+      "elapsed": 0.29093166499660583,
+      "stdout": "uid=1000(mascheck) gid=1000(mascheck) groups=1000(mascheck),989(lxd),1001(maslxd)\n+------+-------+------+------+------+-----------+\n| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |\n+------+-------+------+------+------+-----------+\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "-d",
+        "test-6d344f2a52b84332910c443ef9404e08",
+        "-u",
+        "root",
+        "--cd",
+        "/",
+        "--",
+        "bash",
+        "-lc",
+        "set -e; test \"$(stat -c %G /var/snap/lxd/common/lxd/unix.socket)\" = maslxd; test \"$(stat -c %a /var/snap/lxd/common/lxd/unix.socket)\" = 660"
+      ],
+      "code": 0,
+      "elapsed": 0.13641323000047123,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "wsl.exe",
+        "--unregister",
+        "test-6d344f2a52b84332910c443ef9404e08"
+      ],
+      "code": 0,
+      "elapsed": 4.802272614004323,
+      "stdout": "�d\\O\u0010b�R�[\u0010b\u00020 \u0000\n\u0000\n\u0000",
+      "stderr": ""
+    }
+  ],
+  "passed": true,
+  "distro_removed": true
+}

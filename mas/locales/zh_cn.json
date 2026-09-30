@@ -221,5 +221,11 @@
   "gpu_discovery_tool_missing": "缺少 LXD 附带的 GPU 探测工具：{path}。请检查 LXD snap 安装。",
   "gpu_discovery_invalid": "NVIDIA 官方探测未返回有效且可访问的 WSL 驱动路径；不会使用旧路径或扫描候选目录。",
   "help_channel": "选择发布通道",
-  "stable_version_mismatch": "stable 产品与同版本测试发布不匹配；未执行安装或测试。"
+  "stable_version_mismatch": "stable 产品与同版本测试发布不匹配；未执行安装或测试。",
+  "socket_setup": "准备 LXD socket 的持久用户组权限。",
+  "socket_config_invalid": "LXD socket 配置路径存在冲突或格式无效：{path}",
+  "socket_group_missing": "LXD 配置的管理组不存在：{group}",
+  "socket_unit_conflict": "LXD socket 的有效 systemd 配置不符合预期；请检查配置冲突。",
+  "socket_metadata_invalid": "LXD socket 的类型、属主或权限存在冲突：{path}",
+  "socket_wait_failed": "LXD socket 用户组权限准备未完成。"
 }

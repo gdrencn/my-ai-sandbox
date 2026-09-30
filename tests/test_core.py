@@ -205,7 +205,7 @@ class BehaviorTests(unittest.TestCase):
 
             with self.subTest(snap_present=snap_present), \
                     patch("mas.install.prepare_dependencies"), \
-                    patch("mas.install.prepare_fuse_access"), \
+                    patch("mas.install.prepare_fuse_access"), patch("mas.install.prepare_socket_access", return_value=SimpleNamespace(gr_name="lxd", gr_gid=986, gr_mem=["tester"])), \
                     patch("mas.install.Path.read_text", side_effect=['ID=ubuntu\n', 'systemd\n']), \
                     patch("mas.install.Path.exists", return_value=False), \
                     patch("mas.install.shutil.which", side_effect=lambda name: "/usr/bin/snap" if name == "snap" and snap_present else None), \

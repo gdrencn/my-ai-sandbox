@@ -144,7 +144,7 @@ class FilesystemTests(unittest.TestCase):
             if str(path)=='/etc/os-release': return 'ID=ubuntu\n'
             if str(path)=='/proc/1/comm': return 'systemd\n'
             return original(path,*args,**kwargs)
-        with patch('mas.install.prepare_dependencies') as dependencies, patch('mas.install.prepare_fuse_access'), patch.object(Path,'read_text',read), patch('mas.install.shutil.which',side_effect=lambda name: None if name=='sshfs' else '/snap/bin/'+name), patch('mas.install.os.geteuid',return_value=1000), patch('mas.install.os.getgid',return_value=1000), patch('mas.install.os.getgroups',return_value=[986]), patch('mas.install.pwd.getpwuid',return_value=SimpleNamespace(pw_name='tester')), patch('mas.install.grp.getgrnam',return_value=SimpleNamespace(gr_gid=986,gr_mem=['tester'])), patch('mas.install.run') as run:
+        with patch('mas.install.prepare_dependencies') as dependencies, patch('mas.install.prepare_fuse_access'), patch('mas.install.prepare_socket_access', return_value=SimpleNamespace(gr_name='lxd', gr_gid=986, gr_mem=['tester'])), patch.object(Path,'read_text',read), patch('mas.install.shutil.which',side_effect=lambda name: None if name=='sshfs' else '/snap/bin/'+name), patch('mas.install.os.geteuid',return_value=1000), patch('mas.install.os.getgid',return_value=1000), patch('mas.install.os.getgroups',return_value=[986]), patch('mas.install.pwd.getpwuid',return_value=SimpleNamespace(pw_name='tester')), patch('mas.install.grp.getgrnam',return_value=SimpleNamespace(gr_gid=986,gr_mem=['tester'])), patch('mas.install.run') as run:
             self.assertFalse(prepare_system())
         dependencies.assert_called_once_with()
         run.assert_not_called()

@@ -49,7 +49,7 @@ def main():
             if filename == "mas-install.pyz":
                 excluded += ["cli.py", "terminal_ui.py", "__main__.py"]
             if filename == "mas.pyz":
-                excluded += ["install.py", "dependencies.sh"]
+                excluded += ["install.py", "dependencies.sh", "socket_access.py"]
             shutil.copytree(ROOT / "mas", stage / "mas", ignore=shutil.ignore_patterns(*excluded))
             if filename == "mas-test.pyz":
                 shutil.copyfile(ROOT / "bootstrap.py", stage / "bootstrap.py")

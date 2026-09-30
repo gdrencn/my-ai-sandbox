@@ -221,5 +221,11 @@
   "gpu_discovery_tool_missing": "The GPU discovery tool supplied by LXD is missing: {path}. Check the LXD snap installation.",
   "gpu_discovery_invalid": "NVIDIA discovery did not return valid accessible WSL driver paths; cached paths and directory scanning will not be used.",
   "help_channel": "Select release channel",
-  "stable_version_mismatch": "Stable product and its matching test release differ; installation and testing were not started."
+  "stable_version_mismatch": "Stable product and its matching test release differ; installation and testing were not started.",
+  "socket_setup": "Preparing persistent LXD socket group access.",
+  "socket_config_invalid": "Conflicting or invalid LXD socket configuration: {path}",
+  "socket_group_missing": "The configured LXD administration group does not exist: {group}",
+  "socket_unit_conflict": "The effective LXD socket systemd configuration conflicts with the expected settings.",
+  "socket_metadata_invalid": "Conflicting LXD socket type, ownership or permissions: {path}",
+  "socket_wait_failed": "LXD socket group access preparation did not complete."
 }
