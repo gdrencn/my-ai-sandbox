@@ -1,0 +1,114 @@
+{
+  "selected": "v0.2.6",
+  "prerelease": true,
+  "assets": [
+    {
+      "name": "bootstrap.py",
+      "sha256": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+      "matched": true
+    },
+    {
+      "name": "install-stable.sh",
+      "sha256": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "matched": true
+    },
+    {
+      "name": "install-test.sh",
+      "sha256": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "matched": true
+    },
+    {
+      "name": "install.sh",
+      "sha256": "8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+      "matched": true
+    },
+    {
+      "name": "mas-install.pyz",
+      "sha256": "cd517850d0ef58812d2b8747f38e838f4b88718661f4638b3c379847801a879b",
+      "matched": true
+    },
+    {
+      "name": "mas-test.pyz",
+      "sha256": "b8da0150843510297d4754ec801ed236001dac067cfdb7a40d036bf368954a1e",
+      "matched": true
+    },
+    {
+      "name": "mas.pyz",
+      "sha256": "63d46dc60988d81219190b9f9f9738989c4b7a92d08d5b201923030ada6cfe01",
+      "matched": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "8b8c6887ae4b3e170ebc34d0217288d36e336944211284a1d49f759a183b75c1",
+      "matched": true
+    },
+    {
+      "name": "test-stable.sh",
+      "sha256": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "matched": true
+    },
+    {
+      "name": "test.sh",
+      "sha256": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "matched": true
+    },
+    {
+      "name": "WSL_REPORT.json",
+      "sha256": "f62a8bc8bc6ea18eef7a0435e80f86967f1f0aa804beee954ce027c8b74b4205",
+      "matched": true
+    }
+  ],
+  "latest": "stable/0.1.15",
+  "stable_test_pair": "v0.1.15",
+  "stable_pair_checksums_match": true,
+  "entries": [
+    {
+      "path": "stable/install.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "stable",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/install.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "test",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/test.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "test",
+        "--test",
+        "--output",
+        "path with spaces"
+      ]
+    },
+    {
+      "path": "test/test-stable.sh",
+      "source_matches": true,
+      "arguments": [
+        "--channel",
+        "stable",
+        "--test",
+        "--output",
+        "path with spaces"
+      ]
+    }
+  ],
+  "full_public_test_rerun": true,
+  "public_entry": "test/test.sh",
+  "public_test_cwd": "/tmp",
+  "public_test_report": "validation/V0_2_6_PUBLIC_REPORT.json",
+  "public_test_elapsed": 452.48680725000304,
+  "installed_product_version": "0.2.6"
+}

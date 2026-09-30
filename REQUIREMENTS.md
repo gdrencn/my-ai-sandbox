@@ -450,7 +450,7 @@ Status: implemented and verified outside the checkout: 197 packaged units and al
 
 ## 33. WSL GPU runtime and channel entry adaptation — v0.2.6
 
-Status: implemented and verified locally outside the checkout: 201 units and all 22 native stages passed in 452.2 seconds; no skips or cleanup errors. Public release verification follows.
+Status: implemented and verified locally outside the checkout: 201 units and all 22 native stages passed in 452.2 seconds; no skips or cleanup errors. Published v0.2.6 test; public test/test.sh installation and full regression also passed (201 units, 22 stages, 452.5 seconds). All eleven public assets and four entry routes verified; stable remains 0.1.15.
 
 - Explicitly select /usr/lib/wsl/lib for nvidia-ctk library lookup in WSL. Preserve official per-start active-driver discovery and narrow read-only directory mappings; do not scan for the newest-looking directory or map the whole driver store.
 - After successful discovery and resource validation, omit only the recognized multiple-driver-store-path warning in product UI/CLI. Tester invocations retain it. Preserve all other diagnostics and all failure diagnostics; no requirement that this warning appear on any host.

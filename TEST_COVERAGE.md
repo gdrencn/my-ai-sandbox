@@ -165,3 +165,5 @@ Reproduced the 0.2.4 missing-mas failure using its existing archive from /tmp. M
 ## WSL runtime and entry adaptation — 0.2.6
 
 201 packaged unit tests and 22 native stages passed from /tmp (452.2 seconds), no skips or cleanup errors. New tests exercise profile ownership/legacy migration and exact stable channel pairing. Native GPU validation independently loads the host CUDA driver and checks /proc/self/maps against mapped driver directories; it verifies login-shell nvidia-smi and profile removal on disable. No requirement that the multiple-directory warning occur was added. Public fixed-entry validation is recorded separately. Evidence: validation/V0_2_6_LOCAL_REPORT.json.
+
+Public 0.2.6 entry validation from /tmp additionally passed 201 packaged units and all 22 native stages in 452.5 seconds, no skips or cleanup failures. See validation/V0_2_6_PUBLIC_REPORT.json; all eleven public assets and four channel routes are verified in validation/V0_2_6_RELEASE_CHECK.json. Stable pairing was verified by release checksums, without running the full stable suite again.
