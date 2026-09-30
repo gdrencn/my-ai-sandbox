@@ -171,3 +171,5 @@ Public 0.2.6 entry validation from /tmp additionally passed 201 packaged units a
 ## GPU result reuse — 0.2.7
 
 204 packaged units and 22 native stages passed locally in 453.3 seconds. New menu regressions count actual GPU discovery calls through the shared manager/module, check on/off defaults, read changed configuration after a failure, and preserve primary/secondary failures. Tester checks retain standalone hardware queries and repeated disable while reusing mutation results and independently validating LXD records. No warning-presence assertion or cross-operation discovery limit is introduced. Evidence: validation/V0_2_7_LOCAL_REPORT.json.
+
+Public installation/test from /tmp passed 204 units and all 22 native stages in 447.9 seconds, no skips or cleanup failures. All eleven published assets match validated local artifacts; see validation/V0_2_7_RELEASE_CHECK.json and validation/V0_2_7_PUBLIC_REPORT.json. Separate isolated packaged-unit execution from /tmp also passed.

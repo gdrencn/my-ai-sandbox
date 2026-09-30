@@ -474,7 +474,7 @@ Status: agreed, pending implementation from the next stable publication. This do
 
 ## 35. Reuse GPU discovery results within existing flows — v0.2.7
 
-Status: implemented and locally verified: 204 packaged units and 22 native stages passed (453.3 seconds), no skips or cleanup failures. Public publication and verification follow. This is a targeted optimization, not a restriction on detect callers or a change to the discovery contract.
+Status: implemented and locally verified: 204 packaged units and 22 native stages passed (453.3 seconds), no skips or cleanup failures. Published v0.2.7 test; public installation and all 204 units / 22 native stages passed from /tmp in 447.9 seconds. This is a targeted optimization, not a restriction on detect callers or a change to the discovery contract.
 
 - Preserve the complete detect result, independent creation/startup detection timing and standalone CLI query behavior. No global cache, persistent host inventory or installation-time detection.
 - Within a hardware-menu interaction, reuse the acquired host capability for configuration and display refresh. Use successful configuration results for the new displayed state. After failure, read and validate actual container configuration rather than publishing the requested state; reuse the host information for that read.
