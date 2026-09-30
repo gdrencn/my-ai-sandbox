@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.9 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.10 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -32,10 +32,10 @@ This maps the checks present in current batch 0.2.9 to requirements and implemen
 ## Current limits
 
 - Full real runs are on the current Ubuntu WSL host. Native Ubuntu/cloud hosts and other architectures still require external-machine verification.
-- Fresh installation, socket recreation and WSL restarts were verified in a separate Ubuntu 24.04 WSL fixture in 0.2.8. Batch 0.2.9 verifies prepared-host installation and PATH behavior; it does not repeat destructive provisioning on the development host. Same-user sudo/PTY checks and actual APT inside disposable containers complement controlled installer/failure tests. Non-Snap installation-policy support remains outside this audit batch.
+- Fresh installation, socket recreation and WSL restarts were verified in a separate Ubuntu 24.04 WSL fixture in 0.2.8. Batches 0.2.9 and 0.2.10 verify prepared-host behavior; they do not repeat destructive provisioning on the development host. Same-user sudo/PTY checks and actual APT inside disposable containers complement controlled installer/failure tests. Non-Snap installation-policy support remains outside these audit batches.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
-- GPU coverage and its platform limits are described in the 0.2.1–0.2.9 sections below. General host-resource sharing policy, restricted project/profile enforcement and custom network controls remain pending.
+- GPU coverage and its platform limits are described in the 0.2.1–0.2.10 sections below. General host-resource sharing policy, restricted project/profile enforcement and custom network controls remain pending.
 
 The historical integration group identifier `tui` remains for report continuity; it now runs the inline text-menu application. New groups are `invalid-inputs`, `lifecycle-repeat` and `unmarked-import`.
 
@@ -190,3 +190,17 @@ Twenty-two additional units cover real Unix HTTP conditional requests and projec
 Final frozen validation passed all units and stages in 483.2 seconds with no skips, unexecuted cases or cleanup errors. Windows UNC read/create/edit/delete/mkdir/rmdir and real GPU computation passed. Reports: validation/V0_2_9_LOCAL_REPORT.json and the preserved corrected packaging regression in validation/V0_2_9_PACKAGING_FIRST_ATTEMPT.json. Actual resource exhaustion and kernel-uninterruptible processes use fault tests rather than destructive host experiments. The old UNC mismatch remains unresolved; no retry was introduced.
 
 Public 0.2.9 installation/test from /tmp passed the same 236 units and all 23 report stages in 488.9 seconds, without skips, unexecuted cases or cleanup errors. Installed product/tester bytes match the published assets, and the isolated project was independently confirmed reclaimed. All eleven assets and four fixed entry routes were checked; normal installation preserved the tester and stable pairing was verified by checksums. Stable remains stable/0.1.15. Evidence: validation/V0_2_9_PUBLIC_REPORT.json and validation/V0_2_9_RELEASE_CHECK.json.
+
+## Remaining failure boundaries — 0.2.10
+
+`tests/test_failure_review.py` adds eighteen tests:
+
+- Real PTYs: reaped child with multiple queued reads, expected-pattern/finish decisions, final diagnostic observer and transcript, suppressed cleanup callbacks, failed transcript writes with confirmed process exit, EOF with a live child retaining the polling interval, and signaling the owned child when its process group is unavailable.
+- Controlled deadlines/cleanup: continuously readable output, bounded native client reaping, output-report failure with later cleanup still attempted, CLI event failure preserving its primary exception, and cleanup timeout recorded while final events/output are still attempted. Existing TERM-ignore/KILL and unconfirmed-terminal-exit regressions remain active.
+- GPU runtime files: malformed JSON, null/scalar/object/non-string directory entries, non-UTF-8 loader/profile contents, preserved ownership/configuration and no foreign-file deletion.
+- Native failure data: real failing Python stand-in for a mutating LXD client with both output streams and no trailing newline; isolated directory-query, listener, SSHFS and fusermount failures retaining native details and operation context.
+- Tester entry: invalid timeout rejects both installation and standalone setup before side effects; valid 300-second minimum reaches installation.
+
+The existing distribution archive regression also verifies that tester-only case, PTY, cleanup-action and Windows UNC language keys are excluded from product/installer common catalogs. The packaged tester retains the optional test catalogs.
+
+Final frozen local execution from /tmp passed all 254 packaged units and 23 report stages (unit plus 22 real integration stages) in 484.5 seconds, with no skips, unexecuted stages or cleanup errors. This follows a successful earlier candidate and an additional review/refinement. Report: validation/V0_2_10_LOCAL_REPORT.json. Publication/public-entry checks are pending. Windows UNC passed this run; the historical mismatch remains unexplained and is not claimed fixed.

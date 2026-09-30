@@ -67,5 +67,11 @@
   "wait_filesystem-disconnect": "filesystem disconnect",
   "case_dependency-install": "Native sudo and dependency installation",
   "case_gpu": "GPU access, computation and switch",
-  "gpu_test_unavailable": "No supported discrete GPU on host; real GPU computation was not tested."
+  "gpu_test_unavailable": "No supported discrete GPU on host; real GPU computation was not tested.",
+  "action_cleanup-stop": "cleanup-stop",
+  "action_cleanup-delete": "cleanup-delete",
+  "pty_cleanup_timeout": "Could not confirm test terminal process {pid} exited (timeout {timeout}s per stage); check for remaining test processes.",
+  "pty_drain_timeout": "Timed out draining test terminal output after {timeout}s; a descendant may still be writing to the terminal.",
+  "windows_unc_failed": "Windows UNC file test failed (exit code {code}); full evidence was recorded: {details}",
+  "case_configuration-concurrency": "Conditional configuration updates"
 }

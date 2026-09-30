@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前 test 为 `0.2.9`，完成配置并发更新保护、测试收尾与诊断、PATH 检查、CLI 帮助及共享界面能力的九项审查改进。完整范围和验证记录见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+当前开发批次为 `0.2.10`，完成终端尾部输出、进程清理、GPU 运行库文件校验、原生错误保留和测试参数校验的五项修正；本地打包与完整回归已通过，正在完成 test 发布及公开入口核验。完整范围和验证记录见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 

@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This is an inventory of the additional behavior implemented in mas/core.py as of test batch 0.2.9. Phase 1 stable remains the unchanged 0.1.15 release. CLI and text menus call the same Manager. Installation is separate from these operations.
+This is an inventory of the additional behavior implemented in mas/core.py as of test batch 0.2.10. Phase 1 stable remains the unchanged 0.1.15 release. CLI and text menus call the same Manager. Installation is separate from these operations.
 
 ## Shared execution and validation
 
@@ -101,7 +101,7 @@ Bare mas directly opens my-ai-sandbox with list, new, import, mas preferences an
 Deletion continues to require explicit unmount/cleanup. Its bilingual instruction now refers only to deletion; it no longer incorrectly includes start/stop.
 
 
-## GPU module — current through 0.2.9
+## GPU module — current through 0.2.10
 
 `Manager.hardware` is the shared CLI/menu entry to `mas/gpu.py`. `GPU.status`, `GPU.set`, `GPU.ensure` and `GPU.prepare` separate queries, stopped-container resource configuration, default/driver refresh orchestration, and required internal runtime preparation. GPU configuration shares the lifecycle/filesystem lock. Configuration and exact ownership metadata are published in one conditional LXD API update through LXD.configuration; native operation success and structured readback must both precede success. Disabling verifies removal of the owned loader file, then removes owned devices and saves explicit off. Native errors preserve actionable state rather than publishing success.
 
@@ -120,10 +120,18 @@ The WSL query disables unused hooks and nvsandboxutils discovery using official 
 0.2.6 passes `--library-search-path=/usr/lib/wsl/lib` to the WSL discovery command. Only a recognized multiple-driver-store-path warning is omitted after successful product discovery and validation; tester contexts explicitly retain it. All other warnings and failure diagnostics remain visible. Independent test observation loads the host CUDA driver and reads /proc/self/maps, comparing the loaded driver directory with container mappings. No timestamps/version-name guessing is used.
 
 
-## Conditional configuration and current diagnostics — 0.2.9
+## Conditional configuration and native diagnostics — 0.2.9
 
 GPU.set reads an instance definition with its LXD ETag, checks ownership/stopped state again, changes only owned device entries and user.mas.gpu, and passes the same definition/ETag to the shared configuration writer. LXD rejects a concurrent instance-definition change through If-Match. The shared writer owns local HTTP transport, project scoping, writable-field filtering, operation polling and native errors; GPU owns resource definitions, guest runtime files and final record/device verification. Neither layer silently retries a rejected version. The already-existing guest-file removal behavior remains internal to GPU; conditional configuration publication does not turn it into a multi-resource rollback transaction.
 
 Captured installer diagnostics and native command failures retain the appropriate streams using shared formatting/rendering. Test events are consumed incrementally with complete-line offsets, case/source context and a final drain. Replayed diagnostic occurrences are omitted from final captured output; negative cases announce their expected error before execution. Shared Terminal close retains normal timeout budgets, escalates TERM to KILL when required, and records an unconfirmed exit instead of waiting indefinitely. Session cleanup preserves the primary exception while attempting final events and language restoration.
 
 CLI descriptions/arguments/examples share the bilingual catalog; menu and progress use mas/text.py for safe display width and clipping. PATH setup validates managed marker structure, preserves user content and file metadata and atomically replaces each changed startup file. Windows UNC verification records its exact immediate read/write evidence; the historical intermittent mismatch has no established root cause or automatic retry.
+
+## Remaining failure boundaries — 0.2.10
+
+Native lifecycle/configuration semantics remain as described above. Shared core.finish_client terminates and reaps a client with the caller's existing timeout; an unconfirmed exit is explicit, and cleanup failure does not replace a primary operation failure. Mutating LXD failures preserve stdout and stderr using the shared failure formatter.
+
+GPU runtime-file checks validate directory responses before interpreting absence and compare the exact owned file bytes. Invalid responses and foreign binary content prevent file removal/configuration publication. Filesystem query failures retain their native cause while reporting that inspection failed; listener, SSHFS and unmount failures retain both streams with a boundary.
+
+The separate tester drains queued PTY output after reaping before deciding that an expected pattern is missing. EOF from a live child retains the existing test-terminal wait interval. Cleanup disables callbacks, reaps/terminates independently of logging, bounds tail draining and attempts resource closure even after output failure. CLI/terminal sessions share independent cleanup-step finalization. Invalid public tester timeouts are rejected before installation or test setup. These tester changes are excluded from the product archive.

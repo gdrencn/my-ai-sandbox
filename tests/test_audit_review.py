@@ -116,8 +116,8 @@ class AuditTests(unittest.TestCase):
             self.addCleanup(os.close,write_fd)
             terminal.transcript=(Path(directory)/'transcript').open('wb')
             clock=[0]
-            terminal.read=Mock(side_effect=lambda:clock.__setitem__(0,clock[0]+100))
-            with patch('mas.testing.os.killpg') as kill, patch('mas.testing.time.monotonic',side_effect=lambda:clock[0]):
+            terminal._reap=Mock(side_effect=lambda:clock.__setitem__(0,clock[0]+100))
+            with patch('mas.testing.os.killpg') as kill, patch('mas.testing.time.monotonic',side_effect=lambda:clock[0]), patch('mas.testing.time.sleep'):
                 with self.assertRaises(Error):terminal.close()
             self.assertEqual([call.args[1] for call in kill.call_args_list],[signal.SIGTERM,signal.SIGKILL])
             self.assertIsNone(terminal.fd)

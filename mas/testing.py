@@ -32,10 +32,10 @@ import zipfile
 
 from . import __version__, config
 from .test_output import Output
-from .core import Error, LXD, Manager, MANAGED, host_image
+from .core import Error, LXD, Manager, MANAGED, host_image, finish_client
 
 from .i18n import t, Parser, catalog, progress_text
-from .diagnostics import cleanup_scope
+from .diagnostics import cleanup_scope, notify, warn
 
 
 PRODUCT_UNDER_TEST = None
@@ -83,6 +83,7 @@ class Terminal:
         self.buffer = b""
         self.cursor = 0
         self.status = None
+        self.eof = False
         self.transcript = transcript.open("wb")
         try:
             self.pid, self.fd = pty.fork()
@@ -105,25 +106,52 @@ class Terminal:
             with cleanup_scope(self.close):
                 raise
 
-    def read(self):
-        now = time.monotonic()
-        if self.on_wait and now - self.last_update >= 1:
-            self.on_wait(now - self.started)
-            self.last_update = now
-        if select.select([self.fd], [], [], 0.1)[0]:
+    def _receive(self, wait):
+        if self.eof:
+            if wait:
+                time.sleep(wait)
+            return False
+        if select.select([self.fd], [], [], wait)[0]:
             try:
                 chunk = os.read(self.fd, 65536)
             except OSError as exc:
                 if exc.errno != errno.EIO:
                     raise
                 chunk = b""
+            if not chunk:
+                self.eof = True
+                return False
             self.buffer += chunk
             self.transcript.write(chunk)
             self.transcript.flush()
+            return True
+        return False
+
+    def _reap(self):
         if self.status is None:
             pid, status = os.waitpid(self.pid, os.WNOHANG)
             if pid:
                 self.status = os.waitstatus_to_exitcode(status)
+
+    def _drain(self):
+        # A descendant can retain the PTY after the child exits. Consume queued
+        # bytes without waiting for its EOF, and bound continuous writers.
+        deadline = time.monotonic() + self.timeout
+        while self._receive(0):
+            if time.monotonic() >= deadline:
+                raise Error(t('pty_drain_timeout', timeout=self.timeout))
+
+    def read(self):
+        now = time.monotonic()
+        if self.on_wait and now - self.last_update >= 1:
+            self.on_wait(now - self.started)
+            self.last_update = now
+        try:
+            self._receive(0.1)
+        finally:
+            self._reap()
+        if self.status is not None:
+            self._drain()
         if self.on_read:
             self.on_read()
 
@@ -164,37 +192,48 @@ class Terminal:
         # Final event consumption is owned by Suite even if it fails. It must
         # not prevent process termination and descriptor release here.
         self.on_read = None
+        self.on_wait = None
+        errors = []
+        def attempt(operation):
+            try:
+                operation()
+                return True
+            except Exception as exc:
+                errors.append(exc)
+                return False
         try:
-            self.read()
+            # Reaping/termination must not depend on PTY reads or log writes.
+            attempt(self._reap)
             for sig in (signal.SIGTERM, signal.SIGKILL):
                 if self.status is not None:
                     break
-                with contextlib.suppress(ProcessLookupError):
-                    os.killpg(self.pid, sig)
+                def send_signal():
+                    try:
+                        os.killpg(self.pid, sig)
+                    except ProcessLookupError:
+                        # pty.fork's child may not have established its process
+                        # group yet. Its unreaped PID is still our own child.
+                        with contextlib.suppress(ProcessLookupError):
+                            os.kill(self.pid, sig)
+                attempt(send_signal)
                 deadline = time.monotonic() + self.timeout
                 while self.status is None and time.monotonic() < deadline:
-                    self.read()
+                    if not attempt(self._reap):
+                        break
+                    if self.status is None:
+                        time.sleep(0.1)
             if self.status is None:
-                raise Error(t('pty_cleanup_timeout', pid=self.pid, timeout=self.timeout))
-            # Reaping can precede the last buffered PTY bytes. Drain without
-            # waiting for EOF from unrelated descendants retaining the terminal.
-            while select.select([self.fd], [], [], 0)[0]:
-                try:
-                    chunk = os.read(self.fd, 65536)
-                except OSError as exc:
-                    if exc.errno != errno.EIO:
-                        raise
-                    break
-                if not chunk:
-                    break
-                self.buffer += chunk
-                self.transcript.write(chunk)
+                errors.append(Error(t('pty_cleanup_timeout', pid=self.pid, timeout=self.timeout)))
+            else:
+                attempt(self._drain)
         finally:
-            try:
-                os.close(self.fd)
-            finally:
-                self.fd = None
-                self.transcript.close()
+            attempt(lambda: os.close(self.fd))
+            self.fd = None
+            attempt(self.transcript.close)
+        if errors:
+            for error in errors[1:]:
+                warn('cleanup_secondary', error)
+            raise errors[0]
 
 
 class Suite:
@@ -318,9 +357,20 @@ class Suite:
         if code != 0:
             self.output.keep(t("expected_error", command=" ".join(args)))
         displayed = []
+        out, err = '', ''
         with stdout_path.open("w+") as stdout, stderr_path.open("w+") as stderr:
             process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=stdout, stderr=stderr, text=True)
-            try:
+            def collect_output():
+                nonlocal out, err
+                stdout.seek(0)
+                stderr.seek(0)
+                out, err = stdout.read(), stderr.read()
+                self.output.diagnostics(out, err, failed=process.returncode != 0, exclude=displayed)
+            def collect_events():
+                displayed.extend(self.read_events(event_path, diagnostics=True))
+            def finish_command():
+                self._finalize(lambda: finish_client(process, self.timeout), collect_events, collect_output)
+            with cleanup_scope(finish_command, lambda exc: None):
                 try:
                     process.stdin.write(answer or "")
                     process.stdin.close()
@@ -333,18 +383,22 @@ class Suite:
                         raise Error(t("wait_timeout", label=" ".join(args), timeout=self.timeout*3))
                     self.output.progress(t("working", name=action + " " + " ".join(args[1:]), elapsed=elapsed))
                     time.sleep(1)
-            finally:
-                if process.poll() is None:
-                    process.kill()
-                process.wait()
-                displayed.extend(self.read_events(event_path, diagnostics=True))
-                stdout.seek(0)
-                stderr.seek(0)
-                out, err = stdout.read(), stderr.read()
-                self.output.diagnostics(out, err, failed=process.returncode != 0, exclude=displayed)
         if process.returncode != code:
             raise AssertionError(t("cli_failed", args=args, expected=code, actual=process.returncode, stdout=out, stderr=err))
         return out
+
+    def _finalize(self, *steps):
+        """Try each independent cleanup step even if reporting itself fails."""
+        errors = []
+        for step in steps:
+            try:
+                step()
+            except Exception as exc:
+                errors.append(str(exc))
+                self.cleanup_errors.append(str(exc))
+                notify(lambda: self.output.keep(t('cleanup_secondary', error=exc)))
+        if errors:
+            raise Error('\n'.join(errors))
 
     @contextlib.contextmanager
     def terminal(self, args):
@@ -359,17 +413,9 @@ class Suite:
             with patch.dict(os.environ, {"XDG_CONFIG_HOME": str(self.config_home)}):
                 config.set_value("language", previous)
         def finish_session():
-            errors = []
-            for cleanup in (lambda: terminal.close() if terminal else None,
-                            lambda: self.read_events(event_path, diagnostics=True) if event_path else None, restore_language):
-                try:
-                    cleanup()
-                except Exception as exc:
-                    errors.append(str(exc))
-                    self.cleanup_errors.append(str(exc))
-                    self.output.keep(t('cleanup_secondary', error=exc))
-            if errors:
-                raise Error('\n'.join(errors))
+            self._finalize(lambda: terminal.close() if terminal else None,
+                           lambda: self.read_events(event_path, diagnostics=True) if event_path else None,
+                           restore_language)
         with cleanup_scope(finish_session, lambda exc: None):
             command = self.command(args)
             event_path = self.event_path
@@ -1105,6 +1151,8 @@ def main(argv=None):
     parser.add_argument("--install", type=Path, help=t("help_test_install"))
     parser.add_argument("--product", type=Path, help=t('help_product'))
     args = parser.parse_args(argv)
+    if args.timeout < 300:
+        parser.error(t('timeout_minimum'))
     if not __debug__:
         parser.error(t('test_optimization'))
     global PRODUCT_UNDER_TEST

@@ -138,6 +138,10 @@ class DistributionTests(unittest.TestCase):
             self.skipTest("No product archive supplied.")
         with zipfile.ZipFile(PRODUCT_UNDER_TEST) as archive:
             names=archive.namelist()
+            for language in ('en_us', 'zh_cn'):
+                messages = json.loads(archive.read('mas/locales/'+language+'.json'))
+                self.assertFalse(any(key.startswith(('case_', 'pty_', 'action_cleanup-')) for key in messages))
+                self.assertNotIn('windows_unc_failed', messages)
         self.assertFalse(any(name.startswith(('tests/', 'mas/locales/test/')) for name in names))
         for forbidden in ('mas/testing.py','mas/test_output.py','mas/install.py','mas/dependencies.sh'):
             self.assertNotIn(forbidden,names)

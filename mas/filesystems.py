@@ -17,7 +17,15 @@ import uuid
 
 from .core import Error, validate_target
 from .i18n import t
-from .diagnostics import cleanup_scope
+from .diagnostics import cleanup_scope, failure_text
+
+
+def read_output_file(path):
+    """Native output is diagnostic data, not a UTF-8 configuration contract."""
+    try:
+        return path.read_text(encoding='utf-8', errors='replace')
+    except FileNotFoundError:
+        return ''
 
 
 def fuse_access_ready(path=Path('/etc/fuse.conf')):
@@ -199,7 +207,9 @@ class Filesystems:
             query = '/1.0/instances/' + quote(target, safe='') + '/files?' + urlencode(dict(project=self.project, path=str(part)))
             try:
                 value = json.loads(self.manager.lxd.command(['query', query]))
-            except (ValueError, Error) as exc:
+            except Error as exc:
+                raise Error(failure_text(t('fs_directory_query', path=part), str(exc))) from exc
+            except ValueError as exc:
                 raise Error(t('fs_directory', path=part)) from exc
             if not isinstance(value, list) or any(not isinstance(name, str) for name in value):
                 raise Error(t('fs_directory', path=part))
@@ -363,11 +373,15 @@ class Filesystems:
 
     def _listener_details(self, listener, work):
         if listener.poll() is not None:
-            raise Error((work/'listener.err').read_text().strip() or t('fs_listener_failed'))
-        output = (work/'listener.out').read_text()
+            raise Error(self._helper_failure(work, 'listener', 'fs_listener_failed'))
+        output = read_output_file(work/'listener.out')
         port = re.search(r'SSH SFTP listening on 127\.0\.0\.1:(\d+)', output)
         password = re.search(r'password "([^"\n]+)"', output)
         return (port[1], password[1]) if port and password else None
+
+    @staticmethod
+    def _helper_failure(work, name, fallback):
+        return failure_text(*(read_output_file(work/(name+suffix)) for suffix in ('.out', '.err'))) or t(fallback)
 
     def _start_sshfs(self, data, entry, work, connection):
         port, password = connection
@@ -383,9 +397,9 @@ class Filesystems:
 
     def _mount_observation(self, entry, listener, sshfs, work):
         if listener.poll() is not None:
-            raise Error((work/'listener.err').read_text().strip() or t('fs_listener_failed'))
+            raise Error(self._helper_failure(work, 'listener', 'fs_listener_failed'))
         if sshfs.poll() is not None:
-            raise Error((work/'sshfs.err').read_text().strip() or t('fs_mount_failed'))
+            raise Error(self._helper_failure(work, 'sshfs', 'fs_mount_failed'))
         actual = self._actual(entry)
         if actual and not self._matching(entry, actual):
             raise Error(t('fs_conflict', path=entry['destination']))
@@ -426,7 +440,7 @@ class Filesystems:
                     final=False, started=waiting, deadline=deadline)
                 entry['mount_id'] = actual['id']
                 self._save(data)
-                diagnostics = ''.join((work/name).read_text() for name in ('listener.err', 'sshfs.err') if (work/name).exists())
+                diagnostics = failure_text(*(read_output_file(work/name) for name in ('listener.err', 'sshfs.err')))
             except BaseException:
                 self.manager.emit(dict(action='mountfs', target=target, status='error', observation='residual', elapsed=time.monotonic()-started))
                 try:
@@ -483,7 +497,7 @@ class Filesystems:
             except subprocess.TimeoutExpired as exc:
                 raise Error(t('fs_timeout', target=entry['target'])) from exc
             if result.returncode:
-                raise Error(result.stderr.strip() or t('fs_unmount_failed'))
+                raise Error(failure_text(result.stdout, result.stderr) or t('fs_unmount_failed'))
             self._wait('unmountfs', entry['target'], lambda: not self._actual(entry), final=False)
             if result.stderr:
                 self.manager.emit(dict(action='unmountfs', target=entry['target'], status='waiting', observation='unmounted', elapsed=0, native_stderr=result.stderr))

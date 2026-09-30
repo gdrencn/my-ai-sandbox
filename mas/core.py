@@ -55,6 +55,18 @@ def read_output(stream):
     return os.pread(stream.fileno(), os.fstat(stream.fileno()).st_size, 0).decode("utf-8", errors="replace")
 
 
+def finish_client(process, timeout):
+    """Terminate/reap our client within a bound, not the daemon's operation."""
+    if process is None:
+        return
+    if process.poll() is None:
+        process.kill()
+    try:
+        process.wait(timeout=timeout)
+    except subprocess.TimeoutExpired as exc:
+        raise Error(t('client_cleanup_timeout', pid=process.pid, timeout=timeout)) from exc
+
+
 def confirm(message, ask=None):
     """One confirmation policy, independent of CLI or TUI presentation."""
     try:
@@ -212,12 +224,8 @@ class Manager:
         outcome = "error"
         native_stdout, native_stderr = "", ""
         native_failure = False
-        def finish_client():
-            if process is not None and process.poll() is None:
-                process.kill()
-                process.wait()
-
-        with cleanup_scope(finish_client, lambda exc: self._cleanup_warning(action, target, exc)):
+        with cleanup_scope(lambda: finish_client(process, self.lxd.timeout),
+                           lambda exc: self._cleanup_warning(action, target, exc)):
             try:
                 with tempfile.TemporaryFile(mode="w+t") as output, tempfile.TemporaryFile(mode="w+t") as errors:
                     process = subprocess.Popen(self.lxd.prefix + args, stdin=subprocess.DEVNULL,
@@ -233,7 +241,7 @@ class Manager:
                             native_stdout, native_stderr = read_output(output), read_output(errors)
                         if code is not None and code != 0:
                             native_failure = True
-                            raise Error((native_stdout + native_stderr).strip() or t("lxd_exit", code=code))
+                            raise Error(failure_text(native_stdout, native_stderr) or t("lxd_exit", code=code))
                         instance = self.find(target, remaining)
                         last = instance["status"] if instance else "Absent"
                         if instance and last == "Error":

@@ -207,7 +207,13 @@ class GPU:
     def _runtime_file(self, target, path=CONF):
         endpoint = '/1.0/instances/' + quote(target, safe='') + '/files?' + urlencode(
             {'project': self.lxd.project, 'path': path.rsplit('/', 1)[0]})
-        entries = json.loads(self.lxd.command(['query', endpoint]))
+        raw = self.lxd.command(['query', endpoint])
+        try:
+            entries = json.loads(raw)
+        except ValueError as exc:
+            raise Error(t('gpu_runtime_query', path=path)) from exc
+        if not isinstance(entries, list) or any(not isinstance(name, str) for name in entries):
+            raise Error(t('gpu_runtime_query', path=path))
         if path.rsplit('/', 1)[1] not in entries:
             return None
         # Pull preserves the native file type. Never follow a guest symlink on the host.
@@ -216,10 +222,10 @@ class GPU:
             self.lxd.command(['file', 'pull', 'local:' + target + path, str(local)])
             if local.is_symlink() or not local.is_file():
                 raise Error(t('gpu_runtime_conflict', path=path))
-            content = local.read_text()
-        if content != RUNTIME_FILES[path]:
+            content = local.read_bytes()
+        if content != RUNTIME_FILES[path].encode('utf-8'):
             raise Error(t('gpu_runtime_conflict', path=path))
-        return content
+        return RUNTIME_FILES[path]
 
     def set(self, target, enabled, *, capability=None):
         if type(enabled) is not bool:
