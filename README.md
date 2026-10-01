@@ -187,6 +187,10 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 测试需要下载镜像及临时磁盘空间。备份文件是临时测试产物，测试结束时删除；报告及日志保留。
 
+## 容器内安全边界测试
+
+容器内可另行运行独立的 [安全边界测试脚本](GUEST_SECURITY_PROBE.md)，从容器 root 视角尝试未授权设备、内核控制入口和宿主资源访问。它保留 PASS/FAIL/REVIEW/SKIP 的区别，可用宿主非敏感参照核验 namespace 与唯一标记；不属于当前 mas-test 的自动化测试环节。
+
 ## 开发与发布
 
 从 `0.1.3` 起统一使用 `a.b.c`：主版本 `a` 当前固定为 `0`，仅用户明确允许时才能改为 `1`；`b` 为阶段号，当前测试开发进入 `2`（阶段 1 稳定版仍为 `0.1.15`）；`c` 为提交批次号，每批递增一次，同一批中的多个 Git commit 不重复递增。不再使用 `-test.x` 后缀，GitHub prerelease 属性单独保留。
