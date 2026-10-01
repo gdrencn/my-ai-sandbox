@@ -16,7 +16,7 @@ mas_choose_language() {
         else
             printf '  ○ %s\n\033[7m❯ ● %s\033[0m\n' '简体中文 (zh_cn)' 'English (en_us)' >/dev/tty
         fi
-        printf '%s\n' '↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回' >/dev/tty
+        printf '%s\n' '↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消' >/dev/tty
         IFS= read -rsn1 key </dev/tty || return 1
         case $key in
             '') break ;;

@@ -55,7 +55,7 @@ def column_rows(rows):
     return [Columns(row, widths) for row in prepared]
 
 
-def rendered(label, width):
+def rendered(label, width, color=True):
     if isinstance(label, str):
         return clipped(label, width)
     prefix = clipped(label.prefix, width)
@@ -66,7 +66,7 @@ def rendered(label, width):
         largest = max(range(len(widths)), key=widths.__getitem__)
         widths[largest] -= 1
     result = prefix
-    colors = {'green': '\x1b[32m', 'yellow': '\x1b[33m', 'red': '\x1b[31m'}
+    colors = {'green': '\x1b[32m', 'yellow': '\x1b[33m', 'red': '\x1b[31m'} if color else {}
     for index, (cell, size) in enumerate(zip(label.values, widths)):
         value = clipped(cell.text, min(size, available))
         result += colors.get(cell.tone, '') + value + ('\x1b[39m' if cell.tone in colors else '')
@@ -184,16 +184,38 @@ class Screen:
                        rendered(label, width - 1) + '\x1b[0m\n')
         self.rows = len(lines)
 
-    def choose(self, title, options, default=None, multiple=False, checked=(), radio=False):
+    def instructions(self, text):
+        """Keep complete key hints while reserving an active input/option row."""
+        width, height = self.size()
+        lines = wrapped(text, width - 1)
+        if len(lines) > height - 2:
+            if not self.rows or self.dimensions != (width, height):
+                self.write('\n'.join(lines) + '\n')
+            return []
+        return [(line, False) for line in lines]
+
+    def choose(self, title, options, default=None, multiple=False, checked=(), radio=False,
+               cancel=None, description=()):
         if not options:
             raise ValueError('Menu requires at least one option')
         index = next((i for i, (value, _) in enumerate(options) if value == default), 0)
         selection = Selection(options, index, multiple, set(checked))
+        cancel = cancel or ('cancel' if radio or multiple else 'back')
+        footer = t('menu_multi_keys' if multiple else 'menu_keys', action=t('menu_' + cancel))
         with self.prompt():
+            # Context is permanent history, so it stays complete on narrow/short
+            # terminals and is not repeated by selection movement or redraws.
+            for text in (title, *(['', *description] if description else [])):
+                for line in wrapped(text, self.size()[0] - 1):
+                    self.write(line + '\n')
+            if description:
+                self.write('\n')
             while True:
-                count = max(1, self.size()[1] - 3)
+                width, height = self.size()
+                footer_lines = self.instructions(footer)
+                count = max(1, height - len(footer_lines) - 1)
                 offset = max(0, selection.index - count + 1)
-                lines = [(title, False)]
+                lines = []
                 for index in range(offset, min(len(options), offset + count)):
                     value, label = options[index]
                     focused = index == selection.index
@@ -201,7 +223,7 @@ class Screen:
                     prefix = ('❯ ' if focused else '  ') + (marker + ' ' if marker else '')
                     row = prefix + label if isinstance(label, str) else replace(label, prefix=prefix)
                     lines.append((row, focused))
-                lines.append((t('menu_multi_keys' if multiple else 'menu_keys'), False))
+                lines.extend(footer_lines)
                 self.draw(lines)
                 key = self.key()
                 while key == 'idle':
@@ -224,14 +246,14 @@ class Screen:
     def input(self, prompt):
         value, cursor = '', 0
         with self.prompt():
+            for line in wrapped(prompt, self.size()[0] - 1):
+                self.write(line + '\n')
             while True:
                 left, right = value[:cursor], value[cursor:]
                 width = max(1, self.size()[0] - 3)
                 while cells(left) > width:
                     left = left[1:]
-                instructions = wrapped(prompt, self.size()[0] - 1)[:max(1, self.size()[1] - 3)]
-                self.draw([(line, False) for line in instructions] +
-                          [(left + '▏' + right, False), (t('input_keys'), False)])
+                self.draw([(left + '▏' + right, False)] + self.instructions(t('input_keys')))
                 key = self.key()
                 while key == 'idle':
                     key = self.key()

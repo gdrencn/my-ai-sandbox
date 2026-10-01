@@ -24,26 +24,29 @@ class UI:
         before_output()
         print(message, file=sys.stderr if error else sys.stdout, flush=True)
 
-    def choose(self, title, actions, default=None):
-        return self.view.choose(title, [(key, t(label)) for key, label in actions], default=default)
+    def choose(self, title, actions, default=None, **options):
+        return self.view.choose(title, [(key, t(label)) for key, label in actions], default=default, **options)
 
     def present(self, title, callback, back=True):
-        """One entry/result/return contract for actions and navigation sections."""
-        self.view.heading(title)
+        """Actions own entry headings; navigation selectors own their titles."""
+        if back:
+            self.view.heading(title)
         result = None
-        failed = False
+        failure = None
         try:
             result = callback()
         except menu.Cancelled:
             if back:
                 self.write(t('cancelled'))
         except config.ConfigError as exc:
-            failed = True
-            self.write(t(exc.key, **exc.values), error=True)
+            failure = t(exc.key, **exc.values)
         except (Error, OSError) as exc:
-            failed = True
-            self.write(t('error', error=exc), error=True)
-        if back or failed:
+            failure = t('error', error=exc)
+        if failure is not None:
+            if not back:
+                self.view.heading(title)
+            self.write(failure, error=True)
+        if back or failure is not None:
             try:
                 self.view.choose(t('page_result'), [(None, t('menu_back'))])
             except menu.Cancelled:
@@ -62,7 +65,19 @@ class UI:
             self.present(t('language_title'), change_language)
 
     def info(self, target):
-        self.write(format_info(self.manager.info(target)))
+        instance = self.manager.info(target)
+        record = self.manager.gpu.record(instance)
+        gpu = t('state_enabled' if record['enabled'] else 'state_disabled') if record else t('gpu_unconfigured')
+        summary = [t('info_name', name=instance['name']),
+                   t('info_state', status=state(instance['status'])), t('info_gpu', value=gpu)]
+        selected = 'configuration'
+        while True:
+            selected = self.choose(t('menu_info_title', target=target),
+                [('configuration', 'menu_configuration'), ('back', 'menu_back')], selected,
+                description=summary)
+            if selected == 'back':
+                return
+            self.present(t('page_configuration', target=target), lambda: self.write(format_info(instance)))
 
     def enter(self, target):
         try:
@@ -73,36 +88,19 @@ class UI:
 
     def container(self, target):
         selected = 'info'
-        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'mountedfs', 'mountfs', 'unmountfs', 'hardware', 'back')]
+        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'filesystem', 'hardware', 'back')]
         while True:
             selected = self.choose(t('page_container', target=target), actions, selected)
             if selected == 'back':
                 return
-            if selected == 'hardware':
-                self.present(t('page_hardware', target=target), lambda: self.hardware(target), back=False)
+            if selected in ('info', 'filesystem', 'hardware'):
+                title = t('menu_info_title' if selected == 'info' else 'page_' + selected, target=target)
+                self.present(title, lambda: getattr(self, selected)(target), back=False)
                 continue
             deleted = False
             def action():
                 nonlocal deleted
-                if selected == 'info':
-                    self.info(target)
-                elif selected == 'mountfs':
-                    path = self.view.input(t('fs_path_prompt'))
-                    destination = self.manager.mountfs(target, path or None)
-                    self.write(t('fs_mounted_at', path=destination))
-                elif selected in ('mountedfs', 'unmountfs'):
-                    from .presentation import show_mounts
-                    entries = self.manager.mountedfs(target)
-                    if selected == 'mountedfs' or not entries:
-                        show_mounts(entries, self.write)
-                    if selected == 'unmountfs' and entries:
-                        status_column = any(e['status'] != 'mounted' for e in entries)
-                        rows = menu.column_rows([(e['path'], menu.status_cell(state(e['status']), e['status'])) if status_column else (e['path'],) for e in entries])
-                        path = self.view.choose(t('fs_unmount_select'), [(e['path'], row) for e, row in zip(entries, rows)] + [(None, t('menu_back'))])
-                        if path is not None:
-                            self.manager.unmountfs(target, path)
-                            self.write(t('menu_done'))
-                elif selected == 'enter':
+                if selected == 'enter':
                     self.enter(target)
                 elif selected == 'delete':
                     deleted = self.manager.delete(target, self.view.confirm)
@@ -116,6 +114,37 @@ class UI:
             if deleted:
                 return
 
+    def filesystem(self, target):
+        selected = 'mountedfs'
+        actions = [(key, 'menu_' + key) for key in ('mountedfs', 'mountfs', 'unmountfs', 'back')]
+        while True:
+            selected = self.choose(t('page_filesystem', target=target), actions, selected)
+            if selected == 'back':
+                return
+            def action():
+                if selected == 'mountfs':
+                    self.write(t('fs_path_help'))
+                    path = self.view.input(t('fs_path_prompt'))
+                    destination = self.manager.mountfs(target, path or None)
+                    self.write(t('fs_mounted_at', path=destination))
+                    return
+                from .presentation import show_mounts
+                entries = self.manager.mountedfs(target)
+                if selected == 'mountedfs' or not entries:
+                    show_mounts(entries, self.write)
+                if selected == 'unmountfs' and entries:
+                    status_column = any(e['status'] != 'mounted' for e in entries)
+                    rows = menu.column_rows([(e['path'], menu.status_cell(state(e['status']), e['status']))
+                                             if status_column else (e['path'],) for e in entries])
+                    path = self.view.choose(t('fs_unmount_select'),
+                        [(e['path'], row) for e, row in zip(entries, rows)] + [(None, t('menu_back'))])
+                    if path is not None:
+                        self.manager.unmountfs(target, path)
+                        self.write(t('menu_done'))
+                    else:
+                        self.write(t('cancelled'))
+            self.present(t('page_action', action=t('menu_' + selected), target=target), action)
+
     def hardware(self, target):
         status = None
         while True:
@@ -123,13 +152,11 @@ class UI:
                 status = self.manager.hardware(target)
             choices = []
             if status['available']:
-                if not status.get('configured', True):
-                    self.write(t('gpu_pending'))
                 choices.append(('gpu', t('gpu_switch', value=t('state_enabled' if status['enabled'] else 'state_disabled'))))
-            else:
-                self.write(t('gpu_unavailable'))
+            notice = ([t('gpu_pending')] if not status.get('configured', True) else []) if status['available'] else [t('gpu_unavailable')]
             choices.append((None, t('menu_back')))
-            if self.view.choose(t('page_hardware', target=target), choices, default='gpu' if status['available'] else None) is None:
+            if self.view.choose(t('page_hardware', target=target), choices,
+                                default='gpu' if status['available'] else None, description=notice) is None:
                 return
             def change():
                 nonlocal status
@@ -157,14 +184,14 @@ class UI:
         selected = None
         while True:
             items = self.manager.list()
-            if not items:
-                self.write(t('menu_empty'))
             rows = menu.column_rows([(item['name'], menu.status_cell(state(item['status']), item['status'])) for item in items])
             choices = [(item['name'], row) for item, row in zip(items, rows)]
             if len(items) > 1 and any(item['status'] != 'Stopped' for item in items):
                 choices.append((STOP_ALL, t('menu_stop_all')))
             choices.append((None, t('menu_back')))
-            selected = self.view.choose(t('page_list'), choices, default=selected if selected is not None else (items[0]['name'] if items else None))
+            selected = self.view.choose(t('page_list'), choices,
+                default=selected if selected is not None else (items[0]['name'] if items else None),
+                description=[] if items else [t('menu_empty')])
             if selected is None:
                 return
             if selected is STOP_ALL:
@@ -175,12 +202,13 @@ class UI:
     def migration(self):
         items = self.manager.legacy_list()
         if not items:
-            self.write(t('migration_empty'))
-            self.view.choose(t('menu_migrate'), [(None, t('menu_back'))])
+            self.view.choose(t('menu_migrate'), [(None, t('menu_back'))],
+                             description=[t('migration_help'), t('migration_empty')])
             return
         rows = menu.column_rows([(i['name'], menu.status_cell(state(i['status']), i['status'])) for i in items])
         target = self.view.choose(t('menu_migrate'), [(i['name'], row) for i, row in zip(items, rows)]
-                                  + [(None, t('menu_back'))], default=items[0]['name'])
+                                  + [(None, t('menu_back'))], default=items[0]['name'],
+                                  description=[t('migration_help')])
         if target is None:
             return
         def migrate():
@@ -194,7 +222,7 @@ class UI:
         actions += [('settings', 'page_settings'), ('exit', 'menu_exit')]
         while True:
             try:
-                selected = self.choose(t('page_main'), actions, selected)
+                selected = self.choose(t('page_main'), actions, selected, cancel='exit')
             except menu.Cancelled:
                 return
             if selected == 'exit':

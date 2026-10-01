@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.12 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.13 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -14,7 +14,7 @@ This maps the checks present in current batch 0.2.12 to requirements and impleme
 | --- | --- | --- |
 | Target validation, local scope and ownership | missing targets; remote/snapshot names; start/stop/delete/info/enter/export reject unmarked fixture; native unmarked instance remains running under stop-all | instance-local marker, VM exclusion, profile-only marker exclusion, sorted managed list, invalid JSON/schema and query errors |
 | new | matching host image, explicit override, duplicate target, unavailable image | host-release selection, collisions with unmarked instances, command/state/marker wait guarantees |
-| list / info | managed listing, stopped state, unmarked/missing targets rejected, complete information in menu history | sorted filtering; malformed/failed query must not establish absence |
+| list / info | managed listing, stopped state, unmarked/missing targets rejected, summary plus explicit complete configuration in menu history | sorted filtering; malformed/failed query must not establish absence |
 | start | running state, sandbox identity, passwordless sudo, outbound HTTPS, repeated start, existing UID/home/file/shell preservation | Running skips native start but still prepares user; unsupported state rejection; failed startup blocks shell entry |
 | stop / stop --all | Running to Stopped, repeated stop, only managed fixtures affected | stopped no-op, unsupported states, continue after individual errors and aggregate failures |
 | delete | running rejection, duplicate/missing targets, default-No and explicit Yes in CLI/menu, actual disappearance | state recheck after confirmation, unmarked protection, native/state wait failure paths |
@@ -34,10 +34,10 @@ This maps the checks present in current batch 0.2.12 to requirements and impleme
 ## Current limits
 
 - Full real runs are on the current Ubuntu WSL host. Native Ubuntu/cloud hosts and other architectures still require external-machine verification.
-- Fresh installation, socket recreation and WSL restarts were verified in a separate Ubuntu 24.04 WSL fixture in 0.2.8. Batches 0.2.9–0.2.12 verify prepared-host behavior; they do not repeat destructive provisioning on the development host. Same-user sudo/PTY checks and actual APT inside disposable containers complement controlled installer/failure tests. Non-Snap installation-policy support remains outside these audit batches.
+- Fresh installation, socket recreation and WSL restarts were verified in a separate Ubuntu 24.04 WSL fixture in 0.2.8. Batches 0.2.9–0.2.13 verify prepared-host behavior; they do not repeat destructive provisioning on the development host. Same-user sudo/PTY checks and actual APT inside disposable containers complement controlled installer/failure tests. Non-Snap installation-policy support remains outside these audit batches.
 - Disk/publication failure, LXD query corruption, native Error state, VM import rejection, timeout and interruption branches use fault injection. They are not claims of live disk exhaustion, daemon destruction, VM boot or natural timeout testing.
 - Terminal checks use real PTYs and CSI/SS3 input. They do not certify every terminal emulator or SSH client.
-- GPU coverage and its platform limits are described in the 0.2.1–0.2.12 sections below. Fixed project/profile enforcement and approved GPU resource verification are implemented in 0.2.11. Non-GPU host-resource sharing and custom network controls remain pending. The current WSL kernel reports AppArmor disabled; verified isolation does not include AppArmor confinement.
+- GPU coverage and its platform limits are described in the 0.2.1–0.2.13 sections below. Fixed project/profile enforcement and approved GPU resource verification are implemented in 0.2.11. Non-GPU host-resource sharing and custom network controls remain pending. The current WSL kernel reports AppArmor disabled; verified isolation does not include AppArmor confinement.
 
 The historical integration group identifier `tui` remains for report continuity; it now runs the inline text-menu application. New groups are `invalid-inputs`, `lifecycle-repeat` and `unmarked-import`.
 
@@ -222,7 +222,7 @@ The first full candidate passed 285 units and all 26 stages in 595.2 seconds wit
 
 The published test/test.sh entry independently passed all 287 packaged units and all 26 report stages from /tmp in 602.0 seconds, with no skips, unexecuted checks or cleanup errors (validation/V0_2_11_PUBLIC_REPORT.json). All eleven assets, four fixed entries, package separation, ordinary installation, installed hashes and reclamation of the test project, temporary imports and legacy migration resources were verified (validation/V0_2_11_RELEASE_CHECK.json). GPU computation and Windows UNC operations passed both complete runs. Existing Windows UNC diagnosis remains active; the historical intermittent failure was not reproduced or silently retried. Stable remains stable/0.1.15.
 
-## Independent guest diagnostic
+## Independent guest diagnostic — historical 0.2.11 verification
 
 test/guest_security_probe.py and its thin test/security.sh download/run entry are delivered separately from the packaged tester. They have 20 regression checks in scripts/test_guest_security_probe.py; these are not counted as additional mas-test units. The fixtures cover malformed host references, permission denial versus missing capability, successful unauthorized device access, kernel opening without writes, child timeout/bad output, read-only GPU exceptions, entire-driver-store mapping, uncertain service provenance, canary matching without content disclosure, failed observations, root/container guards, atomic private report publication, exit semantics, diagnostic visibility and terminal-control escaping. Entry fixtures additionally verify a real downloaded file, argument forwarding, native sudo selection, retained working directory, exit codes, failed downloads, old Python rejection and cleanup. Method/evidence output is checked on the console and in JSON.
 
@@ -249,3 +249,11 @@ The tester discovers 331 packaged units, 44 more than the previous release. The 
 The first broader candidate passed all 26 stages. A later frozen run passed 328 units but exposed the existing early SSHFS completion race: known_hosts was absent immediately after reported success. That failed report is preserved in validation/V0_2_12_READINESS_FIRST_ATTEMPT.json; five later stages were correctly not_run and cleanup succeeded. The repaired frozen archives then passed all 331 units and 26 stages from /tmp in 632.9 seconds, with no skipped units, unexecuted stages or cleanup errors. Evidence: validation/V0_2_12_LOCAL_REPORT.json.
 
 The GPU-on challenge produced 59 PASS, 16 INFO and one SKIP; GPU-off produced 57 PASS, 16 INFO and one SKIP. Both had zero FAIL/REVIEW/ERROR. The missing binfmt_misc/register entry is explicitly unverified; it is not counted as a denied operation. Guest-local system services remain INFO, and current AppArmor disabled status remains truthful. Public test/test.sh also passed all 331 units and 26 stages from /tmp in 650.2 seconds, with no skipped units or cleanup errors. Separate public guest download execution as sandbox/sudo passed, retaining nine explicitly unverified checks without host references. Eleven assets, four fixed entries, ordinary installation and owned-resource reclamation were checked; evidence is in the versioned public/release/guest reports. This is expanded behavioral coverage, not exhaustive path or upstream-vulnerability proof.
+
+## Approved menu refinements and final candidate — 0.2.13
+
+Nine new tests in tests/test_menu_refinements.py bring packaged discovery to 340. Controlled backend checks verify filesystem grouping, exact foundational calls and retained focus; explicit Back/Escape and empty unmount perform no mutation; information reuses one snapshot for enabled/disabled/unconfigured summaries and repeated complete views without discovery; malformed records stay errors; navigation failure precedes result return; mount columns retain full wide/long paths and status without ANSI/TAB/control injection.
+
+Real PTYs in both languages exercise main/preferences/container/info/details/hardware/filesystem transitions, actual rendered heading count and blank-line boundaries, all submenu return positions, empty container/migration explanations, complete wrapped prompts and Exit/Back/Cancel hints in narrow 39-column terminals with 8-row and 4-row windows. These are rendered interaction checks, not only label assertions. Existing default-No, CSI/SS3, resize, circular navigation, shell terminal restoration and result ordering tests remain. Native product PTYs exercise the new filesystem entry and info summary/details without weakening JSON/state/shell assertions.
+
+Frozen archives ran from /tmp outside the source tree: 340 units with zero skips, all 26 report stages passed in 663.7 seconds and zero cleanup errors. Native fixed policy, migration/import, GPU calculation and on/off guest challenges, Linux/Windows UNC mounts and revised menus passed. The unchanged public guest probe bytes remain tester-only; no new claim of exhaustive path, terminal-emulator or upstream-exploit coverage is made. Publication/public-entry verification follows the local run. Evidence: validation/V0_2_13_LOCAL_REPORT.json.

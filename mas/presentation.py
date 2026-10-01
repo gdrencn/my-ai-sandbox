@@ -3,6 +3,7 @@ import json
 from .diagnostics import diagnostic_lines
 from .output import Output
 from .i18n import t, state, progress_text
+from .menu import column_rows, rendered
 import sys
 
 
@@ -25,8 +26,9 @@ class Progress:
 def show_mounts(entries, write=print):
     if not entries:
         write(t("fs_empty"))
-    for entry in entries:
-        write(f"{entry['path']}\t{entry['destination']}\t{state(entry['status'])}")
+    rows = column_rows([(entry['path'], entry['destination'], state(entry['status'])) for entry in entries])
+    for row in rows:
+        write(rendered(row, sum(row.widths) + 2 * (len(row.widths) - 1), color=False))
 
 
 def format_info(instance):

@@ -54,7 +54,7 @@ class MenuContractTests(unittest.TestCase):
             manager.mountedfs.return_value = entries
             view.choose.side_effect = ['unmountfs', '/a', None, 'back']
             with patch('mas.terminal_ui.sys.stdout', io.StringIO()), patch('mas.presentation.show_mounts') as table:
-                UI(view, manager).container('demo')
+                UI(view, manager).filesystem('demo')
             table.assert_not_called()
             options = view.choose.call_args_list[1].args[1]
             self.assertEqual([len(row.values) for _, row in options[:-1]], [2,2] if abnormal else [1,1])
@@ -137,7 +137,7 @@ menu.interactive(exercise)
                                 terminal.expect('选择镜像版本' if language == 'zh_cn' else 'Choose an image version')
                                 terminal.send('\n')
                             if case == 'mount':
-                                terminal.expect('请输入容器内目录路径' if language == 'zh_cn' else 'Enter a directory path')
+                                terminal.expect('请输入容器内的绝对目录路径' if language == 'zh_cn' else 'Enter an absolute directory path')
                                 terminal.send('\n')
                             result = '操作结果' if language == 'zh_cn' else 'Operation result'
                             terminal.expect(result);terminal.send('\n')

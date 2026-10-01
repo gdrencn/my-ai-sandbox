@@ -19,7 +19,8 @@ def main():
     installer = (ROOT / "scripts/install.template.sh").read_text()
     for token, key in {"LANGUAGE_TITLE": "language_title", "LANGUAGE_ZH": "language_zh",
                        "LANGUAGE_EN": "language_en", "LANGUAGE_KEYS": "menu_keys"}.items():
-        installer = installer.replace("@" + token + "@", shlex.quote(messages[key]))
+        value = messages[key].format(action=messages['menu_cancel']) if key == 'menu_keys' else messages[key]
+        installer = installer.replace("@" + token + "@", shlex.quote(value))
     installer = installer.replace('@DEPENDENCIES@', (ROOT / 'mas/dependencies.sh').read_text())
     for language, suffix in (('zh_cn', 'ZH'), ('en_us', 'EN')):
         catalog = json.loads((ROOT / 'mas/locales' / (language + '.json')).read_text())
