@@ -1,8 +1,8 @@
 {
   "purpose": "standalone-guest-probe",
   "product_version": "0.2.11",
-  "project": "test-guest-probe-34b4a71a024e4e3aa1f967eda4e4adf5",
-  "target": "test-c9b159152f0f4807ae501eda0eca12ac",
+  "project": "test-guest-probe-eedd2513427a413fa9e553976755743e",
+  "target": "test-397397add70a4437b59336c83bbdfe55",
   "runs": {
     "on": {
       "schema": 1,
@@ -11,6 +11,7 @@
       "checks": [
         {
           "check": "uid-map",
+          "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
           "status": "PASS",
           "message": "容器 root 不应映射到宿主 root",
           "evidence": {
@@ -19,6 +20,7 @@
         },
         {
           "check": "gid-map",
+          "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
           "status": "PASS",
           "message": "容器 root 不应映射到宿主 root",
           "evidence": {
@@ -27,6 +29,7 @@
         },
         {
           "check": "seccomp",
+          "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
           "status": "PASS",
           "message": "检查实际 seccomp 过滤状态",
           "evidence": {
@@ -35,6 +38,7 @@
         },
         {
           "check": "capabilities",
+          "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
           "status": "INFO",
           "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
           "evidence": {
@@ -44,60 +48,67 @@
         },
         {
           "check": "namespace:user",
+          "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "user:[4026532298]",
+            "guest": "user:[4026532300]",
             "host": "user:[4026531837]"
           }
         },
         {
           "check": "namespace:pid",
+          "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "pid:[4026532302]",
+            "guest": "pid:[4026532304]",
             "host": "pid:[4026532216]"
           }
         },
         {
           "check": "namespace:mnt",
+          "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "mnt:[4026532299]",
+            "guest": "mnt:[4026532301]",
             "host": "mnt:[4026532214]"
           }
         },
         {
           "check": "namespace:net",
+          "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "net:[4026532305]",
+            "guest": "net:[4026532307]",
             "host": "net:[4026531833]"
           }
         },
         {
           "check": "namespace:ipc",
+          "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "ipc:[4026532301]",
+            "guest": "ipc:[4026532303]",
             "host": "ipc:[4026532202]"
           }
         },
         {
           "check": "namespace:uts",
+          "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "uts:[4026532300]",
+            "guest": "uts:[4026532302]",
             "host": "uts:[4026532215]"
           }
         },
         {
           "check": "apparmor",
+          "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
           "status": "INFO",
           "message": "如实记录 AppArmor；未启用不冒充已生效",
           "evidence": {
@@ -107,6 +118,7 @@
         },
         {
           "check": "basic-interfaces",
+          "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
           "status": "PASS",
           "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
           "evidence": {
@@ -115,6 +127,7 @@
         },
         {
           "check": "gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "method": "读取 mountinfo，核对 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd 的只读挂载选项",
           "status": "PASS",
           "message": "GPU 运行库映射应为只读",
           "evidence": {
@@ -142,6 +155,7 @@
         },
         {
           "check": "gpu-readonly:/usr/lib/wsl/lib",
+          "method": "读取 mountinfo，核对 /usr/lib/wsl/lib 的只读挂载选项",
           "status": "PASS",
           "message": "GPU 运行库映射应为只读",
           "evidence": {
@@ -166,6 +180,7 @@
         },
         {
           "check": "mount-sources",
+          "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
           "status": "PASS",
           "message": "未发现典型 Windows/宿主 home 映射",
           "evidence": {
@@ -174,48 +189,56 @@
         },
         {
           "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+          "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/var/lib/lxd/unix.socket",
+          "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/lxd/unix.socket",
+          "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/docker.sock",
+          "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/containerd/containerd.sock",
+          "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/podman/podman.sock",
+          "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/libvirt/libvirt-sock",
+          "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "devlxd",
+          "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
           "status": "INFO",
           "message": "实例内 devlxd 与宿主 LXD 管理 socket 不同，按当前兼容策略保留",
           "evidence": {
@@ -224,6 +247,7 @@
         },
         {
           "check": "windows-interop",
+          "method": "检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP",
           "status": "PASS",
           "message": "未发现典型 Windows/WSL 入口",
           "evidence": {
@@ -233,6 +257,7 @@
         },
         {
           "check": "gpu-expectation",
+          "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
           "status": "PASS",
           "message": "GPU 是获准的资源例外；仅检查显式开关预期，不将其判为越界",
           "evidence": {
@@ -244,22 +269,23 @@
         },
         {
           "check": "host-canary:0",
+          "method": "尝试直接路径、/proc/1/root 与 /proc/self/root 路径读取，比较唯一标记 SHA-256",
           "status": "PASS",
           "message": "宿主标记不可读或不可见",
           "evidence": {
             "attempts": [
               {
-                "path": "/tmp/mas-host-reference-oq8ax__r/non-secret-marker",
+                "path": "/tmp/mas-host-reference-7t3lup7a/non-secret-marker",
                 "outcome": "unavailable",
                 "errno": 2
               },
               {
-                "path": "/proc/1/root/tmp/mas-host-reference-oq8ax__r/non-secret-marker",
+                "path": "/proc/1/root/tmp/mas-host-reference-7t3lup7a/non-secret-marker",
                 "outcome": "unavailable",
                 "errno": 2
               },
               {
-                "path": "/proc/self/root/tmp/mas-host-reference-oq8ax__r/non-secret-marker",
+                "path": "/proc/self/root/tmp/mas-host-reference-7t3lup7a/non-secret-marker",
                 "outcome": "unavailable",
                 "errno": 2
               }
@@ -268,6 +294,7 @@
         },
         {
           "check": "device:host-memory",
+          "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -278,6 +305,7 @@
         },
         {
           "check": "device:kernel-log",
+          "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -288,6 +316,7 @@
         },
         {
           "check": "device:kvm",
+          "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -298,6 +327,7 @@
         },
         {
           "check": "device:host-disk",
+          "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -308,6 +338,7 @@
         },
         {
           "check": "control:/proc/sysrq-trigger",
+          "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -318,6 +349,7 @@
         },
         {
           "check": "control:/proc/sys/kernel/modprobe",
+          "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -328,6 +360,7 @@
         },
         {
           "check": "control:/proc/sys/kernel/kexec_load_disabled",
+          "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -338,6 +371,7 @@
         },
         {
           "check": "control:/proc/sys/vm/drop_caches",
+          "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -348,6 +382,7 @@
         },
         {
           "check": "control:/sys/power/state",
+          "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -358,12 +393,13 @@
         },
         {
           "check": "network-policy",
+          "method": "说明网络测试范围，不进行网络扫描或登录",
           "status": "INFO",
           "message": "网络流量及网络登录另议；此脚本不扫描网络、不尝试登录",
           "evidence": {}
         }
       ],
-      "elapsed": 0.2435654810105916,
+      "elapsed": 0.24294219999865163,
       "exit_code": 0,
       "counts": {
         "PASS": 32,
@@ -383,6 +419,7 @@
       "checks": [
         {
           "check": "uid-map",
+          "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
           "status": "PASS",
           "message": "容器 root 不应映射到宿主 root",
           "evidence": {
@@ -391,6 +428,7 @@
         },
         {
           "check": "gid-map",
+          "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
           "status": "PASS",
           "message": "容器 root 不应映射到宿主 root",
           "evidence": {
@@ -399,6 +437,7 @@
         },
         {
           "check": "seccomp",
+          "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
           "status": "PASS",
           "message": "检查实际 seccomp 过滤状态",
           "evidence": {
@@ -407,6 +446,7 @@
         },
         {
           "check": "capabilities",
+          "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
           "status": "INFO",
           "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
           "evidence": {
@@ -416,60 +456,67 @@
         },
         {
           "check": "namespace:user",
+          "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "user:[4026532298]",
+            "guest": "user:[4026532300]",
             "host": "user:[4026531837]"
           }
         },
         {
           "check": "namespace:pid",
+          "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "pid:[4026532302]",
+            "guest": "pid:[4026532304]",
             "host": "pid:[4026532216]"
           }
         },
         {
           "check": "namespace:mnt",
+          "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "mnt:[4026532299]",
+            "guest": "mnt:[4026532301]",
             "host": "mnt:[4026532214]"
           }
         },
         {
           "check": "namespace:net",
+          "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "net:[4026532305]",
+            "guest": "net:[4026532307]",
             "host": "net:[4026531833]"
           }
         },
         {
           "check": "namespace:ipc",
+          "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "ipc:[4026532301]",
+            "guest": "ipc:[4026532303]",
             "host": "ipc:[4026532202]"
           }
         },
         {
           "check": "namespace:uts",
+          "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
           "status": "PASS",
           "message": "与宿主 namespace 比较",
           "evidence": {
-            "guest": "uts:[4026532300]",
+            "guest": "uts:[4026532302]",
             "host": "uts:[4026532215]"
           }
         },
         {
           "check": "apparmor",
+          "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
           "status": "INFO",
           "message": "如实记录 AppArmor；未启用不冒充已生效",
           "evidence": {
@@ -479,6 +526,7 @@
         },
         {
           "check": "basic-interfaces",
+          "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
           "status": "PASS",
           "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
           "evidence": {
@@ -487,6 +535,7 @@
         },
         {
           "check": "mount-sources",
+          "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
           "status": "PASS",
           "message": "未发现典型 Windows/宿主 home 映射",
           "evidence": {
@@ -495,48 +544,56 @@
         },
         {
           "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+          "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/var/lib/lxd/unix.socket",
+          "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/lxd/unix.socket",
+          "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/docker.sock",
+          "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/containerd/containerd.sock",
+          "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/podman/podman.sock",
+          "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/libvirt/libvirt-sock",
+          "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "devlxd",
+          "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
           "status": "INFO",
           "message": "实例内 devlxd 与宿主 LXD 管理 socket 不同，按当前兼容策略保留",
           "evidence": {
@@ -545,6 +602,7 @@
         },
         {
           "check": "windows-interop",
+          "method": "检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP",
           "status": "PASS",
           "message": "未发现典型 Windows/WSL 入口",
           "evidence": {
@@ -554,6 +612,7 @@
         },
         {
           "check": "gpu-expectation",
+          "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
           "status": "PASS",
           "message": "GPU 是获准的资源例外；仅检查显式开关预期，不将其判为越界",
           "evidence": {
@@ -563,22 +622,23 @@
         },
         {
           "check": "host-canary:0",
+          "method": "尝试直接路径、/proc/1/root 与 /proc/self/root 路径读取，比较唯一标记 SHA-256",
           "status": "PASS",
           "message": "宿主标记不可读或不可见",
           "evidence": {
             "attempts": [
               {
-                "path": "/tmp/mas-host-reference-oq8ax__r/non-secret-marker",
+                "path": "/tmp/mas-host-reference-7t3lup7a/non-secret-marker",
                 "outcome": "unavailable",
                 "errno": 2
               },
               {
-                "path": "/proc/1/root/tmp/mas-host-reference-oq8ax__r/non-secret-marker",
+                "path": "/proc/1/root/tmp/mas-host-reference-7t3lup7a/non-secret-marker",
                 "outcome": "unavailable",
                 "errno": 2
               },
               {
-                "path": "/proc/self/root/tmp/mas-host-reference-oq8ax__r/non-secret-marker",
+                "path": "/proc/self/root/tmp/mas-host-reference-7t3lup7a/non-secret-marker",
                 "outcome": "unavailable",
                 "errno": 2
               }
@@ -587,6 +647,7 @@
         },
         {
           "check": "device:host-memory",
+          "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -597,6 +658,7 @@
         },
         {
           "check": "device:kernel-log",
+          "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -607,6 +669,7 @@
         },
         {
           "check": "device:kvm",
+          "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -617,6 +680,7 @@
         },
         {
           "check": "device:host-disk",
+          "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -627,6 +691,7 @@
         },
         {
           "check": "control:/proc/sysrq-trigger",
+          "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -637,6 +702,7 @@
         },
         {
           "check": "control:/proc/sys/kernel/modprobe",
+          "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -647,6 +713,7 @@
         },
         {
           "check": "control:/proc/sys/kernel/kexec_load_disabled",
+          "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -657,6 +724,7 @@
         },
         {
           "check": "control:/proc/sys/vm/drop_caches",
+          "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -667,6 +735,7 @@
         },
         {
           "check": "control:/sys/power/state",
+          "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -677,12 +746,13 @@
         },
         {
           "check": "network-policy",
+          "method": "说明网络测试范围，不进行网络扫描或登录",
           "status": "INFO",
           "message": "网络流量及网络登录另议；此脚本不扫描网络、不尝试登录",
           "evidence": {}
         }
       ],
-      "elapsed": 0.25171724300889764,
+      "elapsed": 0.24262930499389768,
       "exit_code": 0,
       "counts": {
         "PASS": 30,
@@ -702,6 +772,7 @@
       "checks": [
         {
           "check": "uid-map",
+          "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
           "status": "PASS",
           "message": "容器 root 不应映射到宿主 root",
           "evidence": {
@@ -710,6 +781,7 @@
         },
         {
           "check": "gid-map",
+          "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
           "status": "PASS",
           "message": "容器 root 不应映射到宿主 root",
           "evidence": {
@@ -718,6 +790,7 @@
         },
         {
           "check": "seccomp",
+          "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
           "status": "PASS",
           "message": "检查实际 seccomp 过滤状态",
           "evidence": {
@@ -726,6 +799,7 @@
         },
         {
           "check": "capabilities",
+          "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
           "status": "INFO",
           "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
           "evidence": {
@@ -735,60 +809,67 @@
         },
         {
           "check": "namespace:user",
+          "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
           "status": "SKIP",
           "message": "无宿主参照，仅记录，尚未验证隔离",
           "evidence": {
-            "guest": "user:[4026532298]",
+            "guest": "user:[4026532300]",
             "host": null
           }
         },
         {
           "check": "namespace:pid",
+          "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
           "status": "SKIP",
           "message": "无宿主参照，仅记录，尚未验证隔离",
           "evidence": {
-            "guest": "pid:[4026532302]",
+            "guest": "pid:[4026532304]",
             "host": null
           }
         },
         {
           "check": "namespace:mnt",
+          "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
           "status": "SKIP",
           "message": "无宿主参照，仅记录，尚未验证隔离",
           "evidence": {
-            "guest": "mnt:[4026532299]",
+            "guest": "mnt:[4026532301]",
             "host": null
           }
         },
         {
           "check": "namespace:net",
+          "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
           "status": "SKIP",
           "message": "无宿主参照，仅记录，尚未验证隔离",
           "evidence": {
-            "guest": "net:[4026532305]",
+            "guest": "net:[4026532307]",
             "host": null
           }
         },
         {
           "check": "namespace:ipc",
+          "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
           "status": "SKIP",
           "message": "无宿主参照，仅记录，尚未验证隔离",
           "evidence": {
-            "guest": "ipc:[4026532301]",
+            "guest": "ipc:[4026532303]",
             "host": null
           }
         },
         {
           "check": "namespace:uts",
+          "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
           "status": "SKIP",
           "message": "无宿主参照，仅记录，尚未验证隔离",
           "evidence": {
-            "guest": "uts:[4026532300]",
+            "guest": "uts:[4026532302]",
             "host": null
           }
         },
         {
           "check": "apparmor",
+          "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
           "status": "INFO",
           "message": "如实记录 AppArmor；未启用不冒充已生效",
           "evidence": {
@@ -798,6 +879,7 @@
         },
         {
           "check": "basic-interfaces",
+          "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
           "status": "PASS",
           "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
           "evidence": {
@@ -806,6 +888,7 @@
         },
         {
           "check": "mount-sources",
+          "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
           "status": "PASS",
           "message": "未发现典型 Windows/宿主 home 映射",
           "evidence": {
@@ -814,48 +897,56 @@
         },
         {
           "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+          "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/var/lib/lxd/unix.socket",
+          "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/lxd/unix.socket",
+          "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/docker.sock",
+          "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/containerd/containerd.sock",
+          "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/podman/podman.sock",
+          "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "management-socket:/run/libvirt/libvirt-sock",
+          "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
           "status": "PASS",
           "message": "管理 socket 路径不存在",
           "evidence": {}
         },
         {
           "check": "devlxd",
+          "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
           "status": "INFO",
           "message": "实例内 devlxd 与宿主 LXD 管理 socket 不同，按当前兼容策略保留",
           "evidence": {
@@ -864,6 +955,7 @@
         },
         {
           "check": "windows-interop",
+          "method": "检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP",
           "status": "PASS",
           "message": "未发现典型 Windows/WSL 入口",
           "evidence": {
@@ -873,6 +965,7 @@
         },
         {
           "check": "gpu-expectation",
+          "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
           "status": "INFO",
           "message": "GPU 是获准的资源例外；仅检查显式开关预期，不将其判为越界",
           "evidence": {
@@ -882,12 +975,14 @@
         },
         {
           "check": "host-canaries",
+          "method": "有宿主非敏感唯一标记参照时，尝试路径读取并比较 SHA-256",
           "status": "SKIP",
           "message": "未提供宿主唯一标记；常见路径检查不能替代任意宿主文件验证",
           "evidence": {}
         },
         {
           "check": "device:host-memory",
+          "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -898,6 +993,7 @@
         },
         {
           "check": "device:kernel-log",
+          "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -908,6 +1004,7 @@
         },
         {
           "check": "device:kvm",
+          "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -918,6 +1015,7 @@
         },
         {
           "check": "device:host-disk",
+          "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -928,6 +1026,7 @@
         },
         {
           "check": "control:/proc/sysrq-trigger",
+          "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -938,6 +1037,7 @@
         },
         {
           "check": "control:/proc/sys/kernel/modprobe",
+          "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -948,6 +1048,7 @@
         },
         {
           "check": "control:/proc/sys/kernel/kexec_load_disabled",
+          "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -958,6 +1059,7 @@
         },
         {
           "check": "control:/proc/sys/vm/drop_caches",
+          "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -968,6 +1070,7 @@
         },
         {
           "check": "control:/sys/power/state",
+          "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
           "status": "PASS",
           "message": "访问被权限或只读边界拒绝",
           "evidence": {
@@ -978,12 +1081,13 @@
         },
         {
           "check": "network-policy",
+          "method": "说明网络测试范围，不进行网络扫描或登录",
           "status": "INFO",
           "message": "网络流量及网络登录另议；此脚本不扫描网络、不尝试登录",
           "evidence": {}
         }
       ],
-      "elapsed": 0.2547082929959288,
+      "elapsed": 0.24492855099379085,
       "exit_code": 0,
       "counts": {
         "PASS": 22,
@@ -998,12 +1102,690 @@
     }
   },
   "cleanup_errors": [],
-  "script_sha256": "faa2b0d84eb418eab03b49311a947f6e2982550993f23922edb3109edd0a03c5",
-  "resource_reclamation_verified": true,
-  "focused_unit_tests": 13,
-  "public_download": {
-    "entry": "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/scripts/guest_security_probe.py",
-    "matches_verified_script": true,
-    "sha256": "faa2b0d84eb418eab03b49311a947f6e2982550993f23922edb3109edd0a03c5"
-  }
+  "script_sha256": "d3e121ba052521e898c3bdb292399a2e9232c7c5d9b20a5ba5715dacc50c7ca3",
+  "entry_sha256": "5cdfde983da3ad813ea14683e9bb99180129c9166b062d3150986a25ff244940",
+  "focused_unit_tests": 20,
+  "entry_runs": {
+    "root": {
+      "report": {
+        "schema": 1,
+        "purpose": "guest-boundary-probe",
+        "gpu_expected": "off",
+        "checks": [
+          {
+            "check": "uid-map",
+            "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
+            "status": "PASS",
+            "message": "容器 root 不应映射到宿主 root",
+            "evidence": {
+              "mapping": "         0    1065536      65536\n"
+            }
+          },
+          {
+            "check": "gid-map",
+            "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
+            "status": "PASS",
+            "message": "容器 root 不应映射到宿主 root",
+            "evidence": {
+              "mapping": "         0    1065536      65536\n"
+            }
+          },
+          {
+            "check": "seccomp",
+            "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
+            "status": "PASS",
+            "message": "检查实际 seccomp 过滤状态",
+            "evidence": {
+              "mode": "2"
+            }
+          },
+          {
+            "check": "capabilities",
+            "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
+            "status": "INFO",
+            "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
+            "evidence": {
+              "effective": "000001ffffffffff",
+              "bounding": "000001ffffffffff"
+            }
+          },
+          {
+            "check": "namespace:user",
+            "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "user:[4026532300]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:pid",
+            "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "pid:[4026532304]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:mnt",
+            "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "mnt:[4026532301]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:net",
+            "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "net:[4026532307]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:ipc",
+            "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "ipc:[4026532303]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:uts",
+            "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "uts:[4026532302]",
+              "host": null
+            }
+          },
+          {
+            "check": "apparmor",
+            "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
+            "status": "INFO",
+            "message": "如实记录 AppArmor；未启用不冒充已生效",
+            "evidence": {
+              "enabled": "N",
+              "profile": "kernel\u0000"
+            }
+          },
+          {
+            "check": "basic-interfaces",
+            "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
+            "status": "PASS",
+            "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
+            "evidence": {
+              "sys_present": true
+            }
+          },
+          {
+            "check": "mount-sources",
+            "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
+            "status": "PASS",
+            "message": "未发现典型 Windows/宿主 home 映射",
+            "evidence": {
+              "suspicious": []
+            }
+          },
+          {
+            "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+            "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/var/lib/lxd/unix.socket",
+            "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/lxd/unix.socket",
+            "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/docker.sock",
+            "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/containerd/containerd.sock",
+            "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/podman/podman.sock",
+            "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/libvirt/libvirt-sock",
+            "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "devlxd",
+            "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
+            "status": "INFO",
+            "message": "实例内 devlxd 与宿主 LXD 管理 socket 不同，按当前兼容策略保留",
+            "evidence": {
+              "visible": true
+            }
+          },
+          {
+            "check": "windows-interop",
+            "method": "检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP",
+            "status": "PASS",
+            "message": "未发现典型 Windows/WSL 入口",
+            "evidence": {
+              "paths": [],
+              "wsl_interop_environment": null
+            }
+          },
+          {
+            "check": "gpu-expectation",
+            "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
+            "status": "PASS",
+            "message": "GPU 是获准的资源例外；仅检查显式开关预期，不将其判为越界",
+            "evidence": {
+              "expected": "off",
+              "devices": []
+            }
+          },
+          {
+            "check": "host-canaries",
+            "method": "有宿主非敏感唯一标记参照时，尝试路径读取并比较 SHA-256",
+            "status": "SKIP",
+            "message": "未提供宿主唯一标记；常见路径检查不能替代任意宿主文件验证",
+            "evidence": {}
+          },
+          {
+            "check": "device:host-memory",
+            "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "device:kernel-log",
+            "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "device:kvm",
+            "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "device:host-disk",
+            "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "control:/proc/sysrq-trigger",
+            "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sysrq-trigger'"
+            }
+          },
+          {
+            "check": "control:/proc/sys/kernel/modprobe",
+            "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'"
+            }
+          },
+          {
+            "check": "control:/proc/sys/kernel/kexec_load_disabled",
+            "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'"
+            }
+          },
+          {
+            "check": "control:/proc/sys/vm/drop_caches",
+            "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'"
+            }
+          },
+          {
+            "check": "control:/sys/power/state",
+            "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/sys/power/state'"
+            }
+          },
+          {
+            "check": "network-policy",
+            "method": "说明网络测试范围，不进行网络扫描或登录",
+            "status": "INFO",
+            "message": "网络流量及网络登录另议；此脚本不扫描网络、不尝试登录",
+            "evidence": {}
+          }
+        ],
+        "elapsed": 0.2500818039989099,
+        "exit_code": 0,
+        "counts": {
+          "PASS": 23,
+          "FAIL": 0,
+          "REVIEW": 0,
+          "SKIP": 7,
+          "INFO": 4,
+          "ERROR": 0
+        },
+        "conclusion": "no_confirmed_breach",
+        "limitation": "不证明不存在漏洞；REVIEW/SKIP 项尚未验证，不能算通过。"
+      },
+      "cwd": "/home/sandbox",
+      "path": "/home/sandbox/entry-root.json",
+      "native_sudo": false
+    },
+    "sandbox": {
+      "report": {
+        "schema": 1,
+        "purpose": "guest-boundary-probe",
+        "gpu_expected": "off",
+        "checks": [
+          {
+            "check": "uid-map",
+            "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
+            "status": "PASS",
+            "message": "容器 root 不应映射到宿主 root",
+            "evidence": {
+              "mapping": "         0    1065536      65536\n"
+            }
+          },
+          {
+            "check": "gid-map",
+            "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
+            "status": "PASS",
+            "message": "容器 root 不应映射到宿主 root",
+            "evidence": {
+              "mapping": "         0    1065536      65536\n"
+            }
+          },
+          {
+            "check": "seccomp",
+            "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
+            "status": "PASS",
+            "message": "检查实际 seccomp 过滤状态",
+            "evidence": {
+              "mode": "2"
+            }
+          },
+          {
+            "check": "capabilities",
+            "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
+            "status": "INFO",
+            "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
+            "evidence": {
+              "effective": "000001ffffffffff",
+              "bounding": "000001ffffffffff"
+            }
+          },
+          {
+            "check": "namespace:user",
+            "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "user:[4026532300]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:pid",
+            "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "pid:[4026532304]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:mnt",
+            "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "mnt:[4026532301]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:net",
+            "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "net:[4026532307]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:ipc",
+            "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "ipc:[4026532303]",
+              "host": null
+            }
+          },
+          {
+            "check": "namespace:uts",
+            "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
+            "status": "SKIP",
+            "message": "无宿主参照，仅记录，尚未验证隔离",
+            "evidence": {
+              "guest": "uts:[4026532302]",
+              "host": null
+            }
+          },
+          {
+            "check": "apparmor",
+            "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
+            "status": "INFO",
+            "message": "如实记录 AppArmor；未启用不冒充已生效",
+            "evidence": {
+              "enabled": "N",
+              "profile": "kernel\u0000"
+            }
+          },
+          {
+            "check": "basic-interfaces",
+            "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
+            "status": "PASS",
+            "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
+            "evidence": {
+              "sys_present": true
+            }
+          },
+          {
+            "check": "mount-sources",
+            "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
+            "status": "PASS",
+            "message": "未发现典型 Windows/宿主 home 映射",
+            "evidence": {
+              "suspicious": []
+            }
+          },
+          {
+            "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+            "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/var/lib/lxd/unix.socket",
+            "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/lxd/unix.socket",
+            "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/docker.sock",
+            "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/containerd/containerd.sock",
+            "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/podman/podman.sock",
+            "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "management-socket:/run/libvirt/libvirt-sock",
+            "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+            "status": "PASS",
+            "message": "管理 socket 路径不存在",
+            "evidence": {}
+          },
+          {
+            "check": "devlxd",
+            "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
+            "status": "INFO",
+            "message": "实例内 devlxd 与宿主 LXD 管理 socket 不同，按当前兼容策略保留",
+            "evidence": {
+              "visible": true
+            }
+          },
+          {
+            "check": "windows-interop",
+            "method": "检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP",
+            "status": "PASS",
+            "message": "未发现典型 Windows/WSL 入口",
+            "evidence": {
+              "paths": [],
+              "wsl_interop_environment": null
+            }
+          },
+          {
+            "check": "gpu-expectation",
+            "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
+            "status": "PASS",
+            "message": "GPU 是获准的资源例外；仅检查显式开关预期，不将其判为越界",
+            "evidence": {
+              "expected": "off",
+              "devices": []
+            }
+          },
+          {
+            "check": "host-canaries",
+            "method": "有宿主非敏感唯一标记参照时，尝试路径读取并比较 SHA-256",
+            "status": "SKIP",
+            "message": "未提供宿主唯一标记；常见路径检查不能替代任意宿主文件验证",
+            "evidence": {}
+          },
+          {
+            "check": "device:host-memory",
+            "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "device:kernel-log",
+            "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "device:kvm",
+            "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "device:host-disk",
+            "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "mknod",
+              "errno": 1,
+              "native_error": "[Errno 1] Operation not permitted"
+            }
+          },
+          {
+            "check": "control:/proc/sysrq-trigger",
+            "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sysrq-trigger'"
+            }
+          },
+          {
+            "check": "control:/proc/sys/kernel/modprobe",
+            "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'"
+            }
+          },
+          {
+            "check": "control:/proc/sys/kernel/kexec_load_disabled",
+            "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'"
+            }
+          },
+          {
+            "check": "control:/proc/sys/vm/drop_caches",
+            "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'"
+            }
+          },
+          {
+            "check": "control:/sys/power/state",
+            "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
+            "status": "PASS",
+            "message": "访问被权限或只读边界拒绝",
+            "evidence": {
+              "step": "open",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/sys/power/state'"
+            }
+          },
+          {
+            "check": "network-policy",
+            "method": "说明网络测试范围，不进行网络扫描或登录",
+            "status": "INFO",
+            "message": "网络流量及网络登录另议；此脚本不扫描网络、不尝试登录",
+            "evidence": {}
+          }
+        ],
+        "elapsed": 0.24915637300000526,
+        "exit_code": 0,
+        "counts": {
+          "PASS": 23,
+          "FAIL": 0,
+          "REVIEW": 0,
+          "SKIP": 7,
+          "INFO": 4,
+          "ERROR": 0
+        },
+        "conclusion": "no_confirmed_breach",
+        "limitation": "不证明不存在漏洞；REVIEW/SKIP 项尚未验证，不能算通过。"
+      },
+      "cwd": "/home/sandbox",
+      "path": "/home/sandbox/entry-sandbox.json",
+      "native_sudo": true
+    }
+  },
+  "resource_reclamation_verified": true
 }

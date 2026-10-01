@@ -4,19 +4,29 @@
 
 ## 下载与运行
 
-在容器终端内运行，需要 Python 3.10+，只使用标准库：
+在新机器的容器终端内运行这一条命令即可，需要 curl、Python 3.10+；以普通用户执行时还需要系统 sudo：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/scripts/guest_security_probe.py -o guest_security_probe.py
-sudo python3 guest_security_probe.py
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
 ```
 
-脚本不会自动提权。必须使用容器 root 才能检查最强的容器内权限；以 sandbox 普通身份测试不足以覆盖 root 工作负载。脚本检查 LXC 运行标识，拒绝在普通宿主执行探测；这个检查用于防止误运行，不是不可伪造的身份认证。
+入口下载完整的 `test/guest_security_probe.py` 到本次私有临时目录，再运行该文件；结束后清理下载文件。它不安装 mas、不运行 mas-test，也不安装软件包。容器 root 直接运行；普通用户通过系统 `sudo` 执行，认证按系统原有方式处理。mas 的 sandbox 用户已有免密 sudo。Python 脚本本身不处理提权，且不依赖 mas 或第三方 Python 包。
+
+必须使用容器 root 才能检查最强的容器内权限；以 sandbox 普通身份测试不足以覆盖 root 工作负载。脚本检查 LXC 运行标识，拒绝在普通宿主执行探测；这个检查用于防止误运行，不是不可伪造的身份认证。
+
+终端逐项显示检查标识、尝试的方法、实际结果和观察证据。设备/内核控制入口遇到权限拒绝时，会显示是 `mknod` 还是 `open` 阶段被拒绝，以及原始 errno；最后显示各状态计数和报告位置。
 
 默认在当前目录创建名称唯一、权限为 `0600` 的 JSON 报告。也可以指定文件名；已有文件或符号链接均不覆盖：
 
 ```bash
-sudo python3 guest_security_probe.py --report guest-security-report.json --gpu on
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- --report guest-security-report.json --gpu on
+```
+
+报告保存在运行命令时的当前目录，不在下载临时目录中；容器 root 所有的 `0600` 报告可以用 `sudo cat guest-security-report.json` 查看。终端结果无需再次打开报告即可阅读。想保留脚本文件供离线重复执行，可以单独下载同一份实现：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/guest_security_probe.py -o guest_security_probe.py
+sudo python3 guest_security_probe.py
 ```
 
 `--gpu on` 表示预期 GPU 开启；`off` 表示预期关闭；默认 `unknown` 仅记录设备，不判定开关是否正确。应根据当前容器的配置选择，不能在没有 GPU 的宿主上默认要求 `on`。每项设备/内核控制入口的子进程默认超时 3 秒，`--timeout` 可以设置为 1–10 秒。
@@ -82,7 +92,7 @@ Windows/WSL 路径清单：`/mnt/c/Windows`、`/mnt/c/Users`、`/proc/sys/fs/bin
 将这个普通 JSON 文件复制到容器后运行：
 
 ```bash
-sudo python3 guest_security_probe.py --host-reference host-reference.json
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- --host-reference host-reference.json
 ```
 
 `canaries` 可选。每项为 `{"path": "/绝对路径/唯一非敏感标记", "sha256": "64位小写SHA256"}`。最多 16 项，文件应不超过 64 KiB，路径不得包含上级跳转或控制字符。标记必须由用户明确允许在宿主创建、记录散列并保持存在；不要拿真实密码、SSH 私钥或其他凭据充当标记，也不要把标记所在的宿主目录挂载给容器。只复制参照 JSON，测试目标仍是标记不应被容器读到。
@@ -98,7 +108,7 @@ sudo python3 guest_security_probe.py --host-reference host-reference.json
 - INFO：记录背景或已明确不在本次判断范围的状态。
 - ERROR：探测异常、超时或执行条件不满足，不能当作权限拒绝。
 
-退出码 `0` 表示未发现明确 FAIL/ERROR，仍可能有 REVIEW/SKIP；`1` 表示出现 FAIL；`2` 表示存在 ERROR、输入/执行条件问题或报告写入失败。JSON 保留所有检查、计数、原始错误、实际 AppArmor 属性和结果限制。拒绝已有报告文件，不用覆盖或重试掩盖失败。
+退出码 `0` 表示未发现明确 FAIL/ERROR，仍可能有 REVIEW/SKIP；`1` 表示出现 FAIL；`2` 表示存在 ERROR、输入/执行条件问题或报告写入失败。下载/系统 sudo 失败时，一键入口保留该命令的非零退出码；用户中断通常为 `130`，TERM 结束为 `143`。JSON 保留每项 `check`、`method`、`status`、`message`、`evidence`，以及计数、原始错误、实际 AppArmor 属性和结果限制。拒绝已有报告文件，不用覆盖或重试掩盖失败。
 
 ## 验证范围与依据
 
@@ -110,4 +120,4 @@ LXD 容器与宿主共享内核，运行时会提供必要的基础接口；本�
 
 默认调用也已在该临时容器内验证：没有宿主参照时，六种 namespace 对比和宿主标记检查明确标为 7 项 SKIP，而不是通过；GPU 预期 unknown 只作 INFO。该次结果为 22 PASS、7 SKIP、5 INFO，无 FAIL/REVIEW/ERROR。
 
-13 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖和输出保留诊断。临时 Project/容器已回收；公开下载入口的文件与验证脚本逐字节一致。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。
+20 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖、方法与证据展示，以及一键入口的参数传递、退出码、下载失败、旧 Python 拒绝和临时文件清理。临时容器内另行验证了 root 直接执行、sandbox 通过系统 sudo 执行同一入口，以及报告保留在当前目录。临时 Project/容器已回收。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。

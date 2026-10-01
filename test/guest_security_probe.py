@@ -39,8 +39,48 @@ STATUS_TEXT = {'PASS': '通过', 'FAIL': '失败', 'REVIEW': '需核对',
                'SKIP': '未验证', 'INFO': '信息', 'ERROR': '测试错误'}
 
 
+def check_method(check):
+    methods = {
+        'uid-map': '读取 /proc/self/uid_map，检查容器 root 对应的外层 UID',
+        'gid-map': '读取 /proc/self/gid_map，检查容器 root 对应的外层 GID',
+        'seccomp': '读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2',
+        'capabilities': '读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位',
+        'apparmor': '读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态',
+        'basic-interfaces': '读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys',
+        'gpu-driver-store': '检查 mountinfo 是否暴露整个 /usr/lib/wsl/drivers',
+        'mount-sources': '检查 mountinfo 的文件系统类型、挂载根和挂载点',
+        'devlxd': '检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口',
+        'windows-interop': '检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP',
+        'gpu-expectation': '列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期',
+        'host-canaries': '有宿主非敏感唯一标记参照时，尝试路径读取并比较 SHA-256',
+        'network-policy': '说明网络测试范围，不进行网络扫描或登录',
+        'execution': '检查执行条件、输入与报告路径，运行各项探测',
+    }
+    if check.startswith('device:'):
+        mode, major, minor = DEVICES[check.split(':', 1)[1]]
+        kind = 'char' if mode == stat.S_IFCHR else 'block'
+        return (f'在私有临时目录 mknod {kind} {major}:{minor}，再只读 open/close；'
+                '不读取、写入或执行 ioctl')
+    if check.startswith('control:'):
+        return '对 ' + check.split(':', 1)[1] + ' 尝试写模式 open/close，不写入任何字节'
+    if check.startswith('namespace:'):
+        return '读取 /proc/self/ns/' + check.split(':', 1)[1] + '，有宿主参照时比较标识'
+    if check.startswith('management-socket:'):
+        return ('检查 ' + check.split(':', 1)[1] + '；存在时尝试 Unix socket 连接并立即关闭，不发送请求')
+    if check.startswith('gpu-readonly:'):
+        return '读取 mountinfo，核对 ' + check.split(':', 1)[1] + ' 的只读挂载选项'
+    if check.startswith('host-canary:'):
+        return '尝试直接路径、/proc/1/root 与 /proc/self/root 路径读取，比较唯一标记 SHA-256'
+    return methods.get(check, '执行此项检查')
+
+
 def result(check, status, message, **evidence):
-    return dict(check=check, status=status, message=message, evidence=evidence)
+    return dict(check=check, method=check_method(check), status=status, message=message, evidence=evidence)
+
+
+def terminal_text(text):
+    return re.sub(r'[\x00-\x1f\x7f-\x9f]',
+                  lambda match: json.dumps(match[0], ensure_ascii=True)[1:-1], text)
 
 
 def mappings(text):
@@ -154,7 +194,8 @@ def bounded_probe(kind, value, work, timeout):
         item = json.loads(child.stdout)
         if (child.returncode or not isinstance(item, dict)
                 or item.get('check') != kind + ':' + value or item.get('status') not in STATUS_TEXT
-                or not isinstance(item.get('message'), str) or not isinstance(item.get('evidence'), dict)):
+                or not isinstance(item.get('method'), str) or not isinstance(item.get('message'), str)
+                or not isinstance(item.get('evidence'), dict)):
             raise ValueError('子进程返回内容无效')
         return item
     except (ValueError, TypeError):
@@ -362,7 +403,11 @@ def main(argv=None):
     report = dict(schema=SCHEMA, purpose='guest-boundary-probe', gpu_expected=options.gpu, checks=[])
     def emit(item):
         report['checks'].append(item)
-        print('[' + STATUS_TEXT[item['status']] + '] ' + item['check'] + '：' + item['message'], flush=True)
+        print('[' + STATUS_TEXT[item['status']] + '] ' + terminal_text(item['check'])
+              + '：' + terminal_text(item['message']), flush=True)
+        print('  方法：' + terminal_text(item['method']), flush=True)
+        if item['evidence']:
+            print('  观察：' + json.dumps(item['evidence'], ensure_ascii=False), flush=True)
         if item['status'] == 'ERROR':
             for key in ('native_error', 'native_stderr'):
                 if item['evidence'].get(key):
