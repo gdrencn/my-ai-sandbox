@@ -1,0 +1,57 @@
+{
+  "version": "0.2.13",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.13",
+  "tag": "v0.2.13",
+  "asset_hashes": {
+    "SHA256SUMS": "57c2ad309aa7fb47fba49ed104ba535d3f56a579c3b568e360d2fcb40bb1c756",
+    "WSL_REPORT.json": "467ced5f361b7eb13ab83dacdefe94b364f432a8484fba1232cd302cae7ab276",
+    "bootstrap.py": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "mas-install.pyz": "8f79adf5ec4f52d8fac2c4463d166a513a1953d52dd868ed11d8282418f6ae8e",
+    "mas-test.pyz": "054ad90daec01832f3608e6477f0391039c557bf287f302c04bd7ab4c1014393",
+    "mas.pyz": "cad64794b9f8780073431d697c239560e68cb3b35e79d0c1b9ec5cdc90320077",
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484"
+  },
+  "latest_stable": "stable/0.1.15",
+  "probe_packaged_only_in_tester": true,
+  "public_entries": [
+    "stable/install.sh",
+    "test/install.sh",
+    "test/test.sh",
+    "test/test-stable.sh"
+  ],
+  "public_probe_source_matches": true,
+  "reproducible_build": true,
+  "public_test": {
+    "units": 340,
+    "stages": 26,
+    "elapsed": 634.3
+  },
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "public_project_removed": true,
+  "local_project_removed": true,
+  "mount_registry_empty": true,
+  "ordinary_install_preserves_tester": true,
+  "installed_product_and_tester_hashes_match": true,
+  "staging_projects_removed": [
+    "mas-import-0091dfa844314978a0a080a819ffd374",
+    "mas-import-5a6c39127fca49129f6b38062bbbf4a5",
+    "mas-import-662856eaae434f93a77c89e8898a3a6f",
+    "mas-import-8b9acd1af7634b168199d0209e92c854",
+    "mas-import-9b24dc2ef3bf4b37bb654648474d6a63",
+    "mas-import-a8d377e368564237a53eb4f704e88845",
+    "mas-import-b4768af0bcb446a790aca824fbf44e13",
+    "mas-import-c28bca1f6bc04599be121529e73de057",
+    "mas-import-e09b3bdb2a024d1188b00e63e7fa7565",
+    "mas-import-f62f03fde0904760aeff7663ac5c5b77"
+  ],
+  "legacy_targets_removed": true,
+  "legacy_profiles_removed": true
+}

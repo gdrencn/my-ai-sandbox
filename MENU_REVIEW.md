@@ -1,6 +1,6 @@
 # Menu interaction review — October 2026
 
-These recommendations were requested alongside the 0.2.12 test/probe review and all ten were approved for batch 0.2.13. REQUIREMENTS.md section 42 records their implementation and acceptance scope. All ten are implemented and locally verified in frozen 0.2.13: 340 packaged units and 26 native stages passed in 663.7 seconds. Public-entry verification follows publication. Existing lifecycle, default-No confirmations, arrow navigation, inline history and exit-to-host-shell behavior remain the accepted baseline.
+These recommendations were requested alongside the 0.2.12 test/probe review and all ten were approved for batch 0.2.13. REQUIREMENTS.md section 42 records their implementation and acceptance scope. All ten are implemented and locally verified in frozen 0.2.13: 340 packaged units and 26 native stages passed in 663.7 seconds. Public-entry verification also passed all 340 units and 26 stages in 634.3 seconds, with no skipped units or cleanup errors; see validation/V0_2_13_PUBLIC_REPORT.json. Existing lifecycle, default-No confirmations, arrow navigation, inline history and exit-to-host-shell behavior remain the accepted baseline.
 
 ## Approved changes implemented in 0.2.13
 

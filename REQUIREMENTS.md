@@ -2,7 +2,7 @@
 
 Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches; section 40 describes the independently delivered guest diagnostic; section 41 records its integrated test review and SSHFS completion repair; section 42 records the approved menu refinements and final test-release review. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: test batch 0.2.13 implements the ten approved menu refinements in section 42, retaining the fixed isolation/import/migration policy in section 39 and shared guest challenge/SSHFS completion repair in section 41. Frozen local verification passed 340 packaged units and all 26 report stages in 663.7 seconds; publication/public verification is next. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
+Current baseline: test batch 0.2.13 implements the ten approved menu refinements in section 42, retaining the fixed isolation/import/migration policy in section 39 and shared guest challenge/SSHFS completion repair in section 41. Local and public installation/test runs both passed 340 packaged units and all 26 report stages; eleven release assets, public source entries, ordinary installation and owned-resource reclamation were verified. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
 
 ## 1. Scope
 
@@ -611,7 +611,7 @@ The user requested menu wording/structure recommendations and authorized iterati
 
 ## 42. Approved menu refinements and release-candidate review — v0.2.13
 
-Status: implemented and locally verified; publication/public verification pending. The user approved all ten recommendations in MENU_REVIEW.md and requested another final review before personally testing the next test release. Publishing stable is not part of this batch.
+Status: implemented, published as test v0.2.13 and verified locally and through the public installation/test entry. The user approved all ten recommendations in MENU_REVIEW.md and requested another final review before personally testing the next test release. Publishing stable is not part of this batch.
 
 - Navigation selectors own their page title exactly once. Actions and failures retain explicit function-entry headings, unified blank-line boundaries and result-before-navigation order. Empty navigation pages display their explanation within the page rather than before its title.
 - Use `容器列表` / `Containers` for the main container-list entry and destination. Keep the merged main menu, mas preferences and exit at the top level; do not add a general management intermediate page.
