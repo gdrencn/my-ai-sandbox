@@ -120,4 +120,4 @@ LXD 容器与宿主共享内核，运行时会提供必要的基础接口；本�
 
 默认调用也已在该临时容器内验证：没有宿主参照时，六种 namespace 对比和宿主标记检查明确标为 7 项 SKIP，而不是通过；GPU 预期 unknown 只作 INFO。该次结果为 22 PASS、7 SKIP、5 INFO，无 FAIL/REVIEW/ERROR。
 
-20 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖、方法与证据展示，以及一键入口的参数传递、退出码、下载失败、旧 Python 拒绝和临时文件清理。临时容器内另行验证了 root 直接执行、sandbox 通过系统 sudo 执行同一入口，以及报告保留在当前目录。临时 Project/容器已回收。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。
+20 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖、方法与证据展示，以及一键入口的参数传递、退出码、下载失败、旧 Python 拒绝和临时文件清理。临时容器内另行验证了 root 直接执行、sandbox 通过系统 sudo 执行同一入口，以及报告保留在当前目录。发布后还在另一个新建临时容器中，以 sandbox 身份通过真实 GitHub 下载执行公开一键命令：GPU 开启、无宿主参照时为 24 PASS、7 SKIP、5 INFO，无 FAIL/REVIEW/ERROR。两份公开文件与已验证源码逐字节一致；报告正常保留，下载文件及临时 Project/容器已回收。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。
