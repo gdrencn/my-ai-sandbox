@@ -110,4 +110,4 @@ LXD 容器与宿主共享内核，运行时会提供必要的基础接口；本�
 
 默认调用也已在该临时容器内验证：没有宿主参照时，六种 namespace 对比和宿主标记检查明确标为 7 项 SKIP，而不是通过；GPU 预期 unknown 只作 INFO。该次结果为 22 PASS、7 SKIP、5 INFO，无 FAIL/REVIEW/ERROR。
 
-13 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖和输出保留诊断。临时 Project/容器已回收。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。
+13 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖和输出保留诊断。临时 Project/容器已回收；公开下载入口的文件与验证脚本逐字节一致。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。

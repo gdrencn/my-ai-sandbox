@@ -1000,5 +1000,10 @@
   "cleanup_errors": [],
   "script_sha256": "faa2b0d84eb418eab03b49311a947f6e2982550993f23922edb3109edd0a03c5",
   "resource_reclamation_verified": true,
-  "focused_unit_tests": 13
+  "focused_unit_tests": 13,
+  "public_download": {
+    "entry": "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/scripts/guest_security_probe.py",
+    "matches_verified_script": true,
+    "sha256": "faa2b0d84eb418eab03b49311a947f6e2982550993f23922edb3109edd0a03c5"
+  }
 }
