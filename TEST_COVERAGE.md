@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.10 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.11 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -204,3 +204,16 @@ Public 0.2.9 installation/test from /tmp passed the same 236 units and all 23 re
 The existing distribution archive regression also verifies that tester-only case, PTY, cleanup-action and Windows UNC language keys are excluded from product/installer common catalogs. The packaged tester retains the optional test catalogs.
 
 Final frozen local execution from /tmp passed all 254 packaged units and 23 report stages (unit plus 22 real integration stages) in 484.5 seconds, with no skips, unexecuted stages or cleanup errors. This follows a successful earlier candidate and an additional review/refinement. Report: validation/V0_2_10_LOCAL_REPORT.json. Public installation/test also passed all 254 units and 23 report stages from /tmp in 481.6 seconds, with no skips, unexecuted cases or cleanup errors. All eleven assets, four entries, normal installation preserving the tester, installed file hashes and project reclamation were checked. Reports: validation/V0_2_10_PUBLIC_REPORT.json and validation/V0_2_10_RELEASE_CHECK.json. Windows UNC passed this run; the historical mismatch remains unexplained and is not claimed fixed.
+
+
+## Fixed isolation and backup compatibility — 0.2.11
+
+Coverage increases to 287 packaged units and 26 reported stages (unit plus 25 real integration stages). The added policy module tests baseline drift, forbidden explicit keys and syscall allowlists, malformed records/device fields, extra devices, exact approved GPU resources, safe stop/list during policy drift, conditional permission refresh, source-preserving migration refusal/cancellation, safe inherited-setting preservation, mount guards and shared menu entry. Import foundation tests retain marking/final-completion failures.
+
+Ten staging tests cover native import/copy sequencing without guest execution, original autostart restoration, unmarked stopped staging, pre-copy audit rejection, empty-stage cleanup versus data retention, creation ownership context, query/cleanup errors preserving primary failures, interruption, successful-copy cleanup failure, owner/occupant conflicts and foreign profile preservation before data deletion. Shared REST completion has an asynchronous-delete/native-failure regression using the real Unix HTTP fixture. These failures are injected; they do not claim naturally occurring storage corruption or daemon outages.
+
+Three added native groups verify project-level refusal of privilege/raw configuration/kernel modules/BPF/nesting/interception/host disks, effective-policy refusal of an unsafe syscall override/changed GPU mapping/extra character device/pool-backed volume, preservation of rejected stopped backup data outside the production project, guest UID mapping and namespaces, active seccomp and denied forbidden-device access, absent host management/Windows paths, explicit migration rejection/cancellation and successful data/user/inherited-setting retention. Migration cancellation uses the real menu; accepted native migration uses CLI and menu reuse is unit tested. Existing native backup round trips, unmarked-backup import, GPU computation/switches, mount read/write and lifecycle restoration, Windows UNC and text-menu operations remain in the suite.
+
+Temporary imports emit structured ownership context at resource creation, including interruption/failure paths. Tester recovery verifies the owner destination matches its unique project and reuses staging cleanup. No prefix-wide deletion or user failed-import cleanup is performed. The suite records actual runtime AppArmor availability; the current WSL kernel has it disabled. Native Ubuntu/cloud, native NVIDIA CDI, other GPU vendors, alternate storage backends and live exploit testing are not established by this report.
+
+The first full candidate passed 285 units and all 26 stages in 595.2 seconds without skips or cleanup errors. The final frozen product passed all 287 units and all 26 stages in 605.7 seconds with no skipped/unexecuted checks or cleanup errors (validation/V0_2_11_LOCAL_REPORT.json). The rebuilt tester also passed all 287 units after removing a redundant fixture override; product/installer bytes are unchanged (validation/V0_2_11_FINAL_UNIT_REPORT.json). Public results follow publication. Existing Windows UNC diagnosis remains active; the historical intermittent failure was not reproduced or silently retried.

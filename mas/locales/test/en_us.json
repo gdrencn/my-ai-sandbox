@@ -73,5 +73,10 @@
   "pty_cleanup_timeout": "Could not confirm test terminal process {pid} exited (timeout {timeout}s per stage); check for remaining test processes.",
   "pty_drain_timeout": "Timed out draining test terminal output after {timeout}s; a descendant may still be writing to the terminal.",
   "windows_unc_failed": "Windows UNC file test failed (exit code {code}); full evidence was recorded: {details}",
-  "case_configuration-concurrency": "Conditional configuration updates"
+  "case_configuration-concurrency": "Conditional configuration updates",
+  "case_isolation-policy": "Fixed isolation policy and device approval",
+  "case_isolation-runtime": "Runtime identities, namespaces and seccomp",
+  "case_legacy-migration": "Explicit legacy migration and data preservation",
+  "policy_test_accepted": "LXD accepted a forbidden configuration: {command}",
+  "legacy_cleanup_conflict": "Legacy container {target} test ownership changed; preserved without cleanup."
 }

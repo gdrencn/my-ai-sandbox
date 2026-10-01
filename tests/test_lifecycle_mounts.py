@@ -15,7 +15,7 @@ class LifecycleMountTests(unittest.TestCase):
         self.instance = dict(name='demo', type='container', status='Stopped', config={MANAGED:'true'})
         self.lxd = Mock(timeout=300, project='default')
         self.lxd.instances.side_effect = lambda *args: [self.instance.copy()]
-        self.manager = Manager(self.lxd, fs_root=self.base/'root', fs_state=self.base/'state')
+        self.manager = Manager(self.lxd, fs_root=self.base/'root', fs_state=self.base/'state', isolation=Mock())
         self.manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
         self.entries = [dict(path='/a',destination=str(self.base/'root/demo/a'),default=True),
                         dict(path='/b',destination=str(self.base/'root/demo/b'),default=False),

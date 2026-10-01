@@ -218,7 +218,7 @@ class GPUFileReviewTests(unittest.TestCase):
 
 class NativeFailureReviewTests(unittest.TestCase):
     def test_mutating_lxd_failure_keeps_stream_boundaries(self):
-        manager = Manager(Mock(prefix=python_command("import sys;sys.stdout.write('stdout detail');sys.stderr.write('stderr detail');sys.exit(1)"), timeout=300))
+        manager = Manager(Mock(prefix=python_command("import sys;sys.stdout.write('stdout detail');sys.stderr.write('stderr detail');sys.exit(1)"), timeout=300), isolation=Mock())
         manager.find = Mock(return_value=None)
         with self.assertRaisesRegex(Error, 'stdout detail\nstderr detail'):
             manager._run_lxd_until_state('new', 'test-fault', [], 'Stopped')

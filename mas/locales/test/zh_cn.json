@@ -73,5 +73,10 @@
   "pty_cleanup_timeout": "无法确认测试终端进程 {pid} 已退出（每阶段超时 {timeout} 秒）；请检查残留测试进程。",
   "pty_drain_timeout": "读取测试终端剩余输出超过 {timeout} 秒；可能仍有子孙进程持续向终端写入。",
   "windows_unc_failed": "Windows UNC 文件测试失败（退出码 {code}）；完整证据已写入报告：{details}",
-  "case_configuration-concurrency": "配置并发更新保护"
+  "case_configuration-concurrency": "配置并发更新保护",
+  "case_isolation-policy": "固定隔离配置与设备授权",
+  "case_isolation-runtime": "运行时身份、namespace 与 seccomp",
+  "case_legacy-migration": "旧容器显式迁移与数据保留",
+  "policy_test_accepted": "LXD 接受了应被拒绝的配置：{command}",
+  "legacy_cleanup_conflict": "旧容器 {target} 的测试归属已改变；保留容器，不清理。"
 }

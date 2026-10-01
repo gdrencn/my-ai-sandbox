@@ -78,7 +78,7 @@ class MenuContractTests(unittest.TestCase):
         view.choose.assert_called_once()
 
     def test_core_marks_only_post_shell_failures(self):
-        manager = Manager(Mock(prefix=[]))
+        manager = Manager(Mock(prefix=[]), isolation=Mock())
         manager.require = Mock();manager.start = Mock();manager.on_exit = Mock()
         for code, failure in ((1,None), (0,Error('stop failed')), (0,OSError('cleanup failed'))):
             manager.on_exit.side_effect = failure

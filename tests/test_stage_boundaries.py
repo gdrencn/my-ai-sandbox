@@ -19,8 +19,11 @@ class StageTests(unittest.TestCase):
         language = patch('mas.config.language', return_value='en_us')
         language.start(); self.addCleanup(language.stop)
         self.events = []
-        self.manager = Manager(Mock(timeout=300, prefix=['lxc']), self.events.append)
+        self.manager = Manager(Mock(timeout=300, prefix=['lxc']), self.events.append, isolation=Mock())
         self.manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
+        self.manager.imports = Mock()
+        self.manager.imports.restore.side_effect = lambda target, path: self.manager._run_lxd_until_state(
+            'import', target, ['import', 'local:', str(path), target], 'Stopped', require_marker=False)
         self.manager.require = Mock(return_value=instance('Running'))
 
     def test_user_preparation_failure_has_no_function_completion_or_external_post(self):

@@ -99,9 +99,21 @@ class Configuration:
         writable = {key: item[key] for key in
                     ('architecture', 'config', 'devices', 'ephemeral', 'profiles', 'stateful', 'description')
                     if key in item}
+        self.update(self.endpoint('/1.0/instances/' + quote(target, safe='')), writable, etag, on_wait)
+
+    def update(self, endpoint, writable, etag, on_wait=None):
+        """One conditional-update transport for instances, profiles and projects."""
+        self.check_etag(etag)
         started = time.monotonic()
+        body, _ = self.request('PUT', endpoint, writable, etag)
+        self.complete(body, on_wait=on_wait, started=started)
+
+    def complete(self, body, on_wait=None, started=None):
+        """Observe a native REST operation; project deletion may also be async."""
+        started = time.monotonic() if started is None else started
         deadline = started + self.lxd.timeout
-        body, _ = self.request('PUT', self.endpoint('/1.0/instances/' + quote(target, safe='')), writable, etag)
+        if body.get('type') == 'sync' and body.get('status_code') == 200:
+            return
         operation = body.get('operation')
         if (body.get('type') != 'async' or not isinstance(operation, str)
                 or not re.fullmatch(r'/1.0/operations/[A-Za-z0-9-]+', operation)):

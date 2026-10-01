@@ -172,9 +172,25 @@ class UI:
             else:
                 self.present(t('page_container', target=selected), lambda: self.container(selected), back=False)
 
+    def migration(self):
+        items = self.manager.legacy_list()
+        if not items:
+            self.write(t('migration_empty'))
+            self.view.choose(t('menu_migrate'), [(None, t('menu_back'))])
+            return
+        rows = menu.column_rows([(i['name'], menu.status_cell(state(i['status']), i['status'])) for i in items])
+        target = self.view.choose(t('menu_migrate'), [(i['name'], row) for i, row in zip(items, rows)]
+                                  + [(None, t('menu_back'))], default=items[0]['name'])
+        if target is None:
+            return
+        def migrate():
+            done = self.manager.migrate(target, self.view.confirm)
+            self.write(t('menu_done' if done else 'cancelled'))
+        self.present(t('page_action', action=t('menu_migrate'), target=target), migrate)
+
     def loop(self):
         selected = 'list'
-        actions = [(key, 'menu_' + key) for key in ('list', 'new', 'import')]
+        actions = [(key, 'menu_' + key) for key in ('list', 'new', 'import', 'migrate')]
         actions += [('settings', 'page_settings'), ('exit', 'menu_exit')]
         while True:
             try:
@@ -188,6 +204,8 @@ class UI:
                     self.containers()
                 elif selected == 'settings':
                     self.settings()
+                elif selected == 'migrate':
+                    self.migration()
                 elif selected == 'new':
                     target = self.view.input(t('new_target'))
                     image = self.view.input(t('new_image'))
@@ -196,7 +214,7 @@ class UI:
                     target = self.view.input(t('import_target'))
                     self.manager.import_container(target, self.view.input(t('backup_file')))
             title = t('page_settings' if selected == 'settings' else 'menu_' + selected)
-            self.present(title, action, back=selected not in ('list', 'settings'))
+            self.present(title, action, back=selected not in ('list', 'settings', 'migrate'))
 
 
 def run(manager):

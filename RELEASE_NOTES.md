@@ -1,3 +1,13 @@
+# 0.2.11 — 固定隔离配置与原生备份兼容（test）
+
+- 使用专用 `mas` Project/Profile；固定非特权、独立身份映射、默认 seccomp、禁止 nesting/lowlevel/interception 和未授权宿主设备。保留现有网络行为及容器内免密 sudo。
+- 完整核验 expanded 配置、GPU 精确映射与只读属性、root/NIC 和额外存储卷。配置不合规时拒绝启动；查看信息、安全停止和宿主挂载恢复仍可使用。
+- 增加 `mas migrate TARGET` 及“迁移旧容器”菜单，确认后原生迁移停止且无挂载的旧容器；保留安全的继承配置和用户数据。旧容器挂载可用 mountedfs/unmountfs 的 --legacy 参数恢复。
+- 按用户确认的方案解决 LXD 6.9 原生备份与 lowlevel=block 的冲突：临时 Project 导入、核验后原生复制，正式 Project 限制不变。失败保留备份及停止的临时数据，报告位置；成功仅清理所属临时资源，不修改备份格式或容器文件权限。
+- 补充固定配置、运行时身份/namespace/seccomp、设备拒绝、迁移、临时导入和异步清理验证。最终验证结果记录于 IMPLEMENTED.md、TEST_COVERAGE.md 和版本报告。
+
+当前 WSL 内核 AppArmor 未启用，已记录；不将其标为已生效。CPU/内存/进程限制、额外网络策略和下一次 stable 的 release 分支仍待后续开发。Stable/0.1.15 不变。
+
 # 0.2.10 — 测试终端与失败边界修正（test）
 
 - 修复子进程正常退出、终端尾部输出尚未读完时误判测试失败的问题，保留最终诊断和完整记录；终端提前关闭而进程仍运行时保持探测间隔。

@@ -268,10 +268,18 @@ class GPU:
             if self.record(instance) != record or self.record(current) != record:
                 raise Error(t('gpu_record_changed'))
             self.check_owned(instance, record)
+            expanded = dict(current.get('expanded_devices', current['devices']))
             for name in (record or {}).get('devices', {}):
                 current['devices'].pop(name)
+                expanded.pop(name, None)
             current['devices'].update(definition)
+            expanded.update(definition)
+            current['expanded_devices'] = expanded
             current['config'][KEY] = json.dumps(desired, sort_keys=True)
+            current['expanded_config'] = {**current.get('expanded_config', {}), **current['config']}
+            if enabled:
+                self.manager.isolation.allow_gpu(capability)
+            self.manager.isolation.audit(current)
             start = time.monotonic()
             self.lxd.configuration.write(target, current, etag,
                 on_wait=lambda elapsed: self.manager.emit(dict(action='gpu', target=target,

@@ -1,8 +1,8 @@
 # my-ai-sandbox Requirements
 
-Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–38 describe phase 2 plans and subsequent batches. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
+Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: test batch 0.2.10 is implemented, published and verified locally and through the public installation/test entry. Stable remains stable/0.1.15. Section 38 records the current failure-boundary corrections. Restricted project/profile policy, CPU/memory/process controls, network-policy changes and the stable-only release branch are still pending under sections 27 and 34.
+Current baseline: test batch 0.2.11 implements the fixed project/profile isolation policy, expanded-device verification, explicit legacy migration and approved temporary-project import compatibility in section 39. Local implementation verification passed; test publication/public verification is pending. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
 
 ## 1. Scope
 
@@ -343,29 +343,29 @@ Keep the existing latest-test entry unchanged. Document stable installation with
 
 Record audit findings, final test results, matching hashes, published asset inventory and installation verification after completion. Preserve the distinction between current WSL verification, user-reported fresh-install evidence and unverified native Ubuntu/cloud environments.
 
-## 27. Phase 2 — pending container isolation and hardware configuration
+## 27. Phase 2 — container isolation and hardware configuration
 
-Status: project/profile policies and non-GPU hardware controls remain pending. GPU implementation and measured scope are recorded in section 28. The earlier requirements-only update did not authorize runtime changes; the user subsequently authorized the GPU implementation and tests.
+Status: project/profile policy and effective-configuration verification are implemented by section 39; GPU implementation and measured scope are recorded in section 28. Non-GPU hardware controls and separate network traffic policy remain pending. The named production project/profile are mas; migration is explicit.
 
 The isolation goal is to protect the Linux/WSL host and its Windows host from unauthorized container access through host resources. Container workloads and in-container administrative activity are outside mas policy. Use LXD's supported isolation mechanisms first; host changes require a demonstrated need. Upstream Windows, WSL, Linux, LXD, LXC and GPU-driver vulnerabilities remain upstream responsibilities. Retain the current default network behavior in this batch; additional network controls and login policy are deferred.
 
 ### 27.1. Project configuration — fixed security policy
 
-- [ ] Use a dedicated mas project with `features.profiles=true` and `restricted=true`. Project naming and migration of phase 1 containers remain to be confirmed.
-- [ ] Set `restricted.containers.privilege=isolated`, `restricted.containers.lowlevel=block`, `restricted.containers.nesting=block`, and `restricted.containers.interception=block`.
-- [ ] Set `restricted.backups=allow` to retain export functionality.
-- [ ] Set `restricted.devices.unix-block=block`, `restricted.devices.unix-hotplug=block`, `restricted.devices.usb=block`, `restricted.devices.pci=block`, and `restricted.devices.infiniband=block`.
-- [ ] Use `restricted.devices.proxy=block` as the baseline; revisit only in the separate network design. NIC/network policy remains to be confirmed.
-- [ ] Use `restricted.devices.disk=block` as the root-disk-only baseline. If GPU runtime libraries require host disk devices, define the necessary `allow` policy and `restricted.devices.disk.paths` prefixes, together with read-only device configuration, before implementation.
-- [ ] Resolve `restricted.devices.gpu` and `restricted.devices.unix-char` according to the verified GPU implementation. Allow only the categories required by that implementation; category permission does not constitute an exact device/path whitelist. GPU category permissions belong to project policy; actual per-container GPU allocation belongs to hardware configuration.
-- [ ] Treat project policy as fixed mas-managed configuration. Provide no user-editable project settings in the terminal menu or a general mas CLI escape hatch for altering the baseline. This does not claim to prevent a host LXD administrator from using native administrative tools.
+- [x] Use a dedicated mas project with `features.profiles=true` and `restricted=true`. Use project/profile mas and explicit migration as defined in section 39.
+- [x] Set `restricted.containers.privilege=isolated`, `restricted.containers.lowlevel=block`, `restricted.containers.nesting=block`, and `restricted.containers.interception=block`.
+- [x] Set `restricted.backups=allow` to retain export functionality.
+- [x] Set `restricted.devices.unix-block=block`, `restricted.devices.unix-hotplug=block`, `restricted.devices.usb=block`, `restricted.devices.pci=block`, and `restricted.devices.infiniband=block`.
+- [x] Use `restricted.devices.proxy=block` as the baseline; revisit only in the separate network design. Managed NIC attachment is restricted to the approved existing bridge; traffic policy remains deferred.
+- [x] Use `restricted.devices.disk=block` as the root-disk-only baseline. If GPU runtime libraries require host disk devices, define the necessary `allow` policy and `restricted.devices.disk.paths` prefixes, together with read-only device configuration, before implementation.
+- [x] Resolve `restricted.devices.gpu` and `restricted.devices.unix-char` according to the verified GPU implementation. Allow only the categories required by that implementation; category permission does not constitute an exact device/path whitelist. GPU category permissions belong to project policy; actual per-container GPU allocation belongs to hardware configuration.
+- [x] Treat project policy as fixed mas-managed configuration. Provide no user-editable project settings in the terminal menu or a general mas CLI escape hatch for altering the baseline. This does not claim to prevent a host LXD administrator from using native administrative tools.
 
 ### 27.2. Profile configuration — fixed container security baseline
 
-- [ ] Use a dedicated mas profile with `security.privileged=false`, `security.idmap.isolated=true`, `security.nesting=false`, and `security.syscalls.deny_default=true`.
-- [ ] Leave `raw.idmap`, `raw.lxc`, and `raw.apparmor` unset; retain LXD-managed identity mapping and confinement. Check the effective configuration including inherited values.
-- [ ] Determine `security.devlxd` after checking dependencies and the guest-interface scope. Its value remains to be confirmed; distinguish `/dev/lxd` from the host administrative socket.
-- [ ] Treat this baseline as fixed mas-managed configuration, without user-editable profile settings in the terminal menu or a general mas CLI escape hatch. CPU, memory and process limits, and GPU allocation are not fixed profile policy; they belong to section 27.3.
+- [x] Use a dedicated mas profile with `security.privileged=false`, `security.idmap.isolated=true`, `security.nesting=false`, and `security.syscalls.deny_default=true`.
+- [x] Leave `raw.idmap`, `raw.lxc`, and `raw.apparmor` unset; retain LXD-managed identity mapping and confinement. Check the effective configuration including inherited values.
+- [x] Keep basic devlxd at its compatibility default, explicitly disable `security.devlxd.management.volumes`, leave `security.devlxd.images` unset, and distinguish the instance guest socket from the host administrative socket. Disabling basic devlxd remains pending.
+- [x] Treat this baseline as fixed mas-managed configuration, without user-editable profile settings in the terminal menu or a general mas CLI escape hatch. CPU, memory and process limits, and GPU allocation are not fixed profile policy; they belong to section 27.3.
 
 ### 27.3. Hardware configuration — editable per container
 
@@ -373,14 +373,14 @@ GPU and the hardware menu are delivered by section 28; CPU, memory and process c
 
 - [ ] Add a `硬件选项` / `Hardware options` menu item after selecting a container. It contains GPU allocation, CPU limits (`limits.cpu`), memory limits (`limits.memory`), and process-count limits (`limits.processes`). These controls are per-container configuration, not global mas preferences.
 - [ ] Provide equivalent CLI operations through the same shared configuration functions. CLI syntax, value ranges, defaults, reset behavior, running-container change semantics, and menu ordering remain to be confirmed.
-- [ ] GPU access is authorized by default when a supported discrete host GPU is available; the user can explicitly disable it. Record the devices and runtime-library resources necessary for that allocation. Preserve the fixed security baseline; resolve any conflict before implementation. GPU support must cover the intended WSL compute use case; native Ubuntu uses its applicable LXD-supported mechanism and requires separate validation.
-- [ ] Prefer LXD's existing GPU/device mechanisms and vendor-supported resource discovery. Any additional third-party dependency still requires explicit approval. GPU compute support does not implicitly authorize WSLg display, audio, Windows drive mappings, host home directories, or host management sockets.
+- [x] GPU access is authorized by default when a supported discrete host GPU is available; the user can explicitly disable it. Record the devices and runtime-library resources necessary for that allocation. Preserve the fixed security baseline; resolve any conflict before implementation. GPU support must cover the intended WSL compute use case; native Ubuntu uses its applicable LXD-supported mechanism and requires separate validation.
+- [x] Prefer LXD's existing GPU/device mechanisms and vendor-supported resource discovery. Any additional third-party dependency still requires explicit approval. GPU compute support does not implicitly authorize WSLg display, audio, Windows drive mappings, host home directories, or host management sockets.
 
 ### 27.4. Validation and unresolved integration work
 
-- [ ] Audit expanded instance configuration, project restrictions, and actual runtime confinement in the current WSL environment. Record supported protections and measured limitations rather than inferring them solely from successful startup.
-- [ ] Validate real GPU computation in a non-privileged container using the selected official mechanism. Verify access as `sandbox`, actual device/library exposure, read-only runtime mappings where applicable, and the effective GPU selection scope. Device enumeration alone is insufficient.
-- [ ] Before implementation, resolve phase 1 migration, imported configuration handling, baseline drift handling, GPU enable/disable lifecycle, and hardware defaults/CLI semantics. Preserve managed-container ownership boundaries and existing filesystem/lifecycle reuse.
+- [x] Audit expanded instance configuration, project restrictions, and actual runtime confinement in the current WSL environment. Record supported protections and measured limitations rather than inferring them solely from successful startup.
+- [x] Validate real GPU computation in a non-privileged container using the selected official mechanism. Verify access as `sandbox`, actual device/library exposure, read-only runtime mappings where applicable, and the effective GPU selection scope. Device enumeration alone is insufficient.
+- [ ] Migration, imported configuration handling, baseline drift and GPU lifecycle are resolved in sections 28 and 39; CPU/memory/process defaults and CLI semantics remain pending. Preserve managed-container ownership boundaries and existing filesystem/lifecycle reuse.
 - [ ] After authorized development, verify CLI/menu equivalence, baseline enforcement, hardware changes and GPU computation; update IMPLEMENTED.md only with completed and verified behavior. Publish the resulting development batch through the established test-release process.
 
 
@@ -520,3 +520,61 @@ Status: implemented, published and verified. All 254 packaged units and 23 repor
 5. Validate the automated tester's timeout before installation or other test setup. Values below 300 seconds must fail without invoking installation or creating a test workspace. Verify both installation and standalone entry paths; keep valid timeout behavior unchanged.
 
 Acceptance: run focused regressions, packaged unit tests from outside the checkout, and the complete real LXD/GPU/filesystem/menu suite. Verify package separation and checksums, including that test-only language keys are confined to the tester's optional catalogs and excluded from product catalogs. Update implemented/behavior/coverage documentation after verification, publish test v0.2.10, then verify the public installation/test entry and record its evidence. Stable remains stable/0.1.15; the future release branch remains pending.
+
+## 39. Fixed isolation policy and effective-configuration verification — v0.2.11
+
+Status: implemented and locally verified; test publication/public verification pending. This section supersedes the unresolved project/profile configuration in section 27 where values are specified. Non-GPU hardware defaults, disabling devlxd, enabling host AppArmor, disk quotas, network traffic/login policy and the stable-only release branch remain pending.
+
+### 39.1. Scope and ownership
+
+- Protect the Linux/WSL host and its Windows host against unauthorized container access through host resources. Container-internal workloads and root/sudo use remain unrestricted by mas workload policy. GPU compute resources are the explicitly authorized host-resource exception.
+- Use the dedicated production project `mas` and its dedicated `mas` profile. Test runs use uniquely named projects and the same policy implementation. Do not modify the default project's configuration, unrelated profiles or unmanaged instances. Refuse a colliding pre-existing project/profile that cannot be identified as mas-owned.
+- Configure the automatically created project-local `default` profile with the same fixed baseline as `mas` for native backup compatibility. Neither profile inherits the host default profile; only its existing root pool and managed network are selected.
+- Fixed policy means mas exposes no general project/profile settings through CLI or menus. Trusted host root/LXD administrators can still change LXD settings through native administrative tools; preventing those administrators is outside the goal.
+- Retain Python-standard-library implementation and the existing LXD/GPU modules. Add no packages and no private kernel-isolation mechanism. Share policy application and verification across installer, CLI, menu and automated tests.
+
+### 39.2. Project target configuration
+
+- Set `features.profiles=true`, `features.storage.volumes=true`, `features.networks=false`, `features.images=false`, and `restricted=true`. Keep the existing shared image cache and approved managed network. Preserve current networking by using an approved existing LXD managed network; do not create traffic restrictions in this batch.
+- Set `restricted.containers.privilege=isolated`, `restricted.containers.lowlevel=block`, `restricted.containers.nesting=block`, and `restricted.containers.interception=block`.
+- Leave `restricted.idmap.uid` and `restricted.idmap.gid` unset: no host-identity exceptions.
+- Set `restricted.devices.unix-block=block`, `restricted.devices.unix-hotplug=block`, `restricted.devices.usb=block`, `restricted.devices.pci=block`, `restricted.devices.infiniband=block`, and `restricted.devices.proxy=block`.
+- Set `restricted.backups=allow` for export compatibility.
+- Set `restricted.devices.nic=managed` and `restricted.networks.access` to the approved managed network name. These settings constrain NIC attachment, not outbound destinations, protocols or login policy.
+- Begin with `restricted.devices.disk=block`, `restricted.devices.unix-char=block`, and `restricted.devices.gpu=block`. Permit only the categories needed by an authorized GPU backend. WSL NVIDIA needs `unix-char=allow`, `disk=allow`, and `restricted.devices.disk.paths` containing `/usr/lib/wsl/lib` and the exact authorized driver-directory prefixes. Native NVIDIA CDI needs `gpu=allow`.
+- Keep already authorized driver-directory prefixes while other stopped/running containers may still use them; add newly discovered exact prefixes using the shared conditional update. Startup still refreshes the individual container to the host-selected active driver. Do not scan or grant the driver-store parent.
+- Maintain per-container GPU allocation separately from project category permission. Never expose the whole driver-store parent, Windows filesystems, host home, WSLg, host management sockets or unapproved hardware.
+- Project permission is not an exact device whitelist: verify complete expanded device definitions, including source, destination, read-only attributes and storage-volume ownership. Restrict extra pool-backed disk attachments through effective device verification as well as project-scoped custom volumes.
+
+### 39.3. Profile target configuration
+
+- Set `security.privileged=false`, `security.idmap.isolated=true`, `security.nesting=false`, and `security.syscalls.deny_default=true`. Root remains usable inside the non-privileged container; retain sandbox passwordless sudo.
+- Leave `raw.idmap`, `raw.lxc`, `raw.apparmor`, `raw.seccomp`, `security.syscalls.allow`, `security.idmap.base`, `security.idmap.size`, `linux.kernel_modules`, `linux.kernel_modules.load`, `security.delegate_bpf`, `security.delegate_bpf.cmd_types`, `security.delegate_bpf.map_types`, `security.delegate_bpf.prog_types`, and `security.delegate_bpf.attach_types` unset. Unset means no explicit key in the relevant project/profile/instance or inherited effective configuration; do not replace forbidden absent keys with an explicit `false`.
+- Retain existing default devlxd availability for compatibility while closing `security.devlxd.management.volumes=false`; leave `security.devlxd.images` unset at its false default. A decision to disable basic devlxd remains pending because cloud-init uses its instance-scoped interface. Do not equate `/dev/lxd/sock` with the full host administrative socket.
+- Use the container's own LXD-managed root filesystem on the approved storage pool and the approved managed NIC. Do not inherit unrelated default-profile settings or devices. Preserve authorized per-container GPU ownership definitions.
+
+### 39.4. Operation boundaries, migration and failures
+
+- Check effective expanded configuration after creation/import/migration and before startup. Reject unsafe local overrides, inherited baseline drift, unexpected devices and malformed policy records with concrete differences. Refuse dependent operations; do not automatically delete or rewrite unknown settings or devices.
+- Preserve lifecycle boundaries: checks and GPU resource refresh belong before native startup; sandbox and GPU runtime preparation remain inside successful mas startup; automatic filesystem restoration remains after complete mas startup/stop success. A failed policy/preparation check must not enter native startup or external restoration. Read-only container listing/information, safe stop and host mount recovery must remain possible when startup is refused. Leave `security.syscalls.allow` unset because a native allowlist replaces the default denylist even when `security.syscalls.deny_default=true`; verification must check the effective behavior, not that flag alone.
+- The user selected explicit migration of managed default-project containers. Provide shared CLI/menu migration, preserving a source refused during preflight and never independently deleting the source on native failure. A client timeout cannot guarantee that the daemon-side native move was cancelled; report its native failure without inventing rollback. Require the source stopped, no recorded mounts, no destination name collision, and a compatible security/device configuration. Use native LXD migration rather than copying guest files or modifying their permissions. Preserve safe settings inherited from the old profile through native per-instance configuration overrides when applying the new baseline. Offer `mountedfs TARGET --legacy` and `unmountfs TARGET [PATH] --legacy` solely for old default-project host-mount recovery; these flags do not enable ordinary legacy startup. Report differences without changing a refused source. Replace only the explicitly approved baseline/profile during a successful migration; preserve guest data, approved GPU state, hardware limits and unrelated safe instance settings.
+- Native unmarked backup import remains supported when compatible with policy. Native policy rejection and mas post-import rejection must never be reported as successful import or add the managed marker to an unverified instance. Do not delete rejected imported data automatically. Explain where preserved data can be inspected and what requires manual handling.
+- Keep namespace/project selection inside shared LXD operations; all direct local API requests, filesystem records, GPU updates and tester subprocesses must use the selected project consistently.
+
+### 39.5. Hardware and verification
+
+- Retain the implemented GPU switch and fresh driver discovery before actual startup. CPU `limits.cpu`, memory `limits.memory`, and process `limits.processes` UI/CLI defaults, ranges, reset and live-change semantics remain to be confirmed. Root-disk `size` is a future candidate requiring verified filesystem-quota support, not a promised current feature.
+- Add native project restriction tests and effective-configuration drift tests. Verify profile overrides, unsafe device categories, exact GPU paths/read-only attributes, rejected unmarked backups, source-preserving migration failure, successful migration, unmanaged-resource preservation, ETag conflicts and CLI/menu reuse.
+- Verify actual user identity maps, PID/mount/network namespaces, seccomp and device access; report actual AppArmor availability/profile rather than assuming it from configuration. The inspected development WSL reports AppArmor disabled. Do not enable host AppArmor or claim it provides protection in this batch.
+- Verify real GPU computation as sandbox, agreement between active host driver resources and container mappings, and read-only driver mappings. Enumeration or successful startup alone is insufficient.
+- Run packaged units outside the checkout and the full real LXD/GPU/filesystem/menu suite. Keep diagnostic/summary output conventions and cleanup ownership boundaries. Update IMPLEMENTED.md, CORE_BEHAVIOR.md, TEST_COVERAGE.md, README.md and release notes after verified implementation. Publish test v0.2.11, verify public artifacts and the public installation/test entry, and record measured limitations. Stable remains stable/0.1.15.
+
+### 39.6. Approved temporary-project import compatibility
+
+The user approved the temporary-project solution after native LXD 6.9 rejected normal backup `volatile.idmap.next` metadata under `restricted.containers.lowlevel=block`. Keep the production baseline fixed and retain native backup formats; no private YAML parser or backup rewriting.
+
+- Create a uniquely named, ownership-recorded temporary project for each import. Reuse baseline project/profile provisioning, root pool, managed NIC and already authorized GPU resources. Only this temporary project's lowlevel restriction may be `allow`; other production restrictions remain in force.
+- Import into that project using native LXD, never start the imported container, disable temporary autostart, and remove a carried managed marker before validation. Audit the actual effective configuration and devices against the destination policy before native cross-project copy. Restore the original safe autostart preference on the destination through the native copy override.
+- Recheck destination name absence, copy using the fixed destination profile, verify the stopped destination and effective policy, then mark it managed through the existing import completion path. Native copy handles volatile identity metadata; mas does not change guest file identities or permissions.
+- Successful transfer removes only the recorded temporary source, owned profile and owned project. Failure with imported data preserves the original backup and the temporary stopped instance, reports both project and target, and records structured recovery context. A failed import with no created instance may reclaim only its owned empty temporary project. Cleanup errors preserve primary errors and never produce full import success.
+- Tester cleanup may recover these temporary resources only when their recorded owner and destination match the test run. Real user failures are not silently erased. Native tools remain available for manual inspection/deletion of retained temporary data. Do not expose staging as a normal selectable or startable mas project.

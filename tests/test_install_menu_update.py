@@ -24,7 +24,7 @@ class NavigationTests(unittest.TestCase):
         view.choose.return_value = 'exit'
         UI(view, manager).loop()
         self.assertEqual([key for key, _ in view.choose.call_args.args[1]],
-                         ['list', 'new', 'import', 'settings', 'exit'])
+                         ['list', 'new', 'import', 'migrate', 'settings', 'exit'])
         manager.list.assert_not_called()
 
     def test_stop_all_visibility_uses_count_and_exact_stopped_state(self):

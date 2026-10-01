@@ -151,7 +151,7 @@ class DistributionTests(unittest.TestCase):
         from mas.core import Manager, MANAGED
         from mas.cli import Progress
         events=[]
-        manager=Manager(Mock(prefix=[sys.executable], timeout=300), events.append)
+        manager=Manager(Mock(prefix=[sys.executable], timeout=300), events.append, isolation=Mock())
         manager.gpu = Mock()  # GPU behavior has independent unit/native coverage.
         manager.find=Mock(return_value={"name":"demo","status":"Stopped","type":"container","config":{MANAGED:"true"}})
         manager._run_lxd_until_state("new", "demo", ["-c", "import sys;print('normal native output');print('native notice',file=sys.stderr)"], "Stopped")

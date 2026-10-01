@@ -89,6 +89,14 @@ class ConfigurationTests(unittest.TestCase):
         for _, endpoint, _, _ in self.requests:
             self.assertEqual(parse_qs(urlsplit(endpoint).query), {'project': ['isolated project']})
 
+    def test_async_deletion_reuses_completion_and_propagates_native_failure(self):
+        self.client.complete(dict(type='async', operation='/1.0/operations/delete-test'))
+        self.assertEqual(len(self.requests),2)
+        self.assertTrue(all('/operations/delete-test' in r[1] for r in self.requests))
+        self.operation_codes=[400];self.operation_error='deletion failed'
+        with self.assertRaisesRegex(Error,'deletion failed'):
+            self.client.complete(dict(type='async', operation='/1.0/operations/delete-test'))
+
     def test_native_concurrent_change_rejects_stale_write_without_retry(self):
         value, etag = self.client.read('test-config')
         self.item['config']['user.keep'] = 'native-change'

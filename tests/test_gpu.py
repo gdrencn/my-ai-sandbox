@@ -252,7 +252,7 @@ class GPUTests(unittest.TestCase):
 
     def test_discovery_failure_prevents_native_start_and_post_processing(self):
         from mas.core import Manager
-        manager = Manager(Mock(timeout=600))
+        manager = Manager(Mock(timeout=600), isolation=Mock())
         manager.require = Mock(return_value=self.item)
         manager.filesystems.locked = Mock(side_effect=contextlib.nullcontext)
         manager.mountedfs = Mock(return_value=[])
@@ -279,7 +279,7 @@ class GPUTests(unittest.TestCase):
 
     def test_gpu_prepare_failure_prevents_start_completion(self):
         from mas.core import Manager
-        manager = Manager(Mock(timeout=600))
+        manager = Manager(Mock(timeout=600), isolation=Mock())
         manager.gpu = Mock()
         manager.gpu.prepare.side_effect = Error('runtime failure')
         manager._prepare_user = Mock(return_value={})

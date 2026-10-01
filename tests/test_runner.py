@@ -137,8 +137,11 @@ class RunnerTests(unittest.TestCase):
         suite=testing.Suite.__new__(testing.Suite)
         suite.output=Output(io.StringIO())
         suite.workspace=Mock();suite.created_project=True
-        suite.targets=['test-fixture'];suite.cleanup_errors=[]
+        suite.targets=['test-fixture'];suite.legacy_targets=[];suite.legacy_profiles=[];suite.cleanup_errors=[]
+        suite.events=[]
         suite.manager=Mock();suite.host=Mock();suite.project='test-project'
+        suite.manager.isolation.resource.return_value=({}, '"etag"', '/fixture')
+        suite.manager.lxd.configuration.request.return_value=({'type':'sync','status_code':200},None)
         suite.manager.mountedfs.return_value=[{'path':'/var/log'}]
         def find(target):
             suite.manager.unmountfs.assert_called_once_with(target,'/var/log')

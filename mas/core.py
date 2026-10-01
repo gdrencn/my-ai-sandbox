@@ -142,10 +142,18 @@ class LXD:
 
 
 class Manager:
-    def __init__(self, lxd=None, report=None, fs_root=None, fs_state=None):
-        self.lxd = lxd or LXD()
+    def __init__(self, lxd=None, report=None, fs_root=None, fs_state=None, isolation=None):
+        from .isolation import PROJECT
+        self.lxd = lxd or LXD(project=PROJECT)
         self.report = report or (lambda event: None)
         self.fs_root, self.fs_state = fs_root, fs_state
+        if isolation is not None:
+            self.isolation = isolation
+
+    @cached_property
+    def isolation(self):
+        from .isolation import Isolation
+        return Isolation(self)
 
     def emit(self, event):
         notify(self.report, event)
@@ -168,11 +176,19 @@ class Manager:
         from .gpu import GPU
         return GPU(self)
 
+    @cached_property
+    def imports(self):
+        from .imports import Imports
+        return Imports(self)
+
     def hardware(self, target, enabled=None, *, capability=None):
+        if enabled is not None:
+            self.isolation.audit(self.require(target, stopped=True))
         return (self.gpu.status(target, capability=capability) if enabled is None
                 else self.gpu.set(target, enabled, capability=capability))
 
     def mountfs(self, target, path=None, *, default_home=False):
+        self.isolation.audit(self.require(target))
         return self.filesystems.mount(target, path, default_home=default_home)
 
     def unmountfs(self, target, path=None):
@@ -211,7 +227,7 @@ class Manager:
     def info(self, target):
         return self.require(target)
 
-    def _run_lxd_until_state(self, action, target, args, expected, require_marker=True):
+    def _run_lxd_until_state(self, action, target, args, expected, require_marker=True, client=None):
         """Wait for BOTH native command completion and a structured postcondition.
 
         Capture output to a file to avoid pipe backpressure on long operations.
@@ -228,7 +244,7 @@ class Manager:
                            lambda exc: self._cleanup_warning(action, target, exc)):
             try:
                 with tempfile.TemporaryFile(mode="w+t") as output, tempfile.TemporaryFile(mode="w+t") as errors:
-                    process = subprocess.Popen(self.lxd.prefix + args, stdin=subprocess.DEVNULL,
+                    process = subprocess.Popen((client or self.lxd).prefix + args, stdin=subprocess.DEVNULL,
                                                stdout=output, stderr=errors, text=True)
                     while True:
                         native_stdout, native_stderr = read_output(output), read_output(errors)
@@ -266,9 +282,13 @@ class Manager:
         image = image or host_image()
         if image.startswith("-"):
             raise Error(t('invalid_image'))
+        self.isolation.check()
+        from .isolation import PROFILE
         result = self._run_lxd_until_state("new", target,
-                               ["init", image, "local:" + target, "-c", MANAGED + "=true"], "Stopped")
+                               ["init", image, "local:" + target, "-p", PROFILE, "-c", MANAGED + "=true"], "Stopped")
+        self.isolation.audit(result)
         self.gpu.ensure(target)
+        self.isolation.audit(self.find(target))
         self._completed('new', target, 'Stopped', started)
         return result
 
@@ -292,6 +312,8 @@ class Manager:
         """External coordination surrounds the complete internal mas operation."""
         expected = 'Running' if action == 'start' else 'Stopped'
         instance = self._check_lifecycle_state(target, action)
+        if action == 'start':
+            self.isolation.audit(instance)
         if instance['status'] == expected:
             return self._execute_lifecycle(target, action, instance)
         # One outer lock spans all phases; nested foundations reuse that lock.
@@ -325,7 +347,9 @@ class Manager:
         expected = 'Running' if action == 'start' else 'Stopped'
         result = already
         if already is None:
-            self.require(target, stopped=action == 'start')
+            instance = self.require(target, stopped=action == 'start')
+            if action == 'start':
+                self.isolation.audit(instance)
             command = [action, 'local:' + target]
             if action == 'stop':
                 command += ['--timeout', str(self.lxd.timeout)]
@@ -375,14 +399,62 @@ class Manager:
         path = Path(filename).expanduser().absolute()
         if not path.is_file():
             raise Error(t("backup_missing", path=path))
-        instance = self._run_lxd_until_state("import", target, ["import", "local:", str(path), target],
-                                   "Stopped", require_marker=False)
+        self.isolation.check()
+        instance = self.imports.restore(target, path)
         if instance.get("type") != "container":
             raise Error(t("import_not_container", target=target))
+        try:
+            self.isolation.audit(instance)
+        except Error as exc:
+            # A backup may carry our old marker. Quarantine only that known key;
+            # preserve the instance and all unknown settings and guest data.
+            if instance.get('config', {}).get(MANAGED) == 'true':
+                try:
+                    self._run_lxd_until_state('quarantine-import', target,
+                        ['config', 'unset', 'local:' + target, MANAGED], 'Stopped', require_marker=False)
+                except (Error, OSError) as quarantine_error:
+                    self._cleanup_warning('import', target, quarantine_error)
+            raise Error(t('policy_import_preserved', target=target, project=self.lxd.project, error=exc)) from exc
         # lxc import has no config override. Mark only after this import succeeds.
         self._run_lxd_until_state("mark-import", target,
                         ["config", "set", "local:" + target, MANAGED + "=true"], "Stopped")
+        self.isolation.audit(self.find(target))
         self._completed('import', target, 'Stopped', started)
+
+    @cached_property
+    def legacy(self):
+        return Manager(LXD(project='default', timeout=self.lxd.timeout, diagnostic=self.lxd.diagnostic),
+                       self.report, self.fs_root, self.fs_state, isolation=self.isolation)
+
+    def legacy_list(self):
+        return sorted((item for item in self.legacy.lxd.instances() if self.managed(item)), key=lambda i: i['name'])
+
+    def migrate(self, target, ask=None):
+        from .isolation import BASE_CONFIG, PROFILE, PROFILE_KEY
+        started = time.monotonic()
+        self.absent(target)
+        source = self.legacy.require(target, stopped=True)
+        self.legacy.filesystems.guard_delete(target)
+        self.isolation.audit(source, legacy=True)
+        if not confirm(t('migration_confirm', target=target, project=self.lxd.project), ask):
+            return False
+        with self.legacy.filesystems.deletion_guard(target):
+            source = self.legacy.require(target, stopped=True)
+            self.absent(target)
+            self.isolation.audit(source, legacy=True)
+            overrides = []
+            # The old profile is replaced. Preserve its safe effective settings
+            # as instance-local values through LXD's native move overrides.
+            for key, value in source['expanded_config'].items():
+                if key not in source['config'] and key not in BASE_CONFIG and key != PROFILE_KEY:
+                    overrides += ['--config', key + '=' + value]
+            result = self._run_lxd_until_state('migrate', target,
+                ['move', 'local:' + target, 'local:' + target, '--target-project', self.lxd.project,
+                 '--profile', PROFILE, *overrides],
+                'Stopped', client=self.legacy.lxd)
+            self.isolation.audit(result)
+        self._completed('migrate', target, 'Stopped', started)
+        return True
 
     def export(self, target, filename, ask=None):
         started = time.monotonic()

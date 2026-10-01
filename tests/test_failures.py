@@ -25,7 +25,13 @@ class FailureTests(unittest.TestCase):
     def manager(self, item=None):
         lxd = Mock(prefix=['lxc', '--project', 'test-isolated'], timeout=300)
         lxd.instances.return_value = [item or instance()]
-        return Manager(lxd, Mock())
+        manager = Manager(lxd, Mock(), isolation=Mock())
+        # Import orchestration has its own tests. These cases exercise the
+        # foundation's marking and completion boundary after a native result.
+        manager.imports = Mock()
+        manager.imports.restore.side_effect = lambda target, path: manager._run_lxd_until_state(
+            'import', target, ['import', 'local:', str(path), target], 'Stopped', require_marker=False)
+        return manager
 
     def operation(self, observations, codes, expected='Running', error=None):
         manager = self.manager()
@@ -82,7 +88,7 @@ class FailureTests(unittest.TestCase):
                       [dict(name=1,type='container',status='Stopped',config={})]):
             client.command = Mock(return_value=json.dumps(value))
             with self.subTest(value=value), self.assertRaisesRegex(Error, 'invalid instance data'):
-                Manager(client).absent('test-fault')
+                Manager(client, isolation=Mock()).absent('test-fault')
 
     def test_query_timeout_and_nonzero_exit_are_explicit_errors(self):
         client = LXD.__new__(LXD)

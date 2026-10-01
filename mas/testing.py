@@ -239,7 +239,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu", "configuration-concurrency"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu", "configuration-concurrency", "isolation-policy", "isolation-runtime", "legacy-migration"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -266,6 +266,8 @@ class Suite:
         self.manager.gpu.keep_known_warnings = True
         self.created_project = False
         self.targets = []
+        self.legacy_targets = []
+        self.legacy_profiles = []
         self.events = []
         self.results = {case: {"status": "not_run"} for case in self.CASES}
         self.cleanup_errors = []
@@ -273,6 +275,7 @@ class Suite:
         self.event_offsets = {}
         self.unit_results = None
         self.gpu_results = {"status": "not_run"}
+        self.isolation_results = {'status': 'not_run'}
 
     def native_diagnostic(self, message):
         self.events.append(dict(action='diagnostic', status='warning', native_stderr=message,
@@ -347,7 +350,7 @@ class Suite:
         start = time.monotonic()
         self.counter += 1
         arguments = list(args)
-        if answer is not None and args[0] in ('delete', 'export', 'enter'):
+        if answer is not None and args[0] in ('delete', 'export', 'enter', 'migrate'):
             arguments.append('--yes' if answer.strip().lower() in ('y', 'yes') else '--no')
         command = self.command(arguments)
         event_path = self.event_path
@@ -444,6 +447,183 @@ class Suite:
         instance = self.manager.find(target)
         return (instance["status"] if instance else "Absent") == expected
 
+    def expected_native_refusal(self, args):
+        self.output.keep(t('expected_error', command='lxc ' + ' '.join(args)))
+        try:
+            self.manager.lxd.command(args)
+        except Error as exc:
+            self.output.keep(str(exc))
+            self.events.append(dict(action='isolation-refusal', status='ok', command=args, error=str(exc)))
+        else:
+            raise AssertionError(t('policy_test_accepted', command=repr(args)))
+
+    def isolation_policy(self, target):
+        self.manager.isolation.check()
+        for key, value in [('security.privileged','true'), ('raw.idmap','both 1000 1000'),
+                           ('raw.seccomp','false'), ('linux.kernel_modules','dummy'),
+                           ('security.delegate_bpf','true'), ('security.nesting','true'),
+                           ('security.syscalls.intercept.mount','true')]:
+            self.expected_native_refusal(['config','set','local:'+target,key+'='+value])
+        self.expected_native_refusal(['config','device','add','local:'+target,'mas-test-block',
+                                     'disk','source=/etc','path=/host-etc','readonly=true'])
+        self.manager.lxd.command(['config','set','local:'+target,'security.syscalls.deny_default=false'])
+        try:
+            self.cli('start',target,code=1)
+            assert self.state(target,'Stopped')
+        finally:
+            self.manager.lxd.command(['config','unset','local:'+target,'security.syscalls.deny_default'])
+        gpu_record = self.manager.gpu.record(self.manager.info(target))
+        if gpu_record and gpu_record['backend']=='wsl-nvidia' and gpu_record['enabled']:
+            self.manager.lxd.command(['config','device','set','local:'+target,'mas-gpu-lib','readonly=false'])
+            try:
+                self.cli('start',target,code=1)
+                assert self.state(target,'Stopped')
+            finally:
+                self.manager.lxd.command(['config','device','set','local:'+target,'mas-gpu-lib','readonly=true'])
+            self.manager.lxd.command(['config','device','add','local:'+target,'mas-test-extra-char',
+                                     'unix-char','source=/dev/null','path=/dev/mas-test-null'])
+            try:
+                self.cli('start',target,code=1)
+                assert self.state(target,'Stopped')
+            finally:
+                self.manager.lxd.command(['config','device','remove','local:'+target,'mas-test-extra-char'])
+        # Project allowlists do not constrain pool-backed extra volumes.
+        record = self.manager.isolation.check()
+        volume = random_target()
+        self.manager.lxd.command(['storage','volume','create','local:'+record['pool'],volume])
+        try:
+            args = ['config','device','add','local:'+target,'mas-test-volume',
+                    'disk','pool='+record['pool'],'source='+volume,'path=/extra-volume']
+            if 'wsl-nvidia' not in record['backends']:
+                self.expected_native_refusal(args)
+            else:
+                self.manager.lxd.command(args)
+                try:
+                    self.cli('start',target,code=1)
+                    assert self.state(target,'Stopped')
+                finally:
+                    self.manager.lxd.command(['config','device','remove','local:'+target,'mas-test-volume'])
+        finally:
+            self.manager.lxd.command(['storage','volume','delete','local:'+record['pool'],volume])
+        self.manager.isolation.audit(self.manager.info(target))
+        # Preserve rejected native backup data in its stopped staging project.
+        backup = Path(self.workspace.name) / 'unsafe-backup.tar.gz'
+        self.manager.lxd.command(['config','set','local:'+target,'security.syscalls.deny_default=false'])
+        try:
+            self.cli('export',target,str(backup))
+        finally:
+            self.manager.lxd.command(['config','unset','local:'+target,'security.syscalls.deny_default'])
+        rejected = self.target()
+        before = len(self.events)
+        self.cli('import',rejected,str(backup),code=1)
+        assert self.manager.find(rejected) is None
+        owners = [e['owner'] for e in self.events[before:] if e.get('phase') == 'staging-created']
+        assert len(owners) == 1
+        staging = Manager(LXD(project=owners[0]['project'],timeout=self.timeout))
+        restored = staging.find(rejected)
+        assert restored and restored['status']=='Stopped' and not self.manager.managed(restored), restored
+        assert restored['config']['security.syscalls.deny_default']=='false'
+        assert restored['config']['boot.autostart']=='false' and backup.is_file()
+        self.cli('start',rejected,code=1)
+
+    def isolation_runtime(self, target):
+        source = """import json,os,stat,tempfile,errno
+from pathlib import Path
+probe={'denied':False}
+with tempfile.TemporaryDirectory(prefix='mas-device-probe-') as work:
+ path=work+'/host-memory'
+ try:
+  probe['step']='mknod'
+  os.mknod(path,stat.S_IFCHR|0o600,os.makedev(1,1))
+  probe['step']='open'
+  fd=os.open(path,os.O_RDONLY)
+  os.close(fd)
+ except OSError as exc:
+  probe.update(denied=exc.errno in (errno.EPERM,errno.EACCES),errno=exc.errno)
+status=Path('/proc/self/status').read_text()
+print(json.dumps({'uid_map':Path('/proc/self/uid_map').read_text(),
+ 'namespaces':{n:os.readlink('/proc/self/ns/'+n) for n in ('user','pid','mnt','net','ipc','uts')},
+ 'seccomp':[line for line in status.splitlines() if line.startswith('Seccomp:')][0],
+ 'device_access_probe':probe,
+ 'apparmor_profile':Path('/proc/self/attr/current').read_text().strip(),
+ 'host_admin_socket_visible':Path('/var/snap/lxd/common/lxd/unix.socket').exists(),
+ 'host_paths_visible':{p:Path(p).exists() for p in ('/mnt/c','/var/run/docker.sock')},
+ 'forbidden_devices_visible':{p:Path(p).exists() for p in ('/dev/sda','/dev/nvme0n1','/dev/mem','/dev/kvm')}}))
+"""
+        guest = json.loads(self.manager.lxd.command(['exec','local:'+target,'--','python3','-c',source]))
+        host = {n:os.readlink('/proc/self/ns/'+n) for n in guest['namespaces']}
+        assert all(guest['namespaces'][n]!=host[n] for n in host), (guest,host)
+        root_mapping = next([int(v) for v in line.split()] for line in guest['uid_map'].splitlines() if line.split()[0]=='0')
+        assert root_mapping[1]!=0, guest
+        assert guest['seccomp'].split()[-1]=='2', guest
+        assert not guest['host_admin_socket_visible'], guest
+        assert not any(guest['host_paths_visible'].values()), guest
+        assert not any(guest['forbidden_devices_visible'].values()), guest
+        assert guest['device_access_probe']['denied'], guest
+        apparmor = Path('/sys/module/apparmor/parameters/enabled')
+        self.isolation_results = {'status':'passed','project':self.project,
+            'policy':self.manager.isolation.check(), 'guest':guest,'host_namespaces':host,
+            'apparmor_enabled':apparmor.read_text().strip() if apparmor.exists() else 'unavailable',
+            'apparmor_confinement_verified':guest['apparmor_profile'].startswith('lxd-')}
+        if self.isolation_results['apparmor_enabled']=='Y':
+            assert self.isolation_results['apparmor_confinement_verified'], guest
+
+    def legacy_fixture(self):
+        record = self.manager.isolation.check()
+        target = random_target()
+        profile = random_target()
+        body, _ = self.host.configuration.request('POST',self.host.configuration.endpoint('/1.0/profiles'),
+            {'name':profile,'config':{'user.mas.test.run':self.project,'limits.memory':'2GiB',
+                                     'user.mas.migration.inherited':'keep'},
+             'devices':self.manager.isolation.devices(record)})
+        self.manager.isolation.sync_result(body)
+        self.legacy_profiles.append(profile)
+        self.host.command(['init',host_image(),'local:'+target,'--profile',profile,
+                           '-c',MANAGED+'=true','-c','user.mas.test.run='+self.project,
+                           '-c','security.privileged=false','-c','security.nesting=false',
+                           '-c','security.syscalls.deny_default=true'])
+        self.legacy_targets.append(target)
+        return target
+
+    def legacy_migration(self):
+        from .core import USER_SETUP
+        target = self.legacy_fixture()
+        self.manager.isolation.audit(self.manager.legacy.require(target),legacy=True)
+        self.manager.legacy._run_lxd_until_state('start',target,['start','local:'+target],'Running')
+        self.host.command(['exec','local:'+target,'--','/bin/sh','-c',USER_SETUP])
+        self.host.command(['exec','local:'+target,'--','/bin/sh','-c',
+                           "printf 'migration preserved' > /home/sandbox/mas-migration; chown sandbox:sandbox /home/sandbox/mas-migration"])
+        self.manager.legacy._run_lxd_until_state('stop',target,['stop','local:'+target],'Stopped')
+        original = self.manager.legacy.require(target)
+        self.host.command(['config','set','local:'+target,'security.syscalls.deny_default=false'])
+        try:
+            self.cli('migrate',target,'--yes',code=1)
+            assert self.manager.legacy.require(target)['config']['security.syscalls.deny_default']=='false'
+            assert self.state(target,'Absent')
+        finally:
+            self.host.command(['config','set','local:'+target,'security.syscalls.deny_default=true'])
+        # Exercise cancellation through a real menu, selecting only our fixture.
+        with self.terminal([]) as terminal:
+            terminal.expect('my-ai-sandbox');terminal.send('\x1b[B'*3+'\n')
+            terminal.expect('Migrate legacy container')
+            names=[i['name'] for i in self.manager.legacy_list()]
+            terminal.send('\x1b[B'*names.index(target)+'\n')
+            terminal.expect('Move stopped container '+target)
+            terminal.send('\n');terminal.expect('Cancelled.')
+            terminal.send('\n');terminal.expect('my-ai-sandbox');terminal.send('\x1b[D');terminal.finish()
+        assert self.manager.legacy.require(target)['config']==original['config']
+        self.targets.append(target)
+        self.cli('migrate',target,'--yes')
+        assert self.manager.legacy.find(target) is None
+        migrated = self.manager.info(target)
+        assert migrated['config']['limits.memory']=='2GiB'
+        assert migrated['config']['user.mas.migration.inherited']=='keep'
+        self.cli('start',target)
+        assert self.exec(target,"cat /home/sandbox/mas-migration")=='migration preserved'
+        assert self.exec(target,"su --login sandbox -c 'sudo -n id -u'").strip()=='0'
+        self.cli('stop',target)
+        self.cli('delete',target,'--yes')
+
     def exec(self, target, script):
         return self.manager.lxd.command(["exec", "local:" + target, "--", "/bin/sh", "-c", script])
 
@@ -476,12 +656,17 @@ class Suite:
                 self.output.diagnostics(details, "")
             assert result.wasSuccessful(), t("unit_failed")
         with self.case("new-default"):
-            self.host.command(["project", "create", "local:" + self.project,
-                               "-c", "features.images=false", "-c", "features.profiles=false"])
-            self.created_project = True
+            try:
+                self.manager.isolation.provision()
+            finally:
+                self.created_project = self.manager.isolation.created
             self.cli("new", target)
             assert self.state(target, "Stopped")
             assert self.manager.info(target)["config"]["image.version"] == host_image().split(":")[1]
+        with self.case('isolation-policy'):
+            self.isolation_policy(target)
+        with self.case('legacy-migration'):
+            self.legacy_migration()
         with self.case("missing-image"):
             missing = self.target()
             self.cli("new", missing, "--image", "ubuntu:mas-missing-" + uuid.uuid4().hex, code=1)
@@ -536,6 +721,8 @@ class Suite:
             assert self.exec(target, "su --login sandbox -c 'id -un; sudo -n id -u'").splitlines() == ["sandbox", "0"]
             self.wait("outbound HTTPS", lambda: self.network(target))
             self.exec(target, "printf '%s' mas-roundtrip-data > /home/sandbox/mas-proof")
+        with self.case('isolation-runtime'):
+            self.isolation_runtime(target)
         with self.case("gpu"):
             self.gpu_test()
         with self.case("dependency-install"):
@@ -1000,7 +1187,7 @@ try {
                 self.menu_result(terminal,parent,chinese)
             down, up, back = "\x1b[B", "\x1bOA", "\x1b[D"
             terminal.expect("my-ai-sandbox")
-            send(down * 3 + "\n", "mas Preferences")
+            send(down * 4 + "\n", "mas Preferences")
             send("\n", "Select interface language / 请选择界面语言")
             terminal.send("\x1b");result("mas Preferences")
             send("\n", "Select interface language / 请选择界面语言")
@@ -1009,7 +1196,7 @@ try {
             send("\n", "请选择界面语言 / Select interface language")
             terminal.send(down + "\n");result("mas Preferences")
             send(back, "my-ai-sandbox")
-            send(up * 3 + "\x1b[C", "No managed containers.")
+            send(up * 4 + "\x1b[C", "No managed containers.")
             send(back, "my-ai-sandbox")
             send(down + "\n", "Enter the container name:")
             terminal.send("\x1b");result("my-ai-sandbox")
@@ -1090,6 +1277,18 @@ try {
             self.cleanup_errors.append(t("backup_cleanup", error=exc))
         if not self.created_project:
             return
+        try:
+            from .imports import Imports
+            from .isolation import Isolation
+            owners = {e['owner']['id']: e['owner'] for e in self.events
+                      if e.get('phase') == 'staging-created'}
+            projects = {p['name'] for p in Isolation.list_objects(self.host,
+                ['project','list','local:','--format=json'])} if owners else set()
+            for owner in owners.values():
+                if owner['project'] in projects:
+                    Imports.cleanup(self.manager, owner)
+        except (Error, OSError) as exc:
+            self.cleanup_errors.append(str(exc))
         for target in self.targets:
             try:
                 for entry in self.manager.mountedfs(target):
@@ -1103,7 +1302,36 @@ try {
                                             "Absent", require_marker=False)
             except Exception as exc:
                 self.cleanup_errors.append(f"{target}: {exc}")
+        for target in self.legacy_targets:
+            try:
+                item = self.manager.legacy.find(target)
+                if item:
+                    if item.get('config', {}).get('user.mas.test.run') != self.project:
+                        raise Error(t('legacy_cleanup_conflict', target=target))
+                    if item['status'] != 'Stopped':
+                        self.manager.legacy._run_lxd_until_state('cleanup-stop',target,
+                            ['stop','local:'+target,'--timeout',str(self.timeout)],'Stopped',require_marker=False)
+                    self.manager.legacy._run_lxd_until_state('cleanup-delete',target,
+                        ['delete','local:'+target],'Absent',require_marker=False)
+            except (Error, OSError) as exc:
+                self.cleanup_errors.append('default/' + target + ': ' + str(exc))
+        for name in self.legacy_profiles:
+            try:
+                from .isolation import Isolation
+                policy = Isolation(self.manager.legacy)
+                item, etag, endpoint = policy.resource('profiles', name)
+                if item['config'].get('user.mas.test.run') != self.project:
+                    raise Error(t('legacy_cleanup_conflict', target=name))
+                body, _ = self.host.configuration.request('DELETE',endpoint,etag=etag)
+                policy.sync_result(body)
+            except (Error, OSError) as exc:
+                self.cleanup_errors.append('default/profile/' + name + ': ' + str(exc))
         try:
+            from .isolation import PROFILE
+            self.manager.isolation.check()
+            _, etag, endpoint = self.manager.isolation.resource('profiles', PROFILE)
+            body, _ = self.manager.lxd.configuration.request('DELETE', endpoint, etag=etag)
+            self.manager.isolation.sync_result(body)
             self.host.command(["project", "delete", "local:" + self.project])
         except Error as exc:
             self.cleanup_errors.append(str(exc))
@@ -1117,6 +1345,8 @@ try {
             "project": self.project, "targets": self.targets, "cases": self.results,
             "events": self.events, "cleanup_errors": self.cleanup_errors,
             "unit_tests": self.unit_results, "gpu": self.gpu_results,
+            'isolation': self.isolation_results, 'legacy_targets': self.legacy_targets,
+            'legacy_profiles': self.legacy_profiles,
             "elapsed": time.monotonic() - self.started,
         }, indent=2))
 

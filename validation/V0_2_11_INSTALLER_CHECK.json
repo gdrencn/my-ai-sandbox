@@ -1,0 +1,18 @@
+{
+  "installed_version": "0.2.11",
+  "project": "mas",
+  "fixed_policy": {
+    "backends": [
+      "wsl-nvidia"
+    ],
+    "driver_paths": [
+      "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd"
+    ],
+    "network": "lxdbr0",
+    "pool": "default",
+    "version": 1
+  },
+  "default_configuration_preserved": true,
+  "installed_product_matches": true,
+  "verification": "second idempotent installation; compare configuration, excluding dynamic used_by lists"
+}

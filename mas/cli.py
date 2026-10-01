@@ -7,6 +7,7 @@ import sys
 from . import __version__
 from . import config
 from .core import Error, LXD, Manager
+from .isolation import PROJECT
 from .presentation import Progress, show_mounts, format_info
 
 from .i18n import t, state, Parser
@@ -28,16 +29,18 @@ def parser():
         item.add_argument("key", choices=["language"], help=t('help_config_key'))
         if action == "set":
             item.add_argument("value", choices=config.LANGUAGES, help=t('help_language_value'))
-    for name in ("new", "list", "start", "stop", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs"):
+    for name in ("new", "list", "start", "stop", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs", "migrate"):
         command = commands.add_parser(name, help=t('help_cmd_' + name), description=t('help_cmd_' + name), epilog=t('example_' + name))
         if name != "list":
             command.add_argument("target", metavar="TARGET", help=t('help_target'), **({"nargs": "?"} if name == "stop" else {}))
-        if name in ("delete", "export", "enter"):
+        if name in ("delete", "export", "enter", "migrate"):
             consent = command.add_mutually_exclusive_group()
             consent.add_argument("--yes", dest="consent", action="store_const", const=True, help=t("help_yes"))
             consent.add_argument("--no", dest="consent", action="store_const", const=False, help=t("help_no"))
         if name in ("mountfs", "unmountfs"):
             command.add_argument("path", metavar="PATH", nargs="?", help=t("help_" + name + "_path"))
+        if name in ('mountedfs', 'unmountfs'):
+            command.add_argument('--legacy', action='store_true', help=t('help_legacy_mounts'))
         if name == "stop":
             command.add_argument("--all", action="store_true", help=t('help_all'))
         if name == "new":
@@ -67,7 +70,9 @@ def main(argv=None, manager=None):
             return 0
         from .menu import confirm as ask_menu
         ask = ask_menu if getattr(args, "consent", None) is None else lambda _: args.consent
-        manager = manager or Manager(LXD(timeout=args.timeout, diagnostic=progress.output.keep), report=progress)
+        manager = manager or Manager(LXD(project=PROJECT, timeout=args.timeout, diagnostic=progress.output.keep), report=progress)
+        if getattr(args, 'legacy', False):
+            manager = manager.legacy
         if args.command is None:
             from .terminal_ui import run
             run(manager)
@@ -86,6 +91,9 @@ def main(argv=None, manager=None):
             show_mounts(manager.mountedfs(args.target))
         elif args.command == "new":
             manager.new(args.target, args.image)
+        elif args.command == 'migrate':
+            if not manager.migrate(args.target, ask):
+                print(t('cancelled'))
         elif args.command == "import":
             manager.import_container(args.target, args.file)
         elif args.command == "export":

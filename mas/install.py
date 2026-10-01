@@ -165,6 +165,9 @@ def initialize():
         raise Error(t('root_disk_missing'))
     if not any(d.get("type") == "nic" for d in devices):
         raise Error(t('nic_missing'))
+    from .core import Manager
+    from .isolation import PROJECT
+    Manager(LXD(project=PROJECT, timeout=1800)).isolation.provision()
 
 
 def configure_path(home=None, shell=None):
