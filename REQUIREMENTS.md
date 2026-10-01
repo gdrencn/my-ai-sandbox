@@ -2,7 +2,7 @@
 
 Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: test batch 0.2.11 implements the fixed project/profile isolation policy, expanded-device verification, explicit legacy migration and approved temporary-project import compatibility in section 39. Local implementation verification passed; test publication/public verification is pending. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
+Current baseline: test batch 0.2.11 implements the fixed project/profile isolation policy, expanded-device verification, explicit legacy migration and approved temporary-project import compatibility in section 39. It is published and passed local and public installation/test verification: 287 packaged units and all 26 report stages. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
 
 ## 1. Scope
 
@@ -356,8 +356,8 @@ The isolation goal is to protect the Linux/WSL host and its Windows host from un
 - [x] Set `restricted.backups=allow` to retain export functionality.
 - [x] Set `restricted.devices.unix-block=block`, `restricted.devices.unix-hotplug=block`, `restricted.devices.usb=block`, `restricted.devices.pci=block`, and `restricted.devices.infiniband=block`.
 - [x] Use `restricted.devices.proxy=block` as the baseline; revisit only in the separate network design. Managed NIC attachment is restricted to the approved existing bridge; traffic policy remains deferred.
-- [x] Use `restricted.devices.disk=block` as the root-disk-only baseline. If GPU runtime libraries require host disk devices, define the necessary `allow` policy and `restricted.devices.disk.paths` prefixes, together with read-only device configuration, before implementation.
-- [x] Resolve `restricted.devices.gpu` and `restricted.devices.unix-char` according to the verified GPU implementation. Allow only the categories required by that implementation; category permission does not constitute an exact device/path whitelist. GPU category permissions belong to project policy; actual per-container GPU allocation belongs to hardware configuration.
+- [x] Use `restricted.devices.disk=block` as the root-disk-only baseline; WSL GPU uses the approved disk=allow exception, exact driver/library prefixes and read-only device definitions in section 39.
+- [x] Allow the gpu category for native NVIDIA CDI and the unix-char category for WSL NVIDIA; otherwise block those categories. Allow only the categories required by that implementation; category permission does not constitute an exact device/path whitelist. GPU category permissions belong to project policy; actual per-container GPU allocation belongs to hardware configuration.
 - [x] Treat project policy as fixed mas-managed configuration. Provide no user-editable project settings in the terminal menu or a general mas CLI escape hatch for altering the baseline. This does not claim to prevent a host LXD administrator from using native administrative tools.
 
 ### 27.2. Profile configuration — fixed container security baseline
@@ -371,8 +371,9 @@ The isolation goal is to protect the Linux/WSL host and its Windows host from un
 
 GPU and the hardware menu are delivered by section 28; CPU, memory and process controls remain pending. GPU defaults and CLI semantics below are superseded by section 28 where specified.
 
-- [ ] Add a `硬件选项` / `Hardware options` menu item after selecting a container. It contains GPU allocation, CPU limits (`limits.cpu`), memory limits (`limits.memory`), and process-count limits (`limits.processes`). These controls are per-container configuration, not global mas preferences.
-- [ ] Provide equivalent CLI operations through the same shared configuration functions. CLI syntax, value ranges, defaults, reset behavior, running-container change semantics, and menu ordering remain to be confirmed.
+- [x] Add a `硬件选项` / `Hardware options` menu item after selecting a container, initially containing GPU allocation. These controls are per-container configuration, not global mas preferences.
+- [ ] Extend that hardware menu with CPU limits (`limits.cpu`), memory limits (`limits.memory`), and process-count limits (`limits.processes`) after their behavior is confirmed.
+- [ ] Provide equivalent CPU/memory/process CLI operations through the same shared configuration functions. Their syntax, value ranges, defaults, reset behavior, running-container change semantics and menu ordering remain to be confirmed; GPU CLI/menu equivalence is already implemented.
 - [x] GPU access is authorized by default when a supported discrete host GPU is available; the user can explicitly disable it. Record the devices and runtime-library resources necessary for that allocation. Preserve the fixed security baseline; resolve any conflict before implementation. GPU support must cover the intended WSL compute use case; native Ubuntu uses its applicable LXD-supported mechanism and requires separate validation.
 - [x] Prefer LXD's existing GPU/device mechanisms and vendor-supported resource discovery. Any additional third-party dependency still requires explicit approval. GPU compute support does not implicitly authorize WSLg display, audio, Windows drive mappings, host home directories, or host management sockets.
 
@@ -380,8 +381,9 @@ GPU and the hardware menu are delivered by section 28; CPU, memory and process c
 
 - [x] Audit expanded instance configuration, project restrictions, and actual runtime confinement in the current WSL environment. Record supported protections and measured limitations rather than inferring them solely from successful startup.
 - [x] Validate real GPU computation in a non-privileged container using the selected official mechanism. Verify access as `sandbox`, actual device/library exposure, read-only runtime mappings where applicable, and the effective GPU selection scope. Device enumeration alone is insufficient.
-- [ ] Migration, imported configuration handling, baseline drift and GPU lifecycle are resolved in sections 28 and 39; CPU/memory/process defaults and CLI semantics remain pending. Preserve managed-container ownership boundaries and existing filesystem/lifecycle reuse.
-- [ ] After authorized development, verify CLI/menu equivalence, baseline enforcement, hardware changes and GPU computation; update IMPLEMENTED.md only with completed and verified behavior. Publish the resulting development batch through the established test-release process.
+- [x] Resolve migration, imported configuration handling, baseline drift and GPU lifecycle as defined in sections 28 and 39. Preserve managed-container ownership boundaries and existing filesystem/lifecycle reuse.
+- [ ] Confirm CPU/memory/process defaults and CLI semantics before implementing their controls.
+- [x] Verify the implemented CLI/menu equivalence, baseline enforcement, GPU changes and GPU computation; update IMPLEMENTED.md with verified behavior. Publish test v0.2.11 and verify its public artifacts and installation/test entry. Non-GPU hardware verification follows its future authorized development.
 
 
 ## 28. Phase 2 first batch — independent GPU module
@@ -523,7 +525,7 @@ Acceptance: run focused regressions, packaged unit tests from outside the checko
 
 ## 39. Fixed isolation policy and effective-configuration verification — v0.2.11
 
-Status: implemented and locally verified; test publication/public verification pending. This section supersedes the unresolved project/profile configuration in section 27 where values are specified. Non-GPU hardware defaults, disabling devlxd, enabling host AppArmor, disk quotas, network traffic/login policy and the stable-only release branch remain pending.
+Status: implemented, published as test v0.2.11 and verified through local and public installation/test runs. Both complete runs passed 287 packaged units and all 26 report stages, without skipped/unexecuted checks or cleanup errors. This section supersedes the unresolved project/profile configuration in section 27 where values are specified. Non-GPU hardware defaults, disabling devlxd, enabling host AppArmor, disk quotas, network traffic/login policy and the stable-only release branch remain pending.
 
 ### 39.1. Scope and ownership
 

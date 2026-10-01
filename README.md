@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-本批 `0.2.11` 已完成固定 Project/Profile 隔离配置、完整设备核验、旧容器显式迁移和临时 Project 备份导入方案。本地通过 287 项单元测试及全部 26 个回归环节；公开发布验证进行中。完整范围和验证记录见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+本批 [0.2.11](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.11) 已发布，完成固定 Project/Profile 隔离配置、完整设备核验、旧容器显式迁移和临时 Project 备份导入方案。本地与公开测试入口均通过 287 项单元测试及全部 26 个回归环节，无跳过或清理错误。普通安装、发布文件一致性和资源回收也已核验。完整范围和验证记录见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -135,7 +135,7 @@ LXD 6.9 的备份导入会携带 volatile 身份元数据，直接导入固定�
 
 导入失败不会删除原备份或已经导入的数据；提示会给出临时 Project 和容器名。可用 `lxc --project PROJECT config show TARGET --expanded`、`lxc --project PROJECT info TARGET` 进行原生检查。修复或回收由用户明确操作；程序不自动启动失败数据，也不静默接管未完成的目标。没有导入数据的空临时 Project 可以自动清理。
 
-当前实测 WSL 内核未启用 AppArmor，报告如实记录为 `unconfined`；本批没有修改宿主内核配置。原生 Ubuntu、其他 GPU/存储后端和上游漏洞修复不属于当前 WSL 验证结果。CPU、内存和进程限制、额外网络策略、完全关闭 devlxd、宿主 AppArmor 配置及磁盘配额仍待后续讨论。
+当前实测 WSL 内核未启用 AppArmor；报告保存原生运行时属性，并明确记录 AppArmor 约束未获验证。本批没有修改宿主内核配置。原生 Ubuntu、其他 GPU/存储后端和上游漏洞修复不属于当前 WSL 验证结果。CPU、内存和进程限制、额外网络策略、完全关闭 devlxd、宿主 AppArmor 配置及磁盘配额仍待后续讨论。
 
 ## 容器文件系统挂载（0.1.9 起）
 
@@ -233,7 +233,7 @@ mas start TARGET
 
 WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和官方探测选中的当前 NVIDIA 驱动子目录；不映射整个 Windows 驱动目录。WSL DXG 访问不是逐卡隔离。设备清单、驱动目录、配置值和运行库配置文件路径记录在 `user.mas.gpu`。模块管理容器内 `/etc/ld.so.conf.d/mas-gpu.conf`，启动时刷新动态链接库缓存；关闭时删除该文件及设备，下一次启动刷新缓存。检测到资源配置漂移或文件冲突会报错，不覆盖不属于模块的资源。GPU 库路径可供普通 sandbox 用户加载；WSL 的诊断工具可通过 `/usr/lib/wsl/lib/nvidia-smi` 调用。
 
-测试工具会验证开关、菜单、只读资源、关闭后的设备消失、重新开启，以及 sandbox 用户执行真实 CUDA 内核并读回结果。无支持设备的机器明确记录 GPU 计算未执行。此模块不安装 CUDA Toolkit、模型框架或新的宿主驱动。Project/profile 安全基线、CPU/内存/进程限制仍待后续实现。
+测试工具会验证开关、菜单、只读资源、关闭后的设备消失、重新开启，以及 sandbox 用户执行真实 CUDA 内核并读回结果。无支持设备的机器明确记录 GPU 计算未执行。此模块不安装 CUDA Toolkit、模型框架或新的宿主驱动。Project/Profile 安全基线已在 0.2.11 实现；CPU/内存/进程限制仍待后续实现。
 
 从 0.2.3 起，WSL 驱动目录由 LXD snap 已附带的 `nvidia-ctk` 以 WSL 模式探测，不扫描全部历史目录。GPU 开启时，每次实际启动前重新查询并复用 GPU 配置函数更新映射，运行期间不自动修改。工具缺失、探测失败或结果无效会报错，不继续使用旧选择。mas 只读取官方工具输出的资源清单，不应用 CDI 文档或执行 hooks，也不额外安装软件包。
 

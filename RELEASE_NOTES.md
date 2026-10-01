@@ -4,7 +4,7 @@
 - 完整核验 expanded 配置、GPU 精确映射与只读属性、root/NIC 和额外存储卷。配置不合规时拒绝启动；查看信息、安全停止和宿主挂载恢复仍可使用。
 - 增加 `mas migrate TARGET` 及“迁移旧容器”菜单，确认后原生迁移停止且无挂载的旧容器；保留安全的继承配置和用户数据。旧容器挂载可用 mountedfs/unmountfs 的 --legacy 参数恢复。
 - 按用户确认的方案解决 LXD 6.9 原生备份与 lowlevel=block 的冲突：临时 Project 导入、核验后原生复制，正式 Project 限制不变。失败保留备份及停止的临时数据，报告位置；成功仅清理所属临时资源，不修改备份格式或容器文件权限。
-- 补充固定配置、运行时身份/namespace/seccomp、设备拒绝、迁移、临时导入和异步清理验证。最终验证结果记录于 IMPLEMENTED.md、TEST_COVERAGE.md 和版本报告。
+- 补充固定配置、运行时身份/namespace/seccomp、设备拒绝、迁移、临时导入和异步清理验证。本地及公开入口均通过 287 项单元测试和全部 26 个环节，分别耗时 605.7 秒和 602.0 秒，无跳过、未执行项或清理错误。普通安装、11 个发布附件、四个固定入口与资源回收已核验；详细记录见 IMPLEMENTED.md、TEST_COVERAGE.md 和版本报告。
 
 当前 WSL 内核 AppArmor 未启用，已记录；不将其标为已生效。CPU/内存/进程限制、额外网络策略和下一次 stable 的 release 分支仍待后续开发。Stable/0.1.15 不变。
 
