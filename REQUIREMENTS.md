@@ -2,7 +2,7 @@
 
 Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches; section 40 describes the independently delivered guest diagnostic; section 41 records its integrated test review and SSHFS completion repair. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: test batch 0.2.12 retains the fixed isolation/import/migration policy in section 39 and adds the shared guest challenge and SSHFS completion repair in section 41. Frozen local verification passed 331 packaged units and all 26 report stages; publication/public verification is next. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
+Current baseline: test batch 0.2.12 retains the fixed isolation/import/migration policy in section 39 and adds the shared guest challenge and SSHFS completion repair in section 41. Local and public installation/test runs both passed 331 packaged units and all 26 report stages; eleven release assets and the standalone public guest entry were verified. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas and the stable-only release branch remain pending.
 
 ## 1. Scope
 
@@ -596,7 +596,7 @@ The user authorized first writing a script that runs inside a container and chal
 
 ## 41. Test and guest-boundary review — v0.2.12
 
-Status: implemented and locally verified; publication/public verification pending.
+Status: implemented, published as test v0.2.12 and verified locally and through the public installation/test and standalone guest entries. Menu changes remain recommendations only.
 
 The user requested menu wording/structure recommendations and authorized iterative improvements to automated tests and the independent guest challenge. Menu changes are recommendations only in this batch. Preserve the product's agreed resource boundary, normal container interfaces, GPU exception and deferred network policy; do not enable AppArmor or introduce new resource limits here.
 

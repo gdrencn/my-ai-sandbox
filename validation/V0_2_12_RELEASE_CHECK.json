@@ -1,0 +1,49 @@
+{
+  "version": "0.2.12",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.12",
+  "tag": "v0.2.12",
+  "asset_hashes": {
+    "SHA256SUMS": "1dcb6705413eb392102c7eeaddd5a293c1d86bccca3ed085153b99b0d54281af",
+    "WSL_REPORT.json": "66c23f155aa436a85e4e3fe8190a0efa1ae653fb1046296874f530e6348ddc60",
+    "bootstrap.py": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "install.sh": "9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+    "mas-install.pyz": "17164a3b8c8df396287888087912e176f29ebbae9e9868477c82843ed77399a4",
+    "mas-test.pyz": "2a2c8682e2eef8c39105c6c48d5b58ab5388739da7d34e55dc192681a9a798a1",
+    "mas.pyz": "0d58facdc1d730e81ca8049608369cb983bfc39001000caad3369917ecee1c57",
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484"
+  },
+  "latest_stable": "stable/0.1.15",
+  "probe_packaged_only_in_tester": true,
+  "public_entries": [
+    "stable/install.sh",
+    "test/install.sh",
+    "test/test.sh",
+    "test/test-stable.sh"
+  ],
+  "public_test": {
+    "units": 331,
+    "stages": 26,
+    "elapsed": 650.2
+  },
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "public_project_removed": true,
+  "standalone_project_removed": true,
+  "mount_registry_empty": true,
+  "ordinary_install_preserves_tester": true,
+  "installed_product_and_tester_hashes_match": true,
+  "staging_projects_removed": [
+    "mas-import-51d4fea5b9e0462ab659265b91ff463a",
+    "mas-import-821442d127fa413ba45addf1c413ac90",
+    "mas-import-a265d1fafd264082898b1547752cd868",
+    "mas-import-a4a7d1210516453a966cf6b4841ff099",
+    "mas-import-ce98da1ab9734acb82e425b119c47729"
+  ],
+  "legacy_targets_removed": true
+}

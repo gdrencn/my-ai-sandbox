@@ -197,3 +197,5 @@ mas-test 的运行时隔离环节执行完整探测，GPU 环节在关闭后再�
 0.2.11 的初始脚本及公开下载验证属于历史证据，保留在 `validation/GUEST_SECURITY_PROBE_REPORT.json`；0.2.12 的本轮完整结果记录在 IMPLEMENTED.md 和版本化主测试报告中。
 
 本轮本地 frozen 包通过 331 项单元测试、26 个实机环节（632.9 秒）。有可信参照时，GPU 开启结果为 59 PASS、16 INFO、1 SKIP；关闭为 57 PASS、16 INFO、1 SKIP，均无 FAIL/REVIEW/ERROR。唯一 SKIP 为不存在的 binfmt_misc/register；AppArmor 仍为未启用，未作其他宣称。详见 validation/V0_2_12_LOCAL_REPORT.json。
+
+发布后的公开一键命令在另一个新建临时容器内，以 sandbox 经系统 sudo 实测：51 PASS、16 INFO、9 SKIP，无 FAIL/REVIEW/ERROR。没有宿主参照的六种 namespace、可见进程来源、宿主标记共八项未验证；不存在的 binfmt_misc/register 另占一项。公开源码字节与测试包一致，报告保留，临时 Project 已回收。证据：validation/V0_2_12_GUEST_PUBLIC_REPORT.json。

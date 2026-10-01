@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-本批 0.2.12 完成共享安全挑战覆盖和 SSHFS 挂载就绪修正，保留 0.2.11 的固定 Project/Profile、迁移和备份导入策略。本地冻结包通过 331 项单元测试及全部 26 个回归环节；发布与公开入口核验随后记录。菜单改进目前为建议，见 [MENU_REVIEW.md](MENU_REVIEW.md)。完整范围见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+本批 [0.2.12](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.12) 已发布，完成共享安全挑战覆盖和 SSHFS 挂载就绪修正，保留 0.2.11 的固定 Project/Profile、迁移和备份导入策略。本地冻结包和公开入口均通过 331 项单元测试及全部 26 个回归环节，普通安装、发布文件和资源回收已核验。菜单改进目前为建议，见 [MENU_REVIEW.md](MENU_REVIEW.md)。完整范围见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 
