@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Independent, non-destructive LXD guest boundary probes (Python 3.10+)."""
 import argparse
+import http.client
+import itertools
+import contextlib
 from collections import Counter
 import errno
 import hashlib
@@ -10,6 +13,7 @@ from pathlib import Path
 import re
 import socket
 import stat
+import struct
 import subprocess
 import sys
 import tempfile
@@ -21,20 +25,39 @@ NAMESPACES = ('user', 'pid', 'mnt', 'net', 'ipc', 'uts')
 DENIED = {errno.EACCES, errno.EPERM, errno.EROFS}
 DEVICES = {
     'host-memory': (stat.S_IFCHR, 1, 1),
+    'kernel-memory': (stat.S_IFCHR, 1, 2),
+    'io-ports': (stat.S_IFCHR, 1, 4),
     'kernel-log': (stat.S_IFCHR, 1, 11),
     'kvm': (stat.S_IFCHR, 10, 232),
     'host-disk': (stat.S_IFBLK, 8, 0),
+    'host-nvme': (stat.S_IFBLK, 259, 0),
+    'host-loop': (stat.S_IFBLK, 7, 0),
 }
 CONTROLS = (
     '/proc/sysrq-trigger', '/proc/sys/kernel/modprobe',
     '/proc/sys/kernel/kexec_load_disabled', '/proc/sys/vm/drop_caches',
-    '/sys/power/state',
+    '/proc/sys/kernel/core_pattern', '/proc/sys/kernel/hotplug',
+    '/proc/sys/kernel/modules_disabled', '/proc/sys/kernel/sysrq',
+    '/proc/sys/kernel/panic', '/proc/sys/kernel/panic_on_oops',
+    '/proc/sys/kernel/unprivileged_bpf_disabled', '/proc/sys/kernel/perf_event_paranoid',
+    '/proc/sys/kernel/yama/ptrace_scope', '/proc/sys/fs/binfmt_misc/register',
+    '/sys/power/state', '/sys/power/disk', '/sys/kernel/uevent_helper',
 )
 SOCKETS = (
     '/var/snap/lxd/common/lxd/unix.socket', '/var/lib/lxd/unix.socket',
-    '/run/lxd/unix.socket', '/run/docker.sock', '/run/containerd/containerd.sock',
-    '/run/podman/podman.sock', '/run/libvirt/libvirt-sock',
+    '/run/lxd/unix.socket', '/run/lxd.socket', '/run/docker.sock',
+    '/var/run/docker.sock', '/run/containerd/containerd.sock',
+    '/run/podman/podman.sock', '/run/libvirt/libvirt-sock', '/run/libvirt/virtqemud-sock',
+    '/run/dbus/system_bus_socket', '/run/systemd/private', '/run/snapd.socket',
+    '/run/snapd-snap.socket',
 )
+WINDOWS_PATHS = ('/mnt/c/Windows', '/mnt/c/Users', '/mnt/d/Windows', '/mnt/d/Users',
+                 '/mnt/wsl', '/mnt/wslg', '/run/WSL', '/init',
+                 '/proc/sys/fs/binfmt_misc/WSLInterop')
+READ_ENDPOINTS = ('/proc/kcore', '/proc/kmsg')
+SPECIAL_FILESYSTEMS = ('/sys/kernel/debug', '/sys/kernel/security', '/sys/fs/pstore',
+                       '/sys/firmware/efi/efivars', '/sys/fs/bpf')
+MAX_INVENTORY = 512
 STATUS_TEXT = {'PASS': '通过', 'FAIL': '失败', 'REVIEW': '需核对',
                'SKIP': '未验证', 'INFO': '信息', 'ERROR': '测试错误'}
 
@@ -49,8 +72,12 @@ def check_method(check):
         'basic-interfaces': '读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys',
         'gpu-driver-store': '检查 mountinfo 是否暴露整个 /usr/lib/wsl/drivers',
         'mount-sources': '检查 mountinfo 的文件系统类型、挂载根和挂载点',
+        'device-inventory': '有界枚举 /dev 的设备类型及 major:minor；未知设备仅提示核对，不打开 watchdog/USB/PCI 设备',
+        'process-roots': '有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境',
+        'socket-inventory': '读取 /proc/net/unix 与 /run/user 的管理 socket 路径，不连接抽象 socket 或扫描网络',
+        'special-filesystems': '记录 debugfs/securityfs/pstore/efivarfs/bpffs 挂载与可见性，不修改其中内容',
         'devlxd': '检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口',
-        'windows-interop': '检查 /mnt/c/Windows、/mnt/c/Users、WSLInterop、/init 和 WSL_INTEROP',
+        'windows-interop': '检查 Windows/WSL 路径、binfmt_misc 注册项和 WSL_INTEROP，不执行解释器或 Windows 命令',
         'gpu-expectation': '列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期',
         'host-canaries': '有宿主非敏感唯一标记参照时，尝试路径读取并比较 SHA-256',
         'network-policy': '说明网络测试范围，不进行网络扫描或登录',
@@ -63,6 +90,10 @@ def check_method(check):
                 '不读取、写入或执行 ioctl')
     if check.startswith('control:'):
         return '对 ' + check.split(':', 1)[1] + ' 尝试写模式 open/close，不写入任何字节'
+    if check.startswith('read-endpoint:'):
+        return '对 ' + check.split(':', 1)[1] + ' 只读 open/close；不读取内存或日志内容'
+    if check.startswith('devlxd-api:'):
+        return '对实例 devlxd 执行有界只读 GET ' + check.split(':', 1)[1] + '；不创建、修改或删除资源'
     if check.startswith('namespace:'):
         return '读取 /proc/self/ns/' + check.split(':', 1)[1] + '，有宿主参照时比较标识'
     if check.startswith('management-socket:'):
@@ -70,7 +101,7 @@ def check_method(check):
     if check.startswith('gpu-readonly:'):
         return '读取 mountinfo，核对 ' + check.split(':', 1)[1] + ' 的只读挂载选项'
     if check.startswith('host-canary:'):
-        return '尝试直接路径、/proc/1/root 与 /proc/self/root 路径读取，比较唯一标记 SHA-256'
+        return '有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容'
     return methods.get(check, '执行此项检查')
 
 
@@ -91,7 +122,11 @@ def mappings(text):
 
 
 def read_text(path):
-    return Path(path).read_text(encoding='utf-8', errors='replace')
+    with open(path, encoding='utf-8', errors='replace') as source:
+        text = source.read(1048577)
+    if len(text) > 1048576:
+        raise ValueError('读取超过 1 MiB 上限：' + str(path))
+    return text
 
 
 def visible_paths(paths):
@@ -130,6 +165,15 @@ def validate_reference(data):
                 or any(part in ('.', '..') for part in path.split('/'))
                 or not isinstance(digest, str) or not re.fullmatch('[0-9a-f]{64}', digest)):
             raise ValueError('canary 需要绝对文件路径和小写 SHA-256；不接受路径跳转')
+    sockets = data.get('sockets', [])
+    if not isinstance(sockets, list) or len(sockets) > 64:
+        raise ValueError('sockets 必须是至多 64 项的列表')
+    for item in sockets:
+        if (not isinstance(item, dict) or not isinstance(item.get('path'), str)
+                or not item['path'].startswith('/') or any(ord(c) < 32 or ord(c) == 127 for c in item['path'])
+                or type(item.get('device')) is not int or item['device'] < 0
+                or type(item.get('inode')) is not int or item['inode'] <= 0):
+            raise ValueError('socket 参照需要绝对路径及有效 device/inode')
     return data
 
 
@@ -164,7 +208,7 @@ def active_probe(kind, value, work):
     check = kind + ':' + value
     step = 'mknod' if kind == 'device' else 'open'
     try:
-        if kind == 'device':
+        if kind == 'device' and value in DEVICES:
             mode, major, minor = DEVICES[value]
             path = os.path.join(work, value)
             os.mknod(path, mode | 0o600, os.makedev(major, minor))
@@ -172,35 +216,41 @@ def active_probe(kind, value, work):
             fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_CLOEXEC | os.O_NOFOLLOW)
         elif kind == 'control' and value in CONTROLS:
             fd = os.open(value, os.O_WRONLY | os.O_NONBLOCK | os.O_CLOEXEC)
+        elif kind == 'read-endpoint' and value in READ_ENDPOINTS:
+            fd = os.open(value, os.O_RDONLY | os.O_NONBLOCK | os.O_CLOEXEC)
         else:
             raise ValueError('未知的内部探测')
         os.close(fd)
         if kind == 'device':
             return result(check, 'FAIL', '能够打开未授权设备；未读取、写入或执行 ioctl', step=step)
-        return result(check, 'REVIEW', '能够打开内核写入口；未写入，实际写权限尚未证实', step=step)
+        return result(check, 'REVIEW', '能够打开内核入口；未读写，实际内容访问权限尚未证实', step=step)
     except OSError as exc:
         return denied_result(check, step, exc)
 
 
-def bounded_probe(kind, value, work, timeout):
-    command = [sys.executable, str(Path(__file__).resolve()), '--_probe', kind, value, work]
+def bounded_call(check, arguments, timeout):
+    command = [sys.executable, '-I', str(Path(__file__).resolve()), *arguments]
     try:
         child = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired as exc:
-        return result(kind + ':' + value, 'ERROR', '探测超时，不能当作权限拒绝', timeout=timeout,
+        return result(check, 'ERROR', '探测超时，不能当作权限拒绝', timeout=timeout,
                       native_stdout=exc.stdout.decode(errors='replace') if exc.stdout else '',
                       native_stderr=exc.stderr.decode(errors='replace') if exc.stderr else '')
     try:
         item = json.loads(child.stdout)
         if (child.returncode or not isinstance(item, dict)
-                or item.get('check') != kind + ':' + value or item.get('status') not in STATUS_TEXT
+                or item.get('check') != check or item.get('status') not in STATUS_TEXT
                 or not isinstance(item.get('method'), str) or not isinstance(item.get('message'), str)
                 or not isinstance(item.get('evidence'), dict)):
             raise ValueError('子进程返回内容无效')
         return item
     except (ValueError, TypeError):
-        return result(kind + ':' + value, 'ERROR', '探测子进程异常', returncode=child.returncode,
+        return result(check, 'ERROR', '探测子进程异常', returncode=child.returncode,
                       native_stdout=child.stdout, native_stderr=child.stderr)
+
+
+def bounded_probe(kind, value, work, timeout):
+    return bounded_call(kind + ':' + value, ['--_probe', kind, value, work], timeout)
 
 
 def decode_mount_field(text):
@@ -224,8 +274,7 @@ def parse_mounts(text):
 
 
 def gpu_mapping(path):
-    return (path == '/usr/lib/wsl/lib' or path.startswith('/usr/lib/wsl/lib/')
-            or path.startswith('/usr/lib/wsl/drivers/'))
+    return path == '/usr/lib/wsl/lib' or bool(re.fullmatch(r'/usr/lib/wsl/drivers/[^/]+', path))
 
 
 def mount_checks(records):
@@ -248,10 +297,11 @@ def mount_checks(records):
     return items
 
 
-def socket_check(path):
+def socket_check(path, references=()):
     check = 'management-socket:' + path
     try:
-        mode = os.stat(path).st_mode
+        info = os.stat(path)
+        mode = info.st_mode
     except FileNotFoundError:
         return result(check, 'PASS', '管理 socket 路径不存在')
     except OSError as exc:
@@ -262,7 +312,21 @@ def socket_check(path):
         with socket.socket(socket.AF_UNIX) as connection:
             connection.settimeout(2)
             connection.connect(path)
-        return result(check, 'REVIEW', '可以连接；未发送管理请求，需确认服务属于宿主还是容器')
+            peer = struct.unpack('3i', connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
+        host_match = any(item['device'] == info.st_dev and item['inode'] == info.st_ino for item in references)
+        local_peer, peer_namespaces = False, {}
+        if peer[0] > 0:
+            try:
+                peer_namespaces = {name:os.readlink('/proc/' + str(peer[0]) + '/ns/' + name) for name in ('pid', 'mnt', 'user')}
+                local_peer = all(peer_namespaces[name] == os.readlink('/proc/self/ns/' + name) for name in peer_namespaces)
+            except OSError:
+                pass
+        return result(check, 'FAIL' if host_match else 'INFO' if local_peer else 'REVIEW',
+                      '连接到了宿主参照中的管理 socket' if host_match else
+                      '服务进程属于当前容器 namespace；未发送管理请求' if local_peer else
+                      '可以连接；未发送管理请求，来源尚不能确认',
+                      device=info.st_dev, inode=info.st_ino, host_reference_match=host_match,
+                      peer_pid=peer[0], peer_uid=peer[1], peer_gid=peer[2], peer_namespaces=peer_namespaces)
     except OSError as exc:
         if exc.errno in DENIED:
             return denied_result(check, 'connect', exc)
@@ -272,10 +336,15 @@ def socket_check(path):
 
 def canary_check(index, item):
     attempts = []
-    for prefix in ('', '/proc/1/root', '/proc/self/root'):
+    prefixes = ['', '/proc/1/root', '/proc/self/root']
+    pids = sorted((name for name in os.listdir('/proc') if name.isdigit()), key=int)
+    prefixes += ['/proc/' + pid + '/root' for pid in pids[:MAX_INVENTORY] if pid != '1']
+    for prefix in prefixes:
         path = prefix + item['path']
         try:
-            fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW | os.O_CLOEXEC)
+            # The reference contains only caller-approved non-secret canaries.
+            # Follow aliases too; rejecting a symlink would miss a real route.
+            fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK | os.O_CLOEXEC)
             with os.fdopen(fd, 'rb') as source:
                 if not stat.S_ISREG(os.fstat(source.fileno()).st_mode):
                     attempts.append(dict(path=path, outcome='not-regular'))
@@ -285,82 +354,283 @@ def canary_check(index, item):
             attempts.append(dict(path=path, outcome='readable', sha256=digest, bytes=len(data)))
             if len(data) <= 65536 and digest == item['sha256']:
                 return result('host-canary:' + str(index), 'FAIL',
-                              '读到了宿主提供的唯一标记文件', attempts=attempts)
+                              '读到了宿主提供的唯一标记文件', attempts=attempts, processes_truncated=len(pids) > MAX_INVENTORY)
         except OSError as exc:
             if exc.errno not in DENIED | {errno.ENOENT, errno.ENOTDIR, errno.ELOOP}:
                 return result('host-canary:' + str(index), 'ERROR', '宿主标记探测异常',
                               native_error=str(exc), attempts=attempts)
             attempts.append(dict(path=path, outcome='unavailable', errno=exc.errno))
     readable = any(attempt['outcome'] in ('readable', 'not-regular') for attempt in attempts)
-    return result('host-canary:' + str(index), 'REVIEW' if readable else 'PASS',
-                  '同名对象可见，内容不符；需核对来源' if readable else '宿主标记不可读或不可见', attempts=attempts)
+    truncated = len(pids) > MAX_INVENTORY
+    return result('host-canary:' + str(index), 'REVIEW' if readable else 'SKIP' if truncated else 'PASS',
+                  '同名对象可见，内容不符；需核对来源' if readable else
+                  '进程路径清单达到上限，未完整验证' if truncated else '宿主标记不可读或不可见',
+                  attempts=attempts, processes_truncated=len(pids) > MAX_INVENTORY)
+
+
+def device_inventory():
+    entries, unknown, errors, depth_limited = [], [], [], []
+    pending = [('/dev', 0)]
+    visited = 0
+    while pending and visited < MAX_INVENTORY:
+        directory, depth = pending.pop()
+        try:
+            with os.scandir(directory) as stream:
+                for entry in stream:
+                    if visited >= MAX_INVENTORY:
+                        break
+                    visited += 1
+                    try:
+                        info = entry.stat(follow_symlinks=False)
+                        if stat.S_ISDIR(info.st_mode) and depth < 3:
+                            pending.append((entry.path, depth + 1))
+                        elif stat.S_ISDIR(info.st_mode):
+                            depth_limited.append(entry.path)
+                        if not (stat.S_ISCHR(info.st_mode) or stat.S_ISBLK(info.st_mode)):
+                            continue
+                        major, minor = os.major(info.st_rdev), os.minor(info.st_rdev)
+                        basic = (stat.S_ISCHR(info.st_mode) and
+                                 ((major == 1 and minor in (3, 5, 7, 8, 9))
+                                  or (major == 5 and minor in (0, 1, 2))
+                                  or 136 <= major <= 143
+                                  or (major == 10 and minor in (200, 229))))
+                        gpu = (stat.S_ISCHR(info.st_mode) and
+                               (major, minor) not in {(major, minor) for mode, major, minor in DEVICES.values() if mode == stat.S_IFCHR}
+                               and bool(re.fullmatch(r'/dev/(?:dxg|nvidia[0-9]+|nvidiactl|nvidia-uvm(?:-tools)?|nvidia-modeset|dri/(?:card|renderD)[0-9]+)', entry.path)))
+                        item = dict(path=entry.path, kind='char' if stat.S_ISCHR(info.st_mode) else 'block',
+                                    major=major, minor=minor, basic=basic, gpu=gpu)
+                        entries.append(item)
+                        if not basic and not gpu:
+                            unknown.append(item)
+                    except OSError as exc:
+                        errors.append(dict(path=entry.path, errno=exc.errno, native_error=str(exc)))
+        except OSError as exc:
+            errors.append(dict(path=directory, errno=exc.errno, native_error=str(exc)))
+    inaccessible = [item for item in errors if item['errno'] in DENIED]
+    errors = [item for item in errors if item['errno'] not in DENIED]
+    return result('device-inventory', 'REVIEW' if unknown else 'ERROR' if errors else 'SKIP' if visited >= MAX_INVENTORY or depth_limited else 'PASS',
+                  '设备清单；非基础/GPU 设备需核对来源及授权，不据节点存在认定可操作宿主',
+                  devices=sorted(entries, key=lambda item: item['path']), unclassified=unknown,
+                  errors=errors, inaccessible=inaccessible, depth_limited=depth_limited, truncated=visited >= MAX_INVENTORY)
+
+
+def process_roots(reference):
+    pids = sorted((name for name in os.listdir('/proc') if name.isdigit()), key=int)
+    entries, errors, matches = [], [], []
+    for pid in pids[:MAX_INVENTORY]:
+        entry = dict(pid=int(pid))
+        try:
+            entry['root'] = os.readlink('/proc/' + pid + '/root')
+            entry['namespaces'] = {name: os.readlink('/proc/' + pid + '/ns/' + name) for name in ('user', 'mnt', 'pid')}
+            if reference and any(entry['namespaces'][name] == reference['namespaces'][name] for name in entry['namespaces']):
+                matches.append(entry)
+            entries.append(entry)
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # Processes may exit during inventory.
+                errors.append(dict(pid=int(pid), errno=exc.errno, native_error=str(exc)))
+    return result('process-roots', 'FAIL' if matches else 'SKIP' if not reference or errors or len(pids) > MAX_INVENTORY else 'PASS',
+                  '发现使用宿主 namespace 的可见进程' if matches else '可见进程路径核验；没有宿主参照时不宣称隔离通过',
+                  processes=entries, host_matches=matches, errors=errors, truncated=len(pids) > MAX_INVENTORY)
+
+
+def socket_paths():
+    paths = list(SOCKETS)
+    truncated = False
+    for line in read_text('/proc/net/unix').splitlines()[1:]:
+        fields = line.split(maxsplit=7)
+        if len(fields) == 8:
+            path = fields[7]
+            if path.startswith('/') and re.search(r'(?:lxd|docker|containerd|podman|libvirt|virtqemud|snapd|systemd/private|bus)', path):
+                paths.append(path)
+    root = Path('/run/user')
+    if root.exists():
+        entries = list(itertools.islice(root.iterdir(), MAX_INVENTORY + 1))
+        truncated = len(entries) > MAX_INVENTORY
+        for entry in entries[:MAX_INVENTORY]:
+            if entry.name.isdigit():
+                paths.extend(str(entry / suffix) for suffix in ('docker.sock', 'podman/podman.sock', 'bus'))
+    paths = list(dict.fromkeys(paths))
+    return paths[:MAX_INVENTORY], truncated or len(paths) > MAX_INVENTORY
+
+
+class UnixHTTP(http.client.HTTPConnection):
+    def connect(self):
+        self.sock = socket.socket(socket.AF_UNIX)
+        try:
+            self.sock.settimeout(self.timeout)
+            self.sock.connect('/dev/lxd/sock')
+        except BaseException:
+            self.sock.close()
+            self.sock = None
+            raise
+
+
+DEVLXD_ENDPOINTS = ('/1.0', '/1.0/config', '/1.0/config/security.privileged',
+                    '/1.0/storage-pools/mas-probe-unowned/volumes/custom',
+                    '/1.0/images/' + '0' * 64 + '/export')
+
+
+def devlxd_check(endpoint):
+    check = 'devlxd-api:' + endpoint
+    try:
+        if not stat.S_ISSOCK(os.stat('/dev/lxd/sock').st_mode):
+            return result(check, 'REVIEW', '实例接口路径不是 socket')
+    except FileNotFoundError:
+        return result(check, 'SKIP', '基本实例接口未提供')
+    with contextlib.closing(UnixHTTP('localhost', timeout=2)) as connection:
+        connection.request('GET', endpoint)
+        response = connection.getresponse()
+        # Do not read image contents or return cloud-init/credential values.
+        if endpoint in ('/1.0', '/1.0/config') and response.status == 200:
+            body = response.read(16385)
+            if len(body) > 16384:
+                raise ValueError('devlxd 响应超出读取上限')
+            data = json.loads(body)
+            if endpoint == '/1.0/config':
+                if not isinstance(data, list) or any(not isinstance(key, str) or not key.startswith(('/1.0/config/user.', '/1.0/config/cloud-init.')) for key in data):
+                    raise ValueError('devlxd 配置列表格式无效')
+                return result(check, 'INFO', '仅列出本实例配置键名，不读取配置值', http_status=200, keys=data)
+            if not isinstance(data, dict):
+                raise ValueError('devlxd 实例响应格式无效')
+            return result(check, 'FAIL' if data.get('supported_storage_drivers') else 'INFO',
+                          '实例接口仍存在；记录卷管理能力，不读取宿主文件', http_status=200,
+                          volume_management_advertised=bool(data.get('supported_storage_drivers')))
+        if endpoint in ('/1.0', '/1.0/config'):
+            return result(check, 'SKIP', '基本实例接口不可用', http_status=response.status)
+        # 403 proves the documented feature/authorization gate refused access.
+        # A missing fingerprint/pool can also produce 404 with the feature on.
+        status = 'PASS' if response.status in (401, 403) else 'FAIL' if response.status == 200 else 'SKIP' if response.status == 404 else 'ERROR'
+        return result(check, status, '实例受限 API 的只读请求结果；404 不能证明权限已关闭', http_status=response.status)
 
 
 def run_checks(reference, gpu, timeout, emit):
-    def add(item):
-        emit(item)
-    for name in ('uid', 'gid'):
+    def observe(check, operation):
+        try:
+            emit(operation())
+        except Exception as exc:
+            emit(result(check, 'ERROR', '此项观察失败；继续检查其他入口', native_error=str(exc)))
+
+    def identity(name):
         text = read_text('/proc/self/' + name + '_map')
         rows = mappings(text)
         safe = any(start == 0 for start, _, _ in rows) and all(outside > 0 for _, outside, _ in rows)
-        add(result(name + '-map', 'PASS' if safe else 'FAIL', '容器 root 不应映射到宿主 root', mapping=text))
-    status = dict(line.split(':', 1) for line in read_text('/proc/self/status').splitlines() if ':' in line)
-    seccomp = status.get('Seccomp', '').strip()
-    add(result('seccomp', 'PASS' if seccomp == '2' else 'FAIL', '检查实际 seccomp 过滤状态', mode=seccomp))
-    add(result('capabilities', 'INFO', '能力位属于当前 namespace；不能单凭它判断拥有宿主权限',
-               effective=status.get('CapEff', '').strip(), bounding=status.get('CapBnd', '').strip()))
-    for name, value in namespace_ids().items():
-        expected = reference['namespaces'][name] if reference else None
-        add(result('namespace:' + name, ('PASS' if value != expected else 'FAIL') if expected else 'SKIP',
-                   '与宿主 namespace 比较' if expected else '无宿主参照，仅记录，尚未验证隔离',
-                   guest=value, host=expected))
-    profile, enabled = None, None
-    for path, key in (('/proc/self/attr/current', 'profile'), ('/sys/module/apparmor/parameters/enabled', 'enabled')):
-        try:
-            value = read_text(path).strip()
-            if key == 'profile':
-                profile = value
-            else:
-                enabled = value
-        except OSError:
-            pass
-    add(result('apparmor', 'INFO' if enabled == 'N' or (profile and profile.startswith('lxd-')) else 'REVIEW',
-               '如实记录 AppArmor；未启用不冒充已生效', enabled=enabled, profile=profile))
-    with open('/dev/null', 'rb') as source:
-        if source.read(1) != b'':
-            raise ValueError('/dev/null 行为不符')
-    with open('/dev/zero', 'rb') as source:
-        if source.read(1) != b'\0':
-            raise ValueError('/dev/zero 行为不符')
-    if not stat.S_ISDIR(os.stat('/sys').st_mode):
-        raise ValueError('/sys 不是目录')
-    add(result('basic-interfaces', 'PASS', '/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口',
-               sys_present=True))
-    for item in mount_checks(parse_mounts(read_text('/proc/self/mountinfo'))):
-        add(item)
-    for path in SOCKETS:
-        add(socket_check(path))
-    add(result('devlxd', 'INFO', '实例内 devlxd 与宿主 LXD 管理 socket 不同，按当前兼容策略保留',
-               visible=bool(visible_paths(('/dev/lxd/sock',)))))
-    windows = visible_paths(('/mnt/c/Windows', '/mnt/c/Users', '/proc/sys/fs/binfmt_misc/WSLInterop', '/init'))
-    add(result('windows-interop', 'REVIEW' if windows else 'PASS',
-               '发现 Windows/WSL 入口特征，需核对；未运行 Windows 命令' if windows else '未发现典型 Windows/WSL 入口',
-               paths=windows, wsl_interop_environment=os.environ.get('WSL_INTEROP')))
-    devices = ['/dev/' + name for name in sorted(os.listdir('/dev'))
-               if name == 'dxg' or re.fullmatch(r'nvidia[0-9]+', name)]
-    add(result('gpu-expectation', ('PASS' if bool(devices) == (gpu == 'on') else 'FAIL') if gpu != 'unknown' else 'INFO',
-               'GPU 是获准的资源例外；仅检查显式开关预期，不将其判为越界', expected=gpu, devices=devices))
+        return result(name + '-map', 'PASS' if safe else 'FAIL', '容器 root 不应映射到宿主 root', mapping=text)
+    for name in ('uid', 'gid'):
+        observe(name + '-map', lambda name=name: identity(name))
+
+    status = {}
+    def security_status():
+        status.update(dict(line.split(':', 1) for line in read_text('/proc/self/status').splitlines() if ':' in line))
+        mode = status.get('Seccomp', '').strip()
+        return result('seccomp', 'PASS' if mode == '2' else 'FAIL', '检查实际 seccomp 过滤状态', mode=mode)
+    observe('seccomp', security_status)
+    emit(result('capabilities', 'INFO' if status else 'SKIP', '能力位属于当前 namespace；不能单凭它判断拥有宿主权限',
+                effective=status.get('CapEff', '').strip(), bounding=status.get('CapBnd', '').strip()))
+    for name in NAMESPACES:
+        def namespace(name=name):
+            value = os.readlink('/proc/self/ns/' + name)
+            expected = reference['namespaces'][name] if reference else None
+            return result('namespace:' + name, ('PASS' if value != expected else 'FAIL') if expected else 'SKIP',
+                          '与宿主 namespace 比较' if expected else '无宿主参照，仅记录，尚未验证隔离', guest=value, host=expected)
+        observe('namespace:' + name, namespace)
+    observe('process-roots', lambda: process_roots(reference))
+
+    def apparmor():
+        values, errors = {}, []
+        for path, key in (('/proc/self/attr/current', 'profile'), ('/sys/module/apparmor/parameters/enabled', 'enabled')):
+            try:
+                values[key] = read_text(path).strip()
+            except OSError as exc:
+                errors.append(dict(path=path, errno=exc.errno))
+        return result('apparmor', 'INFO', '记录可选 AppArmor 的实际状态；不将未启用本身视为越界', **values, errors=errors)
+    observe('apparmor', apparmor)
+
+    def basic():
+        with open('/dev/null', 'rb') as source:
+            if source.read(1) != b'':
+                raise ValueError('/dev/null 行为不符')
+        with open('/dev/zero', 'rb') as source:
+            if source.read(1) != b'\0':
+                raise ValueError('/dev/zero 行为不符')
+        if not stat.S_ISDIR(os.stat('/sys').st_mode):
+            raise ValueError('/sys 不是目录')
+        return result('basic-interfaces', 'PASS', '/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口', sys_present=True)
+    observe('basic-interfaces', basic)
+    observe('device-inventory', device_inventory)
+
+    records = []
+    try:
+        records = parse_mounts(read_text('/proc/self/mountinfo'))
+        for item in mount_checks(records):
+            emit(item)
+    except Exception as exc:
+        emit(result('mount-sources', 'ERROR', '挂载来源读取失败', native_error=str(exc)))
+    def special():
+        mounts = [item for item in records if item['path'] in SPECIAL_FILESYSTEMS]
+        visible = visible_paths(SPECIAL_FILESYSTEMS)
+        return result('special-filesystems', 'INFO', '记录内核接口挂载；可见不等于能读取或修改宿主', mounts=mounts, visible=visible)
+    observe('special-filesystems', special)
+
+    paths = list(SOCKETS)
+    try:
+        paths, truncated = socket_paths()
+        emit(result('socket-inventory', 'SKIP' if truncated else 'INFO',
+                    '管理入口路径清单；逐项连接检查，不发送管理请求', paths=paths, truncated=truncated))
+    except Exception as exc:
+        emit(result('socket-inventory', 'ERROR', '动态路径发现失败，仍检查固定管理路径', native_error=str(exc)))
+    sockets = reference.get('sockets', []) if reference else []
+    paths = list(dict.fromkeys(paths + [item['path'] for item in sockets]))
+    for path in paths:
+        emit(bounded_call('management-socket:' + path, ['--_socket', path, json.dumps(sockets)], timeout))
+    observe('devlxd', lambda: result('devlxd', 'INFO', '基本实例接口与宿主管理接口不同，按当前兼容策略保留',
+                                   visible=bool(visible_paths(('/dev/lxd/sock',)))))
+    for endpoint in DEVLXD_ENDPOINTS:
+        emit(bounded_call('devlxd-api:' + endpoint, ['--_devlxd', endpoint], timeout))
+
+    def windows():
+        paths = visible_paths(WINDOWS_PATHS)
+        interop = os.environ.get('WSL_INTEROP')
+        registrations = []
+        truncated = False
+        root = Path('/proc/sys/fs/binfmt_misc')
+        if root.exists():
+            entries = list(itertools.islice(root.iterdir(), MAX_INVENTORY + 1))
+            truncated = len(entries) > MAX_INVENTORY
+            for item in entries[:MAX_INVENTORY]:
+                if item.name not in ('register', 'status'):
+                    content = read_text(item)
+                    interpreter = next((line[12:] for line in content.splitlines() if line.startswith('interpreter ')), '')
+                    registrations.append(dict(name=item.name, interpreter=interpreter))
+            if any(item['interpreter'] == '/init' or '.exe' in item['interpreter'].lower() for item in registrations):
+                paths.append('binfmt_misc:Windows-interpreter')
+        return result('windows-interop', 'REVIEW' if paths or interop else 'SKIP' if truncated else 'PASS',
+                      'Windows/WSL 入口特征需核对；未执行解释器或 Windows 命令' if paths or interop else '未发现典型 Windows/WSL 入口',
+                      paths=paths, registrations=registrations, truncated=truncated, wsl_interop_environment=interop)
+    observe('windows-interop', windows)
+    def gpu_check():
+        candidates = ['/dev/' + name for name in sorted(os.listdir('/dev'))
+                      if name == 'dxg' or re.fullmatch(r'nvidia[0-9]+', name)]
+        if Path('/dev/dri').is_dir():
+            candidates += [str(item) for item in Path('/dev/dri').iterdir() if re.fullmatch(r'(card|renderD)[0-9]+', item.name)]
+        devices = [path for path in candidates if stat.S_ISCHR(os.stat(path).st_mode)]
+        invalid = sorted(set(candidates) - set(devices))
+        status = ('PASS' if bool(devices) == (gpu == 'on') else 'FAIL') if gpu != 'unknown' else 'INFO'
+        return result('gpu-expectation', 'REVIEW' if invalid else status,
+                      'GPU 为获准资源例外；核对显式开关预期及设备类型', expected=gpu, devices=devices, invalid_nodes=invalid)
+    observe('gpu-expectation', gpu_check)
     if reference and reference.get('canaries'):
         for index, item in enumerate(reference['canaries']):
-            add(canary_check(index, item))
+            emit(bounded_call('host-canary:' + str(index), ['--_canary', str(index), json.dumps(item)], timeout))
     else:
-        add(result('host-canaries', 'SKIP', '未提供宿主唯一标记；常见路径检查不能替代任意宿主文件验证'))
+        emit(result('host-canaries', 'SKIP', '未提供宿主唯一标记；常见路径检查不能替代任意宿主文件验证'))
     with tempfile.TemporaryDirectory(prefix='mas-guest-security-') as work:
         for name in DEVICES:
-            add(bounded_probe('device', name, work, timeout))
+            emit(bounded_probe('device', name, work, timeout))
         for path in CONTROLS:
-            add(bounded_probe('control', path, work, timeout))
-    add(result('network-policy', 'INFO', '网络流量及网络登录另议；此脚本不扫描网络、不尝试登录'))
+            emit(bounded_probe('control', path, work, timeout))
+        for path in READ_ENDPOINTS:
+            emit(bounded_probe('read-endpoint', path, work, timeout))
+    emit(result('network-policy', 'INFO', '网络流量及网络登录另议；此脚本不扫描网络、不尝试登录'))
 
 
 def publish_report(path, report):
@@ -379,39 +649,54 @@ def publish_report(path, report):
 
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
-    if args and args[0] == '--_probe':
-        if len(args) != 4:
-            return 2
+    if args and args[0].startswith('--_'):
         try:
             environment_check()
-            print(json.dumps(active_probe(*args[1:]), ensure_ascii=False))
+            if args[0] == '--_probe' and len(args) == 4:
+                item = active_probe(*args[1:])
+            elif args[0] == '--_canary' and len(args) == 3 and re.fullmatch(r'[0-9]+', args[1]):
+                canary = json.loads(args[2])
+                validate_reference(dict(schema=1, namespaces=namespace_ids(), canaries=[canary]))
+                item = canary_check(int(args[1]), canary)
+            elif args[0] == '--_socket' and len(args) == 3:
+                references = json.loads(args[2])
+                validate_reference(dict(schema=1, namespaces=namespace_ids(), sockets=references))
+                if not args[1].startswith('/') or any(ord(c) < 32 or ord(c) == 127 for c in args[1]):
+                    raise ValueError('socket 路径无效')
+                item = socket_check(args[1], references)
+            elif args[0] == '--_devlxd' and len(args) == 2 and args[1] in DEVLXD_ENDPOINTS:
+                item = devlxd_check(args[1])
+            else:
+                raise ValueError('内部探测参数无效')
+            print(json.dumps(item, ensure_ascii=False))
             return 0
         except Exception as exc:
-            print(str(exc), file=sys.stderr)
+            print(terminal_text(str(exc)), file=sys.stderr)
             return 2
     parser = argparse.ArgumentParser(add_help=False, description='在 LXD 容器内检查宿主资源隔离边界；不会写入内核控制接口或执行 Windows 命令。')
     parser.add_argument('-h', '--help', action='help', help='显示帮助并退出')
     parser.add_argument('--report', type=Path, help='JSON 报告路径；已存在则报错，默认创建唯一文件')
     parser.add_argument('--host-reference', type=Path, help='可选宿主 namespace/唯一标记参照 JSON')
     parser.add_argument('--gpu', choices=('on', 'off', 'unknown'), default='unknown', help='容器的 GPU 开关预期（默认 unknown）')
-    parser.add_argument('--timeout', type=float, default=3, help='每项设备/控制接口探测的超时秒数（1–10，默认 3）')
+    parser.add_argument('--timeout', type=float, default=3, help='每项设备/控制/socket/API/标记探测超时（1–10 秒，默认 3）')
     options = parser.parse_args(args)
     if not 1 <= options.timeout <= 10:
         parser.error('--timeout 必须为 1–10 秒')
     path = (options.report or Path('guest-security-' + time.strftime('%Y%m%d-%H%M%S') + '-' + uuid.uuid4().hex[:8] + '.json')).absolute()
     started = time.monotonic()
     report = dict(schema=SCHEMA, purpose='guest-boundary-probe', gpu_expected=options.gpu, checks=[])
+    interrupted = False
     def emit(item):
         report['checks'].append(item)
         print('[' + STATUS_TEXT[item['status']] + '] ' + terminal_text(item['check'])
               + '：' + terminal_text(item['message']), flush=True)
         print('  方法：' + terminal_text(item['method']), flush=True)
         if item['evidence']:
-            print('  观察：' + json.dumps(item['evidence'], ensure_ascii=False), flush=True)
+            print('  观察：' + terminal_text(json.dumps(item['evidence'], ensure_ascii=False)), flush=True)
         if item['status'] == 'ERROR':
             for key in ('native_error', 'native_stderr'):
                 if item['evidence'].get(key):
-                    print('  ' + key + ': ' + json.dumps(item['evidence'][key], ensure_ascii=False),
+                    print('  ' + key + ': ' + terminal_text(json.dumps(item['evidence'][key], ensure_ascii=False)),
                           file=sys.stderr, flush=True)
     try:
         if any(ord(character) < 32 or ord(character) == 127 for character in str(path)):
@@ -422,10 +707,13 @@ def main(argv=None):
         environment_check()
         print('\n容器安全边界测试（以容器 root 执行）\n', flush=True)
         run_checks(reference, options.gpu, options.timeout, emit)
+    except KeyboardInterrupt:
+        interrupted = True
+        emit(result('execution', 'ERROR', '测试已中断；保留已完成的检查，不将其余入口算作通过'))
     except Exception as exc:
         emit(result('execution', 'ERROR', '测试未完成', native_error=str(exc)))
     counts = Counter(item['status'] for item in report['checks'])
-    code = 2 if counts['ERROR'] else 1 if counts['FAIL'] else 0
+    code = 130 if interrupted else 2 if counts['ERROR'] else 1 if counts['FAIL'] else 0
     report.update(elapsed=time.monotonic() - started, exit_code=code,
                   counts={status: counts[status] for status in STATUS_TEXT},
                   conclusion='boundary_failure' if counts['FAIL'] else 'incomplete' if counts['ERROR'] else 'no_confirmed_breach',

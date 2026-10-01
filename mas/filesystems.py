@@ -9,13 +9,14 @@ import shutil
 import signal
 import stat
 import subprocess
+import sys
 import tempfile
 import time
 import threading
 from urllib.parse import urlencode, quote
 import uuid
 
-from .core import Error, validate_target
+from .core import Error, validate_target, finish_client
 from .i18n import t
 from .diagnostics import cleanup_scope, failure_text
 
@@ -405,6 +406,24 @@ class Filesystems:
             raise Error(t('fs_conflict', path=entry['destination']))
         return actual[0] if actual else None
 
+    def _start_access_probe(self, entry, work):
+        # SSHFS mounts FUSE before connecting SSH/SFTP. Observe a real request
+        # in a child so a blocked filesystem cannot bypass our deadline.
+        return self._spawn([sys.executable, '-I', '-c',
+            'import os,stat,sys;sys.exit(0 if stat.S_ISDIR(os.stat(sys.argv[1]).st_mode) else 1)', entry['destination']],
+            work/'access.out', work/'access.err')
+
+    def _access_observation(self, entry, listener, sshfs, access, work):
+        actual = self._mount_observation(entry, listener, sshfs, work)
+        code = access.poll()
+        if code is None:
+            return None
+        if code:
+            raise Error(self._helper_failure(work, 'access', 'fs_mount_failed'))
+        if not read_output_file(work/'known_hosts').strip():
+            raise Error(self._helper_failure(work, 'sshfs', 'fs_mount_failed'))
+        return actual
+
     def mount(self, target, path=None, *, default_home=False):
         self._target(target)
         for program in ('sshfs', 'fusermount3'):
@@ -439,6 +458,10 @@ class Filesystems:
                 actual = self._wait('mountfs', target, lambda: self._mount_observation(entry, listener, sshfs, work),
                     final=False, started=waiting, deadline=deadline)
                 entry['mount_id'] = actual['id']
+                access = self._start_access_probe(entry, work)
+                with cleanup_scope(lambda: finish_client(access, min(5, self.timeout))):
+                    self._wait('mountfs', target, lambda: self._access_observation(entry, listener, sshfs, access, work),
+                        final=False, started=waiting, deadline=deadline)
                 self._save(data)
                 diagnostics = failure_text(*(read_output_file(work/name) for name in ('listener.err', 'sshfs.err')))
             except BaseException:
@@ -514,7 +537,7 @@ class Filesystems:
             if not entry.get('work_created', True):
                 raise Error(t('fs_conflict', path=work))
             # Only the private per-mount connection files, never container data.
-            for name in ('listener.out', 'listener.err', 'sshfs.out', 'sshfs.err', 'known_hosts'):
+            for name in ('listener.out', 'listener.err', 'sshfs.out', 'sshfs.err', 'known_hosts', 'access.out', 'access.err'):
                 (work/name).unlink(missing_ok=True)
             work.rmdir()
         data['mounts'].remove(entry)

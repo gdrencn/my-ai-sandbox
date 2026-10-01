@@ -1,78 +1,149 @@
 # 容器内安全边界测试脚本
 
-此脚本用于从容器 root 的权限视角，尝试访问当前 mas 隔离策略不应提供的宿主资源。它是独立诊断工具，不属于当前 mas-test 的 26 个自动化测试环节。
+此脚本从容器 root 的权限视角，检查未经批准的宿主资源访问路径。它可以独立下载运行；0.2.12 的自动化测试也打包并执行同一份源码，不维护另一套重复探测实现。
 
 ## 下载与运行
 
-在新机器的容器终端内运行这一条命令即可，需要 curl、Python 3.10+；以普通用户执行时还需要系统 sudo：
+在容器终端内运行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
 ```
 
-入口下载完整的 `test/guest_security_probe.py` 到本次私有临时目录，再运行该文件；结束后清理下载文件。它不安装 mas、不运行 mas-test，也不安装软件包。容器 root 直接运行；普通用户通过系统 `sudo` 执行，认证按系统原有方式处理。mas 的 sandbox 用户已有免密 sudo。Python 脚本本身不处理提权，且不依赖 mas 或第三方 Python 包。
+需要 curl、Python 3.10+；普通用户还需要系统 sudo。入口下载脚本到私有临时目录，运行后清理下载文件，不安装 mas、软件包或 Python 依赖。容器 root 直接执行；其他用户通过系统 sudo 执行。Python 脚本不处理提权，主入口和子探测入口均检查 root 身份与 LXC 运行标识。该检查防止误运行，不是不可伪造的身份认证。
 
-必须使用容器 root 才能检查最强的容器内权限；以 sandbox 普通身份测试不足以覆盖 root 工作负载。脚本检查 LXC 运行标识，拒绝在普通宿主执行探测；这个检查用于防止误运行，不是不可伪造的身份认证。
-
-终端逐项显示检查标识、尝试的方法、实际结果和观察证据。设备/内核控制入口遇到权限拒绝时，会显示是 `mknod` 还是 `open` 阶段被拒绝，以及原始 errno；最后显示各状态计数和报告位置。
-
-默认在当前目录创建名称唯一、权限为 `0600` 的 JSON 报告。也可以指定文件名；已有文件或符号链接均不覆盖：
+结果逐项显示检查标识、方法、状态和观察证据。默认在运行命令时的当前目录生成唯一的、权限 0600 的 JSON 报告；root 所有的报告可通过 sudo cat 查看。已有文件和符号链接均不覆盖。可以指定参数：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- --report guest-security-report.json --gpu on
 ```
 
-报告保存在运行命令时的当前目录，不在下载临时目录中；容器 root 所有的 `0600` 报告可以用 `sudo cat guest-security-report.json` 查看。终端结果无需再次打开报告即可阅读。想保留脚本文件供离线重复执行，可以单独下载同一份实现：
+`--gpu on` / `off` 核对设备开关预期；默认 `unknown` 仅记录。设备、内核入口、管理 socket、devlxd 和宿主标记的每个独立子探测默认最多 3 秒，`--timeout` 可设为 1–10 秒。超时属于 ERROR，不能当作访问被拒绝。普通文本观察限制为 1,048,576 字符，设备、进程、动态 socket 和 binfmt_misc 清单限制为 512 项。设备目录递归深度最多 3；数量或深度导致未完整检查时如实记录 SKIP。
+
+离线执行可下载同一源码：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/guest_security_probe.py -o guest_security_probe.py
 sudo python3 guest_security_probe.py
 ```
 
-`--gpu on` 表示预期 GPU 开启；`off` 表示预期关闭；默认 `unknown` 仅记录设备，不判定开关是否正确。应根据当前容器的配置选择，不能在没有 GPU 的宿主上默认要求 `on`。每项设备/内核控制入口的子进程默认超时 3 秒，`--timeout` 可以设置为 1–10 秒。
-
 ## 检查与尝试
 
 | 检查 | 实际动作 | 结果含义 |
 | --- | --- | --- |
-| UID/GID | 读取 `/proc/self/uid_map`、`gid_map` | 映射到宿主 UID/GID 0 判为 FAIL；非零 root 映射通过。独立的用户 ID 范围仍需宿主配置核验。 |
-| namespace | 记录 user、pid、mnt、net、ipc、uts 标识 | 有宿主参照才比较；与宿主相同判为 FAIL，无参照则 SKIP。 |
-| seccomp | 读取 `/proc/self/status` | 必须实际处于过滤模式 2；不单凭配置项推断。不会枚举或反编译过滤规则。 |
-| AppArmor / capabilities | 读取实际运行时属性与能力位 | INFO/REVIEW；不将当前 namespace 的能力位视为宿主权限，不将未启用 AppArmor 算成已生效。 |
-| 基础接口 | 读取 `/dev/null`、`/dev/zero`，观察 `/proc`、`/sys` | 正常容器接口可以使用，不能将它们的存在视为越界。 |
-| GPU 映射 | 读取 mountinfo 与 `/dev` 设备名称 | WSL GPU 库/驱动子目录映射必须只读；整个驱动父目录挂载判为 FAIL；按显式 GPU 开关预期检查设备存在。这里不重复已有 CUDA 计算测试。 |
-| 文件系统来源 | 读取 mountinfo | 典型 Windows 文件系统或宿主 home 来源判为 REVIEW，等待确认来源；不盲目认定每个同名目录属于宿主。 |
-| 管理 socket | 检查路径；若存在，尝试 Unix socket 连接并立即关闭 | 不发送管理请求。能连接判为 REVIEW，必须区分宿主服务和容器自己安装的服务；缺失/权限拒绝有明确记录。 |
-| devlxd | 检查 `/dev/lxd/sock` | 仅记录，这是实例接口，不等于宿主 LXD 管理 socket。 |
-| Windows / WSL 入口 | 检查 Windows 路径、WSLInterop、`/init` 和 WSL_INTEROP 变量 | 路径特征存在判为 REVIEW；不执行 Windows 命令。环境变量只记录，不单独认定存在通道。 |
-| 宿主唯一标记 | 使用可选参照，尝试直接路径与 `/proc/1/root`、`/proc/self/root` 路径读取 | SHA-256 与宿主非敏感唯一标记一致才判为明确 FAIL；可见但内容不符判为 REVIEW；不保存文件内容。 |
-| 未授权设备 | 在本次私有临时目录内尝试创建并只读打开设备节点 | 对 host memory（char 1:1）、kernel log（char 1:11）、KVM（char 10:232）、常规磁盘（block 8:0）逐项检查。创建/打开遭权限拒绝为 PASS；对象不存在或内核不支持为 SKIP；能够打开为 FAIL。 |
-| 内核控制入口 | 尝试以写方式打开，随后立即关闭 | 不写任何字节。只读/权限拒绝为 PASS；成功打开为 REVIEW，因为真正写入还可能有额外权限检查。 |
-| 网络 | 输出独立的范围说明 | 不扫描网络、不连接宿主 TCP 服务、不尝试网络登录；这些仍属于另议的策略。 |
+| UID/GID | 读取 uid_map、gid_map | 容器 root 必须映射到外层非零身份；不凭此推断全部 LXD identity 配置。 |
+| namespace | 比较 user、pid、mnt、net、ipc、uts 标识 | 有可信宿主参照时不同为 PASS、相同为 FAIL；没有参照为 SKIP。 |
+| 可见进程 | 读取各 PID 的 root 与 user/mnt/pid namespace | 与宿主参照相同为 FAIL；无参照、无法完整核验或达到上限为 SKIP；不读取进程内存、环境或凭据。 |
+| seccomp | 读取当前进程 Seccomp | 模式 2 为 PASS；不枚举或反编译过滤规则。 |
+| AppArmor / capabilities | 记录实际属性和能力位 | INFO；不把容器 namespace 内能力位视为宿主权限，不把 AppArmor 未启用本身称为越界。 |
+| 基础接口 | 读取 null、zero 各 1 字节，观察 proc/sys | 正常容器接口不属于未授权宿主访问。 |
+| 设备清单 | 按类型和 major:minor 枚举 /dev | 基础设备与 GPU 节点单独记录；未知节点为 REVIEW。watchdog、USB、PCI 节点不主动打开。被权限保护的目录记录拒绝证据。 |
+| GPU | 检查实际字符设备及 mountinfo | 按显式开关预期核对；WSL 库与单个驱动目录必须只读；整个驱动父目录映射为 FAIL。容器自行创建的嵌套挂载不冒充宿主驱动映射。 |
+| 文件系统来源 | 检查 mountinfo 的类型、挂载根、挂载点 | 典型 Windows 或宿主 home 特征为 REVIEW，需要宿主配置/唯一标记确认来源。 |
+| 特殊内核文件系统 | 记录下列特殊路径的挂载与可见性 | INFO；目录可见不证明可以读写宿主，也不执行写入。 |
+| 管理 socket | 固定路径与动态路径连接后立即关闭 | 不发送管理请求。可信宿主 device/inode 匹配为 FAIL；SO_PEERCRED 的 PID、mount、user namespace 全部属于当前容器时为 INFO；来源无法确认为 REVIEW；缺失或权限拒绝为 PASS。 |
+| devlxd | 对实例接口执行下列只读 GET | 基本接口和 user/cloud-init 键清单为 INFO，不读取键值；受限制入口返回 401/403 为 PASS，200 为 FAIL，404 为 SKIP，其他异常为 ERROR。 |
+| Windows / WSL | 固定路径、环境变量、binfmt_misc 解释器注册 | 发现入口特征为 REVIEW；不执行 Windows 二进制文件或解释器。 |
+| 宿主唯一标记 | 有界读取直接路径和可见进程 root 下的别名 | 与宿主非敏感唯一标记 SHA-256 一致为 FAIL；不同内容或非普通文件为 REVIEW；不可见/不可读为 PASS；达到清单上限为 SKIP。会检查符号链接路径，不保存内容。 |
+| 未授权设备 | 私有临时目录 mknod，再只读 open/close | 创建或打开遭权限拒绝为 PASS；内核无对应对象/能力为 SKIP；成功打开为 FAIL。不会读取设备、写入或调用 ioctl。 |
+| 内核控制入口 | 写模式 open/close | 不使用 O_CREAT/O_TRUNC、不写任何字节。权限/只读拒绝为 PASS；打开成功为 REVIEW，真实写入仍可能受额外检查。 |
+| 内核读取入口 | 只读 open/close | 不读取内存或日志内容。拒绝为 PASS、能力缺失为 SKIP、可打开为 REVIEW。 |
+| 网络 | 说明独立讨论的范围 | 不扫描网络、不连接宿主 TCP 服务、不尝试登录。 |
 
-管理 socket 路径清单：
+一项观察失败会记录 ERROR 并继续检查其他入口，避免因为前面的读取失败而漏掉后续设备或控制入口。
 
-- `/var/snap/lxd/common/lxd/unix.socket`
-- `/var/lib/lxd/unix.socket`
-- `/run/lxd/unix.socket`
-- `/run/docker.sock`
-- `/run/containerd/containerd.sock`
-- `/run/podman/podman.sock`
-- `/run/libvirt/libvirt-sock`
+## 精确路径与设备清单
 
-内核控制入口清单：
+主动设备探测：
+
+- `host-memory`：char `1:1`
+- `kernel-memory`：char `1:2`
+- `io-ports`：char `1:4`
+- `kernel-log`：char `1:11`
+- `kvm`：char `10:232`
+- `host-disk`：block `8:0`
+- `host-nvme`：block `259:0`
+- `host-loop`：block `7:0`
+
+写模式 open/close 的 17 个内核控制入口：
 
 - `/proc/sysrq-trigger`
 - `/proc/sys/kernel/modprobe`
 - `/proc/sys/kernel/kexec_load_disabled`
 - `/proc/sys/vm/drop_caches`
+- `/proc/sys/kernel/core_pattern`
+- `/proc/sys/kernel/hotplug`
+- `/proc/sys/kernel/modules_disabled`
+- `/proc/sys/kernel/sysrq`
+- `/proc/sys/kernel/panic`
+- `/proc/sys/kernel/panic_on_oops`
+- `/proc/sys/kernel/unprivileged_bpf_disabled`
+- `/proc/sys/kernel/perf_event_paranoid`
+- `/proc/sys/kernel/yama/ptrace_scope`
+- `/proc/sys/fs/binfmt_misc/register`
 - `/sys/power/state`
+- `/sys/power/disk`
+- `/sys/kernel/uevent_helper`
 
-Windows/WSL 路径清单：`/mnt/c/Windows`、`/mnt/c/Users`、`/proc/sys/fs/binfmt_misc/WSLInterop`、`/init`。其他文件系统映射通过 mountinfo 检查；该固定清单不声称发现所有可能的 Windows 入口。
+只读 open/close 的内核入口：
+
+- `/proc/kcore`
+- `/proc/kmsg`
+
+14 个固定管理 socket：
+
+- `/var/snap/lxd/common/lxd/unix.socket`
+- `/var/lib/lxd/unix.socket`
+- `/run/lxd/unix.socket`
+- `/run/lxd.socket`
+- `/run/docker.sock`
+- `/var/run/docker.sock`
+- `/run/containerd/containerd.sock`
+- `/run/podman/podman.sock`
+- `/run/libvirt/libvirt-sock`
+- `/run/libvirt/virtqemud-sock`
+- `/run/dbus/system_bus_socket`
+- `/run/systemd/private`
+- `/run/snapd.socket`
+- `/run/snapd-snap.socket`
+
+此外，从 `/proc/net/unix` 发现名称包含 lxd、docker、containerd、podman、libvirt、virtqemud、snapd、systemd/private、bus 的文件路径，并检查 `/run/user/<UID>/docker.sock`、`podman/podman.sock`、`bus`。去重后有界执行；不连接抽象 socket。宿主参照中的额外 socket 路径也会检查。
+
+devlxd 的 5 个只读 GET：
+
+- `/1.0`：记录接口可用性；若广告了受禁止的 storage 驱动则 FAIL。
+- `/1.0/config`：核对只列出 user/cloud-init 配置键名，不读取对应值。
+- `/1.0/config/security.privileged`：核对非 user 配置不可读取。
+- `/1.0/storage-pools/mas-probe-unowned/volumes/custom`：核对禁用 volume 管理后的拒绝。
+- `/1.0/images/<64 个零>/export`：核对未启用 image export 时的拒绝。
+
+最后两项的 404 只能说明指定对象不可用，不能证明功能被策略禁用；因此标为 SKIP。在当前 LXD 6.9 中，这些策略拒绝发生在目标对象查找之前，实际返回 403。
+
+Windows/WSL 固定路径：
+
+- `/mnt/c/Windows`
+- `/mnt/c/Users`
+- `/mnt/d/Windows`
+- `/mnt/d/Users`
+- `/mnt/wsl`
+- `/mnt/wslg`
+- `/run/WSL`
+- `/init`
+- `/proc/sys/fs/binfmt_misc/WSLInterop`
+
+同时记录 WSL_INTEROP 和 binfmt_misc 注册的解释器；其他 Windows 文件系统别名通过 mountinfo 与唯一标记补充核验。
+
+特殊内核路径，仅作可见性/挂载记录：
+
+- `/sys/kernel/debug`
+- `/sys/kernel/security`
+- `/sys/fs/pstore`
+- `/sys/firmware/efi/efivars`
+- `/sys/fs/bpf`
 
 ## 可选宿主参照
 
-容器自己只能观察自己的 namespace。想要直接证实与宿主不同，可以提供从宿主生成的非敏感 JSON。六个 namespace 值应分别来自宿主 `/proc/self/ns/<名称>` 的符号链接内容，下面的数值仅为格式示例，不能直接用于真实测试：
+独立运行无法自行认证宿主 namespace、文件或 socket 来源。可以复制可信宿主步骤生成的非敏感参照 JSON；六个 namespace 值应来自实际宿主 `/proc/self/ns/<名称>`，下例数值仅表示格式：
 
 ```json
 {
@@ -85,39 +156,44 @@ Windows/WSL 路径清单：`/mnt/c/Windows`、`/mnt/c/Users`、`/proc/sys/fs/bin
     "ipc": "ipc:[4026531839]",
     "uts": "uts:[4026531838]"
   },
-  "canaries": []
+  "canaries": [],
+  "sockets": []
 }
 ```
-
-将这个普通 JSON 文件复制到容器后运行：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- --host-reference host-reference.json
 ```
 
-`canaries` 可选。每项为 `{"path": "/绝对路径/唯一非敏感标记", "sha256": "64位小写SHA256"}`。最多 16 项，文件应不超过 64 KiB，路径不得包含上级跳转或控制字符。标记必须由用户明确允许在宿主创建、记录散列并保持存在；不要拿真实密码、SSH 私钥或其他凭据充当标记，也不要把标记所在的宿主目录挂载给容器。只复制参照 JSON，测试目标仍是标记不应被容器读到。
+`canaries` 可选，最多 16 项，每项为 `{"path":"/绝对路径/唯一标记","sha256":"64 位小写 SHA-256"}`。标记须为明确允许创建的非敏感、唯一、最多 64 KiB 的普通文件。不要使用密码、私钥或实际凭据，也不要把标记目录映射给容器。只复制参照 JSON；标记本身留在宿主。
 
-宿主参照是否可信，取决于提供它的宿主侧步骤；仅凭容器内运行脚本不能认证参照，也不能核验宿主 LXD Project/Profile 的完整配置。
+`sockets` 可选，最多 64 项，每项为 `{"path":"/run/宿主管理.sock","device":123,"inode":456}`；数值应来自宿主对实际 socket 的 stat，不能照抄示例。容器内连接到相同文件对象，包括路径别名，才形成明确来源证据。没有此参照时，可见服务会核对 peer namespace，但来源不明仍保持 REVIEW。
 
-## 状态与退出码
+可信宿主参照不能由容器自己生成来代替。当前 mas-test 在隔离的临时测试容器中生成真实宿主 namespace、唯一标记和可用宿主 socket 身份；独立下载运行并不自动得到这些参照。
 
-- PASS：该具体检查符合预期，有对应观察或拒绝证据。
-- FAIL：违反明确预期，例如宿主 root 映射、相同宿主 namespace、匹配的宿主标记或可打开的未授权设备。
-- REVIEW：需要确认来源或继续验证，不能算通过，也不能直接称为逃逸。
-- SKIP：没有参照、对象/能力不存在，尚未验证对应边界。
-- INFO：记录背景或已明确不在本次判断范围的状态。
-- ERROR：探测异常、超时或执行条件不满足，不能当作权限拒绝。
+## 状态、退出码和覆盖限制
 
-退出码 `0` 表示未发现明确 FAIL/ERROR，仍可能有 REVIEW/SKIP；`1` 表示出现 FAIL；`2` 表示存在 ERROR、输入/执行条件问题或报告写入失败。下载/系统 sudo 失败时，一键入口保留该命令的非零退出码；用户中断通常为 `130`，TERM 结束为 `143`。JSON 保留每项 `check`、`method`、`status`、`message`、`evidence`，以及计数、原始错误、实际 AppArmor 属性和结果限制。拒绝已有报告文件，不用覆盖或重试掩盖失败。
+- PASS：该具体检查符合预期，具有观察或拒绝证据。
+- FAIL：明确预期被违反，如宿主 root 映射、相同宿主 namespace、匹配的宿主标记/socket、可打开的禁止设备。
+- REVIEW：来源或进一步权限仍需核对，既不算通过，也不直接称为逃逸。
+- SKIP：缺少参照、对象/能力不存在、清单达到上限或无法完整验证。
+- INFO：背景、容器内服务或明确允许的接口状态。
+- ERROR：探测异常、超时或执行条件问题，不能当作权限拒绝。
 
-## 验证范围与依据
+退出码 0 表示没有 FAIL/ERROR，仍可能有 REVIEW/SKIP；1 表示存在 FAIL；2 表示 ERROR、输入/执行条件或报告写入问题。中断保留已完成检查和错误记录，返回 130。下载/sudo 失败保留原退出码。
 
-脚本不加载/卸载内核模块、不 remount、不修改 sysctl/cgroup、不读写设备内容、不执行 ioctl、不变更宿主服务，也不扫描凭据。除本次临时探测节点、报告文件外不写入文件。全部设备/控制入口测试由有超时的独立子进程执行。
+JSON 保留每项 check、method、status、message、evidence，以及计数、原始错误、覆盖限制。终端转义控制字符，报告保留原始结构化证据。文件名、路径名或 socket 名称本身不能认证宿主来源。常见路径和有界清单不能证明任意未知别名不可访问。
 
-LXD 容器与宿主共享内核，运行时会提供必要的基础接口；本脚本检查配置造成的可见性和访问边界，不执行已知 CVE 利用，也不证明未知上游漏洞不存在。[LXD 安全模型](https://canonical.com/lxd/docs/latest/explanation/security/)、[容器运行环境](https://canonical.com/lxd/docs/latest/container-environment/)、[Linux 设备编号](https://docs.kernel.org/admin-guide/devices.html)
+脚本不执行上游漏洞利用、内核模块加载/卸载、remount、sysctl/cgroup 修改、设备读写/ioctl、宿主服务修改、凭据读取或资源耗尽。允许写入的只有本次容器临时探测目录/节点和报告文件。网络策略、资源配额、未知上游漏洞、宿主 LXD Project/Profile 的完整配置均不由独立脚本证明。
 
-当前 WSL + LXD 6.9 + mas 0.2.11 的临时容器验证，使用真实宿主 namespace 和唯一标记：GPU 开启时 36 项结果（32 PASS、4 INFO），关闭时 34 项结果（30 PASS、4 INFO），均没有 FAIL、REVIEW、SKIP、ERROR。四种设备节点均在 mknod 阶段被拒绝，五种内核控制入口拒绝写方式打开；六种 namespace 与宿主不同，宿主标记不可见。AppArmor 原始结果仍是 enabled=N、profile=`kernel\u0000`，不宣称其已提供约束。
+## 自动化测试复用与依据
 
-默认调用也已在该临时容器内验证：没有宿主参照时，六种 namespace 对比和宿主标记检查明确标为 7 项 SKIP，而不是通过；GPU 预期 unknown 只作 INFO。该次结果为 22 PASS、7 SKIP、5 INFO，无 FAIL/REVIEW/ERROR。
+独立探测源码与一键入口仅打包进入 mas-test，不进入产品或安装包。`tests/test_guest_security_probe.py` 检查拒绝/允许/来源不明/错误/超时分支、每项失败隔离、符号链接、socket 来源、清单截断、报告不覆盖、控制字符和下载入口。旧 `scripts/test_guest_security_probe.py` 仅转发到同一组测试。
 
-20 项独立回归检查验证错误分类、允许访问的 FAIL 分支、来源不明的 REVIEW 分支、超时、普通宿主/非 root 拒绝、报告不覆盖、方法与证据展示，以及一键入口的参数传递、退出码、下载失败、旧 Python 拒绝和临时文件清理。临时容器内另行验证了 root 直接执行、sandbox 通过系统 sudo 执行同一入口，以及报告保留在当前目录。发布后还在另一个新建临时容器中，以 sandbox 身份通过真实 GitHub 下载执行公开一键命令：GPU 开启、无宿主参照时为 24 PASS、7 SKIP、5 INFO，无 FAIL/REVIEW/ERROR。两份公开文件与已验证源码逐字节一致；报告正常保留，下载文件及临时 Project/容器已回收。证据：[GUEST_SECURITY_PROBE_REPORT.json](validation/GUEST_SECURITY_PROBE_REPORT.json)。这些检查没有改变已发布 mas 0.2.11 的程序、安装包或 mas-test 测试数量。
+mas-test 的运行时隔离环节执行完整探测，GPU 环节在关闭后再执行同一探测，复用已有硬件状态，未新增重复 GPU discovery。主报告保存源码 SHA-256、可信参照、每份 guest JSON 与精确 GPU 预期。容器内的正向样本与符号链接样本确认检测器能够发现匹配标记；它们明确标为测试用容器文件，不冒充真实宿主越界。失败时也尝试取回 JSON，再传播原错误；清理仅限本次拥有的文件和测试资源。
+
+依据：[LXD 安全模型](https://canonical.com/lxd/docs/latest/explanation/security/)、[容器运行环境](https://canonical.com/lxd/docs/latest/container-environment/)、[实例 devlxd 源码](https://github.com/canonical/lxd/blob/main/lxd/devlxd.go)、[Linux 设备编号](https://docs.kernel.org/admin-guide/devices.html)、[Unix socket peer credentials](https://man7.org/linux/man-pages/man7/unix.7.html)。
+
+0.2.11 的初始脚本及公开下载验证属于历史证据，保留在 `validation/GUEST_SECURITY_PROBE_REPORT.json`；0.2.12 的本轮完整结果记录在 IMPLEMENTED.md 和版本化主测试报告中。
+
+本轮本地 frozen 包通过 331 项单元测试、26 个实机环节（632.9 秒）。有可信参照时，GPU 开启结果为 59 PASS、16 INFO、1 SKIP；关闭为 57 PASS、16 INFO、1 SKIP，均无 FAIL/REVIEW/ERROR。唯一 SKIP 为不存在的 binfmt_misc/register；AppArmor 仍为未启用，未作其他宣称。详见 validation/V0_2_12_LOCAL_REPORT.json。

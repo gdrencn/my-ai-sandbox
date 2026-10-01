@@ -145,6 +145,11 @@ class DistributionTests(unittest.TestCase):
         self.assertFalse(any(name.startswith(('tests/', 'mas/locales/test/')) for name in names))
         for forbidden in ('mas/testing.py','mas/test_output.py','mas/install.py','mas/dependencies.sh'):
             self.assertNotIn(forbidden,names)
+        from tests.probe_source import source_bytes
+        with zipfile.ZipFile(sys.argv[0]) as archive:
+            for name in ('guest_security_probe.py', 'security.sh'):
+                self.assertEqual(archive.read('tests/' + name), source_bytes(name))
+                self.assertFalse(any(member.endswith('/' + name) for member in names))
 
 
     def test_successful_native_command_keeps_diagnostics_and_raw_output(self):

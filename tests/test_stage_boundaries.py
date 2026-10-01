@@ -203,10 +203,59 @@ class MountBoundaryTests(unittest.TestCase):
         def wait(*args, **kwargs):
             calls.append(kwargs)
             return ('1234','secret') if len(calls)==1 else dict(id=42)
-        with self.mount_environment(), patch.object(self.fs, '_start_listener'), patch.object(self.fs, '_start_sshfs'), patch.object(self.fs, '_wait', side_effect=wait):
+        with self.mount_environment(), patch.object(self.fs, '_start_listener'), patch.object(self.fs, '_start_sshfs'), \
+                patch.object(self.fs, '_start_access_probe', return_value=Mock(poll=Mock(return_value=0))), \
+                patch.object(self.fs, '_wait', side_effect=wait):
             self.fs.mount('demo', '/home/sandbox')
         self.assertEqual(calls[0]['deadline'], calls[1]['deadline'])
         self.assertEqual(calls[0]['started'], calls[1]['started'])
+        self.assertEqual(calls[1]['deadline'], calls[2]['deadline'])
+        self.assertEqual(calls[1]['started'], calls[2]['started'])
         with self.fs.locked() as data:
             self.assertEqual(data['mounts'][0]['mount_id'], 42)
         self.assertEqual(self.manager.emit.call_args.args[0]['scope'], 'function')
+
+    def test_mount_table_before_sftp_readiness_is_not_function_success(self):
+        work = self.base/'access-work'; work.mkdir()
+        entry = self.entry()
+        actual = dict(id=42, kind='fuse.sshfs', source=entry['source'])
+        listener = Mock(poll=Mock(return_value=None))
+        sshfs = Mock(poll=Mock(return_value=None))
+        access = Mock(poll=Mock(return_value=None))
+        with patch.object(self.fs, '_actual', return_value=[actual]):
+            self.assertIsNone(self.fs._access_observation(entry, listener, sshfs, access, work))
+            (work/'known_hosts').write_text('host key')
+            self.assertIsNone(self.fs._access_observation(entry, listener, sshfs, access, work))
+            access.poll.return_value = 0
+            self.assertEqual(self.fs._access_observation(entry, listener, sshfs, access, work), actual)
+            (work/'known_hosts').unlink()
+            with self.assertRaises(Error):
+                self.fs._access_observation(entry, listener, sshfs, access, work)
+
+    def test_access_error_keeps_native_details_and_missing_mount_is_not_ready(self):
+        work = self.base/'access-work'; work.mkdir()
+        entry = self.entry()
+        listener = Mock(poll=Mock(return_value=None))
+        sshfs = Mock(poll=Mock(return_value=None))
+        (work/'access.err').write_text('remote metadata error')
+        with patch.object(self.fs, '_actual', return_value=[]):
+            with self.assertRaisesRegex(Error, 'remote metadata error'):
+                self.fs._access_observation(entry, listener, sshfs, Mock(poll=Mock(return_value=1)), work)
+            (work/'known_hosts').write_text('host key')
+            self.assertIsNone(self.fs._access_observation(entry, listener, sshfs, Mock(poll=Mock(return_value=0)), work))
+
+    def test_access_timeout_reaps_client_cleans_resources_and_never_emits_success(self):
+        access = Mock(poll=Mock(return_value=None))
+        failure = Error('metadata deadline')
+        with self.mount_environment(), patch.object(self.fs, '_start_listener'), patch.object(self.fs, '_start_sshfs'), \
+                patch.object(self.fs, '_start_access_probe', return_value=access), \
+                patch.object(self.fs, '_wait', side_effect=[('1234','secret'), dict(id=42), failure]):
+            with self.assertRaises(Error) as caught:
+                self.fs.mount('demo', '/home/sandbox')
+        self.assertIs(caught.exception, failure)
+        access.kill.assert_called_once()
+        access.wait.assert_called_once_with(timeout=5)
+        self.assertFalse(any(call.args[0].get('status')=='ok' and call.args[0].get('action')=='mountfs'
+                             for call in self.manager.emit.call_args_list))
+        with self.fs.locked() as data:
+            self.assertEqual(data['mounts'], [])

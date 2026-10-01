@@ -1,6 +1,6 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.11 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.12 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
 ## Test layers
 
@@ -231,3 +231,21 @@ The final script was executed as root inside an owned disposable fixed-policy WS
 These probes perform no network scanning/login, host service request, kernel-control write, device data read/write or ioctl, module/mount manipulation, known-CVE exploitation or credential scan. They supplement configuration/runtime checks without certifying unknown-vulnerability resistance. GUEST_SECURITY_PROBE.md defines the precise targets and the meaning of REVIEW/SKIP.
 
 The exact entry was exercised locally in that disposable container as root and as sandbox with native passwordless sudo, using a curl fixture for the unpublished payload. Each GPU-off run returned 23 PASS/7 SKIP/4 INFO and no FAIL/REVIEW/ERROR; reports persisted in /home/sandbox and downloaded files were reclaimed. The published one-line entry subsequently ran through actual GitHub downloads as sandbox in another fresh fixed-policy container. With GPU on and no host reference it returned 24 PASS/7 SKIP/5 INFO, without FAIL/REVIEW/ERROR; the report persisted in the working directory and download/probe files were reclaimed. Both HTTP files matched verified local hashes, and the public-run container/project were independently confirmed reclaimed. Evidence is stored under public_entry in the same report.
+
+## Shared guest challenge and completion audit — 0.2.12
+
+The tester discovers 331 packaged units, 44 more than the previous release. The existing 20 standalone diagnostic regressions now run inside the package; 17 new guest regressions, four runner regressions and three SSHFS readiness regressions complete the increase. The tester archive contains the exact public probe and download entry; product and installer remain separate. The compatibility test script forwards to the same tests.
+
+| Boundary | Native coverage | Failure/regression coverage |
+| --- | --- | --- |
+| Project policy | Adds raw.lxc/raw.apparmor attempts to native privileged/idmap/seccomp/kernel/BPF/nesting/interception/host-disk refusals | Requires an explicit forbidden/not-allowed policy reason; accepted updates, bad commands and transport errors cannot count as enforcement |
+| Guest boundary | Same standalone source in an isolated real container, trusted six-namespace reference, host canary and available socket identities; repeated with GPU off | Observation failure continues remaining checks; exact method/evidence; namespace matching; malformed references; canary symlink, oversized data and process truncation |
+| Device/kernel paths | Eight device nodes, seventeen control entries, two kernel read entries, /dev metadata inventory and five special kernel filesystems | Denial vs unsupported vs successful access; no device reads/writes/ioctls; no sysctl writes; unknown/dangerous devices remain inventory-only; critical node renamed as GPU is not whitelisted; depth/count limits stay unverified |
+| Unix management / devlxd | Fourteen fixed socket paths plus discovered local-service aliases; five bounded read-only devlxd GETs | Host device/inode matches and aliases are detected; peer namespaces distinguish guest-local services without requests; unknown origin remains REVIEW; GET 404 is not policy proof; malformed metadata/errors are retained |
+| Windows / mounts | Nine fixed WSL/Windows paths, binfmt interpreters, mount provenance and exact read-only GPU maps | No Windows execution; guest nested mounts are not mislabeled as host GPU maps; existing Linux/Windows UNC read-write and lifecycle groups remain |
+| Guest report recovery | Host-only canary unchanged, owned guest temporary directory removed; guest-only positive file and symlink controls detect matches | Failure report is retrieved before cleanup; retrieval failure preserves original probe error; private report does not overwrite; interrupted report, control-character display and download-entry failures |
+| SSHFS completion | Full mounted read/write, start/stop restoration and Windows UNC groups use the corrected shared mount function | Mounted-before-connected state is not function success; missing key, metadata failure, disappearing mount and access timeout are tested; one readiness budget and original error retained, client reaped |
+
+The first broader candidate passed all 26 stages. A later frozen run passed 328 units but exposed the existing early SSHFS completion race: known_hosts was absent immediately after reported success. That failed report is preserved in validation/V0_2_12_READINESS_FIRST_ATTEMPT.json; five later stages were correctly not_run and cleanup succeeded. The repaired frozen archives then passed all 331 units and 26 stages from /tmp in 632.9 seconds, with no skipped units, unexecuted stages or cleanup errors. Evidence: validation/V0_2_12_LOCAL_REPORT.json.
+
+The GPU-on challenge produced 59 PASS, 16 INFO and one SKIP; GPU-off produced 57 PASS, 16 INFO and one SKIP. Both had zero FAIL/REVIEW/ERROR. The missing binfmt_misc/register entry is explicitly unverified; it is not counted as a denied operation. Guest-local system services remain INFO, and current AppArmor disabled status remains truthful. Public-entry verification follows publication. This is expanded behavioral coverage, not exhaustive path or upstream-vulnerability proof.

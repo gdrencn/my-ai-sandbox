@@ -17,6 +17,7 @@ import pty
 import re
 import select
 import signal
+import stat
 import shutil
 import struct
 import subprocess
@@ -276,6 +277,7 @@ class Suite:
         self.unit_results = None
         self.gpu_results = {"status": "not_run"}
         self.isolation_results = {'status': 'not_run'}
+        self.guest_reports = []
 
     def native_diagnostic(self, message):
         self.events.append(dict(action='diagnostic', status='warning', native_stderr=message,
@@ -453,6 +455,8 @@ class Suite:
             self.manager.lxd.command(args)
         except Error as exc:
             self.output.keep(str(exc))
+            assert re.search(r'\b(?:forbidden|not allowed)\b', str(exc), re.IGNORECASE), \
+                'Expected an explicit LXD policy refusal, not an unrelated error: ' + str(exc)
             self.events.append(dict(action='isolation-refusal', status='ok', command=args, error=str(exc)))
         else:
             raise AssertionError(t('policy_test_accepted', command=repr(args)))
@@ -460,6 +464,8 @@ class Suite:
     def isolation_policy(self, target):
         self.manager.isolation.check()
         for key, value in [('security.privileged','true'), ('raw.idmap','both 1000 1000'),
+                           ('raw.lxc','lxc.apparmor.profile=unconfined'),
+                           ('raw.apparmor','deny /etc/** r,'),
                            ('raw.seccomp','false'), ('linux.kernel_modules','dummy'),
                            ('security.delegate_bpf','true'), ('security.nesting','true'),
                            ('security.syscalls.intercept.mount','true')]:
@@ -527,46 +533,116 @@ class Suite:
         self.cli('start',rejected,code=1)
 
     def isolation_runtime(self, target):
-        source = """import json,os,stat,tempfile,errno
-from pathlib import Path
-probe={'denied':False}
-with tempfile.TemporaryDirectory(prefix='mas-device-probe-') as work:
- path=work+'/host-memory'
- try:
-  probe['step']='mknod'
-  os.mknod(path,stat.S_IFCHR|0o600,os.makedev(1,1))
-  probe['step']='open'
-  fd=os.open(path,os.O_RDONLY)
-  os.close(fd)
- except OSError as exc:
-  probe.update(denied=exc.errno in (errno.EPERM,errno.EACCES),errno=exc.errno)
-status=Path('/proc/self/status').read_text()
-print(json.dumps({'uid_map':Path('/proc/self/uid_map').read_text(),
- 'namespaces':{n:os.readlink('/proc/self/ns/'+n) for n in ('user','pid','mnt','net','ipc','uts')},
- 'seccomp':[line for line in status.splitlines() if line.startswith('Seccomp:')][0],
- 'device_access_probe':probe,
- 'apparmor_profile':Path('/proc/self/attr/current').read_text().strip(),
- 'host_admin_socket_visible':Path('/var/snap/lxd/common/lxd/unix.socket').exists(),
- 'host_paths_visible':{p:Path(p).exists() for p in ('/mnt/c','/var/run/docker.sock')},
- 'forbidden_devices_visible':{p:Path(p).exists() for p in ('/dev/sda','/dev/nvme0n1','/dev/mem','/dev/kvm')}}))
-"""
-        guest = json.loads(self.manager.lxd.command(['exec','local:'+target,'--','python3','-c',source]))
-        host = {n:os.readlink('/proc/self/ns/'+n) for n in guest['namespaces']}
-        assert all(guest['namespaces'][n]!=host[n] for n in host), (guest,host)
-        root_mapping = next([int(v) for v in line.split()] for line in guest['uid_map'].splitlines() if line.split()[0]=='0')
-        assert root_mapping[1]!=0, guest
-        assert guest['seccomp'].split()[-1]=='2', guest
-        assert not guest['host_admin_socket_visible'], guest
-        assert not any(guest['host_paths_visible'].values()), guest
-        assert not any(guest['forbidden_devices_visible'].values()), guest
-        assert guest['device_access_probe']['denied'], guest
-        apparmor = Path('/sys/module/apparmor/parameters/enabled')
-        self.isolation_results = {'status':'passed','project':self.project,
-            'policy':self.manager.isolation.check(), 'guest':guest,'host_namespaces':host,
-            'apparmor_enabled':apparmor.read_text().strip() if apparmor.exists() else 'unavailable',
-            'apparmor_confinement_verified':guest['apparmor_profile'].startswith('lxd-')}
-        if self.isolation_results['apparmor_enabled']=='Y':
-            assert self.isolation_results['apparmor_confinement_verified'], guest
+        report = self.guest_boundary(target)
+        checks = {item['check']: item for item in report['checks']}
+        attribute = checks['apparmor']['evidence'].get('profile', '')
+        self.isolation_results = dict(status='passed', project=self.project,
+            policy=self.manager.isolation.check(),
+            guest=dict(uid_map=checks['uid-map']['evidence']['mapping'],
+                       gid_map=checks['gid-map']['evidence']['mapping'],
+                       namespaces={name:checks['namespace:'+name]['evidence']['guest']
+                                   for name in ('user','pid','mnt','net','ipc','uts')},
+                       seccomp=checks['seccomp']['evidence']['mode'], apparmor_profile=attribute),
+            host_namespaces={name:checks['namespace:'+name]['evidence']['host']
+                             for name in ('user','pid','mnt','net','ipc','uts')},
+            apparmor_enabled=checks['apparmor']['evidence'].get('enabled', 'unavailable'),
+            apparmor_confinement_verified=bool(attribute and attribute.startswith('lxd-') and attribute.endswith(' (enforce)')))
+
+    def guest_boundary(self, target, positive=True):
+        """Run the independently delivered source, never a duplicate guest probe."""
+        from tests.probe_source import source_bytes
+        probe_data = source_bytes('guest_security_probe.py')
+        root = Path(self.workspace.name)
+        script = root / 'guest_security_probe.py'
+        script.write_bytes(probe_data)
+        spec = importlib.util.spec_from_file_location('suite_guest_probe', script)
+        probe = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(probe)
+        token = uuid.uuid4().hex
+        marker = root / ('host-canary-' + token)
+        content = ('mas-non-secret-host-canary-' + token).encode()
+        marker.write_bytes(content)
+        reference = dict(schema=1, namespaces={n:os.readlink('/proc/self/ns/' + n) for n in probe.NAMESPACES},
+                         canaries=[dict(path=str(marker), sha256=hashlib.sha256(content).hexdigest())], sockets=[])
+        for path in probe.SOCKETS:
+            try:
+                info = os.stat(path)
+                if stat.S_ISSOCK(info.st_mode):
+                    reference['sockets'].append(dict(path=path, device=info.st_dev, inode=info.st_ino))
+            except (FileNotFoundError, PermissionError):
+                pass
+        reference_file = root / 'host-reference.json'
+        reference_file.write_text(json.dumps(reference))
+        record = self.manager.gpu.record(self.manager.info(target))
+        expected = 'on' if record and record['enabled'] else 'off'
+        evidence = dict(target=target, gpu_expected=expected, source_sha256=hashlib.sha256(probe_data).hexdigest(),
+                        status='not_run', reference=reference)
+        self.guest_reports.append(evidence)
+        remote = self.manager.lxd.command(['exec','local:'+target,'--','python3','-c',
+                     "import tempfile;print(tempfile.mkdtemp(prefix='mas-guest-suite-'))"]).strip()
+        if not re.fullmatch(r'/tmp/mas-guest-suite-[a-zA-Z0-9_-]+', remote):
+            raise Error('Unexpected guest probe directory')
+        def cleanup():
+            if evidence['status'] != 'passed':
+                evidence['status'] = 'failed'
+            self.manager.lxd.command(['exec','local:'+target,'--','rm','-rf','--',remote])
+            if marker.read_bytes() != content:
+                raise AssertionError('Host canary was changed')
+            marker.unlink()
+        with cleanup_scope(cleanup):
+            for source in (script, reference_file):
+                self.manager.lxd.command(['file','push',str(source),'local:'+target+remote+'/'+source.name])
+            failure = None
+            try:
+                stdout = self.manager.lxd.command(['exec','local:'+target,'--','python3',remote+'/'+script.name,
+                    '--gpu',expected,'--host-reference',remote+'/'+reference_file.name,'--report',remote+'/report.json'])
+            except Error as exc:
+                # A failed diagnostic still produces useful evidence. Retrieve
+                # its report before propagating the original execution error.
+                failure = exc
+                stdout = str(exc)
+            index = len(self.guest_reports)
+            (self.directory / f'guest-boundary-{index}.log').write_text(stdout)
+            path = self.directory / f'guest-boundary-{index}.json'
+            try:
+                self.manager.lxd.command(['file','pull','local:'+target+remote+'/report.json',str(path)])
+            except Error:
+                if failure is not None:
+                    raise failure
+                raise
+            report = json.loads(path.read_text())
+            evidence['report'] = report
+            if failure is not None:
+                evidence['status'] = 'failed'
+                raise failure
+            assert report['exit_code'] == 0 and not report['counts']['FAIL'] and not report['counts']['ERROR'], report
+            checks = {item['check']:item for item in report['checks']}
+            required = ['uid-map','gid-map','seccomp','device-inventory','process-roots','windows-interop','gpu-expectation','host-canary:0']
+            required += ['namespace:'+n for n in probe.NAMESPACES]
+            required += ['device:'+n for n in probe.DEVICES]
+            required += ['control:'+p for p in probe.CONTROLS]
+            required += ['devlxd-api:'+p for p in probe.DEVLXD_ENDPOINTS]
+            assert set(required).issubset(checks), sorted(set(required)-set(checks))
+            for check in ['uid-map','gid-map','seccomp','process-roots','windows-interop','gpu-expectation','host-canary:0'] + ['namespace:'+n for n in probe.NAMESPACES]:
+                assert checks[check]['status']=='PASS', checks[check]
+            if positive:
+                # This file is intentionally placed in the guest. Its matching
+                # bytes test detection, not an actual host escape.
+                guest_marker = root / 'positive-canary'
+                guest_marker.write_bytes(content)
+                self.manager.lxd.command(['file','push',str(guest_marker),'local:'+target+remote+'/positive-canary'])
+                self.manager.lxd.command(['exec','local:'+target,'--','ln','-s',remote+'/positive-canary',remote+'/canary-alias'])
+                outcomes = []
+                for filename in ('positive-canary','canary-alias'):
+                    item = dict(path=remote+'/'+filename, sha256=hashlib.sha256(content).hexdigest())
+                    raw = self.manager.lxd.command(['exec','local:'+target,'--','python3',remote+'/'+script.name,
+                                                   '--_canary','0',json.dumps(item)])
+                    outcome = json.loads(raw)
+                    assert outcome['status']=='FAIL', outcome
+                    outcomes.append(outcome)
+                evidence['guest_only_positive_controls'] = outcomes
+            evidence['status'] = 'passed'
+        return report
 
     def legacy_fixture(self):
         record = self.manager.isolation.check()
@@ -979,6 +1055,7 @@ print(json.dumps(sorted(paths)))
         self.cli('start', target)
         if capability['backend'] == 'wsl-nvidia':
             self.exec(target, 'test ! -e /dev/dxg; test ! -e ' + CONF + '; test ! -e ' + PROFILE)
+        self.guest_boundary(target, positive=False)
         self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", 'import ctypes\ntry: lib=ctypes.CDLL("libcuda.so.1")\nexcept OSError: pass\nelse: assert lib.cuInit(0) != 0'])
         self.cli('stop', target)
         self.cli('hardware', target, 'gpu', 'on')
@@ -1346,6 +1423,7 @@ try {
             "events": self.events, "cleanup_errors": self.cleanup_errors,
             "unit_tests": self.unit_results, "gpu": self.gpu_results,
             'isolation': self.isolation_results, 'legacy_targets': self.legacy_targets,
+            'guest_boundary': getattr(self, 'guest_reports', []),
             'legacy_profiles': self.legacy_profiles,
             "elapsed": time.monotonic() - self.started,
         }, indent=2))

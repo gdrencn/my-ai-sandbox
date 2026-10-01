@@ -55,6 +55,8 @@ def main():
                 shutil.copyfile(ROOT / "bootstrap.py", stage / "bootstrap.py")
                 shutil.copyfile(ROOT / "install.sh", stage / "install.sh")
                 shutil.copytree(ROOT / "tests", stage / "tests", ignore=shutil.ignore_patterns("__pycache__"))
+                for name in ('guest_security_probe.py', 'security.sh'):
+                    shutil.copyfile(ROOT / 'test' / name, stage / 'tests' / name)
             module, function = entry.split(":")
             (stage / "__main__.py").write_text(f"from {module} import {function}\nraise SystemExit({function}())\n")
             archive = DIST / filename
