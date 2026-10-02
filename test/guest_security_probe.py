@@ -511,7 +511,7 @@ def devlxd_check(endpoint):
         return result(check, status, '实例受限 API 的只读请求结果；404 不能证明权限已关闭', http_status=response.status)
 
 
-def run_checks(gpu, timeout, emit):
+def run_checks(gpu, timeout, emit, reference=None):
     def observe(check, operation):
         try:
             emit(operation())
@@ -577,8 +577,10 @@ def run_checks(gpu, timeout, emit):
                     '管理入口路径清单；逐项连接检查，不发送管理请求', paths=paths, truncated=truncated))
     except Exception as exc:
         emit(result('socket-inventory', 'ERROR', '动态路径发现失败，仍检查固定管理路径', native_error=str(exc)))
+    references = reference.get('sockets', []) if reference else []
+    paths = sorted(set(paths) | {item['path'] for item in references})
     for path in paths:
-        emit(bounded_call('management-socket:' + path, ['--_socket', path, '[]'], timeout))
+        emit(bounded_call('management-socket:' + path, ['--_socket', path, json.dumps(references)], timeout))
     observe('devlxd', lambda: result('devlxd', 'INFO', '基本实例接口与宿主管理接口不同，按当前兼容策略保留',
                                    visible=bool(visible_paths(('/dev/lxd/sock',)))))
     for endpoint in DEVLXD_ENDPOINTS:
@@ -641,7 +643,9 @@ def publish_report(path, report):
 
 class ChallengeReport:
     """Separate observations from assertions; incomplete evidence never passes."""
-    def __init__(self, purpose, **metadata):
+    def __init__(self, purpose, *, write=None, diagnostic=None, **metadata):
+        self.write = write or (lambda message: print(message, flush=True))
+        self.diagnostic = diagnostic or (lambda message: print(message, file=sys.stderr, flush=True))
         self.started = time.monotonic()
         self.data = dict(schema=2, purpose=purpose, checks=[], observations=[], **metadata)
 
@@ -661,15 +665,15 @@ class ChallengeReport:
                     item['message'] = '验证未通过：' + item['message']
             self.data['checks'].append(item)
             label = '通过' if item['status'] == 'PASS' else '失败'
-        print('[' + label + '] ' + terminal_text(item['check']) + '：' + terminal_text(item['message']), flush=True)
-        print('  方法：' + terminal_text(item['method']), flush=True)
+        self.write('[' + label + '] ' + terminal_text(item['check']) + '：' + terminal_text(item['message']))
+        self.write('  方法：' + terminal_text(item['method']))
         if item['evidence']:
-            print('  观察：' + terminal_text(json.dumps(item['evidence'], ensure_ascii=False)), flush=True)
+            self.write('  观察：' + terminal_text(json.dumps(item['evidence'], ensure_ascii=False)))
         if original == 'ERROR':
-            print('  测试未能完成此项验证。', file=sys.stderr, flush=True)
+            self.diagnostic('  测试未能完成此项验证。')
             for key in ('native_error', 'native_stderr'):
                 if item['evidence'].get(key):
-                    print('  ' + key + ': ' + terminal_text(str(item['evidence'][key])), file=sys.stderr, flush=True)
+                    self.diagnostic('  ' + key + ': ' + terminal_text(str(item['evidence'][key])))
 
     def finish(self, path, interrupted=False):
         failures = [item for item in self.data['checks'] if item['status'] == 'FAIL']
@@ -679,13 +683,13 @@ class ChallengeReport:
         self.data.update(elapsed=time.monotonic()-self.started, exit_code=code, counts=counts,
                          conclusion='checks_failed' if failures else 'checks_passed',
                          scope='结论仅适用于列出的检查与当次观察；环境记录不计为测试。')
-        print('\n测试汇总：通过 ' + str(counts['PASS']) + '，失败 ' + str(counts['FAIL']))
-        print('结论：' + ('测试中断。' if interrupted else '检查未通过，请查看失败原因。' if failures else '本次列出的检查全部通过。'))
+        self.write('\n测试汇总：通过 ' + str(counts['PASS']) + '，失败 ' + str(counts['FAIL']))
+        self.write('结论：' + ('测试中断。' if interrupted else '检查未通过，请查看失败原因。' if failures else '本次列出的检查全部通过。'))
         try:
             publish_report(path, self.data)
-            print('报告：' + terminal_text(str(path)))
+            self.write('报告：' + terminal_text(str(path)))
         except OSError as exc:
-            print('报告写入失败：' + terminal_text(str(exc)), file=sys.stderr)
+            self.diagnostic('报告写入失败：' + terminal_text(str(exc)))
             return 2
         return code
 

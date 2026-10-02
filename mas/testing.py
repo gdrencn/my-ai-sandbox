@@ -242,9 +242,36 @@ class Terminal:
 
 
 class Suite:
-    CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
-             "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "restart", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu", "configuration-concurrency", "isolation-policy", "isolation-runtime", "legacy-migration"]
+    CASE_CATEGORIES = {
+        'unit': 'foundation',
+        'dependency-install': 'environment',
+        'new-default': 'management',
+        'missing-image': 'management',
+        'list-info': 'management',
+        'start-user-network': 'management',
+        'running-guards': 'management',
+        'enter-running-default-exit': 'management',
+        'enter-stopped-stop-exit': 'management',
+        'export-import': 'management',
+        'ownership-and-stop-all': 'management',
+        'invalid-inputs': 'management',
+        'lifecycle-repeat': 'management',
+        'restart': 'management',
+        'unmarked-import': 'management',
+        'legacy-migration': 'management',
+        'configuration-concurrency': 'configuration',
+        'isolation-policy': 'configuration',
+        'gpu': 'resources',
+        'filesystems': 'resources',
+        'filesystem-recovery': 'resources',
+        'overwrite-confirmation': 'interaction',
+        'delete-confirmation': 'interaction',
+        'language-config': 'interaction',
+        'tui': 'interaction',
+        'filesystem-menu': 'interaction',
+        'isolation-runtime': 'security',
+    }
+    CASES = list(CASE_CATEGORIES)
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -274,7 +301,7 @@ class Suite:
         self.legacy_targets = []
         self.legacy_profiles = []
         self.events = []
-        self.results = {case: {"status": "not_run"} for case in self.CASES}
+        self.results = {case: {"status": "not_run", "category": self.CASE_CATEGORIES[case]} for case in self.CASES}
         self.cleanup_errors = []
         self.counter = 0
         self.event_offsets = {}
@@ -300,16 +327,20 @@ class Suite:
         start = time.monotonic()
         self.current_case = name
         title = t("case_" + name)
+        category = self.CASE_CATEGORIES[name]
+        description = t("test_description_" + name)
+        metadata = dict(category=category, description=description)
+        self.output.section(t("test_category_" + category), title, description)
         self.output.progress(t("working", name=title, elapsed=0))
         try:
             yield
         except BaseException as exc:
-            self.results[name] = {"status": "failed", "elapsed": time.monotonic() - start, "error": str(exc)}
-            self.output.keep(t("stage_failed", name=title, elapsed=time.monotonic()-start, error=exc))
+            self.results[name] = {"status": "failed", "elapsed": time.monotonic() - start, "error": str(exc), **metadata}
+            self.output.result(t("stage_failed", name=title, elapsed=time.monotonic()-start, error=exc), passed=False)
             raise
         else:
-            self.results[name] = {"status": "passed", "elapsed": time.monotonic() - start}
-            self.output.keep(t("test_pass", name=title, elapsed=self.results[name]["elapsed"]))
+            self.results[name] = {"status": "passed", "elapsed": time.monotonic() - start, **metadata}
+            self.output.result(t("test_pass", name=title, elapsed=self.results[name]["elapsed"]), passed=True)
 
     def target(self):
         name = random_target()
@@ -364,7 +395,7 @@ class Suite:
         stderr_path = self.directory / f"cli-{self.counter}.stderr.log"
         action = catalog(self.language).get("action_" + args[0], args[0])
         if code != 0:
-            self.output.keep(t("expected_error", command=" ".join(args)))
+            self.output.expected_error(" ".join(args))
         displayed = []
         out, err = '', ''
         with stdout_path.open("w+") as stdout, stderr_path.open("w+") as stderr:
@@ -374,7 +405,8 @@ class Suite:
                 stdout.seek(0)
                 stderr.seek(0)
                 out, err = stdout.read(), stderr.read()
-                self.output.diagnostics(out, err, failed=process.returncode != 0, exclude=displayed)
+                self.output.diagnostics("" if "--help" in args and process.returncode == 0 else out,
+                                        err, failed=process.returncode != 0, exclude=displayed)
             def collect_events():
                 displayed.extend(self.read_events(event_path, diagnostics=True))
             def finish_command():
@@ -454,7 +486,7 @@ class Suite:
         return (instance["status"] if instance else "Absent") == expected
 
     def expected_native_refusal(self, args):
-        self.output.keep(t('expected_error', command='lxc ' + ' '.join(args)))
+        self.output.expected_error('lxc ' + ' '.join(args))
         try:
             self.manager.lxd.command(args)
         except Error as exc:
@@ -553,106 +585,46 @@ class Suite:
             apparmor_confinement_verified=bool(attribute and attribute.startswith('lxd-') and attribute.endswith(' (enforce)')))
 
     def guest_boundary(self, target, positive=True):
-        """Run the independently delivered source, never a duplicate guest probe."""
+        """The complete challenge owns reference collection and guest execution."""
         from tests.probe_source import source_bytes
-        probe_data = source_bytes('guest_security_probe.py')
         root = Path(self.workspace.name)
-        script = root / 'guest_security_probe.py'
-        script.write_bytes(probe_data)
-        spec = importlib.util.spec_from_file_location('suite_guest_probe', script)
-        probe = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(probe)
-        host_script = root / 'host_security_probe.py'
-        host_data = source_bytes('host_security_probe.py')
-        host_script.write_bytes(host_data)
-        host_spec = importlib.util.spec_from_file_location('suite_host_probe', host_script)
-        host_probe = importlib.util.module_from_spec(host_spec)
-        host_spec.loader.exec_module(host_probe)
+        sources = {name: source_bytes(name) for name in ('guest_security_probe.py', 'host_security_probe.py')}
+        for name, content in sources.items():
+            (root / name).write_bytes(content)
+        spec = importlib.util.spec_from_file_location('suite_host_probe', root / 'host_security_probe.py')
+        challenge = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(challenge)
         record = self.manager.gpu.record(self.manager.info(target))
         expected = 'on' if record and record['enabled'] else 'off'
-        evidence = dict(target=target, gpu_expected=expected, source_sha256=hashlib.sha256(probe_data).hexdigest(),
-                        status='not_run', host_source_sha256=hashlib.sha256(host_data).hexdigest())
+        evidence = dict(target=target, gpu_expected=expected, status='not_run',
+                        source_sha256=hashlib.sha256(sources['guest_security_probe.py']).hexdigest(),
+                        host_source_sha256=hashlib.sha256(sources['host_security_probe.py']).hexdigest())
         self.guest_reports.append(evidence)
-        remote = self.manager.lxd.command(['exec','local:'+target,'--','python3','-c',
-                     "import tempfile;print(tempfile.mkdtemp(prefix='mas-guest-suite-'))"]).strip()
-        if not re.fullmatch(r'/tmp/mas-guest-suite-[a-zA-Z0-9_-]+', remote):
-            raise Error('Unexpected guest probe directory')
-        def cleanup():
-            if evidence['status'] != 'passed':
-                evidence['status'] = 'failed'
-            self.manager.lxd.command(['exec','local:'+target,'--','rm','-rf','--',remote])
-        with cleanup_scope(cleanup):
-            self.manager.lxd.command(['file','push',str(script),'local:'+target+remote+'/'+script.name])
-            failure = None
+        index = len(self.guest_reports)
+        log_path = self.directory / f'boundary-{index}.log'
+        report_path = self.directory / f'boundary-{index}.json'
+        primary = None
+        with log_path.open('w', encoding='utf-8') as log:
+            def display(message):
+                log.write(message + '\n')
+                log.flush()
+                self.output.challenge(message)
+            report = challenge.probe.ChallengeReport('complete-boundary-probe', write=display, diagnostic=display,
+                                                     project=self.project, target=target, gpu_expected=expected)
             try:
-                stdout = self.manager.lxd.command(['exec','local:'+target,'--','python3',remote+'/'+script.name,
-                    '--gpu',expected,'--report',remote+'/report.json'])
-            except Error as exc:
-                # A failed diagnostic still produces useful evidence. Retrieve
-                # its report before propagating the original execution error.
-                failure = exc
-                stdout = str(exc)
-            index = len(self.guest_reports)
-            (self.directory / f'guest-boundary-{index}.log').write_text(stdout)
-            path = self.directory / f'guest-boundary-{index}.json'
-            try:
-                self.manager.lxd.command(['file','pull','local:'+target+remote+'/report.json',str(path)])
-            except Error:
-                if failure is not None:
-                    raise failure
-                raise
-            report = json.loads(path.read_text())
-            evidence['report'] = report
-            if failure is not None:
-                evidence['status'] = 'failed'
-                raise failure
-            assert report['exit_code'] == 0 and not report['counts']['FAIL'], report
-            evidence['guest_report'] = report
-            host_report = host_probe.probe.ChallengeReport('host-assisted-boundary-probe', project=self.project, target=target)
-            host_log = io.StringIO()
-            with contextlib.redirect_stdout(host_log):
-                try:
-                    host_probe.run_target(self.manager.lxd.command, target, host_report)
-                except Exception as exc:
-                    host_report.emit(probe.result('host-execution','ERROR','Host-assisted challenge failed',native_error=str(exc)))
-                host_code = host_report.finish(self.directory / f'host-boundary-{index}.json')
-            (self.directory / f'host-boundary-{index}.log').write_text(host_log.getvalue())
-            evidence['host_report'] = host_report.data
-            evidence['reference'] = host_report.data['reference']
-            assert host_code == 0, host_report.data
-            report = dict(schema=2, checks=report['checks'] + host_report.data['checks'],
-                          observations=report.get('observations', []) + host_report.data.get('observations', []),
-                          counts={'PASS':report['counts']['PASS']+host_report.data['counts']['PASS'], 'FAIL':0}, exit_code=0)
-            evidence['report'] = report
-            checks = {item['check']:item for item in report['checks']}
-            required = ['uid-map','gid-map','seccomp','device-inventory','process-roots','windows-interop','gpu-expectation','host-canary:0']
-            required += ['namespace:'+n for n in probe.NAMESPACES]
-            required += ['device:'+n for n in probe.DEVICES]
-            required += ['control:'+p for p in probe.CONTROLS]
-            required += ['devlxd-api:'+p for p in probe.DEVLXD_ENDPOINTS]
-            required += ['binfmt:temporary-mount','binfmt:host-unchanged','host-canary-integrity','host-reference']
-            assert set(required).issubset(checks), sorted(set(required)-set(checks))
-            for check in ['uid-map','gid-map','seccomp','process-roots','windows-interop','gpu-expectation','host-canary:0'] + ['namespace:'+n for n in probe.NAMESPACES]:
-                assert checks[check]['status']=='PASS', checks[check]
-            if positive:
-                # This file is intentionally placed in the guest. Its matching
-                # bytes test detection, not an actual host escape.
-                guest_marker = root / 'positive-canary'
-                content = ('mas-guest-positive-' + uuid.uuid4().hex).encode()
-                guest_marker.write_bytes(content)
-                self.manager.lxd.command(['file','push',str(guest_marker),'local:'+target+remote+'/positive-canary'])
-                self.manager.lxd.command(['exec','local:'+target,'--','ln','-s',remote+'/positive-canary',remote+'/canary-alias'])
-                outcomes = []
-                for filename in ('positive-canary','canary-alias'):
-                    item = dict(path=remote+'/'+filename, sha256=hashlib.sha256(content).hexdigest())
-                    raw = self.manager.lxd.command(['exec','local:'+target,'--','python3',remote+'/'+script.name,
-                                                   '--_canary','0',json.dumps(item)])
-                    outcome = json.loads(raw)
-                    assert outcome['status']=='FAIL', outcome
-                    outcomes.append(outcome)
-                evidence['guest_only_positive_controls'] = outcomes
-            evidence['status'] = 'passed'
-        return report
+                primary = challenge.run_target(self.manager.lxd.command, target, report, gpu=expected, positive=positive)
+            except (Exception, KeyboardInterrupt) as exc:
+                primary = exc
+                report.emit(challenge.probe.result('host-execution', 'ERROR', '完整安全挑战未完成', native_error=str(exc)))
+            code = report.finish(report_path, interrupted=isinstance(primary, KeyboardInterrupt))
+            evidence.update(report=report.data, reference=report.data.get('reference'),
+                            guest_report=report.data.get('guest_report'),
+                            guest_only_positive_controls=report.data.get('guest_only_positive_controls', []),
+                            status='passed' if code == 0 and primary is None else 'failed')
+        if primary is not None:
+            raise primary
+        assert code == 0, report.data
+        return report.data
 
     def legacy_fixture(self):
         record = self.manager.isolation.check()
@@ -764,7 +736,7 @@ class Suite:
             self.manager.lxd.command(['config', 'set', 'local:' + target, 'user.mas.test.concurrent=native-change'])
             self.manager.lxd.command(['config', 'device', 'add', 'local:' + target, 'mas-test-concurrent', 'none'])
             snapshot['config']['user.mas.test.stale'] = 'must-not-publish'
-            self.output.keep(t('expected_error', command='PUT If-Match stale ETag'))
+            self.output.expected_error('PUT If-Match stale ETag')
             try:
                 configuration.write(target, snapshot, etag)
             except Error as exc:
@@ -1565,7 +1537,7 @@ def main(argv=None):
     for error in suite.cleanup_errors:
         suite.output.keep(t("cleanup_failed", error=error))
     if not suite.cleanup_errors:
-        suite.output.keep(t("cleanup_ok"))
+        suite.output.result(t("cleanup_ok"), passed=True)
     counts = {status: sum(item["status"] == status for item in suite.results.values())
               for status in ("passed", "failed", "not_run")}
     suite.output.keep(t("final_summary", **counts, elapsed=time.monotonic()-suite.started))

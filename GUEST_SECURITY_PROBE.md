@@ -1,51 +1,41 @@
-# 容器与宿主侧安全挑战
+# 自动化容器安全挑战
 
-两个入口分别执行能够独立判定的测试，复用同一套探测基础函数。容器入口不要求宿主参照，也不启动或停止容器。宿主侧入口自动准备参照，按需调用标准 mas 启动，并在结束时恢复原运行状态。两个入口都不安装软件、不调整隔离策略；标准启动仍会执行既有 GPU 配置刷新、用户准备和文件系统协调。
+v0.2.18 将容器内检查和需要宿主参照的检查合为一个完整模块，由宿主自动化测试调用。公开入口统一为 `test/test.sh`，不再提供单独的容器或宿主挑战下载入口。冻结包已完成验证，发布及实际公开入口验证正在进行。
 
-## 容器内固定命令
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
-```
-
-命令不变。需要 curl、Python 3.10+，普通用户还需要系统 sudo；以容器 root 执行挑战。入口下载到私有临时目录并在完成或中断后清理，报告保留在当前目录，权限 0600。已有报告和符号链接不覆盖。主入口及子进程拒绝在普通宿主上运行；环境标识检查防止误执行，不是身份认证。
-
-可选参数：
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- --report guest-report.json --gpu on
-```
-
-`--gpu on/off` 核对显式设备预期；不指定时只记录设备。`--timeout` 为每个主动探测设置 1–10 秒的期限，默认 3 秒。这个入口不接受 `--host-reference`，不列出缺少宿主参照的 namespace、进程来源和宿主标记测试。
-
-## 宿主侧固定命令
+## 使用入口
 
 在管理 LXD 的 Linux/WSL 宿主运行：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security-host.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
 ```
 
-默认查询本地 `mas` Project 中由 mas 管理的容器，同时显示运行中和已停止状态，然后从 `/dev/tty` 输入要挑战的容器名。没有运行中的容器也会询问名称。名称输入错误、不存在或不由 mas 管理时允许重新输入；留空或 EOF 取消。显式 TARGET 错误立即失败，LXD 查询或数据格式错误保留真实原因。不会自动切换 Project、迁移旧容器或操作 VM/未标记容器。
+这个固定命令安装当前已发布测试版并运行配套自动化测试；v0.2.18 已将完整挑战纳入同一流程。无需手动进入容器，不再输入现有容器名。测试工具创建本次拥有的专用 Project 和临时容器，通过标准 mas 功能管理启停与收尾，不使用用户已有容器作为挑战对象。
 
-需要宿主 Python 3.10+、curl、lxc、已安装的 mas 产品及正常的 LXD 访问权限，不使用宿主 sudo。通过 PATH 查找产品；新终端尚未更新 PATH 时也检查 `~/.local/bin/mas`。生命周期直接复用该产品的 Manager.start/stop，并保持 --project 指定的范围，不改成直接调用原生 lxc start/stop。
-
-记录测试前状态：原本运行则直接挑战并核对仍运行，不执行启停；原本停止则标准 start 后挑战，结束时标准 stop 恢复停止。启动部分失败、挑战失败、Ctrl-C 和 SIGTERM 也尝试收尾恢复。恢复失败单独计为执行失败，不能报告整体通过；原始挑战错误同时保留。若同名容器身份已变化，拒绝停止替换后的容器并报告差异。报告 lifecycle 字段记录初始状态、身份、调用动作和最后观察状态。原本停止的正常报告额外包含 host-state-restore 通过项。
-
-指定目标，适用于非交互执行：
+源代码和冻结包验证可从项目运行 `python3 scripts/build.py`，然后在项目外运行配套包：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security-host.sh | bash -s -- demo
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security-host.sh | bash -s -- demo --project mas --report host-report.json
+python3 /absolute/path/to/mas-test.pyz --product /absolute/path/to/mas.pyz --output /absolute/path/to/new-results
 ```
 
-宿主每次采集六种 namespace、boot ID、管理 socket 的 device/inode 和 binfmt_misc 挂载及注册摘要。创建一个唯一的非敏感标记，标记目录 0755、文件 0644；其保护不能只依靠宿主目录的读取权限。只传递文件路径和 SHA-256，标记内容始终留在宿主。通过 LXD 的 file push 和 exec 运行挑战，取回 JSON，再检查宿主标记、启动身份和 binfmt_misc 规则未改变。挑战失败也尝试取回报告；清理只处理此次创建的临时目录。原生挑战失败与报告/清理失败均保留。
+宿主需要 Python 3.10+、lxc、正常的 LXD 访问权限和同版本产品/测试工具。容器通过 LXD exec 以 root 运行内部探测，需要 Python 3.10+，无需安装 mas、lxc 或挑战专用软件。环境标识检查防止内部程序误在普通宿主执行，不是身份认证。依赖安装测试仍是完整自动化测试的另一个环节。
 
-目标容器需要 Python 3.10+，无需安装 mas、lxc 或测试专用包；LXD exec 直接以容器 root 运行。报告默认保存在宿主当前目录。容器临时脚本、参照、报告和宿主临时标记在结束后清理。
+## 完整流程
+
+1. 宿主读取当次 user/pid/mnt/net/ipc/uts namespace、boot ID、管理 socket 的 device/inode 和 binfmt_misc 挂载及注册摘要。
+2. 创建唯一非敏感宿主标记，目录 0755、文件 0644。只传递路径和 SHA-256；宿主标记内容不进入容器。标记不能只靠宿主目录读取权限保护。
+3. 将当前测试包中的两份原样 Python 源码和参照送入此次创建的容器临时目录，并传入明确的 GPU on/off 预期。
+4. 调用一次完整容器挑战。共享设备、接口、socket、devlxd、Windows/WSL 检查与 namespace、进程来源、标记、binfmt_misc 检查在同一流程完成。固定、发现及参照中的 socket 路径去重后逐项探测，使用同一份宿主参照。
+5. 取回完整 JSON，把每项方法、观察和通过/失败结果输出在宿主。必需检查缺项或重复、GPU 预期不符、结构无效或汇总/退出码不一致均使验证失败。原生命令失败也先尝试取回报告，再清理并保留原错误。
+6. 清理本次容器临时目录，核对宿主标记、boot ID 和 binfmt_misc 注册规则保持不变。清理或后置核验失败不能报告整体通过。宿主临时标记和参照目录随后回收。
+
+GPU 开启的完整挑战位于“安全挑战”环节；GPU 关闭后的完整挑战位于执行开关的“资源接入”环节。无 GPU 的机器运行明确 off 预期的基础完整挑战，不声称验证了硬件计算。自动化测试另用容器内自有标记文件和符号链接确认摘要匹配检测有效；这两个正向样本不是宿主越界，原始结果保存在报告中。
+
+输出目录保存 `boundary-N.log` 和 `boundary-N.json`，主 `report.json` 的 `guest_boundary` 保存源码哈希、GPU 预期、当次参照、容器报告、完整合并报告和正向样本证据。日志显示全部检查详情，不添加颜色控制符；交互终端上的勾或叉使用绿色或红色。所有报告及详细日志留在宿主输出目录。
 
 ## 检查范围
 
-| 检查 | 入口 | 实际动作与判定 |
+| 检查 | 执行位置 | 实际动作与判定 |
 | --- | --- | --- |
 | UID/GID | 容器 | 读取映射，核对容器 root 的外层身份非零。 |
 | seccomp | 容器 | 读取实际模式，要求过滤模式 2。 |
@@ -53,17 +43,17 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/sec
 | 设备清单 | 容器 | 枚举类型及 major:minor；基础/GPU 设备单列，未知来源或清单截断使验证失败，不贸然打开危险设备。 |
 | GPU 只读映射 | 容器 | WSL 运行库与单个驱动目录必须只读，整个驱动父目录映射失败。 |
 | 挂载来源 | 容器 | 检查 mountinfo；未能确认来源的宿主/Windows 映射特征使验证失败，不据特征本身宣称已经逃逸。 |
-| 管理 socket | 两者 | 连接后立即关闭，不发送请求。缺失/权限拒绝或服务进程属于容器 namespace 为通过；宿主身份匹配失败，无法核验来源也使验证失败。 |
+| 管理 socket | 容器（宿主参照） | 连接后立即关闭，不发送请求。缺失/权限拒绝或服务进程属于容器 namespace 为通过；宿主身份匹配失败，无法核验来源也使验证失败。 |
 | devlxd | 容器 | 基本实例接口保持兼容；检查配置键清单、不开放卷管理、受限 GET 的权限拒绝。401/403 通过；404 不能证明禁用，权限验证失败。实例接口整体不存在时只验证入口未暴露。 |
 | Windows/WSL 入口 | 容器 | 检查路径、环境变量、可见解释器注册；不执行 Windows 命令。入口特征异常使验证失败。 |
 | 未授权设备 | 容器 | 私有目录 mknod 后只读 open/close；拒绝通过，可打开失败。其他错误不得冒充权限拒绝。 |
 | 内核控制与读取入口 | 容器 | 有界 open/close，不读内存/日志、不写任何字节；拒绝通过，可打开使验证失败。缺失只通过“当前路径未暴露”断言，不声称测试了写入权限。 |
-| 六种 namespace | 宿主侧 | 比较 user/pid/mnt/net/ipc/uts；与宿主不同通过，共用失败。 |
-| 可见进程与 root 路径 | 宿主侧 | 核对各 PID 的 user/mnt/pid namespace，检查宿主进程暴露；无法完整核验或截断失败。 |
-| 宿主唯一标记 | 宿主侧 | 尝试直接路径及可见进程 root 下的别名，比较摘要；不可读/不可见通过，匹配失败，同名异物或不完整清单使验证失败。 |
-| binfmt_misc | 宿主侧 | 核对全部现有挂载来源，并在独立临时 user/mount namespace 内尝试建立入口；不登记解释器、不执行 Windows 程序。 |
+| 六种 namespace | 容器（宿主参照） | 比较 user/pid/mnt/net/ipc/uts；与宿主不同通过，共用失败。 |
+| 可见进程与 root 路径 | 容器（宿主参照） | 核对各 PID 的 user/mnt/pid namespace，检查宿主进程暴露；无法完整核验或截断失败。 |
+| 宿主唯一标记 | 容器（宿主参照） | 尝试直接路径及可见进程 root 下的别名，比较摘要；不可读/不可见通过，匹配失败，同名异物或不完整清单使验证失败。 |
+| binfmt_misc | 容器（宿主参照） | 核对全部现有挂载来源，并在独立临时 user/mount namespace 内尝试建立入口；不登记解释器、不执行 Windows 程序。 |
 
-AppArmor、capabilities、特殊内核文件系统可见性、未指定开关的 GPU 清单和网络范围属于环境记录，保存在 `observations`，不计入通过/失败数量。当前政策不要求启用宿主 AppArmor。网络扫描、连接宿主 TCP 服务及网络登录仍不测试。
+AppArmor、capabilities、特殊内核文件系统可见性、socket 清单、基本 devlxd 可见性和网络范围属于环境记录，保存在 `observations`，不计入通过/失败数量。GPU 明确传入 on/off 预期并作为检查项判定。当前政策不要求启用宿主 AppArmor。网络扫描、连接宿主 TCP 服务及网络登录仍不测试。
 
 ## 精确路径与设备清单
 
@@ -119,7 +109,7 @@ AppArmor、capabilities、特殊内核文件系统可见性、未指定开关的
 - `/run/snapd.socket`
 - `/run/snapd-snap.socket`
 
-此外，从 `/proc/net/unix` 发现名称包含 lxd、docker、containerd、podman、libvirt、virtqemud、snapd、systemd/private、bus 的文件路径，并检查 `/run/user/<UID>/docker.sock`、`podman/podman.sock`、`bus`。去重后有界执行；不连接抽象 socket。宿主侧入口另外检查当次参照中的宿主 socket 路径。
+此外，从 `/proc/net/unix` 发现名称包含 lxd、docker、containerd、podman、libvirt、virtqemud、snapd、systemd/private、bus 的文件路径，并检查 `/run/user/<UID>/docker.sock`、`podman/podman.sock`、`bus`。去重后有界执行；不连接抽象 socket。当次参照中的宿主 socket 路径并入同一去重清单，只检查一次。
 
 devlxd 的 5 个只读 GET：
 
@@ -163,6 +153,8 @@ Windows/WSL 固定路径：
 
 ## 结果与退出码
 
+以下退出码属于内部挑战及其 JSON 报告；完整 `mas-test` 在全部环节与清理成功时返回 0，有失败或中断时返回 1。
+
 JSON schema 为 2。`checks` 中每项只有 PASS/FAIL（通过/失败），保留 check、method、message、evidence；纯记录置于 observations。失败项的 failure_kind 区分 boundary（断言违反）、verification（证据不完整或来源未核验）、execution（探测/执行错误），不会把无法确认的来源冒充已经确认越界。
 
 - 0：列出的所有测试通过。
@@ -170,14 +162,14 @@ JSON schema 为 2。`checks` 中每项只有 PASS/FAIL（通过/失败），保�
 - 2：存在执行错误，或输入、报告写入、报告取回、清理失败。
 - 130：中断，保留已经取得的证据。
 
-下载和系统 sudo 失败保留原退出码。每项观察失败仍继续检查其他入口。终端转义控制字符，报告保留结构化原始证据；不覆盖已有报告。
+内部调用保留原始执行错误；取回报告和收尾核验后再传播。每项观察失败仍继续检查其他入口。终端转义控制字符，报告保留结构化原始证据；不覆盖已有报告。
 
 文本读取上限为 1 MiB；设备、进程、动态 socket、binfmt_misc 清单上限为 512 项，设备递归深度为 3。截断不算通过。宿主标记最多读取 64 KiB，不保存内容。结果只针对列出的入口和当次观察，不能证明任意未知别名不可访问或不存在上游漏洞。
 
 ## 自动化测试与边界
 
-两份 Python 源码和两个下载入口仅打包进 mas-test，不进入产品或安装程序。自动化测试在 GPU 开、关状态分别运行容器挑战和同一宿主执行器，保存两份源码哈希、宿主参照、各自报告和合并的覆盖证据。容器内的正向标记及符号链接样本验证匹配检测，明确标为测试文件，不当作真实宿主越界。
+两份 Python 源码只打包进 mas-test，不进入产品或安装程序。宿主协调器管理参照准备、完整容器调用、报告取回、宿主状态核验与本次临时目录清理；Suite 只提供目标、GPU 预期、输出回调并使用完整结果。内部探测保留有界子进程及 root/容器环境检查，不提供另一个公开下载入口。
 
-不加载内核模块、不改 sysctl/cgroup、不读物理内存/磁盘、不执行设备 ioctl、不读取凭据、不修改宿主服务、不耗尽资源。唯一新增挂载是上述隔离子进程的临时 binfmt_misc；不挂载宿主路径。LXD Project/Profile 的完整配置审计仍由 mas 和宿主自动化测试负责。历史版本的 REVIEW/SKIP/INFO/ERROR 报告保留为历史证据，不适用于新版入口。
+不加载内核模块、不改 sysctl/cgroup、不读物理内存/磁盘、不执行设备 ioctl、不读取凭据、不修改宿主服务、不耗尽资源。唯一新增挂载是上述隔离子进程的临时 binfmt_misc；不挂载宿主路径。LXD Project/Profile 的完整配置审计仍由 mas 和配置自动化测试负责。历史独立入口及 REVIEW/SKIP/INFO/ERROR 报告仅为历史证据。
 
 依据：[LXD 安全模型](https://canonical.com/lxd/docs/latest/explanation/security/)、[Linux binfmt_misc 文档](https://docs.kernel.org/6.12/admin-guide/binfmt-misc.html)、[Linux 6.12 按 user namespace 分离的 binfmt_misc 实现](https://github.com/torvalds/linux/blob/v6.12/fs/binfmt_misc.c)、[Linux 设备编号](https://docs.kernel.org/admin-guide/devices.html)、[Unix socket peer credentials](https://man7.org/linux/man-pages/man7/unix.7.html)。

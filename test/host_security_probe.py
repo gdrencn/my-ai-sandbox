@@ -1,35 +1,23 @@
 #!/usr/bin/env python3
-"""Host-assisted LXD challenges; uses the same independent guest primitives."""
+"""Complete automated LXD boundary challenge with fresh host references."""
 import argparse
 import ctypes
 import errno
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
 import re
-import shutil
-import signal
 import stat
 import subprocess
 import sys
 import tempfile
 import uuid
-import zipfile
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import guest_security_probe as probe
-
-
-def host_environment():
-    if sys.platform != 'linux':
-        raise ValueError('请在管理 LXD 的 Linux/WSL 宿主运行。')
-    markers = [os.environ.get('container', '')]
-    path = Path('/run/systemd/container')
-    if path.exists():
-        markers.append(probe.read_text(path).strip())
-    if any(marker and marker not in ('wsl', 'microsoft') for marker in markers):
-        raise ValueError('此入口必须在宿主运行；容器内请使用 security.sh。')
+probe_spec = importlib.util.spec_from_file_location('boundary_guest_probe', Path(__file__).with_name('guest_security_probe.py'))
+probe = importlib.util.module_from_spec(probe_spec)
+probe_spec.loader.exec_module(probe)
 
 
 def boot_id():
@@ -150,10 +138,12 @@ def bounded_mount(reference, timeout):
                                capture_output=True, text=True, timeout=timeout)
         item = json.loads(child.stdout)
         if child.returncode or not isinstance(item, dict) or item.get('check') != check or item.get('status') not in probe.STATUS_TEXT:
-            raise ValueError('binfmt_misc 子进程结果无效：' + child.stderr)
+            raise ValueError('binfmt_misc 子进程结果无效')
         return item
     except Exception as exc:
-        return probe.result(check, 'ERROR', 'binfmt_misc 子进程未完成', native_error=str(exc))
+        return probe.result(check, 'ERROR', 'binfmt_misc 子进程未完成', native_error=str(exc),
+                            native_stdout=child.stdout if 'child' in locals() else '',
+                            native_stderr=child.stderr if 'child' in locals() else '')
 
 
 def binfmt_existing(reference):
@@ -184,9 +174,10 @@ def binfmt_existing(reference):
     return results
 
 
-def guest_checks(reference, timeout, emit):
+def guest_checks(reference, timeout, emit, gpu):
     probe.environment_check()
     validate_host_reference(reference)
+    probe.run_checks(gpu, timeout, emit, reference=reference)
     for name in probe.NAMESPACES:
         try:
             guest = os.readlink('/proc/self/ns/' + name)
@@ -205,14 +196,14 @@ def guest_checks(reference, timeout, emit):
             emit(probe.result(check, 'ERROR', '此项验证失败', native_error=str(exc)))
     for index, item in enumerate(reference['canaries']):
         emit(probe.bounded_call('host-canary:' + str(index), ['--_canary', str(index), json.dumps(item)], timeout))
-    for item in reference['sockets']:
-        emit(probe.bounded_call('management-socket:' + item['path'], ['--_socket', item['path'], json.dumps(reference['sockets'])], timeout))
     emit(bounded_mount(reference, timeout))
 
 
-def validate_guest_report(data, reference):
+def validate_guest_report(data, reference, gpu):
     if (not isinstance(data, dict) or data.get('schema') != 2
-            or data.get('exit_code') not in (0, 1, 2, 130) or not isinstance(data.get('checks'), list)):
+            or type(data.get('exit_code')) is not int or data['exit_code'] not in (0, 1, 2, 130)
+            or data.get('gpu_expected') != gpu or not isinstance(data.get('checks'), list)
+            or not isinstance(data.get('observations'), list)):
         raise ValueError('容器挑战报告格式无效')
     checks = data['checks']
     for item in checks:
@@ -224,17 +215,39 @@ def validate_guest_report(data, reference):
     ids = [item['check'] for item in checks]
     required = {'namespace:'+name for name in probe.NAMESPACES} | {'process-roots', 'binfmt:temporary-mount'}
     required |= {'host-canary:'+str(index) for index in range(len(reference['canaries']))}
+    required |= {'management-socket:'+path for path in probe.SOCKETS}
     required |= {'management-socket:'+item['path'] for item in reference['sockets']}
-    if len(ids) != len(set(ids)) or not required.issubset(ids) or not any(name.startswith('binfmt:existing') for name in ids):
+    required |= {'uid-map','gid-map','seccomp','basic-interfaces','device-inventory','mount-sources','windows-interop','gpu-expectation'}
+    required |= {'device:'+name for name in probe.DEVICES}
+    required |= {'control:'+path for path in probe.CONTROLS}
+    required |= {'read-endpoint:'+path for path in probe.READ_ENDPOINTS}
+    required |= {'devlxd-api:'+path for path in probe.DEVLXD_ENDPOINTS}
+    if (len(ids) != len(set(ids)) or not required.issubset(ids)
+            or not any(name == 'binfmt:existing' or name.startswith('binfmt:existing:') for name in ids)):
         raise ValueError('容器挑战报告遗漏或重复了要求的检查项')
+    observations = data['observations']
+    for item in observations:
+        if (not isinstance(item, dict) or 'status' in item or not isinstance(item.get('check'), str)
+                or not isinstance(item.get('method'), str) or not isinstance(item.get('message'), str)
+                or not isinstance(item.get('evidence'), dict)):
+            raise ValueError('容器挑战报告的环境记录无效')
+    all_ids = ids + [item['check'] for item in observations]
+    if len(all_ids) != len(set(all_ids)):
+        raise ValueError('容器挑战报告重复了检查或环境记录')
     counts = {status:sum(item['status']==status for item in checks) for status in ('PASS','FAIL')}
-    if data.get('counts') != counts or (data['exit_code']==0) != (counts['FAIL']==0):
+    execution_failed = any(item['status'] == 'FAIL' and item.get('failure_kind') == 'execution' for item in checks)
+    expected_code = 2 if execution_failed else 1 if counts['FAIL'] else 0
+    if (data.get('counts') != counts or any(type(value) is not int for value in data.get('counts', {}).values())
+            or (data['exit_code'] != expected_code and not (data['exit_code'] == 130 and execution_failed))):
         raise ValueError('容器挑战报告汇总与检查结果不一致')
     return data
 
 
-def run_target(command, target, report, timeout=3):
-    """Public host entry and mas-test use this same orchestration."""
+def run_target(command, target, report, *, gpu, timeout=3, positive=False):
+    """Run all guest probes once, recover evidence, then verify host integrity."""
+    if gpu not in ('on', 'off'):
+        raise ValueError('完整挑战需要明确的 GPU 开关预期。')
+    primary = None
     remote = None
     with tempfile.TemporaryDirectory(prefix='mas-host-security-') as directory:
         root = Path(directory)
@@ -264,26 +277,31 @@ def run_target(command, target, report, timeout=3):
                 guest = None
                 try:
                     output = command(['exec', 'local:' + target, '--', 'python3', remote + '/host_security_probe.py',
-                        '--_guest-reference', remote + '/host-reference.json', '--timeout', str(timeout),
+                        '--_guest-reference', remote + '/host-reference.json', '--gpu', gpu, '--timeout', str(timeout),
                         '--report', remote + '/report.json'])
                     report.data['guest_stdout'] = output
-                except Exception as exc:
+                except (Exception, KeyboardInterrupt) as exc:
                     primary = exc
                     report.data['guest_stdout'] = str(exc)
                 try:
                     command(['file', 'pull', 'local:' + target + remote + '/report.json', str(root / 'report.json')])
-                    guest = validate_guest_report(json.loads((root / 'report.json').read_text()), reference)
+                    guest = validate_guest_report(json.loads((root / 'report.json').read_text()), reference, gpu)
                     report.data['guest_report'] = guest
                     for item in guest['checks']:
                         if item.get('status') not in ('PASS', 'FAIL'):
                             raise ValueError('容器挑战报告包含无效测试状态')
                         report.emit(item)
+                    for item in guest['observations']:
+                        report.emit(dict(item, status='INFO'))
                 except Exception as exc:
                     report.emit(probe.result('host-report', 'ERROR', '容器报告取回或读取失败', native_error=str(exc)))
                 if primary is not None:
                     report.data['native_failure'] = str(primary)
+                    report.diagnostic(probe.terminal_text(str(primary)) or '容器挑战被中断。')
                     if guest is None or not guest.get('counts', {}).get('FAIL'):
                         report.emit(probe.result('host-execution', 'ERROR', '容器挑战命令失败', native_error=str(primary)))
+                if positive and primary is None and guest and not guest['counts']['FAIL']:
+                    report.data['guest_only_positive_controls'] = positive_controls(command, target, root, remote)
             finally:
                 if remote:
                     try:
@@ -300,120 +318,27 @@ def run_target(command, target, report, timeout=3):
                         report.emit(probe.result(check, 'ERROR', '挑战后状态核验失败', native_error=str(exc)))
 
 
-def lxc_command(project):
-    def command(args):
-        child = subprocess.run(['lxc', '--project', project, *args], capture_output=True, text=True, timeout=90)
-        if child.returncode:
-            raise RuntimeError('\n'.join(part for part in (child.stdout.strip(), child.stderr.strip()) if part)
-                               or 'lxc 退出码 ' + str(child.returncode))
-        return child.stdout
-    return command
+    return primary
 
 
-def choose_target(command, target):
-    instances = json.loads(command(['list', 'local:', '--format=json']))
-    if not isinstance(instances, list) or any(not isinstance(item, dict)
-            or not isinstance(item.get('name'), str) or not isinstance(item.get('config'), dict)
-            or not isinstance(item.get('status'), str) for item in instances):
-        raise ValueError('LXD 容器列表格式无效')
-    managed = sorted((item for item in instances if item.get('type') == 'container'
-                      and item['config'].get('user.mas.managed') == 'true'), key=lambda item: item['name'])
-    def validate(name):
-        if not re.fullmatch(r'[A-Za-z](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', name or ''):
-            raise ValueError('TARGET 必须是本地容器名。')
-        instance = next((item for item in managed if item['name'] == name), None)
-        if instance is None:
-            raise ValueError('当前 Project 中没有此 mas 管理的容器：' + name)
-        if instance['status'] not in ('Running', 'Stopped'):
-            raise ValueError('容器当前状态不允许挑战：' + name + '（' + instance['status'] + '）')
-        return name
-    if target is not None:
-        return validate(target)
-    print('mas 管理的容器：', flush=True)
-    for item in managed:
-        status = {'Running':'运行中', 'Stopped':'已停止'}.get(item['status'], item['status'])
-        print('  ' + probe.terminal_text(item['name']) + '  ' + probe.terminal_text(status), flush=True)
-    if not managed:
-        print('  当前 Project 中没有 mas 管理的容器。', flush=True)
-    try:
-        # Separate streams avoid BufferedRandom's seek requirement on a TTY.
-        # Read from the controlling terminal even when stdin is a curl pipe.
-        with open('/dev/tty', 'r') as terminal_in, open('/dev/tty', 'w') as terminal_out:
-            terminal_out.write('输入容器名，留空取消。\n')
-            while True:
-                terminal_out.write('请输入要挑战的容器名：'); terminal_out.flush()
-                name = terminal_in.readline().strip()
-                if not name:
-                    raise ValueError('已取消宿主侧挑战。')
-                try:
-                    return validate(name)
-                except ValueError as exc:
-                    terminal_out.write(probe.terminal_text(str(exc)) + '\n')
-    except OSError:
-        raise ValueError('非交互执行需要提供 TARGET；例如 security-host.sh demo。') from None
-
-
-def installed_manager(project):
-    """Reuse the installed product's complete lifecycle, including mounts."""
-    product = Path(shutil.which('mas') or Path.home() / '.local/bin/mas').resolve()
-    if not product.is_file() or not zipfile.is_zipfile(product):
-        raise ValueError('未找到已安装的 mas 产品，请先安装 mas。')
-    with zipfile.ZipFile(product) as archive:
-        if not {'mas/core.py', 'mas/isolation.py', 'mas/presentation.py', 'mas/__init__.py'} <= set(archive.namelist()):
-            raise ValueError('已安装的 mas 产品格式无效，请重新安装 mas。')
-    sys.path.insert(0, str(product))
-    try:
-        from mas.core import LXD, Manager
-        from mas.presentation import Progress
-        progress = Progress()
-        return Manager(LXD(project=project, diagnostic=progress.output.keep), report=progress)
-    finally:
-        sys.path.remove(str(product))
-
-
-def challenge_target(command, target, report, manager, timeout=3):
-    """Challenge a managed target and restore its original stable state."""
-    instance = manager.require(target)
-    initial = instance['status']
-    identity = instance.get('config', {}).get('volatile.uuid')
-    if initial not in ('Running', 'Stopped') or not isinstance(identity, str) or not identity:
-        raise ValueError('容器状态或身份不允许挑战。')
-    lifecycle = dict(initial_status=initial, identity=identity, actions=[], final_status=None)
-    report.data['lifecycle'] = lifecycle
-    try:
-        if initial == 'Stopped':
-            print('通过 mas 启动容器：' + probe.terminal_text(target), flush=True)
-            lifecycle['actions'].append('start')
-            manager.start(target)
-        run_target(command, target, report, timeout)
-    finally:
-        try:
-            current = manager.require(target)
-            lifecycle['final_status'] = current['status']
-            if current.get('config', {}).get('volatile.uuid') != identity:
-                raise ValueError('容器身份已变化，未操作替换后的容器。')
-            if initial == 'Stopped':
-                print('通过 mas 恢复停止状态：' + probe.terminal_text(target), flush=True)
-                lifecycle['actions'].append('stop')
-                manager.stop(target)
-                current = manager.require(target)
-                lifecycle['final_status'] = current['status']
-                if current.get('config', {}).get('volatile.uuid') != identity:
-                    raise ValueError('恢复后容器身份已变化。')
-            if current['status'] != initial:
-                raise ValueError('容器未恢复原状态：' + initial + ' → ' + current['status'])
-            if initial == 'Stopped':
-                report.emit(probe.result('host-state-restore', 'PASS', '通过标准 mas stop 恢复原停止状态', target=target))
-        except Exception as exc:
-            report.emit(probe.result('host-state-restore', 'ERROR', '容器原状态恢复或核验失败', native_error=str(exc)))
-        except KeyboardInterrupt:
-            report.emit(probe.result('host-state-restore', 'ERROR', '容器原状态恢复中断'))
-            raise
-
-
-def terminate_challenge(signum, frame):
-    raise KeyboardInterrupt
-
+def positive_controls(command, target, root, remote):
+    """Owned guest samples prove detection; they are not host escapes."""
+    marker = root / 'positive-canary'
+    content = ('mas-guest-positive-' + uuid.uuid4().hex).encode()
+    marker.write_bytes(content)
+    command(['file','push',str(marker),'local:'+target+remote+'/positive-canary'])
+    command(['exec','local:'+target,'--','ln','-s',remote+'/positive-canary',remote+'/canary-alias'])
+    outcomes = []
+    for filename in ('positive-canary', 'canary-alias'):
+        item = dict(path=remote+'/'+filename, sha256=hashlib.sha256(content).hexdigest())
+        raw = command(['exec','local:'+target,'--','python3',remote+'/guest_security_probe.py',
+                       '--_canary','0',json.dumps(item)])
+        outcome = json.loads(raw)
+        if outcome.get('status') != 'FAIL' or outcome.get('check') != 'host-canary:0' or not any(attempt.get('outcome') == 'readable' and attempt.get('sha256') == item['sha256']
+                for attempt in outcome.get('evidence', {}).get('attempts', [])):
+            raise ValueError('容器内正向检测样本未被识别：' + probe.terminal_text(raw))
+        outcomes.append(outcome)
+    return outcomes
 
 def main(argv=None):
     args = list(sys.argv[1:] if argv is None else argv)
@@ -428,44 +353,30 @@ def main(argv=None):
         except Exception as exc:
             print(probe.terminal_text(str(exc)), file=sys.stderr)
             return 2
-    parser = argparse.ArgumentParser(description='从 Linux/WSL 宿主挑战现有 LXD 容器的宿主资源边界；不修改容器配置。')
-    parser.add_argument('target', nargs='?', help='mas 管理的本地容器名；省略时从终端输入；按需启动并恢复原状态')
-    parser.add_argument('--project', default='mas', help='LXD Project，默认 mas')
-    parser.add_argument('--report', type=Path, help='宿主 JSON 报告路径，默认生成唯一文件')
-    parser.add_argument('--timeout', type=float, default=3, help='单项挑战超时（1–10 秒，默认 3）')
-    parser.add_argument('--_guest-reference', type=Path, help=argparse.SUPPRESS)
+    parser = argparse.ArgumentParser(description='自动化测试内部的完整容器安全挑战模块。')
+    parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--gpu', choices=('on','off'), required=True)
+    parser.add_argument('--timeout', type=float, default=3)
+    parser.add_argument('--_guest-reference', type=Path, required=True)
     options = parser.parse_args(args)
     if not 1 <= options.timeout <= 10:
         parser.error('--timeout 必须为 1–10 秒')
-    report = probe.ChallengeReport('host-assisted-boundary-probe', project=options.project, target=options.target)
+    report = probe.ChallengeReport('complete-boundary-probe', gpu_expected=options.gpu)
     try:
         path = probe.report_path(options.report, 'host-security-')
     except ValueError as exc:
         print(probe.terminal_text(str(exc)), file=sys.stderr)
         return 2
     interrupted = False
-    previous_term = None
     try:
-        if options._guest_reference:
-            probe.environment_check()
-            reference = validate_host_reference(json.loads(options._guest_reference.read_text()))
-            guest_checks(reference, options.timeout, report.emit)
-        else:
-            previous_term = signal.signal(signal.SIGTERM, terminate_challenge)
-            host_environment()
-            command = lxc_command(options.project)
-            target = choose_target(command, options.target)
-            report.data['target'] = target
-            print('\n宿主侧容器安全挑战：' + probe.terminal_text(options.project + '/' + target) + '\n', flush=True)
-            challenge_target(command, target, report, installed_manager(options.project), options.timeout)
+        probe.environment_check()
+        reference = validate_host_reference(json.loads(options._guest_reference.read_text()))
+        guest_checks(reference, options.timeout, report.emit, options.gpu)
     except KeyboardInterrupt:
         interrupted = True
         report.emit(probe.result('host-execution', 'ERROR', '挑战中断'))
     except Exception as exc:
         report.emit(probe.result('host-execution', 'ERROR', '挑战未完成', native_error=str(exc)))
-    finally:
-        if previous_term is not None:
-            signal.signal(signal.SIGTERM, previous_term)
     return report.finish(path, interrupted)
 
 

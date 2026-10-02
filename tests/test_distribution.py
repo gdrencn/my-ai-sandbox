@@ -147,7 +147,9 @@ class DistributionTests(unittest.TestCase):
             self.assertNotIn(forbidden,names)
         from tests.probe_source import source_bytes
         with zipfile.ZipFile(sys.argv[0]) as archive:
-            for name in ('guest_security_probe.py', 'security.sh'):
+            for removed in ('tests/security.sh', 'tests/security-host.sh'):
+                self.assertNotIn(removed, archive.namelist())
+            for name in ('guest_security_probe.py', 'host_security_probe.py'):
                 self.assertEqual(archive.read('tests/' + name), source_bytes(name))
                 self.assertFalse(any(member.endswith('/' + name) for member in names))
 

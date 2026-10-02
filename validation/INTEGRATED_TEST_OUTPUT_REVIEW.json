@@ -1,0 +1,99 @@
+{
+  "status": "passed",
+  "published": false,
+  "baseline_version": "0.2.17",
+  "frozen_directory": "/tmp/mas-integrated-final-2dtl3pse",
+  "elapsed": 746.8084556779941,
+  "units": 375,
+  "stages": 27,
+  "category_counts": {
+    "foundation": 1,
+    "environment": 1,
+    "management": 14,
+    "configuration": 2,
+    "resources": 3,
+    "interaction": 5,
+    "security": 1
+  },
+  "separator_count": 27,
+  "localized_stage_headers": 27,
+  "plain_output": true,
+  "ordinary_help_not_diagnostic": true,
+  "cleanup_errors": [],
+  "challenges": [
+    {
+      "gpu_expected": "on",
+      "counts": {
+        "PASS": 69,
+        "FAIL": 0
+      },
+      "observations": 6,
+      "positive_controls": 2
+    },
+    {
+      "gpu_expected": "off",
+      "counts": {
+        "PASS": 72,
+        "FAIL": 0
+      },
+      "observations": 6,
+      "positive_controls": 0
+    }
+  ],
+  "package_review": {
+    "mas.pyz_unchanged": true,
+    "mas-install.pyz_unchanged": true,
+    "bootstrap.py_unchanged": true,
+    "install.sh_unchanged": true,
+    "install-test.sh_unchanged": true,
+    "install-stable.sh_unchanged": true,
+    "test.sh_unchanged": true,
+    "test-stable.sh_unchanged": true,
+    "mas.pyz_probe_members": [],
+    "mas-install.pyz_probe_members": [],
+    "mas-test.pyz_probe_members": [
+      "tests/guest_security_probe.py",
+      "tests/host_security_probe.py"
+    ]
+  },
+  "reproducible_build": {
+    "mas.pyz": true,
+    "mas-install.pyz": true,
+    "mas-test.pyz": true,
+    "SHA256SUMS": true,
+    "bootstrap.py": true,
+    "install.sh": true,
+    "install-test.sh": true,
+    "install-stable.sh": true,
+    "test.sh": true,
+    "test-stable.sh": true
+  },
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "test_project_removed": true,
+  "staging_projects_removed": true,
+  "legacy_targets_removed": true,
+  "legacy_profiles_removed": true,
+  "mount_state": {
+    "results/mount-state/mounts.json": {
+      "version": 1,
+      "directories": {},
+      "mounts": []
+    }
+  },
+  "mount_directories_removed": true,
+  "workspace_removed": true,
+  "challenge_markers_removed": true,
+  "hashes": {
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "mas-test.pyz": "9ee6b038355a3df0f495b8d649316c92b6e841feee241e2329ab910344be4b7b",
+    "mas-install.pyz": "061116af7d3ad690657b3b0ad02017360cb77a18b9f15c74e05e33fb3cb15302",
+    "mas.pyz": "f0c5464467d4304b9bc45e300201253ea1c1252dfab8b6ca92ce0ef9af08047c"
+  }
+}

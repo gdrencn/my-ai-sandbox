@@ -19,6 +19,7 @@ class SecurityRunnerTests(unittest.TestCase):
         self.suite = Suite.__new__(Suite)
         self.suite.manager = Mock()
         self.suite.events = []
+        self.suite.project = "fixture-project"
         self.suite.output = Output(io.StringIO())
 
     def test_only_explicit_policy_denials_are_counted_as_refusals(self):
@@ -54,7 +55,7 @@ class SecurityRunnerTests(unittest.TestCase):
             calls.append(args)
             if args[:3] == ['exec', 'local:fixture', '--']:
                 if args[3:5] == ['python3', '-c']:
-                    return '/tmp/mas-guest-suite-fixture\n'
+                    return '/tmp/mas-host-challenge-fixture\n'
                 if args[3] == 'python3':
                     raise primary
                 return ''
@@ -71,7 +72,9 @@ class SecurityRunnerTests(unittest.TestCase):
         with self.assertRaises(Error) as failure:
             self.suite.guest_boundary('fixture')
         self.assertIs(failure.exception, primary)
-        self.assertEqual(self.suite.guest_reports[0]['report']['counts']['FAIL'], 1)
+        self.assertGreaterEqual(self.suite.guest_reports[0]['report']['counts']['FAIL'], 1)
+        self.assertIn(str(primary), self.suite.output.stream.getvalue())
+        self.assertTrue((self.suite.directory / 'boundary-1.json').is_file())
         self.assertEqual(self.suite.guest_reports[0]['status'], 'failed')
         self.assertLess(next(i for i, args in enumerate(calls) if args[:2] == ['file', 'pull']),
                         next(i for i, args in enumerate(calls) if 'rm' in args))
@@ -83,4 +86,4 @@ class SecurityRunnerTests(unittest.TestCase):
             self.suite.guest_boundary('fixture')
         self.assertIs(failure.exception, primary)
         self.assertTrue(any('rm' in args for args in calls))
-        self.assertTrue((self.suite.directory / 'guest-boundary-1.log').is_file())
+        self.assertTrue((self.suite.directory / 'boundary-1.log').is_file())
