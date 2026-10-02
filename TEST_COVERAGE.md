@@ -1,6 +1,8 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.14 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.15 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+
+Batch 0.2.15 adds the separate guest/host challenge coverage below; local and public validation are recorded separately in IMPLEMENTED.md.
 
 ## Test layers
 
@@ -264,3 +266,11 @@ Frozen archives ran from /tmp outside the source tree: 340 units with zero skips
 Eleven new unit regressions cover failure sequencing, standard mount phases, one user-preparation step, code-independent choices, simultaneous terminal/stop errors, consent/noninteractive behavior, unchanged start arguments, short/long restart entry flags, explicit return destination, retained failure status and focus. Real PTYs exercise all choices, default Enter, Escape and Left in both languages, comparing complete terminal settings after the selector.
 
 The native suite has 27 stages and 351 packaged units. Restart is checked from running/stopped state with changed boot identity and preserved user files, and -e enters the real sandbox shell. A real exit 7 followed by Return to mas preserves status 1 after menu exit. Mounted restart retains two exact paths, statuses and contents. Menu entry independently exercises every destination, state/boot identity and no intervening result page. Local frozen verification passed all units/stages without skips or cleanup errors in 712.1 seconds. The actual public entry independently passed all 351 units and 27 stages in 715.0 seconds, with no skips or cleanup errors. Eleven assets, source entries, installed bytes, ordinary installation and independent cleanup checks passed; evidence is in validation/V0_2_14_PUBLIC_REPORT.json and validation/V0_2_14_RELEASE_CHECK.json. Native guest reboot/shutdown coordination and native session line formatting are outside this batch.
+
+## Independent guest and host-assisted challenges — 0.2.15
+
+Eighteen host-probe regressions cover reference schema/completeness, WSL host acceptance and container rejection, running local target selection, query failure, actual terminal input while stdin is redirected, missing-reference checks removed from guest scope, only PASS/FAIL public checks with separate observations, replayed execution errors, precise missing-path assertions, mount permission denial, identity/detach failure, actual mountpoint enumeration without writes, bounded child timeout and malformed output, metadata-only transfer, original/retrieval/cleanup failures, stale-boot rejection, incomplete/false-success reports and independently downloaded host help with temporary-file cleanup. Existing guest tests now assert schema 2 and the new scope/status contract.
+
+The native tester calls the same host orchestration as the public entry and runs both challenge scopes with GPU on and off. It retains separate JSON/logs, both source hashes, fresh host references and combined coverage evidence. Shared canary positive/alias fixtures verify detection without mislabeling owned guest files as a real host escape. Host tests verify six namespace differences, visible process origin, direct/proc-root marker paths, management sockets, existing binfmt_misc identity, independent temporary mounts, unchanged host registrations/marker and current boot identity. Identification, cleanup and report integrity failures do not become successful security assertions.
+
+The final package contains 369 units and 27 native stages. The four challenge files are embedded exactly in mas-test only; repeated builds match. Final frozen native verification passed all 369 units and 27 stages in 735.6 seconds, without skips or cleanup errors. The public entry is independently verified after publication; see IMPLEMENTED.md and validation/V0_2_15_LOCAL_REPORT.json.

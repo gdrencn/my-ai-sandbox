@@ -534,7 +534,7 @@ class Suite:
 
     def isolation_runtime(self, target):
         report = self.guest_boundary(target)
-        checks = {item['check']: item for item in report['checks']}
+        checks = {item['check']: item for item in report['checks'] + report.get('observations', [])}
         attribute = checks['apparmor']['evidence'].get('profile', '')
         self.isolation_results = dict(status='passed', project=self.project,
             policy=self.manager.isolation.check(),
@@ -558,25 +558,16 @@ class Suite:
         spec = importlib.util.spec_from_file_location('suite_guest_probe', script)
         probe = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(probe)
-        token = uuid.uuid4().hex
-        marker = root / ('host-canary-' + token)
-        content = ('mas-non-secret-host-canary-' + token).encode()
-        marker.write_bytes(content)
-        reference = dict(schema=1, namespaces={n:os.readlink('/proc/self/ns/' + n) for n in probe.NAMESPACES},
-                         canaries=[dict(path=str(marker), sha256=hashlib.sha256(content).hexdigest())], sockets=[])
-        for path in probe.SOCKETS:
-            try:
-                info = os.stat(path)
-                if stat.S_ISSOCK(info.st_mode):
-                    reference['sockets'].append(dict(path=path, device=info.st_dev, inode=info.st_ino))
-            except (FileNotFoundError, PermissionError):
-                pass
-        reference_file = root / 'host-reference.json'
-        reference_file.write_text(json.dumps(reference))
+        host_script = root / 'host_security_probe.py'
+        host_data = source_bytes('host_security_probe.py')
+        host_script.write_bytes(host_data)
+        host_spec = importlib.util.spec_from_file_location('suite_host_probe', host_script)
+        host_probe = importlib.util.module_from_spec(host_spec)
+        host_spec.loader.exec_module(host_probe)
         record = self.manager.gpu.record(self.manager.info(target))
         expected = 'on' if record and record['enabled'] else 'off'
         evidence = dict(target=target, gpu_expected=expected, source_sha256=hashlib.sha256(probe_data).hexdigest(),
-                        status='not_run', reference=reference)
+                        status='not_run', host_source_sha256=hashlib.sha256(host_data).hexdigest())
         self.guest_reports.append(evidence)
         remote = self.manager.lxd.command(['exec','local:'+target,'--','python3','-c',
                      "import tempfile;print(tempfile.mkdtemp(prefix='mas-guest-suite-'))"]).strip()
@@ -586,16 +577,12 @@ class Suite:
             if evidence['status'] != 'passed':
                 evidence['status'] = 'failed'
             self.manager.lxd.command(['exec','local:'+target,'--','rm','-rf','--',remote])
-            if marker.read_bytes() != content:
-                raise AssertionError('Host canary was changed')
-            marker.unlink()
         with cleanup_scope(cleanup):
-            for source in (script, reference_file):
-                self.manager.lxd.command(['file','push',str(source),'local:'+target+remote+'/'+source.name])
+            self.manager.lxd.command(['file','push',str(script),'local:'+target+remote+'/'+script.name])
             failure = None
             try:
                 stdout = self.manager.lxd.command(['exec','local:'+target,'--','python3',remote+'/'+script.name,
-                    '--gpu',expected,'--host-reference',remote+'/'+reference_file.name,'--report',remote+'/report.json'])
+                    '--gpu',expected,'--report',remote+'/report.json'])
             except Error as exc:
                 # A failed diagnostic still produces useful evidence. Retrieve
                 # its report before propagating the original execution error.
@@ -615,13 +602,31 @@ class Suite:
             if failure is not None:
                 evidence['status'] = 'failed'
                 raise failure
-            assert report['exit_code'] == 0 and not report['counts']['FAIL'] and not report['counts']['ERROR'], report
+            assert report['exit_code'] == 0 and not report['counts']['FAIL'], report
+            evidence['guest_report'] = report
+            host_report = host_probe.probe.ChallengeReport('host-assisted-boundary-probe', project=self.project, target=target)
+            host_log = io.StringIO()
+            with contextlib.redirect_stdout(host_log):
+                try:
+                    host_probe.run_target(self.manager.lxd.command, target, host_report)
+                except Exception as exc:
+                    host_report.emit(probe.result('host-execution','ERROR','Host-assisted challenge failed',native_error=str(exc)))
+                host_code = host_report.finish(self.directory / f'host-boundary-{index}.json')
+            (self.directory / f'host-boundary-{index}.log').write_text(host_log.getvalue())
+            evidence['host_report'] = host_report.data
+            evidence['reference'] = host_report.data['reference']
+            assert host_code == 0, host_report.data
+            report = dict(schema=2, checks=report['checks'] + host_report.data['checks'],
+                          observations=report.get('observations', []) + host_report.data.get('observations', []),
+                          counts={'PASS':report['counts']['PASS']+host_report.data['counts']['PASS'], 'FAIL':0}, exit_code=0)
+            evidence['report'] = report
             checks = {item['check']:item for item in report['checks']}
             required = ['uid-map','gid-map','seccomp','device-inventory','process-roots','windows-interop','gpu-expectation','host-canary:0']
             required += ['namespace:'+n for n in probe.NAMESPACES]
             required += ['device:'+n for n in probe.DEVICES]
             required += ['control:'+p for p in probe.CONTROLS]
             required += ['devlxd-api:'+p for p in probe.DEVLXD_ENDPOINTS]
+            required += ['binfmt:temporary-mount','binfmt:host-unchanged','host-canary-integrity','host-reference']
             assert set(required).issubset(checks), sorted(set(required)-set(checks))
             for check in ['uid-map','gid-map','seccomp','process-roots','windows-interop','gpu-expectation','host-canary:0'] + ['namespace:'+n for n in probe.NAMESPACES]:
                 assert checks[check]['status']=='PASS', checks[check]
@@ -629,6 +634,7 @@ class Suite:
                 # This file is intentionally placed in the guest. Its matching
                 # bytes test detection, not an actual host escape.
                 guest_marker = root / 'positive-canary'
+                content = ('mas-guest-positive-' + uuid.uuid4().hex).encode()
                 guest_marker.write_bytes(content)
                 self.manager.lxd.command(['file','push',str(guest_marker),'local:'+target+remote+'/positive-canary'])
                 self.manager.lxd.command(['exec','local:'+target,'--','ln','-s',remote+'/positive-canary',remote+'/canary-alias'])

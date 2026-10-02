@@ -37,7 +37,7 @@ class GuestProbeTests(unittest.TestCase):
         def bounded(check, args, timeout):
             return probe.result(check, 'PASS', 'controlled child')
         with patch.object(probe, 'read_text', side_effect=read), patch.object(probe, 'bounded_call', side_effect=bounded):
-            probe.run_checks(None, 'unknown', 1, items.append)
+            probe.run_checks('unknown', 1, items.append)
         by_id = {item['check']: item for item in items}
         self.assertEqual(by_id['uid-map']['status'], 'ERROR')
         self.assertIn('network-policy', by_id)
@@ -45,7 +45,9 @@ class GuestProbeTests(unittest.TestCase):
             self.assertIn('control:' + path, by_id)
         for name in probe.DEVICES:
             self.assertIn('device:' + name, by_id)
-        self.assertEqual(by_id['host-canaries']['status'], 'SKIP')
+        self.assertNotIn('host-canaries', by_id)
+        self.assertNotIn('process-roots', by_id)
+        self.assertFalse(any(key.startswith('namespace:') for key in by_id))
 
     def test_reference_socket_identity_is_strict_and_optional(self):
         valid = dict(schema=1, namespaces={name: name + ':[123]' for name in probe.NAMESPACES})
@@ -105,8 +107,8 @@ class GuestProbeTests(unittest.TestCase):
 
     def test_devlxd_only_reads_metadata_and_treats_missing_objects_as_unverified(self):
         for endpoint, status, data, expected in (
-            ('/1.0', 200, {}, 'INFO'), ('/1.0', 200, {'supported_storage_drivers': ['dir']}, 'FAIL'),
-            ('/1.0/config', 200, ['/1.0/config/user.mas.gpu'], 'INFO'),
+            ('/1.0', 200, {}, 'PASS'), ('/1.0', 200, {'supported_storage_drivers': ['dir']}, 'FAIL'),
+            ('/1.0/config', 200, ['/1.0/config/user.mas.gpu'], 'PASS'),
             (probe.DEVLXD_ENDPOINTS[-1], 403, {}, 'PASS'),
             (probe.DEVLXD_ENDPOINTS[-1], 404, {}, 'SKIP'),
             (probe.DEVLXD_ENDPOINTS[-1], 200, {}, 'FAIL'),
@@ -140,19 +142,19 @@ class GuestProbeTests(unittest.TestCase):
     def test_interrupt_preserves_partial_report_and_returns_130(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'report.json'
-            def checks(reference, gpu, timeout, emit):
+            def checks(gpu, timeout, emit):
                 emit(probe.result('uid-map', 'PASS', 'fixture'))
                 raise KeyboardInterrupt()
             with patch.object(probe, 'environment_check'), patch.object(probe, 'run_checks', side_effect=checks), patch('sys.stdout', new=io.StringIO()):
                 self.assertEqual(probe.main(['--report', str(path)]), 130)
             report = json.loads(path.read_text())
             self.assertEqual(report['counts']['PASS'], 1)
-            self.assertEqual(report['counts']['ERROR'], 1)
+            self.assertEqual(report['counts']['FAIL'], 1)
 
     def test_c1_control_characters_in_evidence_are_escaped(self):
         with tempfile.TemporaryDirectory() as directory:
             out = io.StringIO()
-            def checks(reference, gpu, timeout, emit):
+            def checks(gpu, timeout, emit):
                 emit(probe.result('socket-inventory', 'INFO', 'fixture', path='native\x85path'))
             with patch.object(probe, 'environment_check'), patch.object(probe, 'run_checks', side_effect=checks), patch('sys.stdout', new=out):
                 self.assertEqual(probe.main(['--report', str(Path(directory) / 'report.json')]), 0)
@@ -227,7 +229,7 @@ class GuestProbeTests(unittest.TestCase):
             with socket.socket(socket.AF_UNIX) as listener:
                 listener.bind(path)
                 listener.listen(1)
-                self.assertEqual(probe.socket_check(path)['status'], 'INFO')
+                self.assertEqual(probe.socket_check(path)['status'], 'PASS')
                 accepted, _ = listener.accept()
                 with accepted:
                     self.assertEqual(accepted.recv(1), b'')
@@ -333,17 +335,17 @@ class GuestProbeTests(unittest.TestCase):
             self.assertEqual(list(Path(directory).iterdir()), [path])
 
     def test_summary_retains_skips_reviews_and_errors_in_exit_semantics(self):
-        for statuses, expected in ((('PASS', 'SKIP', 'REVIEW'), 0), (('FAIL',), 1), (('ERROR', 'FAIL'), 2)):
+        for statuses, expected in ((('PASS', 'SKIP', 'REVIEW'), 1), (('FAIL',), 1), (('ERROR', 'FAIL'), 2)):
             with tempfile.TemporaryDirectory() as directory:
                 path = Path(directory) / 'report.json'
-                def checks(reference, gpu, timeout, emit):
+                def checks(gpu, timeout, emit):
                     for status in statuses:
                         emit(probe.result(status, status, 'fixture'))
                 with patch.object(probe, 'environment_check'), patch.object(probe, 'run_checks', side_effect=checks), patch('sys.stdout', new=io.StringIO()):
                     self.assertEqual(probe.main(['--report', str(path)]), expected)
                 report = json.loads(path.read_text())
                 self.assertEqual(report['exit_code'], expected)
-                self.assertEqual([item['status'] for item in report['checks']], list(statuses))
+                self.assertEqual([item['status'] for item in report['checks']], ['PASS' if status == 'PASS' else 'FAIL' for status in statuses])
 
     def test_report_failure_and_existing_destination_do_not_run_as_success(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -366,13 +368,13 @@ class GuestProbeTests(unittest.TestCase):
             self.assertIn('请使用 sudo', err.getvalue())
             self.assertNotIn('\x1b', err.getvalue())
             self.assertIn('\\u001b', err.getvalue())
-            self.assertEqual(json.loads(path.read_text())['counts']['ERROR'], 1)
+            self.assertEqual(json.loads(path.read_text())['counts']['FAIL'], 1)
 
     def test_report_and_console_explain_method_denied_step_and_native_result(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'report.json'
             item = probe.denied_result('device:host-memory', 'mknod', OSError(errno.EPERM, 'native'))
-            def checks(reference, gpu, timeout, emit):
+            def checks(gpu, timeout, emit):
                 emit(item)
             output = io.StringIO()
             with patch.object(probe, 'environment_check'), patch.object(probe, 'run_checks', side_effect=checks), patch('sys.stdout', new=output):
@@ -488,7 +490,8 @@ elif name == 'python3':
         with tempfile.TemporaryDirectory() as directory:
             process, _ = self.run_entry(directory, ('--help',), REAL_PYTHON='1')
             self.assertEqual(process.returncode, 0, process.stderr)
-            self.assertIn('--host-reference', process.stdout)
+            self.assertNotIn('--host-reference', process.stdout)
+            self.assertIn('--gpu', process.stdout)
             self.assertIn('隔离边界', process.stdout)
             self.assertEqual(list(Path(directory).glob('guest-security-*.json')), [])
 

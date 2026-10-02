@@ -4,7 +4,6 @@ import argparse
 import http.client
 import itertools
 import contextlib
-from collections import Counter
 import errno
 import hashlib
 import json
@@ -40,7 +39,7 @@ CONTROLS = (
     '/proc/sys/kernel/modules_disabled', '/proc/sys/kernel/sysrq',
     '/proc/sys/kernel/panic', '/proc/sys/kernel/panic_on_oops',
     '/proc/sys/kernel/unprivileged_bpf_disabled', '/proc/sys/kernel/perf_event_paranoid',
-    '/proc/sys/kernel/yama/ptrace_scope', '/proc/sys/fs/binfmt_misc/register',
+    '/proc/sys/kernel/yama/ptrace_scope',
     '/sys/power/state', '/sys/power/disk', '/sys/kernel/uevent_helper',
 )
 SOCKETS = (
@@ -102,6 +101,10 @@ def check_method(check):
         return '读取 mountinfo，核对 ' + check.split(':', 1)[1] + ' 的只读挂载选项'
     if check.startswith('host-canary:'):
         return '有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容'
+    if check.startswith('binfmt:'):
+        return '核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则'
+    if check.startswith('host-'):
+        return '从宿主采集当次参照并核对挑战前后状态'
     return methods.get(check, '执行此项检查')
 
 
@@ -225,6 +228,9 @@ def active_probe(kind, value, work):
             return result(check, 'FAIL', '能够打开未授权设备；未读取、写入或执行 ioctl', step=step)
         return result(check, 'REVIEW', '能够打开内核入口；未读写，实际内容访问权限尚未证实', step=step)
     except OSError as exc:
+        if kind in ('control', 'read-endpoint') and exc.errno in (errno.ENOENT, errno.ENOTDIR):
+            return result(check, 'PASS', '当前路径未暴露；此项验证入口不存在，不声称执行了权限拒绝测试',
+                          step=step, errno=exc.errno, native_error=str(exc))
         return denied_result(check, step, exc)
 
 
@@ -321,7 +327,7 @@ def socket_check(path, references=()):
                 local_peer = all(peer_namespaces[name] == os.readlink('/proc/self/ns/' + name) for name in peer_namespaces)
             except OSError:
                 pass
-        return result(check, 'FAIL' if host_match else 'INFO' if local_peer else 'REVIEW',
+        return result(check, 'FAIL' if host_match else 'PASS' if local_peer else 'REVIEW',
                       '连接到了宿主参照中的管理 socket' if host_match else
                       '服务进程属于当前容器 namespace；未发送管理请求' if local_peer else
                       '可以连接；未发送管理请求，来源尚不能确认',
@@ -429,7 +435,9 @@ def process_roots(reference):
             if exc.errno != errno.ENOENT:  # Processes may exit during inventory.
                 errors.append(dict(pid=int(pid), errno=exc.errno, native_error=str(exc)))
     return result('process-roots', 'FAIL' if matches else 'SKIP' if not reference or errors or len(pids) > MAX_INVENTORY else 'PASS',
-                  '发现使用宿主 namespace 的可见进程' if matches else '可见进程路径核验；没有宿主参照时不宣称隔离通过',
+                  '发现使用宿主 namespace 的可见进程' if matches else
+                  '进程来源验证未完成' if not reference or errors or len(pids) > MAX_INVENTORY else
+                  '已核对可见进程 namespace 与 root 路径，未发现宿主进程',
                   processes=entries, host_matches=matches, errors=errors, truncated=len(pids) > MAX_INVENTORY)
 
 
@@ -476,7 +484,7 @@ def devlxd_check(endpoint):
         if not stat.S_ISSOCK(os.stat('/dev/lxd/sock').st_mode):
             return result(check, 'REVIEW', '实例接口路径不是 socket')
     except FileNotFoundError:
-        return result(check, 'SKIP', '基本实例接口未提供')
+        return result(check, 'PASS', '实例接口未暴露，当前没有此访问入口')
     with contextlib.closing(UnixHTTP('localhost', timeout=2)) as connection:
         connection.request('GET', endpoint)
         response = connection.getresponse()
@@ -489,11 +497,11 @@ def devlxd_check(endpoint):
             if endpoint == '/1.0/config':
                 if not isinstance(data, list) or any(not isinstance(key, str) or not key.startswith(('/1.0/config/user.', '/1.0/config/cloud-init.')) for key in data):
                     raise ValueError('devlxd 配置列表格式无效')
-                return result(check, 'INFO', '仅列出本实例配置键名，不读取配置值', http_status=200, keys=data)
+                return result(check, 'PASS', '只返回本实例允许的配置键名，不读取配置值', http_status=200, keys=data)
             if not isinstance(data, dict):
                 raise ValueError('devlxd 实例响应格式无效')
-            return result(check, 'FAIL' if data.get('supported_storage_drivers') else 'INFO',
-                          '实例接口仍存在；记录卷管理能力，不读取宿主文件', http_status=200,
+            return result(check, 'FAIL' if data.get('supported_storage_drivers') else 'PASS',
+                          '实例接口未开放卷管理能力', http_status=200,
                           volume_management_advertised=bool(data.get('supported_storage_drivers')))
         if endpoint in ('/1.0', '/1.0/config'):
             return result(check, 'SKIP', '基本实例接口不可用', http_status=response.status)
@@ -503,7 +511,7 @@ def devlxd_check(endpoint):
         return result(check, status, '实例受限 API 的只读请求结果；404 不能证明权限已关闭', http_status=response.status)
 
 
-def run_checks(reference, gpu, timeout, emit):
+def run_checks(gpu, timeout, emit):
     def observe(check, operation):
         try:
             emit(operation())
@@ -526,15 +534,6 @@ def run_checks(reference, gpu, timeout, emit):
     observe('seccomp', security_status)
     emit(result('capabilities', 'INFO' if status else 'SKIP', '能力位属于当前 namespace；不能单凭它判断拥有宿主权限',
                 effective=status.get('CapEff', '').strip(), bounding=status.get('CapBnd', '').strip()))
-    for name in NAMESPACES:
-        def namespace(name=name):
-            value = os.readlink('/proc/self/ns/' + name)
-            expected = reference['namespaces'][name] if reference else None
-            return result('namespace:' + name, ('PASS' if value != expected else 'FAIL') if expected else 'SKIP',
-                          '与宿主 namespace 比较' if expected else '无宿主参照，仅记录，尚未验证隔离', guest=value, host=expected)
-        observe('namespace:' + name, namespace)
-    observe('process-roots', lambda: process_roots(reference))
-
     def apparmor():
         values, errors = {}, []
         for path, key in (('/proc/self/attr/current', 'profile'), ('/sys/module/apparmor/parameters/enabled', 'enabled')):
@@ -578,10 +577,8 @@ def run_checks(reference, gpu, timeout, emit):
                     '管理入口路径清单；逐项连接检查，不发送管理请求', paths=paths, truncated=truncated))
     except Exception as exc:
         emit(result('socket-inventory', 'ERROR', '动态路径发现失败，仍检查固定管理路径', native_error=str(exc)))
-    sockets = reference.get('sockets', []) if reference else []
-    paths = list(dict.fromkeys(paths + [item['path'] for item in sockets]))
     for path in paths:
-        emit(bounded_call('management-socket:' + path, ['--_socket', path, json.dumps(sockets)], timeout))
+        emit(bounded_call('management-socket:' + path, ['--_socket', path, '[]'], timeout))
     observe('devlxd', lambda: result('devlxd', 'INFO', '基本实例接口与宿主管理接口不同，按当前兼容策略保留',
                                    visible=bool(visible_paths(('/dev/lxd/sock',)))))
     for endpoint in DEVLXD_ENDPOINTS:
@@ -618,11 +615,6 @@ def run_checks(reference, gpu, timeout, emit):
         return result('gpu-expectation', 'REVIEW' if invalid else status,
                       'GPU 为获准资源例外；核对显式开关预期及设备类型', expected=gpu, devices=devices, invalid_nodes=invalid)
     observe('gpu-expectation', gpu_check)
-    if reference and reference.get('canaries'):
-        for index, item in enumerate(reference['canaries']):
-            emit(bounded_call('host-canary:' + str(index), ['--_canary', str(index), json.dumps(item)], timeout))
-    else:
-        emit(result('host-canaries', 'SKIP', '未提供宿主唯一标记；常见路径检查不能替代任意宿主文件验证'))
     with tempfile.TemporaryDirectory(prefix='mas-guest-security-') as work:
         for name in DEVICES:
             emit(bounded_probe('device', name, work, timeout))
@@ -645,6 +637,66 @@ def publish_report(path, report):
         os.link(name, path)
     finally:
         os.unlink(name)
+
+
+class ChallengeReport:
+    """Separate observations from assertions; incomplete evidence never passes."""
+    def __init__(self, purpose, **metadata):
+        self.started = time.monotonic()
+        self.data = dict(schema=2, purpose=purpose, checks=[], observations=[], **metadata)
+
+    def emit(self, item):
+        item = dict(item)
+        original = item['status']
+        if original == 'INFO':
+            item.pop('status')
+            self.data['observations'].append(item)
+            label = '记录'
+        else:
+            item['status'] = 'PASS' if original == 'PASS' else 'FAIL'
+            if original != 'PASS':
+                item.setdefault('failure_kind', 'execution' if original == 'ERROR' else
+                                'verification' if original in ('SKIP', 'REVIEW') else 'boundary')
+                if original in ('SKIP', 'REVIEW'):
+                    item['message'] = '验证未通过：' + item['message']
+            self.data['checks'].append(item)
+            label = '通过' if item['status'] == 'PASS' else '失败'
+        print('[' + label + '] ' + terminal_text(item['check']) + '：' + terminal_text(item['message']), flush=True)
+        print('  方法：' + terminal_text(item['method']), flush=True)
+        if item['evidence']:
+            print('  观察：' + terminal_text(json.dumps(item['evidence'], ensure_ascii=False)), flush=True)
+        if original == 'ERROR':
+            print('  测试未能完成此项验证。', file=sys.stderr, flush=True)
+            for key in ('native_error', 'native_stderr'):
+                if item['evidence'].get(key):
+                    print('  ' + key + ': ' + terminal_text(str(item['evidence'][key])), file=sys.stderr, flush=True)
+
+    def finish(self, path, interrupted=False):
+        failures = [item for item in self.data['checks'] if item['status'] == 'FAIL']
+        errors = any(item.get('failure_kind') == 'execution' for item in failures)
+        code = 130 if interrupted else 2 if errors else 1 if failures else 0
+        counts = {status: sum(item['status'] == status for item in self.data['checks']) for status in ('PASS', 'FAIL')}
+        self.data.update(elapsed=time.monotonic()-self.started, exit_code=code, counts=counts,
+                         conclusion='checks_failed' if failures else 'checks_passed',
+                         scope='结论仅适用于列出的检查与当次观察；环境记录不计为测试。')
+        print('\n测试汇总：通过 ' + str(counts['PASS']) + '，失败 ' + str(counts['FAIL']))
+        print('结论：' + ('测试中断。' if interrupted else '检查未通过，请查看失败原因。' if failures else '本次列出的检查全部通过。'))
+        try:
+            publish_report(path, self.data)
+            print('报告：' + terminal_text(str(path)))
+        except OSError as exc:
+            print('报告写入失败：' + terminal_text(str(exc)), file=sys.stderr)
+            return 2
+        return code
+
+
+def report_path(value, prefix):
+    path = (value or Path(prefix + time.strftime('%Y%m%d-%H%M%S') + '-' + uuid.uuid4().hex[:8] + '.json')).absolute()
+    if any(ord(c) < 32 or ord(c) == 127 for c in str(path)):
+        raise ValueError('报告路径不允许控制字符')
+    if path.exists() or path.is_symlink() or not path.parent.is_dir():
+        raise ValueError('报告路径已存在或父目录不可用：' + str(path))
+    return path
 
 
 def main(argv=None):
@@ -676,57 +728,28 @@ def main(argv=None):
     parser = argparse.ArgumentParser(add_help=False, description='在 LXD 容器内检查宿主资源隔离边界；不会写入内核控制接口或执行 Windows 命令。')
     parser.add_argument('-h', '--help', action='help', help='显示帮助并退出')
     parser.add_argument('--report', type=Path, help='JSON 报告路径；已存在则报错，默认创建唯一文件')
-    parser.add_argument('--host-reference', type=Path, help='可选宿主 namespace/唯一标记参照 JSON')
     parser.add_argument('--gpu', choices=('on', 'off', 'unknown'), default='unknown', help='容器的 GPU 开关预期（默认 unknown）')
     parser.add_argument('--timeout', type=float, default=3, help='每项设备/控制/socket/API/标记探测超时（1–10 秒，默认 3）')
     options = parser.parse_args(args)
     if not 1 <= options.timeout <= 10:
         parser.error('--timeout 必须为 1–10 秒')
-    path = (options.report or Path('guest-security-' + time.strftime('%Y%m%d-%H%M%S') + '-' + uuid.uuid4().hex[:8] + '.json')).absolute()
-    started = time.monotonic()
-    report = dict(schema=SCHEMA, purpose='guest-boundary-probe', gpu_expected=options.gpu, checks=[])
+    report = ChallengeReport('guest-boundary-probe', gpu_expected=options.gpu)
     interrupted = False
-    def emit(item):
-        report['checks'].append(item)
-        print('[' + STATUS_TEXT[item['status']] + '] ' + terminal_text(item['check'])
-              + '：' + terminal_text(item['message']), flush=True)
-        print('  方法：' + terminal_text(item['method']), flush=True)
-        if item['evidence']:
-            print('  观察：' + terminal_text(json.dumps(item['evidence'], ensure_ascii=False)), flush=True)
-        if item['status'] == 'ERROR':
-            for key in ('native_error', 'native_stderr'):
-                if item['evidence'].get(key):
-                    print('  ' + key + ': ' + terminal_text(json.dumps(item['evidence'][key], ensure_ascii=False)),
-                          file=sys.stderr, flush=True)
     try:
-        if any(ord(character) < 32 or ord(character) == 127 for character in str(path)):
-            raise ValueError('报告路径不允许控制字符')
-        if path.exists() or path.is_symlink() or not path.parent.is_dir():
-            raise ValueError('报告路径已存在或父目录不可用：' + str(path))
-        reference = validate_reference(json.loads(options.host_reference.read_text())) if options.host_reference else None
+        path = report_path(options.report, 'guest-security-')
+    except ValueError as exc:
+        print(terminal_text(str(exc)), file=sys.stderr)
+        return 2
+    try:
         environment_check()
         print('\n容器安全边界测试（以容器 root 执行）\n', flush=True)
-        run_checks(reference, options.gpu, options.timeout, emit)
+        run_checks(options.gpu, options.timeout, report.emit)
     except KeyboardInterrupt:
         interrupted = True
-        emit(result('execution', 'ERROR', '测试已中断；保留已完成的检查，不将其余入口算作通过'))
+        report.emit(result('execution', 'ERROR', '测试已中断；保留已完成的检查'))
     except Exception as exc:
-        emit(result('execution', 'ERROR', '测试未完成', native_error=str(exc)))
-    counts = Counter(item['status'] for item in report['checks'])
-    code = 130 if interrupted else 2 if counts['ERROR'] else 1 if counts['FAIL'] else 0
-    report.update(elapsed=time.monotonic() - started, exit_code=code,
-                  counts={status: counts[status] for status in STATUS_TEXT},
-                  conclusion='boundary_failure' if counts['FAIL'] else 'incomplete' if counts['ERROR'] else 'no_confirmed_breach',
-                  limitation='不证明不存在漏洞；REVIEW/SKIP 项尚未验证，不能算通过。')
-    print('\n测试汇总：' + '，'.join(STATUS_TEXT[status] + ' ' + str(counts[status]) for status in STATUS_TEXT))
-    print('结论：' + ('发现边界失败。' if counts['FAIL'] else '测试不完整。' if counts['ERROR'] else '未发现明确越界；需核对和未验证项仍需单独判断。'))
-    try:
-        publish_report(path, report)
-        print('报告：' + str(path))
-    except OSError as exc:
-        print('报告写入失败：' + str(exc), file=sys.stderr)
-        return 2
-    return code
+        report.emit(result('execution', 'ERROR', '测试未完成', native_error=str(exc)))
+    return report.finish(path, interrupted)
 
 
 if __name__ == '__main__':

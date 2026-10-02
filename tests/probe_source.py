@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 def source_bytes(name):
-    if name not in ('guest_security_probe.py', 'security.sh'):
+    if name not in ('guest_security_probe.py', 'security.sh', 'host_security_probe.py', 'security-host.sh'):
         raise ValueError('Unknown guest probe asset')
     packaged = files('tests').joinpath(name)
     if packaged.is_file():
