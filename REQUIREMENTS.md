@@ -1,8 +1,8 @@
 # my-ai-sandbox Requirements
 
-Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches; section 40 describes the independently delivered guest diagnostic; section 41 records its integrated test review and SSHFS completion repair; section 42 records the approved menu refinements and final test-release review; section 43 records the restart and post-terminal action batch. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
+Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches; section 40 describes the independently delivered guest diagnostic; section 41 records its integrated test review and SSHFS completion repair; section 42 records the approved menu refinements and final test-release review; section 43 records the restart and post-terminal action batch; section 44 separates guest and host-assisted security challenges; section 45 adds container-list query feedback. Later implemented and verified sections supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: batch 0.2.16 adds transient container-list query feedback in section 45. The frozen local package passed 371 units and all 27 stages (734.6 seconds), without skips or cleanup errors. Publication and actual public-entry validation are in progress. Independent guest/host challenges from section 44 remain implemented. Stable remains stable/0.1.15; CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas, the stable-only release branch and the post-terminal restart-entry refinement remain pending.
+Current baseline: batch 0.2.16 adds transient container-list query feedback in section 45. Frozen local and actual public product/tester runs passed 371 units and all 27 stages (734.6 / 725.9 seconds), without skips or cleanup errors. Test v0.2.16 is published; eleven artifacts, fixed entries, ordinary installation and resource reclamation passed. Independent guest/host challenges from section 44 remain implemented. Stable remains stable/0.1.15; CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas, the stable-only release branch and the post-terminal restart-entry refinement remain pending.
 
 ## 1. Scope
 
@@ -653,7 +653,7 @@ Status: implemented, published as test v0.2.15 and verified locally and through 
 
 ## 45. Container-list query feedback — v0.2.16
 
-Status: implemented and verified locally; 371 packaged units and all 27 stages passed (734.6 seconds), without skips or cleanup errors. Publication and actual public-entry validation are in progress. The user reported an unexplained two-to-three-second wait when first opening the container list and accepted the proposed transient query message.
+Status: implemented, published as test v0.2.16 and verified locally and through the actual public entry; 371 packaged units and all 27 stages passed (734.6 / 725.9 seconds), without skips or cleanup errors. The user reported an unexplained two-to-three-second wait when first opening the container list and accepted the proposed transient query message.
 
 - In the container-list menu, show `正在读取容器列表…` / `Reading container list…` while the existing shared list query executes. Clear the message before rendering either the populated list or the empty-list explanation.
 - Reuse the shared transient output renderer and existing menu output boundary. Keep native diagnostics visible; clear the waiting message before permanent output, query failure or interruption. Preserve the original errors, terminal mode and navigation behavior.

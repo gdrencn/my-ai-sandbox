@@ -1,0 +1,52 @@
+{
+  "version": "0.2.16",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.16",
+  "tag": "v0.2.16",
+  "source_commit": "daa36b117047a953bfd9bc3ba160367fdadb8c02",
+  "cleared_list_feedback_transcripts": {
+    "local": 8,
+    "public": 8
+  },
+  "asset_hashes": {
+    "SHA256SUMS": "1d2e48a03bc9a52fd021f68745838e0864403e1f8b26908a23499fe41338544f",
+    "WSL_REPORT.json": "72d8fb0b4fa5bb7de207e35ff6c55d007a63915314e13743d80c1b69de62452e",
+    "bootstrap.py": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "mas-install.pyz": "87d46ccbed4e8c7484634133946bd7bec132a059c1e76a52c178acbc782c96b4",
+    "mas-test.pyz": "52cc2e3e4264d1b70ea08126da87cddee2ca15388b08f103561ba124b80f91a2",
+    "mas.pyz": "bd9616c941ee9435fa9d034a0c2c9ccab0ce700f47c390f3daebf0e32a38c201",
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484"
+  },
+  "latest_stable": "stable/0.1.15",
+  "public_entries": [
+    "stable/install.sh",
+    "test/install.sh",
+    "test/test.sh",
+    "test/test-stable.sh"
+  ],
+  "public_sources_match": true,
+  "reproducible_build": true,
+  "probe_packaged_only_in_tester": true,
+  "public_test": {
+    "units": 371,
+    "stages": 27,
+    "elapsed": 725.9
+  },
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "local_project_removed": true,
+  "public_project_removed": true,
+  "staging_projects_removed": true,
+  "mount_registry_empty": true,
+  "mount_directories_removed": true,
+  "legacy_targets_removed": true,
+  "legacy_profiles_removed": true,
+  "ordinary_install_preserves_tester": true,
+  "installed_product_and_tester_hashes_match": true
+}
