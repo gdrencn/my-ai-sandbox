@@ -9,6 +9,7 @@ from unittest.mock import patch
 from types import SimpleNamespace
 
 from mas.cli import Progress
+from mas.i18n import t
 from mas.output import Output
 from mas.testing import Terminal, python_command
 from tests import test_menu
@@ -20,6 +21,89 @@ def event(status, **extra):
 
 
 class ProgressTests(unittest.TestCase):
+    def test_list_wait_in_real_terminals_preserves_results_and_diagnostics(self):
+        for language in ('zh_cn', 'en_us'):
+            for outcome in ('populated', 'empty', 'warning', 'failure', 'interrupt'):
+                with (self.subTest(language=language, outcome=outcome),
+                      tempfile.TemporaryDirectory() as directory,
+                      patch.dict(os.environ, {'XDG_CONFIG_HOME': directory})):
+                    source = f'''
+import os, sys, termios
+from types import SimpleNamespace
+from mas import config
+from mas.cli import main
+from mas.core import Error
+from mas.output import Output
+config.set_value('language', {language!r})
+calls = []
+def listing():
+    calls.append('list')
+    assert termios.tcgetattr(0)[3] & termios.ICANON
+    os.read(0, 1)  # Parent releases the query only after observing feedback.
+    if {outcome!r} == 'interrupt':
+        raise KeyboardInterrupt()
+    if {outcome!r} == 'failure':
+        raise Error('QUERY_FAILED')
+    if {outcome!r} == 'warning':
+        Output(sys.stderr).keep('NATIVE_QUERY_WARNING')
+    return [] if {outcome!r} == 'empty' else [dict(name='demo', status='Stopped')]
+status = main([], manager=SimpleNamespace(list=listing))
+assert calls == ['list']
+print('FINISHED=' + str(status), flush=True)
+'''
+                    terminal = Terminal(python_command(source), 30, Path(directory)/'list-wait.log')
+                    tr = lambda key: t(key, locale=language)
+                    try:
+                        terminal.expect('my-ai-sandbox')
+                        terminal.send('\n')
+                        terminal.expect(tr('list_loading'))
+                        terminal.send('\x04')  # Release the fixture without an echoed newline.
+                        if outcome == 'interrupt':
+                            terminal.expect('FINISHED=130')
+                        else:
+                            if outcome == 'failure':
+                                terminal.expect('QUERY_FAILED')
+                                terminal.expect(tr('page_result'))
+                            else:
+                                terminal.expect_menu(tr('page_list'))
+                                terminal.expect(tr('menu_empty') if outcome == 'empty' else 'demo')
+                            terminal.send('\x1b[D')
+                            terminal.expect('my-ai-sandbox')
+                            terminal.send('\x1b[A\n')
+                            terminal.expect('FINISHED=0')
+                        terminal.finish()
+                        helper = test_menu.MenuTests()
+                        history = helper.render_history(terminal.buffer)
+                        self.assertNotIn(tr('list_loading'), history)
+                        if outcome == 'warning':
+                            self.assertEqual(history.count('NATIVE_QUERY_WARNING'), 1)
+                        if outcome == 'failure':
+                            self.assertIn('QUERY_FAILED', history)
+                        if outcome == 'empty':
+                            self.assertIn(tr('menu_empty'), history)
+                        helper.assert_inline(terminal.buffer)
+                    finally:
+                        terminal.close()
+
+    def test_scoped_wait_restores_output_boundary_and_keeps_plain_output(self):
+        from mas.output import boundary
+        stream = io.StringIO()
+        outer = lambda: stream.write('BOUNDARY\n')
+        token = boundary.set(outer)
+        try:
+            for failure in (None, KeyboardInterrupt()):
+                try:
+                    with Output(stream).waiting('READING'):
+                        Output(stream).keep('DIAGNOSTIC')
+                        if failure is not None:
+                            raise failure
+                except KeyboardInterrupt:
+                    pass
+                self.assertIs(boundary.get(), outer)
+            self.assertEqual(stream.getvalue(), 'BOUNDARY\nDIAGNOSTIC\n' * 2)
+        finally:
+            boundary.reset(token)
+
     def test_plain_stream_keeps_results_and_diagnostics_only(self):
         with patch('mas.config.language', return_value='en_us'):
             stream = io.StringIO()

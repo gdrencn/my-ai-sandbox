@@ -2,7 +2,7 @@
 import sys
 from . import config, menu
 from .core import Error, ShellExitError
-from .output import before_output
+from .output import Output, before_output
 from .i18n import t, state
 from .presentation import format_info
 
@@ -198,7 +198,8 @@ class UI:
     def containers(self):
         selected = None
         while True:
-            items = self.manager.list()
+            with Output(sys.stderr).waiting(t('list_loading')):
+                items = self.manager.list()
             rows = menu.column_rows([(item['name'], menu.status_cell(state(item['status']), item['status'])) for item in items])
             choices = [(item['name'], row) for item, row in zip(items, rows)]
             if len(items) > 1 and any(item['status'] != 'Stopped' for item in items):

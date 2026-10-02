@@ -125,6 +125,7 @@
   "page_main": "my-ai-sandbox",
   "page_settings": "mas Preferences",
   "page_list": "Containers",
+  "list_loading": "Reading container list…",
   "page_container": "Container: {target}",
   "menu_exit": "Exit",
   "menu_back": "Back",

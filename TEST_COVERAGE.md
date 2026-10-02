@@ -1,8 +1,8 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.15 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.16 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
-Batch 0.2.15 adds the separate guest/host challenge coverage below; local and public validation are recorded separately in IMPLEMENTED.md.
+Batch 0.2.16 adds scoped container-list query feedback coverage below; the independent guest/host coverage from 0.2.15 remains.
 
 ## Test layers
 
@@ -274,3 +274,10 @@ Eighteen host-probe regressions cover reference schema/completeness, WSL host ac
 The native tester calls the same host orchestration as the public entry and runs both challenge scopes with GPU on and off. It retains separate JSON/logs, both source hashes, fresh host references and combined coverage evidence. Shared canary positive/alias fixtures verify detection without mislabeling owned guest files as a real host escape. Host tests verify six namespace differences, visible process origin, direct/proc-root marker paths, management sockets, existing binfmt_misc identity, independent temporary mounts, unchanged host registrations/marker and current boot identity. Identification, cleanup and report integrity failures do not become successful security assertions.
 
 The final package contains 369 units and 27 native stages. The four challenge files are embedded exactly in mas-test only; repeated builds match. Final frozen native verification passed all 369 units and 27 stages in 735.6 seconds, without skips or cleanup errors. The actual public entry independently passed all 369 units and 27 stages in 723.7 seconds with no skips or cleanup errors. Both public challenge commands passed (host 18, guest 60), and eleven assets, ordinary installation, exact sources and independent resource cleanup passed. See IMPLEMENTED.md and the V0_2_15 validation reports.
+
+
+## Container-list query feedback — 0.2.16
+
+Two focused tests cover a pending real-PTY query in both languages with populated and empty lists, a native warning, query failure and interruption. The parent observes the wait message before releasing the fixture; rendered history retains results/diagnostics and removes transient feedback. The query runs once. Scoped output restores the enclosing menu boundary after normal/error paths; redirected output keeps diagnostics without transient text or escape sequences. Existing narrow-terminal and complete menu spacing checks passed.
+
+Frozen local execution passed 371 units and 27 native stages in 734.6 seconds, with no skips or cleanup errors. See validation/V0_2_16_LOCAL_REPORT.json. Public validation is recorded separately after publication.

@@ -125,6 +125,7 @@
   "page_main": "my-ai-sandbox",
   "page_settings": "mas 选项",
   "page_list": "容器列表",
+  "list_loading": "正在读取容器列表…",
   "page_container": "容器：{target}",
   "menu_exit": "退出",
   "menu_back": "返回",

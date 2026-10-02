@@ -1,5 +1,6 @@
 """Shared transient terminal lines and permanent output for product and tester."""
 from contextvars import ContextVar
+from contextlib import contextmanager
 import os
 import shutil
 import sys
@@ -27,10 +28,11 @@ class Output:
             self.stream.flush()
             self.active = False
 
-    def progress(self, message):
+    def progress(self, message, *, separate=True):
         if not self.tty:
             return
-        before_output()
+        if separate:
+            before_output()
         try:
             columns = os.get_terminal_size(self.stream.fileno()).columns
         except (AttributeError, OSError, ValueError):
@@ -44,3 +46,23 @@ class Output:
         before_output()
         self.clear()
         print(message, file=self.stream, flush=True)
+
+    @contextmanager
+    def waiting(self, message):
+        """Scope a transient message, clearing it before any shared output."""
+        # The next menu supplies its own gap. Do not leave an extra empty
+        # line behind when this transient query message is erased.
+        self.progress(message, separate=False)
+        previous = boundary.get()
+
+        def before_permanent_output():
+            self.clear()
+            if previous is not None:
+                previous()
+
+        token = boundary.set(before_permanent_output)
+        try:
+            yield
+        finally:
+            boundary.reset(token)
+            self.clear()

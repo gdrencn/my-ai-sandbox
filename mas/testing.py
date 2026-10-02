@@ -162,6 +162,10 @@ class Terminal:
     def expect(self, text):
         self.expect_pattern(re.escape(text.encode()), text)
 
+    def expect_menu(self, title):
+        """Wait for an active menu title, not an earlier option/progress label."""
+        self.expect_pattern(rb'\x1b\[\?25l' + re.escape(title.encode()) + rb'\r?\n', title)
+
     def expect_pattern(self, pattern, description):
         start = time.monotonic()
         while time.monotonic() - start < self.timeout:
@@ -1011,7 +1015,7 @@ class Suite:
         with self.terminal([]) as terminal:
             down, back = '\x1b[B', '\x1b[D'
             terminal.expect('my-ai-sandbox'); terminal.send('\n')
-            terminal.expect('Containers')
+            terminal.expect_menu('Containers')
             names = [item['name'] for item in self.manager.list()]
             terminal.send(down * names.index(target) + '\n')
             terminal.expect('Container: ' + target); terminal.send(down * 8 + '\n')
@@ -1020,7 +1024,7 @@ class Suite:
             self.menu_result(terminal, 'Hardware options: ' + target)
             terminal.expect('GPU: Disabled'); terminal.send(back)
             terminal.expect('Container: ' + target); terminal.send(back)
-            terminal.expect('Containers'); terminal.send(back)
+            terminal.expect_menu('Containers'); terminal.send(back)
             terminal.expect('my-ai-sandbox'); terminal.send('\x1b[A\n'); terminal.finish()
         record = self.manager.gpu.record(self.manager.info(target))
         assert record is not None and not record['enabled']
@@ -1235,13 +1239,16 @@ try {
         # The parent must not appear before the user explicitly returns.
         assert parent.encode() not in terminal.buffer[terminal.cursor:]
         terminal.send('\x1b[D')
-        terminal.expect(parent)
+        if parent == 'Containers':
+            terminal.expect_menu(parent)
+        else:
+            terminal.expect(parent)
 
     def filesystem_menu(self, target):
         with self.terminal([]) as terminal:
             down='\x1b[B';back='\x1b[D';parent='Filesystem: '+target
             terminal.expect('my-ai-sandbox');terminal.send('\n')
-            terminal.expect('Containers')
+            terminal.expect_menu('Containers')
             names=[item['name'] for item in self.manager.list()]
             terminal.send(down*names.index(target)+'\n')
             terminal.expect('Container: '+target)
@@ -1258,7 +1265,7 @@ try {
             terminal.expect('Completed.')
             self.menu_result(terminal,parent)
             terminal.send(back);terminal.expect('Container: '+target)
-            terminal.send(back);terminal.expect('Containers')
+            terminal.send(back);terminal.expect_menu('Containers')
             terminal.send(back);terminal.expect('my-ai-sandbox')
             terminal.send('\x1b[A\n');terminal.finish()
         assert not self.manager.mountedfs(target) and not self.fs_root.exists()
@@ -1299,7 +1306,11 @@ try {
         backup = Path(self.workspace.name) / "tui-backup.tar.gz"
         with self.terminal([]) as terminal:
             def send(keys, expected):
-                terminal.send(keys);terminal.expect(expected)
+                terminal.send(keys)
+                if expected == 'Containers':
+                    terminal.expect_menu(expected)
+                else:
+                    terminal.expect(expected)
             def result(parent, chinese=False):
                 self.menu_result(terminal,parent,chinese)
             down, up, back = "\x1b[B", "\x1bOA", "\x1b[D"
@@ -1377,7 +1388,7 @@ try {
         for choice in ('exit', 'stop', 'restart', 'menu', 'escape'):
             with self.terminal([]) as terminal:
                 terminal.expect('my-ai-sandbox'); terminal.send('\n')
-                terminal.expect('Containers'); terminal.send('\n')
+                terminal.expect_menu('Containers'); terminal.send('\n')
                 terminal.expect('Container: ' + imported); terminal.send(down * 2 + '\n')
                 self.check_shell(terminal)
                 boot = self.exec(imported, 'cat /proc/sys/kernel/random/boot_id')
@@ -1388,7 +1399,7 @@ try {
                 terminal.send(keys[choice])
                 if choice == 'menu':
                     terminal.expect('Container: ' + imported)
-                    terminal.send(back); terminal.expect('Containers')
+                    terminal.send(back); terminal.expect_menu('Containers')
                     terminal.send(back); terminal.expect('my-ai-sandbox')
                     terminal.send(up + '\n')
                 terminal.finish()

@@ -171,7 +171,11 @@ print('FIXTURE_RESULT='+json.dumps(dict(info=manager.info_calls, hardware=manage
                 tr = lambda key, **values: t(key, locale=language, **values)
                 down, up, back = '\x1b[B', '\x1b[A', '\x1b[D'
                 def send(keys, text):
-                    terminal.send(keys); terminal.expect(text)
+                    terminal.send(keys)
+                    if text == tr('page_list'):
+                        terminal.expect_menu(text)
+                    else:
+                        terminal.expect(text)
                 def result(parent):
                     terminal.expect(tr('page_result')); send(back, parent)
                 try:
