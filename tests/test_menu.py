@@ -188,6 +188,9 @@ print('RESTORED')
                 terminal = Terminal(python_command(source), 300, Path(directory)/'mode.log')
                 try:
                     terminal.expect('Mode check')
+                    # Input is ready after lazy catalog loading and the footer.
+                    # Ctrl-C during importlib weakref cleanup can be swallowed.
+                    terminal.expect('Esc')
                     terminal.send(key)
                     terminal.expect('RESTORED')
                     terminal.finish()

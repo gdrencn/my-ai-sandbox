@@ -49,6 +49,7 @@ class SecurityRunnerTests(unittest.TestCase):
         self.suite.directory = Path(directory.name)
         self.suite.guest_reports = []
         self.suite.manager.gpu.record.return_value = None
+        self.suite.manager.require.return_value = {"status":"Running", "config":{"volatile.uuid":"fixture-identity"}}
         primary = Error('guest probe found a boundary failure')
         calls = []
         def command(args):

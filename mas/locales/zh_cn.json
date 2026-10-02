@@ -318,5 +318,7 @@
   "help_cmd_restart": "依次调用标准停止和启动功能；停止失败时不会继续。使用 -e/--enter 则停止后调用进入终端功能。",
   "example_restart": "示例：mas restart demo；mas restart demo -e",
   "help_restart_enter": "停止后进入容器终端（复用 enter 的启动准备）",
-  "cli_restart_consent": "restart 的 --yes/--no 仅可与 -e/--enter 一起使用。"
+  "cli_restart_consent": "restart 的 --yes/--no 仅可与 -e/--enter 一起使用。",
+  "help_install_security": "仅下载测试工具，从宿主挑战指定容器；不安装 mas。",
+  "security_loading": "正在下载 {version} 安全挑战工具"
 }

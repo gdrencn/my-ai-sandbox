@@ -244,31 +244,31 @@ class Terminal:
 class Suite:
     CASE_CATEGORIES = {
         'unit': 'foundation',
-        'dependency-install': 'environment',
         'new-default': 'management',
+        'isolation-policy': 'configuration',
+        'legacy-migration': 'management',
         'missing-image': 'management',
+        'configuration-concurrency': 'configuration',
         'list-info': 'management',
+        'invalid-inputs': 'management',
         'start-user-network': 'management',
+        'gpu': 'resources',
+        'dependency-install': 'environment',
+        'lifecycle-repeat': 'management',
+        'restart': 'management',
         'running-guards': 'management',
         'enter-running-default-exit': 'management',
         'enter-stopped-stop-exit': 'management',
         'export-import': 'management',
+        'overwrite-confirmation': 'interaction',
         'ownership-and-stop-all': 'management',
-        'invalid-inputs': 'management',
-        'lifecycle-repeat': 'management',
-        'restart': 'management',
         'unmarked-import': 'management',
-        'legacy-migration': 'management',
-        'configuration-concurrency': 'configuration',
-        'isolation-policy': 'configuration',
-        'gpu': 'resources',
         'filesystems': 'resources',
         'filesystem-recovery': 'resources',
-        'overwrite-confirmation': 'interaction',
+        'filesystem-menu': 'interaction',
         'delete-confirmation': 'interaction',
         'language-config': 'interaction',
         'tui': 'interaction',
-        'filesystem-menu': 'interaction',
         'isolation-runtime': 'security',
     }
     CASES = list(CASE_CATEGORIES)
@@ -586,45 +586,15 @@ class Suite:
 
     def guest_boundary(self, target, positive=True):
         """The complete challenge owns reference collection and guest execution."""
-        from tests.probe_source import source_bytes
-        root = Path(self.workspace.name)
-        sources = {name: source_bytes(name) for name in ('guest_security_probe.py', 'host_security_probe.py')}
-        for name, content in sources.items():
-            (root / name).write_bytes(content)
-        spec = importlib.util.spec_from_file_location('suite_host_probe', root / 'host_security_probe.py')
-        challenge = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(challenge)
-        record = self.manager.gpu.record(self.manager.info(target))
-        expected = 'on' if record and record['enabled'] else 'off'
-        evidence = dict(target=target, gpu_expected=expected, status='not_run',
-                        source_sha256=hashlib.sha256(sources['guest_security_probe.py']).hexdigest(),
-                        host_source_sha256=hashlib.sha256(sources['host_security_probe.py']).hexdigest())
+        from .security_testing import run_challenge
+        path = self.directory / f'boundary-{len(self.guest_reports)+1}.json'
+        code, evidence, primary = run_challenge(self.manager, target, path, self.output,
+                                               project=self.project, positive=positive)
         self.guest_reports.append(evidence)
-        index = len(self.guest_reports)
-        log_path = self.directory / f'boundary-{index}.log'
-        report_path = self.directory / f'boundary-{index}.json'
-        primary = None
-        with log_path.open('w', encoding='utf-8') as log:
-            def display(message):
-                log.write(message + '\n')
-                log.flush()
-                self.output.challenge(message)
-            report = challenge.probe.ChallengeReport('complete-boundary-probe', write=display, diagnostic=display,
-                                                     project=self.project, target=target, gpu_expected=expected)
-            try:
-                primary = challenge.run_target(self.manager.lxd.command, target, report, gpu=expected, positive=positive)
-            except (Exception, KeyboardInterrupt) as exc:
-                primary = exc
-                report.emit(challenge.probe.result('host-execution', 'ERROR', '完整安全挑战未完成', native_error=str(exc)))
-            code = report.finish(report_path, interrupted=isinstance(primary, KeyboardInterrupt))
-            evidence.update(report=report.data, reference=report.data.get('reference'),
-                            guest_report=report.data.get('guest_report'),
-                            guest_only_positive_controls=report.data.get('guest_only_positive_controls', []),
-                            status='passed' if code == 0 and primary is None else 'failed')
         if primary is not None:
             raise primary
-        assert code == 0, report.data
-        return report.data
+        assert code == 0, evidence['report']
+        return evidence['report']
 
     def legacy_fixture(self):
         record = self.manager.isolation.check()
@@ -698,6 +668,11 @@ class Suite:
         terminal.shell_ready()
 
     def run(self):
+        self.functional_tests()
+        with self.case('isolation-runtime'):
+            self.security_fixture()
+
+    def functional_tests(self):
         target, imported, external = self.target(), self.target(), self.target()
         with self.case("unit"):
             modules = unit_modules()
@@ -780,8 +755,6 @@ class Suite:
             assert self.exec(target, "su --login sandbox -c 'id -un; sudo -n id -u'").splitlines() == ["sandbox", "0"]
             self.wait("outbound HTTPS", lambda: self.network(target))
             self.exec(target, "printf '%s' mas-roundtrip-data > /home/sandbox/mas-proof")
-        with self.case('isolation-runtime'):
-            self.isolation_runtime(target)
         with self.case("gpu"):
             self.gpu_test()
         with self.case("dependency-install"):
@@ -919,6 +892,14 @@ class Suite:
             self.cli("config", "set", "language", self.language)
         with self.case("tui"):
             self.tui()
+
+    def security_fixture(self):
+        target = self.target()
+        self.cli('new', target)
+        assert self.state(target, 'Stopped')
+        self.cli('start', target)
+        assert self.state(target, 'Running')
+        self.isolation_runtime(target)
 
     def filesystems(self, target):
         self.cli('start', target)
@@ -1067,9 +1048,7 @@ print(json.dumps(sorted(paths)))
             assert not disabled['enabled'] and not disabled['devices']
         assert self.manager.gpu.record(self.manager.info(target)) == disabled
         self.cli('start', target)
-        if capability['backend'] == 'wsl-nvidia':
-            self.exec(target, 'test ! -e /dev/dxg; test ! -e ' + CONF + '; test ! -e ' + PROFILE)
-        self.guest_boundary(target, positive=False)
+        self.gpu_off_access(target, initial, disabled)
         self.manager.lxd.command(["exec", "local:" + target, "--", "python3", "-c", 'import ctypes\ntry: lib=ctypes.CDLL("libcuda.so.1")\nexcept OSError: pass\nelse: assert lib.cuInit(0) != 0'])
         self.cli('stop', target)
         self.cli('hardware', target, 'gpu', 'on')
@@ -1081,6 +1060,25 @@ print(json.dumps(sorted(paths)))
         assert {k:v for k,v in before.get('expanded_devices', before['devices']).items() if not k.startswith('mas-gpu')} == {k:v for k,v in after.get('expanded_devices', after['devices']).items() if not k.startswith('mas-gpu')}
         assert after['devices']['mas-gpu' if capability['backend'] == 'nvidia-cdi' else 'mas-gpu-dxg'] == before['devices']['mas-gpu' if capability['backend'] == 'nvidia-cdi' else 'mas-gpu-dxg']
         self.cli('delete', target, answer='y')
+
+    def gpu_off_access(self, target, initial, disabled):
+        """Verify only access changed by the GPU toggle; no full challenge."""
+        info = self.manager.info(target)
+        expanded = info.get('expanded_devices', info['devices'])
+        assert all(name not in expanded for name in initial['resources']['devices']), expanded
+        assert self.manager.gpu.record(info) == disabled
+        from .gpu import CONF, PROFILE
+        paths = [CONF, PROFILE, '/dev/dxg']
+        paths += [path+'/libcuda.so.1.1' for path in initial['resources']['driver_paths']]
+        mapped = [device['path'] for device in initial['resources']['devices'].values() if device.get('type') == 'disk']
+        if initial['backend'] == 'wsl-nvidia':
+            paths.append('/usr/lib/wsl/lib/libcuda.so.1')
+        source = ('import os, glob; paths=' + repr(paths) +
+                  '; assert not any(os.path.lexists(p) for p in paths), paths; '
+                  'assert not glob.glob("/dev/nvidia[0-9]*"); '
+                  'mapped=' + repr(mapped) + '; mounts={line.split()[4] for line in open("/proc/self/mountinfo")}; '
+                  'assert not (set(mapped) & mounts), mapped')
+        self.manager.lxd.command(['exec', 'local:'+target, '--', 'python3', '-c', source])
 
     def windows_filesystem(self, home):
         """Exercise the actual Windows UNC access route when WSL interop exists."""
@@ -1491,6 +1489,10 @@ def install_and_test(args):
 
 
 def main(argv=None):
+    args_list = list(sys.argv[1:] if argv is None else argv)
+    if args_list and args_list[0] == '--security':
+        from .security_testing import main as security_main
+        return security_main(args_list[1:])
     parser = Parser(description=t('help_test'))
     parser.add_argument("--output", type=Path, default=Path("test-results") / time.strftime("%Y%m%d-%H%M%S"), help=t("help_output"))
     parser.add_argument("--timeout", type=int, default=600, help=t("help_timeout"))

@@ -2,11 +2,11 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 最新测试版：0.2.18
+## 最新测试版：0.2.19
 
-安全挑战已合并进自动化测试：宿主采集当次参照并传入容器，一次运行完整挑战，全部方法、观察和通过/失败结果在宿主显示。每个测试环节新增分类、简洁说明和分隔线；终端内成功勾为绿色，失败叉为红色，“预期错误”标签为橙黄色。重定向日志保留纯文本。两个独立挑战入口已从源码移除。
+自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-v0.2.18 冻结测试包在项目外通过 375 项单元测试和全部 27 个真实 LXD 环节（737.4 秒），无跳过项或清理错误。实际公开命令也已通过相同 375 项单元测试和全部 27 个环节（751.2 秒），11 个附件、安装文件和资源回收均已核验。产品功能保持不变，安装包、产品包和测试包使用同一版本号。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-37--integrated-security-challenge-and-classified-test-output-2026-10-02)。
+冻结包在项目外通过 395 项单元测试和全部 27 个测试环节（722.8 秒），最后的独立容器挑战通过 75 项检查；无跳过、未执行或清理错误。 实现和本地核验已完成，发布与公开命令核验待完成。 详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-38--ordered-tests-and-reusable-host-challenge-2026-10-02)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前已发布测试版为 [0.2.18](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.18)。完整安全挑战统一通过下方自动化测试命令执行，测试工具创建自己的临时容器，宿主采集参照后传入容器执行，并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+0.2.19 待完成发布；当前公开安装仍解析 0.2.18。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -60,12 +60,25 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 | `test/install.sh` | 安装最新 test，不运行测试 |
 | `test/test.sh` | 安装并测试最新 test |
 | `test/test-stable.sh` | 安装并测试当前 stable 的同版本产品 |
+| `test/security.sh` | 从宿主挑战指定的 mas 容器，恢复原状态，不安装 mas |
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
 ```
 
-这些入口由同一个模板生成，仅转发通道和动作到共享安装入口。原 `main/install.sh` 及其 `--test`、`--release` 参数继续兼容。发布附件同时提供 `install-stable.sh`、`install-test.sh`、`test.sh`、`test-stable.sh`，固定入口始终解析当前通道版本。
+这些入口由同一个模板生成，仅转发通道和动作到共享安装入口。原 `main/install.sh` 及其 `--test`、`--release` 参数继续兼容，新增 `--security` 独立挑战动作。发布附件同时提供 `install-stable.sh`、`install-test.sh`、`test.sh`、`test-stable.sh`、`security.sh`，固定入口始终解析当前通道版本。
+
+## 独立安全挑战
+
+在管理 LXD 的 Linux/WSL 宿主运行，按提示输入容器名：
+
+    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
+
+也可以直接指定容器：
+
+    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test
+
+开始时停止的容器通过标准 start 启动，结束后通过标准 stop 恢复停止；开始时运行的保持运行。完整结果、JSON 和同名日志保存在宿主。GPU 这类资源接入配置调整后，可重新运行此命令。没有容器内独立命令。范围与判定见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 ## 语言和配置
 
@@ -204,7 +217,9 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 自动化安全挑战
 
-当前源码由 `test/test.sh` 统一执行 [完整安全挑战](GUEST_SECURITY_PROBE.md)，无需手动进入容器或选择用户已有容器。宿主准备当次 namespace、管理 socket、非敏感唯一标记和 binfmt_misc 参照，传入本次拥有的容器，一次执行容器内检查和依赖参照的检查，取回完整报告并核对宿主状态。GPU 开、关状态均覆盖；结果全部显示在宿主，并保存 `boundary-N.log`、`boundary-N.json` 和主报告中的 `guest_boundary` 证据。测试项只有通过/失败；环境记录单列，缺项、重复项或不完整证据不能算通过。两个独立下载入口已撤销；公开入口在新版本发布后采用此合并流程。
+自动化测试完成全部功能环节后，新建一个独立临时容器、标准启动，并调用 [完整安全挑战](GUEST_SECURITY_PROBE.md)。宿主准备当次 namespace、管理 socket、非敏感唯一标记和 binfmt_misc 参照，传入该容器后执行一次完整检查，再取回报告并核对宿主状态。GPU 开关的功能测试只核验对应设备、映射、文件和计算能力；完整挑战使用新容器的明确配置预期。
+
+完整方法和观察在宿主输出，并保存 boundary-1.log、boundary-1.json 和主报告 guest_boundary 中的证据。测试项只有通过/失败；环境记录单列，缺项、重复项或不完整证据不能算通过。需要再次核对已有容器时，使用上方独立宿主 security.sh 命令；它复用同一模块，并恢复测试前状态。
 
 ## 开发与发布
 

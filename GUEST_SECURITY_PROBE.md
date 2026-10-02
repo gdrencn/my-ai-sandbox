@@ -1,37 +1,44 @@
-# 自动化容器安全挑战
+# 容器安全挑战
 
-v0.2.18 将容器内检查和需要宿主参照的检查合为一个完整模块，由宿主自动化测试调用。公开入口统一为 `test/test.sh`，不再提供单独的容器或宿主挑战下载入口。本版本已发布，实际公开入口已完成验证。
+v0.2.19 的自动化测试与独立宿主入口共用 mas/security_testing.py，以及原有 host_security_probe.py、guest_security_probe.py。宿主采集参照并传入容器，内部探针在容器运行，完整结果在宿主输出。security-host.sh 不提供，容器内不提供独立一键入口。
 
 ## 使用入口
 
-在管理 LXD 的 Linux/WSL 宿主运行：
+安装并运行全部自动化测试：
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
-```
+    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
 
-这个固定命令安装当前已发布测试版并运行配套自动化测试；v0.2.18 已将完整挑战纳入同一流程。无需手动进入容器，不再输入现有容器名。测试工具创建本次拥有的专用 Project 和临时容器，通过标准 mas 功能管理启停与收尾，不使用用户已有容器作为挑战对象。
+固定顺序为安装、全部 26 个功能环节、新建独立临时容器并标准启动、一次完整安全挑战、统一清理和汇总。GPU-off 只核验设备定义、节点、挂载、驱动和受管运行库文件移除以及 CUDA 不可用。新挑战容器采用默认 GPU 设置；无支持硬件时使用明确 off 预期。
 
-源代码和冻结包验证可从项目运行 `python3 scripts/build.py`，然后在项目外运行配套包：
+从宿主独立挑战用户指定容器：
 
-```bash
-python3 /absolute/path/to/mas-test.pyz --product /absolute/path/to/mas.pyz --output /absolute/path/to/new-results
-```
+    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
 
-宿主需要 Python 3.10+、lxc、正常的 LXD 访问权限和同版本产品/测试工具。容器通过 LXD exec 以 root 运行内部探测，需要 Python 3.10+，无需安装 mas、lxc 或挑战专用软件。环境标识检查防止内部程序误在普通宿主执行，不是身份认证。依赖安装测试仍是完整自动化测试的另一个环节。
+交互时输入容器名，留空或 Esc 取消。无终端必须提供 TARGET，例如：
+
+    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test --report /home/gordon/security-test.json
+
+独立入口只下载经发布清单校验的测试工具，不安装或覆盖 mas。宿主需要 Python 3.10+、lxc、LXD 访问权限和专用 mas Project 中的托管容器；不采用 lxc 当前 Project。容器需要 Python 3.10+，内部探针通过 LXD exec 以 root 运行，无需安装挑战软件。容器内误运行独立入口会明确报错。
+
+最初停止的容器通过标准 start 启动，最后标准 stop；最初运行的保持运行，若挑战期间停止则通过标准 start 恢复。操作前后核验实例身份，同名替换对象不接受探测或恢复。失败和中断仍进行恢复，原始错误与恢复错误分别保留。启动中断先等待属于该目标及 Project 的已提交 LXD 操作完成，再恢复；原生操作超时或状态无法核验使测试失败。GPU 预期取自标准启动后的配置，兼容没有历史 GPU 记录的原生导入容器。
+
+冻结包可在项目外调用：
+
+    python3 /absolute/path/mas-test.pyz --product /absolute/path/mas.pyz --output /absolute/path/new-results
+    python3 /absolute/path/mas-test.pyz --security test --report /absolute/path/security-test.json
 
 ## 完整流程
 
-1. 宿主读取当次 user/pid/mnt/net/ipc/uts namespace、boot ID、管理 socket 的 device/inode 和 binfmt_misc 挂载及注册摘要。
-2. 创建唯一非敏感宿主标记，目录 0755、文件 0644。只传递路径和 SHA-256；宿主标记内容不进入容器。标记不能只靠宿主目录读取权限保护。
-3. 将当前测试包中的两份原样 Python 源码和参照送入此次创建的容器临时目录，并传入明确的 GPU on/off 预期。
-4. 调用一次完整容器挑战。共享设备、接口、socket、devlxd、Windows/WSL 检查与 namespace、进程来源、标记、binfmt_misc 检查在同一流程完成。固定、发现及参照中的 socket 路径去重后逐项探测，使用同一份宿主参照。
-5. 取回完整 JSON，把每项方法、观察和通过/失败结果输出在宿主。必需检查缺项或重复、GPU 预期不符、结构无效或汇总/退出码不一致均使验证失败。原生命令失败也先尝试取回报告，再清理并保留原错误。
-6. 清理本次容器临时目录，核对宿主标记、boot ID 和 binfmt_misc 注册规则保持不变。清理或后置核验失败不能报告整体通过。宿主临时标记和参照目录随后回收。
+1. 记录初始状态和身份，按需通过标准 start 启动，并读取配置后的 GPU on/off 预期。
+2. 宿主采集六种 namespace、boot ID、管理 socket device/inode，以及 binfmt_misc 挂载和注册摘要。
+3. 创建唯一非敏感宿主标记，目录 0755、文件 0644；只传路径和 SHA-256，内容不进入容器。
+4. 将包内两份原样探针和参照送入容器内本次专用的临时目录，运行一次完整挑战。固定、发现和参照中的 socket 去重检查。
+5. 取回 JSON，验证必需检查、唯一 ID、GPU 预期、结构、汇总及退出码，完整输出方法、观察和 PASS/FAIL。原生命令失败也尝试取回报告，保留原错误。
+6. 用容器内自有标记与符号链接验证摘要检测有效；这两个正向样本不是宿主越界，结果单独保存。
+7. 清理容器临时目录，核对宿主标记、boot ID 和 binfmt_misc 注册规则不变，回收宿主临时数据。
+8. 核验身份并通过标准生命周期恢复初始状态，保存结果。清理、报告、恢复及后置核验错误均不能整体通过。
 
-GPU 开启的完整挑战位于“安全挑战”环节；GPU 关闭后的完整挑战位于执行开关的“资源接入”环节。无 GPU 的机器运行明确 off 预期的基础完整挑战，不声称验证了硬件计算。自动化测试另用容器内自有标记文件和符号链接确认摘要匹配检测有效；这两个正向样本不是宿主越界，原始结果保存在报告中。
-
-输出目录保存 `boundary-N.log` 和 `boundary-N.json`，主 `report.json` 的 `guest_boundary` 保存源码哈希、GPU 预期、当次参照、容器报告、完整合并报告和正向样本证据。日志显示全部检查详情，不添加颜色控制符；交互终端上的勾或叉使用绿色或红色。所有报告及详细日志留在宿主输出目录。
+自动化测试保存 boundary-1.json 和 boundary-1.log；主 report.json 的 guest_boundary 只有一份完整挑战，含源码哈希、GPU 预期、宿主参照、容器报告、合并报告和正向样本。独立模式默认在宿主当前目录生成唯一 security-时间-随机码.json 和同名 .log，--report 可指定新路径；已有报告及同名日志不覆盖。成功返回 0，边界或验证失败返回 1，执行/恢复/报告错误返回 2，取消或中断返回 130。
 
 ## 检查范围
 

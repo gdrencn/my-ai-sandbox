@@ -143,7 +143,7 @@ class DistributionTests(unittest.TestCase):
                 self.assertFalse(any(key.startswith(('case_', 'pty_', 'action_cleanup-')) for key in messages))
                 self.assertNotIn('windows_unc_failed', messages)
         self.assertFalse(any(name.startswith(('tests/', 'mas/locales/test/')) for name in names))
-        for forbidden in ('mas/testing.py','mas/test_output.py','mas/install.py','mas/dependencies.sh'):
+        for forbidden in ('mas/testing.py','mas/test_output.py','mas/security_testing.py','mas/install.py','mas/dependencies.sh'):
             self.assertNotIn(forbidden,names)
         from tests.probe_source import source_bytes
         with zipfile.ZipFile(sys.argv[0]) as archive:

@@ -1,0 +1,119 @@
+{
+  "target": "test-ef4d0651a1794cdba7205a003158e05d",
+  "operation": "/1.0/operations/01a0fea5-3371-726c-b8b6-88857f99a680",
+  "snapshot": {
+    "type": "sync",
+    "status": "Success",
+    "status_code": 200,
+    "operation": "",
+    "error_code": 0,
+    "error": "",
+    "metadata": {
+      "running": [
+        {
+          "id": "01a0fea5-3371-726c-b8b6-88857f99a680",
+          "class": "task",
+          "description": "Starting instance",
+          "created_at": "2026-10-02T17:03:54.60915943-05:00",
+          "updated_at": "2026-10-02T17:03:54.60915943-05:00",
+          "status": "Running",
+          "status_code": 103,
+          "resources": {},
+          "metadata": {
+            "entity_url": "/1.0/instances/test-ef4d0651a1794cdba7205a003158e05d?project=mas"
+          },
+          "may_cancel": true,
+          "err": "",
+          "err_code": 0,
+          "location": "none",
+          "requestor": {
+            "username": "",
+            "protocol": "unix",
+            "address": ""
+          }
+        }
+      ],
+      "success": [
+        {
+          "id": "01a0fea5-1f71-7015-9e94-344f2c3b9cd9",
+          "class": "task",
+          "description": "Creating instance",
+          "created_at": "2026-10-02T17:03:49.489006123-05:00",
+          "updated_at": "2026-10-02T17:03:51.339587501-05:00",
+          "status": "Success",
+          "status_code": 200,
+          "resources": {},
+          "metadata": {
+            "entity_url": "/1.0/instances/test-ef4d0651a1794cdba7205a003158e05d?project=mas"
+          },
+          "may_cancel": true,
+          "err": "",
+          "err_code": 0,
+          "location": "none",
+          "requestor": {
+            "username": "",
+            "protocol": "unix",
+            "address": ""
+          }
+        },
+        {
+          "id": "01a0fea5-1f79-7eb3-9e4c-50c01ffe38b1",
+          "class": "task",
+          "description": "Creating instance",
+          "created_at": "2026-10-02T17:03:49.4979641-05:00",
+          "updated_at": "2026-10-02T17:03:53.082812672-05:00",
+          "status": "Success",
+          "status_code": 200,
+          "resources": {},
+          "metadata": {
+            "entity_url": "/1.0/instances/test-a7cd6bcdb1394401af5e172fc0056d57?project=mas"
+          },
+          "may_cancel": true,
+          "err": "",
+          "err_code": 0,
+          "location": "none",
+          "requestor": {
+            "username": "",
+            "protocol": "unix",
+            "address": ""
+          }
+        },
+        {
+          "id": "01a0fea5-2dc7-7972-807b-bb27b8866a9c",
+          "class": "task",
+          "description": "Updating instance",
+          "created_at": "2026-10-02T17:03:53.159620138-05:00",
+          "updated_at": "2026-10-02T17:03:53.19052518-05:00",
+          "status": "Success",
+          "status_code": 200,
+          "resources": {},
+          "metadata": {
+            "entity_url": "/1.0/instances/test-ef4d0651a1794cdba7205a003158e05d?project=mas"
+          },
+          "may_cancel": true,
+          "err": "",
+          "err_code": 0,
+          "location": "none",
+          "requestor": {
+            "username": "",
+            "protocol": "unix",
+            "address": ""
+          }
+        }
+      ]
+    }
+  },
+  "lifecycle": {
+    "pending_operations": [
+      {
+        "id": "01a0fea5-3371-726c-b8b6-88857f99a680",
+        "status_code": 200,
+        "error": ""
+      }
+    ]
+  },
+  "messages": [
+    "等待 LXD 已提交的启动操作完成，再恢复容器原状态。"
+  ],
+  "elapsed": 5.898507597999924
+}

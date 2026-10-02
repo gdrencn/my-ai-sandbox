@@ -1,0 +1,113 @@
+{
+  "version": "0.2.19",
+  "units": 395,
+  "stages": 27,
+  "elapsed": 722.8014207759998,
+  "single_final_challenge": true,
+  "fresh_target": "test-6deaa63a728549b39e55e3878de78fa0",
+  "boundary_counts": {
+    "PASS": 75,
+    "FAIL": 0
+  },
+  "positive_controls": 2,
+  "headers": 27,
+  "separators": 27,
+  "packaging": "tester-only shared module and exact probe sources",
+  "source_hashes_unchanged": true,
+  "artifact_hashes": {
+    "mas.pyz": "d3adad8d91070906e6809d72062df864406274636bdd51473963ee7a481349e0",
+    "mas-install.pyz": "b53234866097bcef1bc956d2613fee612ae1b37341648aa24fbf9059c20f9128",
+    "mas-test.pyz": "dbd8d78996d1c24ba88c2503723bae8542a5c49c671acdf592fbbb16c28bb609",
+    "bootstrap.py": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+    "SHA256SUMS": "53388f658cf4664b1d10a05d665daf86d9b1ed56997bc9f1cd1e0e47b1cd803d"
+  },
+  "cleanup": "owned projects/instances/profiles/records/backups/canaries absent",
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "standalone_lifecycle": "Stopped/Running/SIGTERM preserved; guest rejected; installed files unchanged",
+  "native_operation_wait": [
+    {
+      "id": "01a0fea5-3371-726c-b8b6-88857f99a680",
+      "status_code": 200,
+      "error": ""
+    }
+  ],
+  "post_start_gpu": {
+    "target": "test-f930da89d76c49df9d62cb7e5e3081f0",
+    "counts": {
+      "PASS": 75,
+      "FAIL": 0
+    },
+    "initial_gpu_record": null,
+    "gpu_expected": "on",
+    "final_status": "Stopped",
+    "calls": [
+      {
+        "args": [
+          "new",
+          "test-f930da89d76c49df9d62cb7e5e3081f0"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": "[成功] 配置 GPU test-f930da89d76c49df9d62cb7e5e3081f0：已开启 — 已等待 1.1 秒\n[成功] 创建 test-f930da89d76c49df9d62cb7e5e3081f0：已停止 — 已等待 4.7 秒\n"
+      },
+      {
+        "args": [
+          "hardware",
+          "test-f930da89d76c49df9d62cb7e5e3081f0",
+          "gpu",
+          "off"
+        ],
+        "code": 0,
+        "stdout": "{\n  \"version\": 1,\n  \"enabled\": false,\n  \"backend\": \"wsl-nvidia\",\n  \"driver_paths\": [\n    \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\"\n  ],\n  \"devices\": {},\n  \"runtime_file\": null,\n  \"runtime_profile\": null\n}\n",
+        "stderr": "[成功] 配置 GPU test-f930da89d76c49df9d62cb7e5e3081f0：已关闭 — 已等待 1.1 秒\n"
+      },
+      {
+        "args": [
+          "info",
+          "test-f930da89d76c49df9d62cb7e5e3081f0"
+        ],
+        "code": 0,
+        "stdout": "{\n  \"name\": \"test-f930da89d76c49df9d62cb7e5e3081f0\",\n  \"description\": \"\",\n  \"status\": \"Stopped\",\n  \"status_code\": 102,\n  \"created_at\": \"2026-10-02T22:04:59.520011797Z\",\n  \"last_used_at\": \"1970-01-01T00:00:00Z\",\n  \"location\": \"none\",\n  \"type\": \"container\",\n  \"project\": \"mas\",\n  \"architecture\": \"x86_64\",\n  \"ephemeral\": false,\n  \"stateful\": false,\n  \"profiles\": [\n    \"mas\"\n  ],\n  \"config\": {\n    \"image.architecture\": \"amd64\",\n    \"image.description\": \"ubuntu 26.04 LTS (release)\",\n    \"image.label\": \"release\",\n    \"image.os\": \"ubuntu\",\n    \"image.release\": \"resolute\",\n    \"image.serial\": \"20260927\",\n    \"image.type\": \"squashfs\",\n    \"image.version\": \"26.04\",\n    \"user.mas.managed\": \"true\",\n    \"volatile.apply_template\": \"create\",\n    \"volatile.base_image\": \"3472ae3d6695211a1e81e3ab207d88e4b5562ccef5e0ac766f840c08c605822e\",\n    \"volatile.cloud-init.instance-id\": \"9fd8a7bb-bc7a-4394-a6a7-cbbfc1a742c3\",\n    \"volatile.eth0.hwaddr\": \"00:16:3e:14:d3:c0\",\n    \"volatile.idmap.base\": \"1131072\",\n    \"volatile.idmap.next\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.last_state.idmap\": \"[]\",\n    \"volatile.uuid\": \"25a47423-c565-468c-8112-eb222d21874d\",\n    \"volatile.uuid.generation\": \"25a47423-c565-468c-8112-eb222d21874d\"\n  },\n  \"devices\": {},\n  \"expanded_config\": {\n    \"image.architecture\": \"amd64\",\n    \"image.description\": \"ubuntu 26.04 LTS (release)\",\n    \"image.label\": \"release\",\n    \"image.os\": \"ubuntu\",\n    \"image.release\": \"resolute\",\n    \"image.serial\": \"20260927\",\n    \"image.type\": \"squashfs\",\n    \"image.version\": \"26.04\",\n    \"security.devlxd.management.volumes\": \"false\",\n    \"security.idmap.isolated\": \"true\",\n    \"security.nesting\": \"false\",\n    \"security.privileged\": \"false\",\n    \"security.syscalls.deny_default\": \"true\",\n    \"user.mas.managed\": \"true\",\n    \"user.mas.profile\": \"1\",\n    \"volatile.apply_template\": \"create\",\n    \"volatile.base_image\": \"3472ae3d6695211a1e81e3ab207d88e4b5562ccef5e0ac766f840c08c605822e\",\n    \"volatile.cloud-init.instance-id\": \"9fd8a7bb-bc7a-4394-a6a7-cbbfc1a742c3\",\n    \"volatile.eth0.hwaddr\": \"00:16:3e:14:d3:c0\",\n    \"volatile.idmap.base\": \"1131072\",\n    \"volatile.idmap.next\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.last_state.idmap\": \"[]\",\n    \"volatile.uuid\": \"25a47423-c565-468c-8112-eb222d21874d\",\n    \"volatile.uuid.generation\": \"25a47423-c565-468c-8112-eb222d21874d\"\n  },\n  \"expanded_devices\": {\n    \"eth0\": {\n      \"name\": \"eth0\",\n      \"network\": \"lxdbr0\",\n      \"type\": \"nic\"\n    },\n    \"root\": {\n      \"path\": \"/\",\n      \"pool\": \"default\",\n      \"type\": \"disk\"\n    }\n  },\n  \"backups\": null,\n  \"state\": {\n    \"status\": \"Stopped\",\n    \"status_code\": 102,\n    \"disk\": null,\n    \"memory\": {\n      \"usage\": 0,\n      \"usage_peak\": 0,\n      \"total\": 0,\n      \"swap_usage\": 0,\n      \"swap_usage_peak\": 0\n    },\n    \"network\": null,\n    \"pid\": 0,\n    \"processes\": 0,\n    \"cpu\": {\n      \"usage\": 0\n    }\n  },\n  \"snapshots\": null\n}\n",
+        "stderr": ""
+      },
+      {
+        "args": [
+          "info",
+          "test-f930da89d76c49df9d62cb7e5e3081f0"
+        ],
+        "code": 0,
+        "stdout": "{\n  \"name\": \"test-f930da89d76c49df9d62cb7e5e3081f0\",\n  \"description\": \"\",\n  \"status\": \"Stopped\",\n  \"status_code\": 102,\n  \"created_at\": \"2026-10-02T22:04:59.520011797Z\",\n  \"last_used_at\": \"2026-10-02T22:05:09.066176183Z\",\n  \"location\": \"none\",\n  \"type\": \"container\",\n  \"project\": \"mas\",\n  \"architecture\": \"x86_64\",\n  \"ephemeral\": false,\n  \"stateful\": false,\n  \"profiles\": [\n    \"mas\"\n  ],\n  \"config\": {\n    \"image.architecture\": \"amd64\",\n    \"image.description\": \"ubuntu 26.04 LTS (release)\",\n    \"image.label\": \"release\",\n    \"image.os\": \"ubuntu\",\n    \"image.release\": \"resolute\",\n    \"image.serial\": \"20260927\",\n    \"image.type\": \"squashfs\",\n    \"image.version\": \"26.04\",\n    \"user.mas.gpu\": \"{\\\"backend\\\": \\\"wsl-nvidia\\\", \\\"devices\\\": {\\\"mas-gpu-driver-0\\\": {\\\"path\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"type\\\": \\\"disk\\\"}, \\\"mas-gpu-dxg\\\": {\\\"mode\\\": \\\"0666\\\", \\\"path\\\": \\\"/dev/dxg\\\", \\\"source\\\": \\\"/dev/dxg\\\", \\\"type\\\": \\\"unix-char\\\"}, \\\"mas-gpu-lib\\\": {\\\"path\\\": \\\"/usr/lib/wsl/lib\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/lib\\\", \\\"type\\\": \\\"disk\\\"}}, \\\"driver_paths\\\": [\\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\"], \\\"enabled\\\": true, \\\"runtime_file\\\": \\\"/etc/ld.so.conf.d/mas-gpu.conf\\\", \\\"runtime_profile\\\": \\\"/etc/profile.d/mas-gpu.sh\\\", \\\"version\\\": 1}\",\n    \"user.mas.managed\": \"true\",\n    \"volatile.base_image\": \"3472ae3d6695211a1e81e3ab207d88e4b5562ccef5e0ac766f840c08c605822e\",\n    \"volatile.cloud-init.instance-id\": \"9fd8a7bb-bc7a-4394-a6a7-cbbfc1a742c3\",\n    \"volatile.eth0.hwaddr\": \"00:16:3e:14:d3:c0\",\n    \"volatile.idmap.base\": \"1131072\",\n    \"volatile.idmap.current\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.idmap.next\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.last_state.idmap\": \"[]\",\n    \"volatile.last_state.power\": \"STOPPED\",\n    \"volatile.last_state.ready\": \"false\",\n    \"volatile.uuid\": \"25a47423-c565-468c-8112-eb222d21874d\",\n    \"volatile.uuid.generation\": \"25a47423-c565-468c-8112-eb222d21874d\"\n  },\n  \"devices\": {\n    \"mas-gpu-driver-0\": {\n      \"path\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"type\": \"disk\"\n    },\n    \"mas-gpu-dxg\": {\n      \"mode\": \"0666\",\n      \"path\": \"/dev/dxg\",\n      \"source\": \"/dev/dxg\",\n      \"type\": \"unix-char\"\n    },\n    \"mas-gpu-lib\": {\n      \"path\": \"/usr/lib/wsl/lib\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/lib\",\n      \"type\": \"disk\"\n    }\n  },\n  \"expanded_config\": {\n    \"image.architecture\": \"amd64\",\n    \"image.description\": \"ubuntu 26.04 LTS (release)\",\n    \"image.label\": \"release\",\n    \"image.os\": \"ubuntu\",\n    \"image.release\": \"resolute\",\n    \"image.serial\": \"20260927\",\n    \"image.type\": \"squashfs\",\n    \"image.version\": \"26.04\",\n    \"security.devlxd.management.volumes\": \"false\",\n    \"security.idmap.isolated\": \"true\",\n    \"security.nesting\": \"false\",\n    \"security.privileged\": \"false\",\n    \"security.syscalls.deny_default\": \"true\",\n    \"user.mas.gpu\": \"{\\\"backend\\\": \\\"wsl-nvidia\\\", \\\"devices\\\": {\\\"mas-gpu-driver-0\\\": {\\\"path\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"type\\\": \\\"disk\\\"}, \\\"mas-gpu-dxg\\\": {\\\"mode\\\": \\\"0666\\\", \\\"path\\\": \\\"/dev/dxg\\\", \\\"source\\\": \\\"/dev/dxg\\\", \\\"type\\\": \\\"unix-char\\\"}, \\\"mas-gpu-lib\\\": {\\\"path\\\": \\\"/usr/lib/wsl/lib\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/lib\\\", \\\"type\\\": \\\"disk\\\"}}, \\\"driver_paths\\\": [\\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\"], \\\"enabled\\\": true, \\\"runtime_file\\\": \\\"/etc/ld.so.conf.d/mas-gpu.conf\\\", \\\"runtime_profile\\\": \\\"/etc/profile.d/mas-gpu.sh\\\", \\\"version\\\": 1}\",\n    \"user.mas.managed\": \"true\",\n    \"user.mas.profile\": \"1\",\n    \"volatile.base_image\": \"3472ae3d6695211a1e81e3ab207d88e4b5562ccef5e0ac766f840c08c605822e\",\n    \"volatile.cloud-init.instance-id\": \"9fd8a7bb-bc7a-4394-a6a7-cbbfc1a742c3\",\n    \"volatile.eth0.hwaddr\": \"00:16:3e:14:d3:c0\",\n    \"volatile.idmap.base\": \"1131072\",\n    \"volatile.idmap.current\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.idmap.next\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.last_state.idmap\": \"[]\",\n    \"volatile.last_state.power\": \"STOPPED\",\n    \"volatile.last_state.ready\": \"false\",\n    \"volatile.uuid\": \"25a47423-c565-468c-8112-eb222d21874d\",\n    \"volatile.uuid.generation\": \"25a47423-c565-468c-8112-eb222d21874d\"\n  },\n  \"expanded_devices\": {\n    \"eth0\": {\n      \"name\": \"eth0\",\n      \"network\": \"lxdbr0\",\n      \"type\": \"nic\"\n    },\n    \"mas-gpu-driver-0\": {\n      \"path\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"type\": \"disk\"\n    },\n    \"mas-gpu-dxg\": {\n      \"mode\": \"0666\",\n      \"path\": \"/dev/dxg\",\n      \"source\": \"/dev/dxg\",\n      \"type\": \"unix-char\"\n    },\n    \"mas-gpu-lib\": {\n      \"path\": \"/usr/lib/wsl/lib\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/lib\",\n      \"type\": \"disk\"\n    },\n    \"root\": {\n      \"path\": \"/\",\n      \"pool\": \"default\",\n      \"type\": \"disk\"\n    }\n  },\n  \"backups\": null,\n  \"state\": {\n    \"status\": \"Stopped\",\n    \"status_code\": 102,\n    \"disk\": null,\n    \"memory\": {\n      \"usage\": 0,\n      \"usage_peak\": 0,\n      \"total\": 0,\n      \"swap_usage\": 0,\n      \"swap_usage_peak\": 0\n    },\n    \"network\": null,\n    \"pid\": 0,\n    \"processes\": 0,\n    \"cpu\": {\n      \"usage\": 0\n    }\n  },\n  \"snapshots\": null\n}\n",
+        "stderr": ""
+      },
+      {
+        "args": [
+          "stop",
+          "test-f930da89d76c49df9d62cb7e5e3081f0"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": "[成功] 停止 test-f930da89d76c49df9d62cb7e5e3081f0：已停止 — 已等待 0.0 秒\n"
+      },
+      {
+        "args": [
+          "delete",
+          "test-f930da89d76c49df9d62cb7e5e3081f0",
+          "--yes"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": "[成功] 删除 test-f930da89d76c49df9d62cb7e5e3081f0：不存在 — 已等待 1.3 秒\n"
+      }
+    ]
+  },
+  "platform_limits": "Current prepared Ubuntu WSL/LXD/NVIDIA host only; no new native Ubuntu/cloud/fresh-provisioning certification"
+}

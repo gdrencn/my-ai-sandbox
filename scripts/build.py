@@ -31,7 +31,8 @@ def main():
     entries = {"stable/install.sh": ("--channel", "stable"),
                "test/install.sh": ("--channel", "test"),
                "test/test.sh": ("--channel", "test", "--test"),
-               "test/test-stable.sh": ("--channel", "stable", "--test")}
+               "test/test-stable.sh": ("--channel", "stable", "--test"),
+               "test/security.sh": ("--channel", "test", "--security")}
     for path, arguments in entries.items():
         wrapper = (ROOT / 'scripts/channel.template.sh').read_text().replace('@ARGUMENTS@', shlex.join(arguments))
         target = ROOT / path
@@ -46,7 +47,7 @@ def main():
             stage = Path(directory)
             excluded = ["__pycache__"]
             if filename != "mas-test.pyz":
-                excluded += ["testing.py", "test_output.py", "test"]
+                excluded += ["testing.py", "test_output.py", "security_testing.py", "test"]
             if filename == "mas-install.pyz":
                 excluded += ["cli.py", "terminal_ui.py", "__main__.py"]
             if filename == "mas.pyz":
@@ -73,7 +74,8 @@ def main():
     for name in ("bootstrap.py", "install.sh"):
         shutil.copyfile(ROOT / name, DIST / name)
     entry_assets = {"install-stable.sh": "stable/install.sh", "install-test.sh": "test/install.sh",
-                    "test.sh": "test/test.sh", "test-stable.sh": "test/test-stable.sh"}
+                    "test.sh": "test/test.sh", "test-stable.sh": "test/test-stable.sh",
+                    "security.sh": "test/security.sh"}
     for name, path in entry_assets.items():
         shutil.copyfile(ROOT / path, DIST / name)
     names = ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh", *entry_assets)

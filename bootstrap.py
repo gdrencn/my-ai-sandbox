@@ -65,19 +65,22 @@ def release_checksums(assets):
 
 def main():
     parser = Parser()
-    parser.add_argument("--test", action="store_true", help=t("help_install_test"))
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument("--test", action="store_true", help=t("help_install_test"))
+    actions.add_argument("--security", action="store_true", help=t("help_install_security"))
     parser.add_argument("--channel", choices=("test", "stable"), default="test", help=t("help_channel"))
     parser.add_argument("--release", help=t("help_release"))
     parser.add_argument("--language", choices=config.LANGUAGES, default=os.environ.get("MAS_LANGUAGE"), help=t("help_language"))
     args, test_args = parser.parse_known_args()
-    choose_language(args.language)
-    if test_args and not args.test:
+    if not args.security:
+        choose_language(args.language)
+    if test_args and not (args.test or args.security):
         parser.error(t("extra_test_args"))
     selected = release(args.release) if args.channel == "test" else release(args.release, channel="stable")
     stable_product = selected if args.channel == "stable" and args.test else None
     if stable_product is not None:
         selected = release(stable_product["tag_name"].split("/")[-1])
-    print(t("installing", version=selected["tag_name"]), flush=True)
+    print(t("security_loading" if args.security else "installing", version=selected["tag_name"]), flush=True)
     assets = asset_urls(selected)
     checksums = release_checksums(assets)
     if stable_product is not None:
@@ -88,7 +91,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix="mas-install-") as directory:
         paths = {}
         legacy = "mas-install.pyz" not in assets
-        names = ["mas.pyz"] if legacy else ["mas.pyz", "mas-install.pyz"]
+        names = ["mas-test.pyz"] if args.security else ["mas.pyz"] if legacy else ["mas.pyz", "mas-install.pyz"]
         if args.test:
             names.append("mas-test.pyz")
         for name in names:
@@ -97,7 +100,9 @@ def main():
                 raise RuntimeError(t("checksum_error", name=name))
             paths[name] = Path(directory) / name
             paths[name].write_bytes(data)
-        if legacy:
+        if args.security:
+            command = [sys.executable, str(paths["mas-test.pyz"]), "--security", *test_args]
+        elif legacy:
             # Historical numeric releases predate the standalone installer.
             code = ("import sys;sys.path.insert(0," + repr(str(paths["mas.pyz"])) + ");"
                     "from mas.install import install;raise SystemExit(install(" + repr(str(paths["mas.pyz"])) + "," +

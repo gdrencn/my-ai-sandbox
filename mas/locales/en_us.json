@@ -318,5 +318,7 @@
   "help_cmd_restart": "Call standard stop then start; a failed stop prevents startup. With -e/--enter, call enter after stop instead.",
   "example_restart": "Examples: mas restart demo; mas restart demo -e",
   "help_restart_enter": "Enter the container terminal after stopping (reuse enter startup preparation)",
-  "cli_restart_consent": "restart --yes/--no requires -e/--enter."
+  "cli_restart_consent": "restart --yes/--no requires -e/--enter.",
+  "help_install_security": "Download only the tester and challenge a container from its host; do not install mas.",
+  "security_loading": "Downloading {version} security challenge tool"
 }
