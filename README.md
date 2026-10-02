@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-本批 0.2.14 加入标准重启和终端结束四选项，保留固定隔离策略、GPU 模块、共享安全挑战和挂载就绪检查。本地冻结包通过 351 项单元测试、全部 27 个回归环节（712.1 秒），无跳过单元或清理错误；公开发布核验待完成。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+本批 [0.2.14](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.14) 已发布，加入标准重启和终端结束四选项，保留固定隔离策略、GPU 模块、共享安全挑战和挂载就绪检查。本地冻结包和公开入口均通过 351 项单元测试、全部 27 个回归环节（712.1 / 715.0 秒），无跳过单元或清理错误；11 个附件、普通安装及资源回收已核验。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 
