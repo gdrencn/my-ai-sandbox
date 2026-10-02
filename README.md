@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-本批 0.2.15 已实现容器与宿主挑战分离，容器固定命令不变，宿主入口自动准备参照并取回报告。本地冻结包通过 369 项单元测试、全部 27 个回归环节（735.6 秒），无跳过单元或清理错误；公开发布与入口核验正在完成。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+本批 [0.2.15](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.15) 已发布，完成容器与宿主挑战分离，容器固定命令不变，宿主入口自动准备参照并取回报告。本地冻结包和实际公开入口均通过 369 项单元测试、全部 27 个回归环节（735.6 / 723.7 秒），无跳过单元或清理错误；两个公开挑战命令、11 个附件、普通安装及资源回收均已核验。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 

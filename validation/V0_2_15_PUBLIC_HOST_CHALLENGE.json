@@ -1,0 +1,1044 @@
+{
+  "schema": 2,
+  "purpose": "host-assisted-boundary-probe",
+  "checks": [
+    {
+      "check": "namespace:user",
+      "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "user:[4026532458]",
+        "host": "user:[4026531837]"
+      }
+    },
+    {
+      "check": "namespace:pid",
+      "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "pid:[4026532462]",
+        "host": "pid:[4026532216]"
+      }
+    },
+    {
+      "check": "namespace:mnt",
+      "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "mnt:[4026532459]",
+        "host": "mnt:[4026532214]"
+      }
+    },
+    {
+      "check": "namespace:net",
+      "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "net:[4026532465]",
+        "host": "net:[4026531833]"
+      }
+    },
+    {
+      "check": "namespace:ipc",
+      "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "ipc:[4026532461]",
+        "host": "ipc:[4026532202]"
+      }
+    },
+    {
+      "check": "namespace:uts",
+      "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "uts:[4026532460]",
+        "host": "uts:[4026532215]"
+      }
+    },
+    {
+      "check": "process-roots",
+      "method": "有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境",
+      "status": "PASS",
+      "message": "已核对可见进程 namespace 与 root 路径，未发现宿主进程",
+      "evidence": {
+        "processes": [
+          {
+            "pid": 1,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 66,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 112,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532730]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 120,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532731]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 206,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532464]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 236,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532803]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 237,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 241,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 242,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532869]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 256,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532873]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 261,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 279,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 285,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 311,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532803]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 312,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532803]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 322,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 418,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          },
+          {
+            "pid": 643,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532458]",
+              "mnt": "mnt:[4026532459]",
+              "pid": "pid:[4026532462]"
+            }
+          }
+        ],
+        "host_matches": [],
+        "errors": [],
+        "truncated": false
+      }
+    },
+    {
+      "check": "binfmt:existing",
+      "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+      "status": "PASS",
+      "message": "当前 mount namespace 未暴露 binfmt_misc 挂载",
+      "evidence": {
+        "mounts": []
+      }
+    },
+    {
+      "check": "host-canary:0",
+      "method": "有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容",
+      "status": "PASS",
+      "message": "宿主标记不可读或不可见",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/1/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/self/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/66/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/112/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/120/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/206/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/236/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/237/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/241/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/242/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/256/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/261/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/279/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/285/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/311/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/312/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/322/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/418/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/643/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/644/root/tmp/mas-host-canary-ct8yj78i/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          }
+        ],
+        "processes_truncated": false
+      }
+    },
+    {
+      "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+      "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/dbus/system_bus_socket",
+      "method": "检查 /run/dbus/system_bus_socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 158,
+        "inode": 276,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532462]",
+          "mnt": "mnt:[4026532459]",
+          "user": "user:[4026532458]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/systemd/private",
+      "method": "检查 /run/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 158,
+        "inode": 43,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532462]",
+          "mnt": "mnt:[4026532459]",
+          "user": "user:[4026532458]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/snapd.socket",
+      "method": "检查 /run/snapd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 158,
+        "inode": 280,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532462]",
+          "mnt": "mnt:[4026532459]",
+          "user": "user:[4026532458]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/snapd-snap.socket",
+      "method": "检查 /run/snapd-snap.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 158,
+        "inode": 281,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532462]",
+          "mnt": "mnt:[4026532459]",
+          "user": "user:[4026532458]"
+        }
+      }
+    },
+    {
+      "check": "binfmt:temporary-mount",
+      "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+      "status": "PASS",
+      "message": "临时挂载属于独立 user namespace，未暴露宿主实例",
+      "evidence": {
+        "device": 93,
+        "inode": 1,
+        "user_namespace": "user:[4026532222]",
+        "host_match": false
+      }
+    },
+    {
+      "check": "host-canary-integrity",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "PASS",
+      "message": "宿主唯一标记内容应保持不变",
+      "evidence": {}
+    },
+    {
+      "check": "binfmt:host-unchanged",
+      "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+      "status": "PASS",
+      "message": "宿主 binfmt_misc 注册规则应保持不变",
+      "evidence": {}
+    },
+    {
+      "check": "host-reference",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "PASS",
+      "message": "宿主启动身份应保持不变",
+      "evidence": {}
+    }
+  ],
+  "observations": [],
+  "project": "mas",
+  "target": "challenge-0cb1ac212489481090615ca8b2a2b6f8",
+  "reference": {
+    "schema": 1,
+    "boot_id": "987f2516-4b53-466b-9e25-7ecdbb782f55",
+    "namespaces": {
+      "user": "user:[4026531837]",
+      "pid": "pid:[4026532216]",
+      "mnt": "mnt:[4026532214]",
+      "net": "net:[4026531833]",
+      "ipc": "ipc:[4026532202]",
+      "uts": "uts:[4026532215]"
+    },
+    "canaries": [
+      {
+        "path": "/tmp/mas-host-canary-ct8yj78i/marker",
+        "sha256": "758c4715fee64d67dfe722d34685e6b2587673de0f636614dcca461c98417346"
+      }
+    ],
+    "sockets": [
+      {
+        "path": "/var/snap/lxd/common/lxd/unix.socket",
+        "device": 2096,
+        "inode": 3021
+      },
+      {
+        "path": "/run/dbus/system_bus_socket",
+        "device": 62,
+        "inode": 883
+      },
+      {
+        "path": "/run/systemd/private",
+        "device": 62,
+        "inode": 65
+      },
+      {
+        "path": "/run/snapd.socket",
+        "device": 62,
+        "inode": 886
+      },
+      {
+        "path": "/run/snapd-snap.socket",
+        "device": 62,
+        "inode": 887
+      }
+    ],
+    "binfmt": [
+      {
+        "path": "/proc/sys/fs/binfmt_misc",
+        "device": 34,
+        "inode": 1,
+        "registrations": [
+          {
+            "name": "WSLInterop",
+            "sha256": "dc50348fcb8063ec34ddcbde6f21ab380027d63918299ba7253f802618d0c815",
+            "interpreter": "/init",
+            "flags": "PF"
+          },
+          {
+            "name": "python3.12",
+            "sha256": "9908195f4bc7f4c65df1b10202db690253ce03ed77e68470b1cf82afb6d55bf4",
+            "interpreter": "/usr/bin/python3.12",
+            "flags": ""
+          },
+          {
+            "name": "python3.14",
+            "sha256": "56f6d188d45e1df44c1c83affeb389d2cb6f504a9535d5fc0b0604d2fa2d5b60",
+            "interpreter": "/usr/bin/python3.14",
+            "flags": ""
+          },
+          {
+            "name": "status",
+            "sha256": "e056a35db086947e2f5969d747f0a7517bff00c7ffff1f9e7b47b72bfac9d948",
+            "interpreter": "",
+            "flags": ""
+          }
+        ]
+      }
+    ]
+  },
+  "guest_stdout": "[通过] namespace:user：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/user，有宿主参照时比较标识\n  观察：{\"guest\": \"user:[4026532458]\", \"host\": \"user:[4026531837]\"}\n[通过] namespace:pid：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/pid，有宿主参照时比较标识\n  观察：{\"guest\": \"pid:[4026532462]\", \"host\": \"pid:[4026532216]\"}\n[通过] namespace:mnt：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/mnt，有宿主参照时比较标识\n  观察：{\"guest\": \"mnt:[4026532459]\", \"host\": \"mnt:[4026532214]\"}\n[通过] namespace:net：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/net，有宿主参照时比较标识\n  观察：{\"guest\": \"net:[4026532465]\", \"host\": \"net:[4026531833]\"}\n[通过] namespace:ipc：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/ipc，有宿主参照时比较标识\n  观察：{\"guest\": \"ipc:[4026532461]\", \"host\": \"ipc:[4026532202]\"}\n[通过] namespace:uts：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/uts，有宿主参照时比较标识\n  观察：{\"guest\": \"uts:[4026532460]\", \"host\": \"uts:[4026532215]\"}\n[通过] process-roots：已核对可见进程 namespace 与 root 路径，未发现宿主进程\n  方法：有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境\n  观察：{\"processes\": [{\"pid\": 1, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 66, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 112, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532730]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 120, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532731]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 206, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532464]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 236, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532803]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 237, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 241, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 242, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532869]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 256, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532873]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 261, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 279, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 285, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 311, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532803]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 312, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532803]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 322, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 418, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}, {\"pid\": 643, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532458]\", \"mnt\": \"mnt:[4026532459]\", \"pid\": \"pid:[4026532462]\"}}], \"host_matches\": [], \"errors\": [], \"truncated\": false}\n[通过] binfmt:existing：当前 mount namespace 未暴露 binfmt_misc 挂载\n  方法：核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则\n  观察：{\"mounts\": []}\n[通过] host-canary:0：宿主标记不可读或不可见\n  方法：有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容\n  观察：{\"attempts\": [{\"path\": \"/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/1/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/self/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/66/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/112/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/120/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/206/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/236/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/237/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/241/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/242/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/256/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/261/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/279/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/285/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/311/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/312/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/322/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/418/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/643/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/644/root/tmp/mas-host-canary-ct8yj78i/marker\", \"outcome\": \"unavailable\", \"errno\": 2}], \"processes_truncated\": false}\n[通过] management-socket:/var/snap/lxd/common/lxd/unix.socket：管理 socket 路径不存在\n  方法：检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/dbus/system_bus_socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/dbus/system_bus_socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 158, \"inode\": 276, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532462]\", \"mnt\": \"mnt:[4026532459]\", \"user\": \"user:[4026532458]\"}}\n[通过] management-socket:/run/systemd/private：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 158, \"inode\": 43, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532462]\", \"mnt\": \"mnt:[4026532459]\", \"user\": \"user:[4026532458]\"}}\n[通过] management-socket:/run/snapd.socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/snapd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 158, \"inode\": 280, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532462]\", \"mnt\": \"mnt:[4026532459]\", \"user\": \"user:[4026532458]\"}}\n[通过] management-socket:/run/snapd-snap.socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/snapd-snap.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 158, \"inode\": 281, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532462]\", \"mnt\": \"mnt:[4026532459]\", \"user\": \"user:[4026532458]\"}}\n[通过] binfmt:temporary-mount：临时挂载属于独立 user namespace，未暴露宿主实例\n  方法：核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则\n  观察：{\"device\": 93, \"inode\": 1, \"user_namespace\": \"user:[4026532222]\", \"host_match\": false}\n\n测试汇总：通过 15，失败 0\n结论：本次列出的检查全部通过。\n报告：/tmp/mas-host-challenge-k2qyckys/report.json\n",
+  "guest_report": {
+    "schema": 2,
+    "purpose": "host-assisted-boundary-probe",
+    "checks": [
+      {
+        "check": "namespace:user",
+        "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "user:[4026532458]",
+          "host": "user:[4026531837]"
+        }
+      },
+      {
+        "check": "namespace:pid",
+        "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "pid:[4026532462]",
+          "host": "pid:[4026532216]"
+        }
+      },
+      {
+        "check": "namespace:mnt",
+        "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "mnt:[4026532459]",
+          "host": "mnt:[4026532214]"
+        }
+      },
+      {
+        "check": "namespace:net",
+        "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "net:[4026532465]",
+          "host": "net:[4026531833]"
+        }
+      },
+      {
+        "check": "namespace:ipc",
+        "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "ipc:[4026532461]",
+          "host": "ipc:[4026532202]"
+        }
+      },
+      {
+        "check": "namespace:uts",
+        "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "uts:[4026532460]",
+          "host": "uts:[4026532215]"
+        }
+      },
+      {
+        "check": "process-roots",
+        "method": "有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境",
+        "status": "PASS",
+        "message": "已核对可见进程 namespace 与 root 路径，未发现宿主进程",
+        "evidence": {
+          "processes": [
+            {
+              "pid": 1,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 66,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 112,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532730]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 120,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532731]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 206,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532464]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 236,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532803]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 237,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 241,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 242,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532869]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 256,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532873]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 261,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 279,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 285,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 311,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532803]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 312,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532803]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 322,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 418,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            },
+            {
+              "pid": 643,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532458]",
+                "mnt": "mnt:[4026532459]",
+                "pid": "pid:[4026532462]"
+              }
+            }
+          ],
+          "host_matches": [],
+          "errors": [],
+          "truncated": false
+        }
+      },
+      {
+        "check": "binfmt:existing",
+        "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+        "status": "PASS",
+        "message": "当前 mount namespace 未暴露 binfmt_misc 挂载",
+        "evidence": {
+          "mounts": []
+        }
+      },
+      {
+        "check": "host-canary:0",
+        "method": "有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容",
+        "status": "PASS",
+        "message": "宿主标记不可读或不可见",
+        "evidence": {
+          "attempts": [
+            {
+              "path": "/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/1/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/self/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/66/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/112/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/120/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/206/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/236/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/237/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/241/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/242/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/256/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/261/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/279/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/285/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/311/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/312/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/322/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/418/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/643/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/644/root/tmp/mas-host-canary-ct8yj78i/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            }
+          ],
+          "processes_truncated": false
+        }
+      },
+      {
+        "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+        "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/dbus/system_bus_socket",
+        "method": "检查 /run/dbus/system_bus_socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 158,
+          "inode": 276,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532462]",
+            "mnt": "mnt:[4026532459]",
+            "user": "user:[4026532458]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/systemd/private",
+        "method": "检查 /run/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 158,
+          "inode": 43,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532462]",
+            "mnt": "mnt:[4026532459]",
+            "user": "user:[4026532458]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/snapd.socket",
+        "method": "检查 /run/snapd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 158,
+          "inode": 280,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532462]",
+            "mnt": "mnt:[4026532459]",
+            "user": "user:[4026532458]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/snapd-snap.socket",
+        "method": "检查 /run/snapd-snap.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 158,
+          "inode": 281,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532462]",
+            "mnt": "mnt:[4026532459]",
+            "user": "user:[4026532458]"
+          }
+        }
+      },
+      {
+        "check": "binfmt:temporary-mount",
+        "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+        "status": "PASS",
+        "message": "临时挂载属于独立 user namespace，未暴露宿主实例",
+        "evidence": {
+          "device": 93,
+          "inode": 1,
+          "user_namespace": "user:[4026532222]",
+          "host_match": false
+        }
+      }
+    ],
+    "observations": [],
+    "project": "mas",
+    "target": null,
+    "elapsed": 0.27197785599855706,
+    "exit_code": 0,
+    "counts": {
+      "PASS": 15,
+      "FAIL": 0
+    },
+    "conclusion": "checks_passed",
+    "scope": "结论仅适用于列出的检查与当次观察；环境记录不计为测试。"
+  },
+  "elapsed": 1.3918642850185279,
+  "exit_code": 0,
+  "counts": {
+    "PASS": 18,
+    "FAIL": 0
+  },
+  "conclusion": "checks_passed",
+  "scope": "结论仅适用于列出的检查与当次观察；环境记录不计为测试。"
+}

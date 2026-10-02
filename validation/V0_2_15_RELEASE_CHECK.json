@@ -1,0 +1,58 @@
+{
+  "public_challenges": {
+    "host": {
+      "PASS": 18,
+      "FAIL": 0
+    },
+    "guest": {
+      "PASS": 60,
+      "FAIL": 0
+    }
+  },
+  "version": "0.2.15",
+  "status": "passed",
+  "release": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.15",
+  "tag": "v0.2.15",
+  "source_commit": "5062ea282adcfa3ef2c173f01eb4d01daa76b008",
+  "asset_hashes": {
+    "SHA256SUMS": "84c43c5319b8ff9a7e89ec7e9092ef722f669558cd8fcf574ec2fc0f43895bad",
+    "WSL_REPORT.json": "6e2a8eab50cc54e38a091883e523cbefb3095f2629ce1abae275f466dbaf1236",
+    "bootstrap.py": "a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "mas-install.pyz": "4dea7c00c24991f1cb45b76e42046237d7c8bcbbcbbaaee1570d3f25baf80f00",
+    "mas-test.pyz": "812c29bf218a2139575af08c9004b20f32ebd18944c84c07b31c8d9159aa184d",
+    "mas.pyz": "75d0489f6ebb43b22150208f4d6fd7438cd9ec7e628fcc8b1ae37180a7b704aa",
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484"
+  },
+  "latest_stable": "stable/0.1.15",
+  "probe_packaged_only_in_tester": true,
+  "public_entries": [
+    "stable/install.sh",
+    "test/install.sh",
+    "test/test.sh",
+    "test/test-stable.sh"
+  ],
+  "public_probe_source_matches": true,
+  "reproducible_build": true,
+  "public_test": {
+    "units": 369,
+    "stages": 27,
+    "elapsed": 723.7
+  },
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "local_project_removed": true,
+  "public_project_removed": true,
+  "staging_projects_removed": true,
+  "mount_registry_empty": true,
+  "mount_directories_removed": true,
+  "legacy_targets_removed": true,
+  "legacy_profiles_removed": true,
+  "ordinary_install_preserves_tester": true,
+  "installed_product_and_tester_hashes_match": true
+}
