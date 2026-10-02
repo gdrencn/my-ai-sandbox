@@ -180,11 +180,11 @@ class Terminal:
         self.expect_pattern(rb"(?:\A|[\r\n]|\x07|\x1b\\)sandbox@[^\r\n\x1b\x07]*:[^\r\n\x1b\x07]*\$ ",
                             "sandbox shell prompt")
 
-    def finish(self):
+    def finish(self, status=0):
         start = time.monotonic()
         while self.status is None and time.monotonic() - start < self.timeout:
             self.read()
-        if self.status != 0:
+        if self.status != status:
             raise AssertionError(t("pty_status", status=self.status, buffer=self.buffer[-2000:]))
 
     def close(self):
@@ -240,7 +240,7 @@ class Terminal:
 class Suite:
     CASES = ["unit", "new-default", "missing-image", "list-info", "start-user-network", "running-guards",
              "enter-running-default-exit", "enter-stopped-stop-exit", "export-import",
-             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu", "configuration-concurrency", "isolation-policy", "isolation-runtime", "legacy-migration"]
+             "overwrite-confirmation", "ownership-and-stop-all", "delete-confirmation", "language-config", "tui", "invalid-inputs", "lifecycle-repeat", "restart", "unmarked-import", "filesystems", "filesystem-recovery", "filesystem-menu", "dependency-install", "gpu", "configuration-concurrency", "isolation-policy", "isolation-runtime", "legacy-migration"]
 
     def __init__(self, report_dir, timeout, product=None):
         self.output = Output()
@@ -782,7 +782,7 @@ class Suite:
             self.cli("new", target, code=1)
         with self.case("invalid-inputs"):
             missing = self.target()
-            for action in ('start', 'stop', 'info', 'delete', 'enter'):
+            for action in ('start', 'stop', 'restart', 'info', 'delete', 'enter'):
                 self.cli(action, missing, code=1)
             self.cli('export', missing, str(self.directory/'missing.tar.gz'), code=1)
             self.cli('import', missing, str(self.directory/'missing.tar.gz'), code=1)
@@ -819,6 +819,31 @@ class Suite:
                 assert self.exec(target, "su --login sandbox -c 'sudo -n id -u'").strip() == '0'
             finally:
                 self.exec(target, 'usermod --shell /bin/bash sandbox')
+        with self.case('restart'):
+            boot = self.exec(target, 'cat /proc/sys/kernel/random/boot_id')
+            self.cli('restart', target)
+            assert self.state(target, 'Running')
+            assert self.exec(target, 'cat /proc/sys/kernel/random/boot_id') != boot
+            assert self.exec(target, 'cat /home/sandbox/mas-retain') == 'preserve'
+            self.cli('stop', target)
+            self.cli('restart', target)
+            assert self.state(target, 'Running')
+            with self.terminal(['restart', target, '-e']) as terminal:
+                self.check_shell(terminal)
+                terminal.send('exit\n')
+                terminal.expect('Container terminal finished: ' + target)
+                terminal.send('\n'); terminal.finish()
+            assert self.state(target, 'Running')
+            with self.terminal(['enter', target]) as terminal:
+                self.check_shell(terminal)
+                terminal.send('exit 7\n')
+                terminal.expect('Container terminal finished: ' + target)
+                terminal.send('\x1b[A\n')
+                terminal.expect('Container terminal exited with status 7.')
+                terminal.expect('Container: ' + target)
+                terminal.send('\x1b[D'); terminal.expect('my-ai-sandbox')
+                terminal.send('\x1b[A\n'); terminal.finish(status=1)
+            assert self.state(target, 'Running')
         with self.case("running-guards"):
             self.cli("delete", target, answer="y\n", code=1)
             self.cli("export", target, str(self.directory / "forbidden.tar.gz"), code=1)
@@ -827,7 +852,7 @@ class Suite:
             with self.terminal(["enter", target]) as terminal:
                 self.check_shell(terminal)
                 terminal.send("exit\n")
-                terminal.expect(f"Stop container {target}?")
+                terminal.expect('Container terminal finished: ' + target)
                 terminal.send("\n")
                 terminal.finish()
             assert self.state(target, "Running")
@@ -836,7 +861,7 @@ class Suite:
             with self.terminal(["enter", target]) as terminal:
                 self.check_shell(terminal)
                 terminal.send("exit\n")
-                terminal.expect(f"Stop container {target}?")
+                terminal.expect('Container terminal finished: ' + target)
                 terminal.send("\x1b[B\n")
                 terminal.finish()
             assert self.state(target, "Stopped")
@@ -867,7 +892,7 @@ class Suite:
             self.manager.lxd.command(["init", host_image(), "local:" + external])
             self.manager.lxd.command(["start", "local:" + external])
             self.wait("external running", lambda: self.state(external, "Running"))
-            for action in ("start", "stop", "delete", "info", "enter"):
+            for action in ("start", "stop", "restart", "delete", "info", "enter"):
                 self.cli(action, external, answer="y\n", code=1)
             self.cli("export", external, str(self.directory / "external.tar.gz"), code=1)
             self.cli("import", external, str(backup), code=1)
@@ -938,6 +963,12 @@ class Suite:
         self.cli('start',target)
         assert self.state(target,'Running')
         assert all(e['status'] == 'mounted' for e in self.manager.mountedfs(target))
+        self.cli('restart', target)
+        assert self.state(target, 'Running')
+        entries = self.manager.mountedfs(target)
+        assert {e['path'] for e in entries} == paths_before
+        assert all(e['status'] == 'mounted' for e in entries)
+        assert home.joinpath('mas-secret').read_text() == 'container secret'
         self.cli('unmountfs',target,'/var/log')
         self.cli('mountfs',target,code=1)
         self.cli('mountfs',target,'/home',code=1)
@@ -977,7 +1008,7 @@ class Suite:
             terminal.expect('Containers')
             names = [item['name'] for item in self.manager.list()]
             terminal.send(down * names.index(target) + '\n')
-            terminal.expect('Container: ' + target); terminal.send(down * 7 + '\n')
+            terminal.expect('Container: ' + target); terminal.send(down * 8 + '\n')
             terminal.expect('GPU: Enabled'); terminal.send('\n')
             terminal.expect('Choose GPU access'); terminal.send(down + '\n')
             self.menu_result(terminal, 'Hardware options: ' + target)
@@ -1208,7 +1239,7 @@ try {
             names=[item['name'] for item in self.manager.list()]
             terminal.send(down*names.index(target)+'\n')
             terminal.expect('Container: '+target)
-            terminal.send(down*6+'\n');terminal.expect(parent)
+            terminal.send(down*7+'\n');terminal.expect(parent)
             terminal.send(down+'\n')
             terminal.expect('Enter an absolute directory path inside the container (leave empty and press Enter to use the sandbox home directory):');terminal.send('/var/log\n')
             terminal.expect('Mounted at ')
@@ -1298,7 +1329,7 @@ try {
             terminal.send(down * 2 + "\n")
             self.wait("TUI stop", lambda: self.state(target, "Stopped"), terminal)
             result("Container: " + target)
-            send(down + "\n", "Enter the host destination path for the backup file:")
+            send(down * 2 + "\n", "Enter the host destination path for the backup file:")
             terminal.send(str(backup) + "\n")
             self.wait("TUI export", backup.exists, terminal)
             result("Container: " + target)
@@ -1337,19 +1368,31 @@ try {
                 assert forbidden not in terminal.buffer, repr(forbidden)
             assert b'"status": "Stopped"' in terminal.buffer
             assert b'[ok] start ' in terminal.buffer
-        for stop in (False, True, None):
+        for choice in ('exit', 'stop', 'restart', 'menu', 'escape'):
             with self.terminal([]) as terminal:
                 terminal.expect('my-ai-sandbox'); terminal.send('\n')
                 terminal.expect('Containers'); terminal.send('\n')
                 terminal.expect('Container: ' + imported); terminal.send(down * 2 + '\n')
                 self.check_shell(terminal)
-                terminal.send('exit\n'); terminal.expect(f'Stop container {imported}?')
+                boot = self.exec(imported, 'cat /proc/sys/kernel/random/boot_id')
+                terminal.send('exit\n'); terminal.expect('Container terminal finished: ' + imported)
                 after_question = terminal.cursor
-                terminal.send('\x1b' if stop is None else (down if stop else '') + '\n')
+                keys = {'exit': '\n', 'stop': down + '\n', 'restart': up * 2 + '\n',
+                        'menu': up + '\n', 'escape': '\x1b'}
+                terminal.send(keys[choice])
+                if choice == 'menu':
+                    terminal.expect('Container: ' + imported)
+                    terminal.send(back); terminal.expect('Containers')
+                    terminal.send(back); terminal.expect('my-ai-sandbox')
+                    terminal.send(up + '\n')
                 terminal.finish()
                 assert b'Operation result' not in terminal.buffer[after_question:]
-                assert ('Container: ' + imported).encode() not in terminal.buffer[after_question:]
-                assert self.state(imported, 'Stopped' if stop else 'Running')
+                if choice != 'menu':
+                    assert ('Container: ' + imported).encode() not in terminal.buffer[after_question:]
+                assert self.state(imported, 'Stopped' if choice == 'stop' else 'Running')
+                if choice != 'stop':
+                    current_boot = self.exec(imported, 'cat /proc/sys/kernel/random/boot_id')
+                    assert (current_boot != boot) == (choice == 'restart')
 
 
     def cleanup(self):

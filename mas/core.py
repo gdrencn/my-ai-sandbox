@@ -45,8 +45,10 @@ class Error(RuntimeError):
     """An actionable operation failure."""
 
 class ShellExitError(Error):
-    """Failure after the container shell returned: callers must leave menus."""
-    pass
+    """Post-terminal failure, with the explicitly chosen return destination."""
+    def __init__(self, message, *, return_to_menu=False):
+        super().__init__(message)
+        self.return_to_menu = return_to_menu
 
 
 
@@ -298,6 +300,11 @@ class Manager:
     def stop(self, target):
         return self._lifecycle(target, 'stop')
 
+    def restart(self, target, enter=False, ask=None):
+        """Compose complete foundations; a failed stop prevents the next call."""
+        self.stop(target)
+        return self.enter(target, ask) if enter else self.start(target)
+
     def _prepare_user(self, target):
         return self._run_lxd_until_state('prepare-user', target,
                                ['exec', 'local:' + target, '--', '/bin/sh', '-c', USER_SETUP], 'Running')
@@ -487,8 +494,21 @@ class Manager:
         return True
 
     def on_exit(self, target, ask=None):
-        if confirm(t("stop_confirm", target=target), ask):
+        message = t('shell_finished', target=target)
+        try:
+            choice = ask(message) if ask is not None else 'exit'
+        except EOFError:
+            choice = 'exit'
+        if choice is None:
+            choice = 'exit'
+        if choice not in ('stop', 'restart', 'menu', 'exit'):
+            # Preserve existing boolean/yes-no providers and CLI consent flags.
+            choice = 'stop' if confirm(message, lambda _: choice) else 'exit'
+        if choice == 'stop':
             self.stop(target)
+        elif choice == 'restart':
+            self.restart(target)
+        return 'menu' if choice == 'menu' else 'exit'
 
     def enter(self, target, ask=None):
         self.require(target)
@@ -496,11 +516,12 @@ class Manager:
         code = subprocess.call(self.lxd.prefix + ["exec", "local:" + target, "--", "su", "--login", "sandbox"])
         # Session completion is independent of the shell's exit-code success.
         try:
-            self.on_exit(target, ask)
+            choice = self.on_exit(target, ask)
         except (Error, OSError) as exc:
             detail = str(exc)
             if code:
                 detail = t('shell_exit', code=code) + '\n' + detail
             raise ShellExitError(detail) from exc
         if code:
-            raise ShellExitError(t('shell_exit', code=code))
+            raise ShellExitError(t('shell_exit', code=code), return_to_menu=choice == 'menu')
+        return choice

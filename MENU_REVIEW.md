@@ -20,3 +20,7 @@ These recommendations were requested alongside the 0.2.12 test/probe review and 
 ## Verification and retained behavior
 
 Both language catalogs and real PTYs were checked, including exact heading count, blank-line boundaries, return focus, zero/one/multiple container lists, ordinary and residual mount rows, narrow/short terminals, result-before-navigation order, default-No confirmation and shell exit to the host. Existing CLI/backend reuse and native failure handling are retained. Evidence: tests/test_menu_refinements.py and validation/V0_2_13_LOCAL_REPORT.json. Further structural changes remain subject to discussion.
+
+## Subsequent approved change — 0.2.14
+
+Section 43 supersedes the prior unconditional exit after an entered terminal. The selected-container page now includes Restart after Stop. Terminal completion offers Stop container, Restart container, Return to mas and Exit mas; default/dismissal is Exit mas. Return to mas preserves Enter focus from that menu and bypasses the result page. CLI terminal entry opens the selected-container page on the same choice. Shell codes remain diagnostics rather than selecting a destination. The ten earlier menu refinements remain implemented.

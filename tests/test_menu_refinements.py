@@ -69,7 +69,7 @@ class RefinementTests(unittest.TestCase):
             UI(view, manager).container('demo')
         first = view.choose.call_args_list[0]
         self.assertEqual([key for key, _ in first.args[1]],
-                         ['info', 'start', 'enter', 'stop', 'export', 'delete', 'filesystem', 'hardware', 'back'])
+                         ['info', 'start', 'enter', 'stop', 'restart', 'export', 'delete', 'filesystem', 'hardware', 'back'])
         self.assertEqual([key for key, _ in view.choose.call_args_list[1].args[1]],
                          ['mountedfs', 'mountfs', 'unmountfs', 'back'])
         self.assertEqual(view.choose.call_args_list[3].kwargs['default'], 'mountfs')
@@ -186,7 +186,7 @@ print('FIXTURE_RESULT='+json.dumps(dict(info=manager.info_calls, hardware=manage
                     send('\n', '"status": "Stopped"')
                     result(tr('menu_info_title', target='demo'))
                     send(down + '\n', tr('page_container', target='demo'))
-                    send(down * 7 + '\n', tr('page_hardware', target='demo'))
+                    send(down * 8 + '\n', tr('page_hardware', target='demo'))
                     send(back, tr('page_container', target='demo'))
                     send(up + '\n', tr('page_filesystem', target='demo'))
                     send(down + '\n', tr('fs_path_prompt'))

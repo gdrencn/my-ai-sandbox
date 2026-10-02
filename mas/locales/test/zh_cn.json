@@ -78,5 +78,6 @@
   "case_isolation-runtime": "运行时身份、namespace 与宿主资源挑战",
   "case_legacy-migration": "旧容器显式迁移与数据保留",
   "policy_test_accepted": "LXD 接受了应被拒绝的配置：{command}",
-  "legacy_cleanup_conflict": "旧容器 {target} 的测试归属已改变；保留容器，不清理。"
+  "legacy_cleanup_conflict": "旧容器 {target} 的测试归属已改变；保留容器，不清理。",
+  "case_restart": "标准重启、数据保留与重启后进入"
 }

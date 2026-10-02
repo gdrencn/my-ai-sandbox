@@ -297,6 +297,21 @@ def confirm(message):
     return interactive(lambda ui: ui.confirm(message))
 
 
+def post_terminal(message, view=None):
+    """Shared post-terminal decision; dismissal and noninteractive input exit."""
+    if view is None:
+        if not sys.stdin.isatty() or not sys.stdout.isatty():
+            return 'exit'
+        return interactive(lambda ui: post_terminal(message, ui))
+    try:
+        return view.choose(message, [
+            ('stop', t('shell_stop')), ('restart', t('shell_restart')),
+            ('menu', t('shell_menu')), ('exit', t('shell_leave'))],
+            default='exit', cancel='exit')
+    except Cancelled:
+        return 'exit'
+
+
 def language_options():
     return [('zh_cn', t('language_zh')), ('en_us', t('language_en'))]
 

@@ -15,10 +15,16 @@ class LeaveMenu(Exception):
         self.error = error
 
 
+class ReturnToMenu(Exception):
+    """Skip the ordinary operation-result page after a terminal decision."""
+    pass
+
+
 class UI:
     def __init__(self, view, manager):
         self.view = view
         self.manager = manager
+        self.terminal_failed = False
 
     def write(self, message, error=False):
         before_output()
@@ -81,14 +87,20 @@ class UI:
 
     def enter(self, target):
         try:
-            self.manager.enter(target, self.view.confirm)
+            choice = self.manager.enter(target, lambda message: menu.post_terminal(message, self.view))
         except ShellExitError as exc:
+            if exc.return_to_menu:
+                self.write(t('error', error=exc), error=True)
+                self.terminal_failed = True
+                raise ReturnToMenu() from exc
             raise LeaveMenu(exc) from exc
+        if choice == 'menu':
+            raise ReturnToMenu()
         raise LeaveMenu()
 
     def container(self, target):
         selected = 'info'
-        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'export', 'delete', 'filesystem', 'hardware', 'back')]
+        actions = [(key, 'menu_' + key) for key in ('info', 'start', 'enter', 'stop', 'restart', 'export', 'delete', 'filesystem', 'hardware', 'back')]
         while True:
             selected = self.choose(t('page_container', target=target), actions, selected)
             if selected == 'back':
@@ -110,7 +122,10 @@ class UI:
                     self.write(t('menu_done' if done else 'cancelled'))
                 else:
                     getattr(self.manager, selected)(target)
-            self.present(t('page_action', action=t('menu_' + selected), target=target), action)
+            try:
+                self.present(t('page_action', action=t('menu_' + selected), target=target), action)
+            except ReturnToMenu:
+                continue
             if deleted:
                 return
 
@@ -245,11 +260,19 @@ class UI:
             self.present(title, action, back=selected not in ('list', 'settings', 'migrate'))
 
 
-def run(manager):
+def run(manager, target=None):
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         raise Error(t('menu_terminal'))
+    ui = None
     try:
-        menu.interactive(lambda view: UI(view, manager).loop())
+        def application(view):
+            nonlocal ui
+            ui = UI(view, manager)
+            if target is not None:
+                ui.present(t('page_container', target=target), lambda: ui.container(target), back=False)
+            ui.loop()
+        menu.interactive(application)
     except LeaveMenu as done:
         if done.error:
             raise done.error
+    return 1 if ui is not None and ui.terminal_failed else 0

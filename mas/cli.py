@@ -6,7 +6,7 @@ import sys
 
 from . import __version__
 from . import config
-from .core import Error, LXD, Manager
+from .core import Error, LXD, Manager, ShellExitError
 from .isolation import PROJECT
 from .presentation import Progress, show_mounts, format_info
 
@@ -29,11 +29,11 @@ def parser():
         item.add_argument("key", choices=["language"], help=t('help_config_key'))
         if action == "set":
             item.add_argument("value", choices=config.LANGUAGES, help=t('help_language_value'))
-    for name in ("new", "list", "start", "stop", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs", "migrate"):
+    for name in ("new", "list", "start", "stop", "restart", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs", "migrate"):
         command = commands.add_parser(name, help=t('help_cmd_' + name), description=t('help_cmd_' + name), epilog=t('example_' + name))
         if name != "list":
             command.add_argument("target", metavar="TARGET", help=t('help_target'), **({"nargs": "?"} if name == "stop" else {}))
-        if name in ("delete", "export", "enter", "migrate"):
+        if name in ("delete", "export", "enter", "restart", "migrate"):
             consent = command.add_mutually_exclusive_group()
             consent.add_argument("--yes", dest="consent", action="store_const", const=True, help=t("help_yes"))
             consent.add_argument("--no", dest="consent", action="store_const", const=False, help=t("help_no"))
@@ -43,6 +43,8 @@ def parser():
             command.add_argument('--legacy', action='store_true', help=t('help_legacy_mounts'))
         if name == "stop":
             command.add_argument("--all", action="store_true", help=t('help_all'))
+        if name == 'restart':
+            command.add_argument('-e', '--enter', action='store_true', help=t('help_restart_enter'))
         if name == "new":
             command.add_argument("--image", help=t('help_image'))
         if name in ("import", "export"):
@@ -57,6 +59,8 @@ def main(argv=None, manager=None):
         arguments.error(t('cli_timeout'))
     if args.command == "stop" and bool(args.target) == args.all:
         arguments.error(t('cli_stop_args'))
+    if args.command == 'restart' and args.consent is not None and not args.enter:
+        arguments.error(t('cli_restart_consent'))
     progress = Progress()
     try:
         if args.command == "config":
@@ -75,7 +79,7 @@ def main(argv=None, manager=None):
             manager = manager.legacy
         if args.command is None:
             from .terminal_ui import run
-            run(manager)
+            return 1 if run(manager) == 1 else 0
         elif args.command == "hardware":
             result = manager.hardware(args.target, None if args.value is None else args.value == "on")
             print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -102,8 +106,22 @@ def main(argv=None, manager=None):
         elif args.command == "delete":
             if not manager.delete(args.target, ask):
                 print(t('cancelled'))
-        elif args.command == "enter":
-            manager.enter(args.target, ask)
+        elif args.command == 'enter' or args.command == 'restart' and args.enter:
+            from .menu import post_terminal
+            after = post_terminal if args.consent is None else lambda _: args.consent
+            status = 0
+            try:
+                choice = (manager.enter(args.target, after) if args.command == 'enter'
+                          else manager.restart(args.target, enter=True, ask=after))
+            except ShellExitError as exc:
+                if not exc.return_to_menu:
+                    raise
+                progress.output.keep(f'mas: {exc}')
+                status, choice = 1, 'menu'
+            if choice == 'menu':
+                from .terminal_ui import run
+                status = 1 if run(manager, target=args.target) == 1 else status
+            return status
         elif args.command == "stop" and args.all:
             manager.stop_all()
         else:
