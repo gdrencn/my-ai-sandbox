@@ -1,0 +1,33 @@
+{
+  "target": "test-ce2b063ff77b45ba969b81c1ae71d276",
+  "project": "mas",
+  "runs": [
+    {
+      "initial": "Stopped",
+      "final": "Stopped",
+      "counts": {
+        "PASS": 19,
+        "FAIL": 0
+      },
+      "report": "/tmp/mas-0.2.17-public-challenges/host-security-20261002-035022-ef06a0e8.json"
+    },
+    {
+      "initial": "Running",
+      "final": "Running",
+      "counts": {
+        "PASS": 18,
+        "FAIL": 0
+      },
+      "report": "/tmp/mas-0.2.17-public-challenges/host-security-20261002-035039-4fdc433f.json"
+    }
+  ],
+  "fallback_installed_path": true,
+  "guest": {
+    "counts": {
+      "PASS": 60,
+      "FAIL": 0
+    },
+    "report": "/tmp/mas-0.2.17-public-challenges/guest.json"
+  },
+  "cleanup": "passed"
+}

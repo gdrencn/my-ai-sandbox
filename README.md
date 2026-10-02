@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-本批 0.2.17 完成宿主挑战的容器名称输入、按需标准启动和原状态恢复。运行中容器保持运行；已停止容器测试后由标准 stop 恢复停止，失败或中断也收尾。冻结包通过 381 项单元测试和全部 27 个环节（731.6 秒），无跳过单元或清理错误；公开验证与测试发布待完成。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+本批 [0.2.17](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.17) 已发布。宿主挑战询问容器名称，按需调用标准启动并恢复原状态：运行中保持运行，已停止测试后由标准 stop 停止，失败或中断也收尾。本地冻结包和实际公开入口均通过 381 项单元测试和全部 27 个环节（731.6 / 736.9 秒），无跳过单元或清理错误；公开宿主挑战两种原状态及容器挑战、11 个附件和资源回收均已核验。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 
