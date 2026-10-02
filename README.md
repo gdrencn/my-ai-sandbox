@@ -2,11 +2,11 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 正在发布测试版：0.2.18
+## 最新测试版：0.2.18
 
 安全挑战已合并进自动化测试：宿主采集当次参照并传入容器，一次运行完整挑战，全部方法、观察和通过/失败结果在宿主显示。每个测试环节新增分类、简洁说明和分隔线；终端内成功勾为绿色，失败叉为红色，“预期错误”标签为橙黄色。重定向日志保留纯文本。两个独立挑战入口已从源码移除。
 
-v0.2.18 冻结测试包在项目外通过 375 项单元测试和全部 27 个真实 LXD 环节（737.4 秒），无跳过项或清理错误。本批次正在发布，实际公开下载核验尚未完成。产品功能保持不变，安装包、产品包和测试包使用同一版本号。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-37--integrated-security-challenge-and-classified-test-output-2026-10-02)。
+v0.2.18 冻结测试包在项目外通过 375 项单元测试和全部 27 个真实 LXD 环节（737.4 秒），无跳过项或清理错误。实际公开命令也已通过相同 375 项单元测试和全部 27 个环节（751.2 秒），11 个附件、安装文件和资源回收均已核验。产品功能保持不变，安装包、产品包和测试包使用同一版本号。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-37--integrated-security-challenge-and-classified-test-output-2026-10-02)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-已验证的 v0.2.18 正在发布；公开入口验证完成前，当前已发布测试版仍为 v0.2.17。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+当前已发布测试版为 [0.2.18](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.18)。完整安全挑战统一通过下方自动化测试命令执行，测试工具创建自己的临时容器，宿主采集参照后传入容器执行，并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 
