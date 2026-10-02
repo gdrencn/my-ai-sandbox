@@ -1,0 +1,32 @@
+{
+  "project": "test-4dd0b77e334a46a8966c0face9a75219",
+  "target": "test-caacda044c42415bb2c6a7dc5e354938",
+  "runs": [
+    {
+      "initial": "Stopped",
+      "final": "Stopped",
+      "counts": {
+        "PASS": 19,
+        "FAIL": 0
+      },
+      "report": "/tmp/mas-0.2.17-lifecycle/stopped.json"
+    },
+    {
+      "initial": "Running",
+      "final": "Running",
+      "counts": {
+        "PASS": 18,
+        "FAIL": 0
+      },
+      "report": "/tmp/mas-0.2.17-lifecycle/running.json"
+    },
+    {
+      "initial": "Stopped",
+      "final": "Stopped",
+      "interruption": "SIGTERM",
+      "exit_code": 130,
+      "report": "/tmp/mas-0.2.17-lifecycle/interrupted.json"
+    }
+  ],
+  "cleanup": "passed"
+}

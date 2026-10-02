@@ -22,7 +22,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-本批 [0.2.16](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.16) 已发布，为容器列表查询补上临时等待提示；完成、失败或中断后清除，原生诊断继续保留。本地冻结包和实际公开入口均通过 371 项单元测试、全部 27 个回归环节（734.6 / 725.9 秒），无跳过单元或清理错误；11 个附件、普通安装及资源回收均已核验。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+本批 0.2.17 完成宿主挑战的容器名称输入、按需标准启动和原状态恢复。运行中容器保持运行；已停止容器测试后由标准 stop 恢复停止，失败或中断也收尾。冻结包通过 381 项单元测试和全部 27 个环节（731.6 秒），无跳过单元或清理错误；公开验证与测试发布待完成。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -196,7 +196,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 容器内安全边界测试
 
-容器内可独立运行 [安全挑战脚本](GUEST_SECURITY_PROBE.md)，从 root 视角检查设备、内核控制、管理 socket 和 Windows/WSL 入口。需要宿主参照的 namespace、进程来源、宿主唯一标记和 binfmt_misc 检查由宿主侧入口完成。测试项只显示通过或失败；纯环境记录另列，不计入测试数量。
+容器内可独立运行 [安全挑战脚本](GUEST_SECURITY_PROBE.md)，从 root 视角检查设备、内核控制、管理 socket 和 Windows/WSL 入口。需要宿主参照的 namespace、进程来源、宿主唯一标记和 binfmt_misc 检查由宿主侧入口完成。 宿主入口询问运行中或已停止的 mas 容器名，按需标准启动，测试结束恢复原状态。测试项只显示通过或失败；纯环境记录另列，不计入测试数量。
 
 在容器终端内一键下载运行，逐项查看尝试方式和结果，并在当前目录保留 JSON 报告：
 

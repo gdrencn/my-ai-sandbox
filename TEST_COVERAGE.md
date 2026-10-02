@@ -1,8 +1,8 @@
 # Automated test coverage
 
-This maps the checks present in current batch 0.2.16 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
+This maps the checks present in current batch 0.2.17 to requirements and implementation. It is a behavioral coverage inventory, not a statement of 100% line/branch coverage. Final execution results are recorded in IMPLEMENTED.md and the versioned validation reports.
 
-Batch 0.2.16 adds scoped container-list query feedback coverage below; the independent guest/host coverage from 0.2.15 remains.
+Batch 0.2.17 adds host challenge target selection and initial-state restoration below; previous list feedback and independent guest/host assertions remain.
 
 ## Test layers
 
@@ -281,3 +281,10 @@ The final package contains 369 units and 27 native stages. The four challenge fi
 Two focused tests cover a pending real-PTY query in both languages with populated and empty lists, a native warning, query failure and interruption. The parent observes the wait message before releasing the fixture; rendered history retains results/diagnostics and removes transient feedback. The query runs once. Scoped output restores the enclosing menu boundary after normal/error paths; redirected output keeps diagnostics without transient text or escape sequences. Existing narrow-terminal and complete menu spacing checks passed.
 
 Frozen local execution passed 371 units and 27 native stages in 734.6 seconds, with no skips or cleanup errors. See validation/V0_2_16_LOCAL_REPORT.json. The actual public entry independently passed 371 units and 27 stages in 725.9 seconds, without skips or cleanup errors. Eleven artifacts, ordinary installation, source bytes, installed hashes, reproducible builds and independent cleanup checks passed; see validation/V0_2_16_PUBLIC_REPORT.json and validation/V0_2_16_RELEASE_CHECK.json.
+
+
+## Host challenge target selection and state restoration — 0.2.17
+
+Ten new regressions and expanded existing cases cover marked Running/Stopped targets, stopped-only lists, empty-list cancellation, controlling-terminal input/correction under redirected stdin, explicit local query scope, invalid names/unmarked targets/transitional states, failed and malformed queries, missing/invalid zipapp, original Running preservation, standard start/challenge/stop order, partially failed startup, primary/stop errors, replacement identity, failed final-state observation, main report semantics and real PTY Ctrl-C/SIGTERM restoration. The host module now has 28 tests; total packaged discovery is 381. Targeted owned real-container verification passed stopped restoration (19 checks), Running preservation (18 checks), SIGTERM restoration and resource reclamation. See validation/V0_2_17_LOCAL_LIFECYCLE.json.
+
+Final frozen archives ran outside the checkout and passed all 381 units and all 27 native stages in 731.6 seconds, with no skipped units or cleanup errors. See validation/V0_2_17_LOCAL_REPORT.json. Public-entry validation is pending. Standard lifecycle itself and security assertions remain unchanged; no new hardware/network/AppArmor policy was added.

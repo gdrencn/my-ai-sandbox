@@ -7,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
 import tempfile
@@ -53,16 +54,26 @@ class HostProbeTests(unittest.TestCase):
                 patch.object(probe,'read_text',return_value='wsl'):
             host.host_environment()
 
-    def test_only_running_local_containers_selected_and_query_failure_preserved(self):
-        command = Mock(return_value=json.dumps([{'name':'demo', 'type':'container', 'status':'Running'},
-                                                {'name':'vm', 'type':'virtual-machine', 'status':'Running'},
-                                                {'name':'stopped', 'type':'container', 'status':'Stopped'}]))
+    def test_managed_running_and_stopped_targets_and_query_failures(self):
+        marked = {'user.mas.managed':'true'}
+        command = Mock(return_value=json.dumps([
+            dict(name='demo', type='container', status='Running', config=marked),
+            dict(name='vm', type='virtual-machine', status='Running', config=marked),
+            dict(name='stopped', type='container', status='Stopped', config=marked),
+            dict(name='foreign', type='container', status='Running', config={}),
+            dict(name='busy', type='container', status='Starting', config=marked)]))
         self.assertEqual(host.choose_target(command, 'demo'), 'demo')
-        for target in ('vm', 'stopped', 'missing', 'remote:demo', 'bad/path', 'bad-'):
+        command.assert_called_once_with(['list', 'local:', '--format=json'])
+        self.assertEqual(host.choose_target(command, 'stopped'), 'stopped')
+        for target in ('vm', 'foreign', 'busy', 'missing', 'remote:demo', 'bad/path', 'bad-'):
             with self.subTest(target=target), self.assertRaises(ValueError):
                 host.choose_target(command, target)
         with self.assertRaises(json.JSONDecodeError):
             host.choose_target(Mock(return_value='invalid'), 'demo')
+        with self.assertRaisesRegex(RuntimeError, 'permission denied'):
+            host.choose_target(Mock(side_effect=RuntimeError('permission denied')), 'demo')
+        with self.assertRaisesRegex(ValueError, '格式'):
+            host.choose_target(Mock(return_value='[{"name":"demo"}]'), 'demo')
         with patch('builtins.open', side_effect=OSError()), contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'TARGET'):
             host.choose_target(command, None)
 
@@ -80,12 +91,15 @@ sys.path.insert(0, FIXTURE)
 import host_security_probe as host
 sys.stdin = open('/dev/null')
 target = host.choose_target(lambda args: json.dumps([
-    dict(name='demo',type='container',status='Running')]), None)
+    dict(name='demo',type='container',status='Stopped',config={'user.mas.managed':'true'})]), None)
 print('SELECTED:' + target)
 '''.replace('FIXTURE', repr(fixture.name))
         with tempfile.TemporaryDirectory() as directory:
             terminal = Terminal(python_command(source), 10, Path(directory)/'terminal.log')
             try:
+                terminal.expect('请输入要挑战的容器名：')
+                terminal.send('missing\n')
+                terminal.expect('当前 Project 中没有此 mas 管理的容器：missing')
                 terminal.expect('请输入要挑战的容器名：')
                 terminal.send('demo\n')
                 terminal.expect('SELECTED:demo')
@@ -93,6 +107,183 @@ print('SELECTED:' + target)
             finally:
                 terminal.close()
 
+    def test_empty_target_prompt_can_cancel_without_running_containers(self):
+        source = '''import sys
+sys.path.insert(0, FIXTURE)
+import host_security_probe as host
+try:
+    host.choose_target(lambda args: '[]', None)
+except ValueError as error:
+    print('CANCELLED:' + str(error))
+'''.replace('FIXTURE', repr(fixture.name))
+        with tempfile.TemporaryDirectory() as directory:
+            terminal = Terminal(python_command(source), 10, Path(directory)/'terminal.log')
+            try:
+                terminal.expect('请输入要挑战的容器名：')
+                terminal.send('\n')
+                terminal.expect('CANCELLED:已取消宿主侧挑战。')
+                terminal.finish()
+            finally:
+                terminal.close()
+
+    def manager_fixture(self, status):
+        instance = dict(status=status, config={'volatile.uuid':'original'})
+        manager = Mock()
+        manager.require.side_effect = lambda target: dict(instance, config=dict(instance['config']))
+        manager.start.side_effect = lambda target: instance.update(status='Running')
+        manager.stop.side_effect = lambda target: instance.update(status='Stopped')
+        return manager, instance
+
+    def test_running_target_preserved_without_lifecycle_calls(self):
+        manager, instance = self.manager_fixture('Running')
+        report = probe.ChallengeReport('fixture')
+        with patch.object(host, 'run_target') as challenge:
+            host.challenge_target(Mock(), 'demo', report, manager)
+        challenge.assert_called_once()
+        manager.start.assert_not_called(); manager.stop.assert_not_called()
+        self.assertEqual(report.data['lifecycle']['actions'], [])
+        self.assertEqual(report.data['lifecycle']['final_status'], 'Running')
+
+    def test_stopped_target_composes_standard_start_challenge_and_stop(self):
+        manager, instance = self.manager_fixture('Stopped')
+        report = probe.ChallengeReport('fixture')
+        order = []
+        def challenge(*args):
+            self.assertEqual(instance['status'], 'Running')
+            order.append('challenge')
+        manager.start.side_effect = lambda target: (order.append('start'), instance.update(status='Running'))
+        manager.stop.side_effect = lambda target: (order.append('stop'), instance.update(status='Stopped'))
+        with patch.object(host, 'run_target', side_effect=challenge), contextlib.redirect_stdout(io.StringIO()):
+            host.challenge_target(Mock(), 'demo', report, manager)
+        self.assertEqual(order, ['start', 'challenge', 'stop'])
+        self.assertEqual(report.data['lifecycle']['initial_status'], 'Stopped')
+        self.assertEqual(report.data['lifecycle']['final_status'], 'Stopped')
+        self.assertEqual(report.data['checks'][0]['check'], 'host-state-restore')
+        self.assertEqual(report.data['checks'][0]['status'], 'PASS')
+
+    def test_start_failure_and_interrupt_still_restore_stopped_state(self):
+        for error in (RuntimeError('preparation failed'), KeyboardInterrupt()):
+            manager, instance = self.manager_fixture('Stopped')
+            def fail(target):
+                instance.update(status='Running')
+                raise error
+            manager.start.side_effect = fail
+            report = probe.ChallengeReport('fixture')
+            with self.subTest(error=type(error).__name__), patch.object(host, 'run_target') as challenge, \
+                    contextlib.redirect_stdout(io.StringIO()), self.assertRaises(type(error)):
+                host.challenge_target(Mock(), 'demo', report, manager)
+            manager.stop.assert_called_once_with('demo')
+            challenge.assert_not_called()
+            self.assertEqual(instance['status'], 'Stopped')
+
+    def test_challenge_failure_or_interrupt_restores_and_retains_primary(self):
+        for error in (RuntimeError('challenge failed'), KeyboardInterrupt()):
+            manager, instance = self.manager_fixture('Stopped')
+            report = probe.ChallengeReport('fixture')
+            with self.subTest(error=type(error).__name__), patch.object(host, 'run_target', side_effect=error), \
+                    contextlib.redirect_stdout(io.StringIO()), self.assertRaises(type(error)):
+                host.challenge_target(Mock(), 'demo', report, manager)
+            manager.stop.assert_called_once_with('demo')
+            self.assertEqual(instance['status'], 'Stopped')
+
+    def test_restore_failure_cannot_hide_challenge_failure_or_report_success(self):
+        for primary in (None, RuntimeError('primary challenge failed')):
+            manager, instance = self.manager_fixture('Stopped')
+            manager.stop.side_effect = RuntimeError('native stop failed')
+            report = probe.ChallengeReport('fixture')
+            with patch.object(host, 'run_target', side_effect=primary), contextlib.redirect_stdout(io.StringIO()):
+                if primary:
+                    with self.assertRaisesRegex(RuntimeError, 'primary challenge failed'):
+                        host.challenge_target(Mock(), 'demo', report, manager)
+                else:
+                    host.challenge_target(Mock(), 'demo', report, manager)
+                with tempfile.TemporaryDirectory() as directory:
+                    self.assertEqual(report.finish(Path(directory)/'report.json'), 2)
+            self.assertEqual(report.data['lifecycle']['final_status'], 'Running')
+            self.assertIn('native stop failed', str(report.data['checks']))
+
+    def test_replacement_and_changed_running_state_are_reported_without_stop(self):
+        for initial, change in (('Stopped', {'config':{'volatile.uuid':'replacement'}}),
+                                ('Running', {'status':'Stopped'})):
+            manager, instance = self.manager_fixture(initial)
+            report = probe.ChallengeReport('fixture')
+            with patch.object(host, 'run_target', side_effect=lambda *args: instance.update(change)), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                host.challenge_target(Mock(), 'demo', report, manager)
+            manager.stop.assert_not_called()
+            self.assertEqual(report.data['checks'][0]['status'], 'FAIL')
+
+    def test_missing_or_invalid_installed_product_is_explicit(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(host.shutil,'which',return_value=None), \
+                patch.object(host.Path,'home',return_value=Path(directory)):
+            with self.assertRaisesRegex(ValueError, '安装 mas'):
+                host.installed_manager('mas')
+            product = Path(directory)/'.local/bin/mas'
+            product.parent.mkdir(parents=True); product.write_text('invalid')
+            with self.assertRaisesRegex(ValueError, '安装 mas'):
+                host.installed_manager('mas')
+            import zipfile
+            with zipfile.ZipFile(product, 'w') as archive:
+                archive.writestr('unrelated.txt', 'not a product')
+            with self.assertRaisesRegex(ValueError, '格式无效'):
+                host.installed_manager('mas')
+
+    def test_main_records_failure_and_restoration_before_finishing_report(self):
+        instances = [dict(name='demo',type='container',status='Stopped',config={'user.mas.managed':'true'})]
+        for failure, expected in ((None, 0), (RuntimeError('challenge failure'), 2), (KeyboardInterrupt(), 130)):
+            manager, instance = self.manager_fixture('Stopped')
+            with tempfile.TemporaryDirectory() as directory, patch.object(host, 'host_environment'), \
+                    patch.object(host, 'lxc_command', return_value=Mock(return_value=json.dumps(instances))), \
+                    patch.object(host, 'installed_manager', return_value=manager), \
+                    patch.object(host, 'run_target', side_effect=failure), \
+                    contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                path = Path(directory)/'report.json'
+                self.assertEqual(host.main(['demo','--report',str(path)]), expected)
+                data = json.loads(path.read_text())
+            self.assertEqual(data['lifecycle']['final_status'], 'Stopped')
+            self.assertEqual(data['exit_code'], expected)
+            manager.stop.assert_called_once_with('demo')
+
+    def test_real_interrupt_and_termination_restore_stopped_target(self):
+        source = '''import json, signal, sys
+sys.path.insert(0, FIXTURE)
+import host_security_probe as host
+class Manager:
+    status = 'Stopped'
+    def require(self, target):
+        return dict(status=self.status,config={'volatile.uuid':'fixture'})
+    def start(self, target):
+        self.status = 'Running'
+    def stop(self, target):
+        self.status = 'Stopped'
+        print('RESTORED', flush=True)
+host.host_environment = lambda: None
+host.lxc_command = lambda project: lambda args: json.dumps([
+    dict(name='demo',type='container',status='Stopped',config={'user.mas.managed':'true'})])
+host.installed_manager = lambda project: Manager()
+def challenge(*args):
+    print('READY', flush=True)
+    signal.pause()
+host.run_target = challenge
+code = host.main(['demo','--report',REPORT])
+print('RESULT:' + str(code), flush=True)
+'''.replace('FIXTURE', repr(fixture.name))
+        for termination in (False, True):
+            with tempfile.TemporaryDirectory() as directory:
+                path = Path(directory)/'report.json'
+                terminal = Terminal(python_command(source.replace('REPORT', repr(str(path)))), 10, Path(directory)/'terminal.log')
+                try:
+                    terminal.expect('READY')
+                    if termination:
+                        os.kill(terminal.pid, signal.SIGTERM)
+                    else:
+                        terminal.send('\x03')
+                    terminal.expect('RESTORED')
+                    terminal.expect('RESULT:130')
+                    terminal.finish()
+                    self.assertEqual(json.loads(path.read_text())['lifecycle']['final_status'], 'Stopped')
+                finally:
+                    terminal.close()
     def test_observations_outside_totals_and_incomplete_checks_fail(self):
         report = probe.ChallengeReport('fixture')
         with tempfile.TemporaryDirectory() as directory, contextlib.redirect_stdout(io.StringIO()):

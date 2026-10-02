@@ -8,11 +8,14 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
+import signal
 import stat
 import subprocess
 import sys
 import tempfile
 import uuid
+import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import guest_security_probe as probe
@@ -308,27 +311,108 @@ def lxc_command(project):
 
 
 def choose_target(command, target):
-    instances = json.loads(command(['list', '--format', 'json']))
-    if not isinstance(instances, list) or any(not isinstance(item, dict) or not isinstance(item.get('name'), str) for item in instances):
+    instances = json.loads(command(['list', 'local:', '--format=json']))
+    if not isinstance(instances, list) or any(not isinstance(item, dict)
+            or not isinstance(item.get('name'), str) or not isinstance(item.get('config'), dict)
+            or not isinstance(item.get('status'), str) for item in instances):
         raise ValueError('LXD 容器列表格式无效')
-    running = sorted(item['name'] for item in instances if item.get('type') == 'container' and item.get('status') == 'Running')
-    if target is None:
-        if not running:
-            raise ValueError('当前 Project 没有运行中的容器，请先启动需要测试的容器。')
-        print('运行中的容器：' + '、'.join(probe.terminal_text(name) for name in running))
-        try:
-            # Separate streams avoid BufferedRandom's seek requirement on a TTY.
-            # Read from the controlling terminal even when stdin is a curl pipe.
-            with open('/dev/tty', 'r') as terminal_in, open('/dev/tty', 'w') as terminal_out:
+    managed = sorted((item for item in instances if item.get('type') == 'container'
+                      and item['config'].get('user.mas.managed') == 'true'), key=lambda item: item['name'])
+    def validate(name):
+        if not re.fullmatch(r'[A-Za-z](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', name or ''):
+            raise ValueError('TARGET 必须是本地容器名。')
+        instance = next((item for item in managed if item['name'] == name), None)
+        if instance is None:
+            raise ValueError('当前 Project 中没有此 mas 管理的容器：' + name)
+        if instance['status'] not in ('Running', 'Stopped'):
+            raise ValueError('容器当前状态不允许挑战：' + name + '（' + instance['status'] + '）')
+        return name
+    if target is not None:
+        return validate(target)
+    print('mas 管理的容器：', flush=True)
+    for item in managed:
+        status = {'Running':'运行中', 'Stopped':'已停止'}.get(item['status'], item['status'])
+        print('  ' + probe.terminal_text(item['name']) + '  ' + probe.terminal_text(status), flush=True)
+    if not managed:
+        print('  当前 Project 中没有 mas 管理的容器。', flush=True)
+    try:
+        # Separate streams avoid BufferedRandom's seek requirement on a TTY.
+        # Read from the controlling terminal even when stdin is a curl pipe.
+        with open('/dev/tty', 'r') as terminal_in, open('/dev/tty', 'w') as terminal_out:
+            terminal_out.write('输入容器名，留空取消。\n')
+            while True:
                 terminal_out.write('请输入要挑战的容器名：'); terminal_out.flush()
-                target = terminal_in.readline().strip()
-        except OSError:
-            raise ValueError('非交互执行需要提供 TARGET；例如 security-host.sh demo。') from None
-    if not re.fullmatch(r'[A-Za-z](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?', target or ''):
-        raise ValueError('TARGET 必须是本地容器名。')
-    if target not in running:
-        raise ValueError('目标不是当前 Project 中运行的容器：' + target)
-    return target
+                name = terminal_in.readline().strip()
+                if not name:
+                    raise ValueError('已取消宿主侧挑战。')
+                try:
+                    return validate(name)
+                except ValueError as exc:
+                    terminal_out.write(probe.terminal_text(str(exc)) + '\n')
+    except OSError:
+        raise ValueError('非交互执行需要提供 TARGET；例如 security-host.sh demo。') from None
+
+
+def installed_manager(project):
+    """Reuse the installed product's complete lifecycle, including mounts."""
+    product = Path(shutil.which('mas') or Path.home() / '.local/bin/mas').resolve()
+    if not product.is_file() or not zipfile.is_zipfile(product):
+        raise ValueError('未找到已安装的 mas 产品，请先安装 mas。')
+    with zipfile.ZipFile(product) as archive:
+        if not {'mas/core.py', 'mas/isolation.py', 'mas/presentation.py', 'mas/__init__.py'} <= set(archive.namelist()):
+            raise ValueError('已安装的 mas 产品格式无效，请重新安装 mas。')
+    sys.path.insert(0, str(product))
+    try:
+        from mas.core import LXD, Manager
+        from mas.presentation import Progress
+        progress = Progress()
+        return Manager(LXD(project=project, diagnostic=progress.output.keep), report=progress)
+    finally:
+        sys.path.remove(str(product))
+
+
+def challenge_target(command, target, report, manager, timeout=3):
+    """Challenge a managed target and restore its original stable state."""
+    instance = manager.require(target)
+    initial = instance['status']
+    identity = instance.get('config', {}).get('volatile.uuid')
+    if initial not in ('Running', 'Stopped') or not isinstance(identity, str) or not identity:
+        raise ValueError('容器状态或身份不允许挑战。')
+    lifecycle = dict(initial_status=initial, identity=identity, actions=[], final_status=None)
+    report.data['lifecycle'] = lifecycle
+    try:
+        if initial == 'Stopped':
+            print('通过 mas 启动容器：' + probe.terminal_text(target), flush=True)
+            lifecycle['actions'].append('start')
+            manager.start(target)
+        run_target(command, target, report, timeout)
+    finally:
+        try:
+            current = manager.require(target)
+            lifecycle['final_status'] = current['status']
+            if current.get('config', {}).get('volatile.uuid') != identity:
+                raise ValueError('容器身份已变化，未操作替换后的容器。')
+            if initial == 'Stopped':
+                print('通过 mas 恢复停止状态：' + probe.terminal_text(target), flush=True)
+                lifecycle['actions'].append('stop')
+                manager.stop(target)
+                current = manager.require(target)
+                lifecycle['final_status'] = current['status']
+                if current.get('config', {}).get('volatile.uuid') != identity:
+                    raise ValueError('恢复后容器身份已变化。')
+            if current['status'] != initial:
+                raise ValueError('容器未恢复原状态：' + initial + ' → ' + current['status'])
+            if initial == 'Stopped':
+                report.emit(probe.result('host-state-restore', 'PASS', '通过标准 mas stop 恢复原停止状态', target=target))
+        except Exception as exc:
+            report.emit(probe.result('host-state-restore', 'ERROR', '容器原状态恢复或核验失败', native_error=str(exc)))
+        except KeyboardInterrupt:
+            report.emit(probe.result('host-state-restore', 'ERROR', '容器原状态恢复中断'))
+            raise
+
+
+def terminate_challenge(signum, frame):
+    raise KeyboardInterrupt
 
 
 def main(argv=None):
@@ -345,7 +429,7 @@ def main(argv=None):
             print(probe.terminal_text(str(exc)), file=sys.stderr)
             return 2
     parser = argparse.ArgumentParser(description='从 Linux/WSL 宿主挑战现有 LXD 容器的宿主资源边界；不修改容器配置。')
-    parser.add_argument('target', nargs='?', help='运行中的本地容器名；省略时从终端输入')
+    parser.add_argument('target', nargs='?', help='mas 管理的本地容器名；省略时从终端输入；按需启动并恢复原状态')
     parser.add_argument('--project', default='mas', help='LXD Project，默认 mas')
     parser.add_argument('--report', type=Path, help='宿主 JSON 报告路径，默认生成唯一文件')
     parser.add_argument('--timeout', type=float, default=3, help='单项挑战超时（1–10 秒，默认 3）')
@@ -360,23 +444,28 @@ def main(argv=None):
         print(probe.terminal_text(str(exc)), file=sys.stderr)
         return 2
     interrupted = False
+    previous_term = None
     try:
         if options._guest_reference:
             probe.environment_check()
             reference = validate_host_reference(json.loads(options._guest_reference.read_text()))
             guest_checks(reference, options.timeout, report.emit)
         else:
+            previous_term = signal.signal(signal.SIGTERM, terminate_challenge)
             host_environment()
             command = lxc_command(options.project)
             target = choose_target(command, options.target)
             report.data['target'] = target
             print('\n宿主侧容器安全挑战：' + probe.terminal_text(options.project + '/' + target) + '\n', flush=True)
-            run_target(command, target, report, options.timeout)
+            challenge_target(command, target, report, installed_manager(options.project), options.timeout)
     except KeyboardInterrupt:
         interrupted = True
         report.emit(probe.result('host-execution', 'ERROR', '挑战中断'))
     except Exception as exc:
         report.emit(probe.result('host-execution', 'ERROR', '挑战未完成', native_error=str(exc)))
+    finally:
+        if previous_term is not None:
+            signal.signal(signal.SIGTERM, previous_term)
     return report.finish(path, interrupted)
 
 

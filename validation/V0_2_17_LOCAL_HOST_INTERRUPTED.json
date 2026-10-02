@@ -1,0 +1,43 @@
+{
+  "schema": 2,
+  "purpose": "host-assisted-boundary-probe",
+  "checks": [
+    {
+      "check": "host-state-restore",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "PASS",
+      "message": "通过标准 mas stop 恢复原停止状态",
+      "evidence": {
+        "target": "test-caacda044c42415bb2c6a7dc5e354938"
+      }
+    },
+    {
+      "check": "host-execution",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "FAIL",
+      "message": "挑战中断",
+      "evidence": {},
+      "failure_kind": "execution"
+    }
+  ],
+  "observations": [],
+  "project": "test-4dd0b77e334a46a8966c0face9a75219",
+  "target": "test-caacda044c42415bb2c6a7dc5e354938",
+  "lifecycle": {
+    "initial_status": "Stopped",
+    "identity": "d3f785c0-14a7-45b5-a18d-230405c5850e",
+    "actions": [
+      "start",
+      "stop"
+    ],
+    "final_status": "Stopped"
+  },
+  "elapsed": 9.961140733998036,
+  "exit_code": 130,
+  "counts": {
+    "PASS": 1,
+    "FAIL": 1
+  },
+  "conclusion": "checks_failed",
+  "scope": "结论仅适用于列出的检查与当次观察；环境记录不计为测试。"
+}
