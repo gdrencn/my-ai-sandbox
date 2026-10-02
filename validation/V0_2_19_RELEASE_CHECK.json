@@ -1,0 +1,179 @@
+{
+  "version": "0.2.19",
+  "prerelease": true,
+  "latest_stable": "stable/0.1.15",
+  "assets": {
+    "bootstrap.py": {
+      "sha256": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+      "size": 5731,
+      "id": 606601467
+    },
+    "install-stable.sh": {
+      "sha256": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "size": 307,
+      "id": 606601482
+    },
+    "install-test.sh": {
+      "sha256": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "size": 305,
+      "id": 606601484
+    },
+    "install.sh": {
+      "sha256": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+      "size": 7722,
+      "id": 606601464
+    },
+    "mas-install.pyz": {
+      "sha256": "b53234866097bcef1bc956d2613fee612ae1b37341648aa24fbf9059c20f9128",
+      "size": 60188,
+      "id": 606601476
+    },
+    "mas-test.pyz": {
+      "sha256": "dbd8d78996d1c24ba88c2503723bae8542a5c49c671acdf592fbbb16c28bb609",
+      "size": 214892,
+      "id": 606601468
+    },
+    "mas.pyz": {
+      "sha256": "d3adad8d91070906e6809d72062df864406274636bdd51473963ee7a481349e0",
+      "size": 57637,
+      "id": 606601471
+    },
+    "security.sh": {
+      "sha256": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+      "size": 316,
+      "id": 606601491
+    },
+    "SHA256SUMS": {
+      "sha256": "53388f658cf4664b1d10a05d665daf86d9b1ed56997bc9f1cd1e0e47b1cd803d",
+      "size": 790,
+      "id": 606601496
+    },
+    "test-stable.sh": {
+      "sha256": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "size": 314,
+      "id": 606601486
+    },
+    "test.sh": {
+      "sha256": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "size": 312,
+      "id": 606601487
+    },
+    "WSL_REPORT.json": {
+      "sha256": "a5a909b574cf5e1819d8e1a90c1697ebc9dc3968050bdc7c142cc35b21e5487d",
+      "size": 590937,
+      "id": 606601498
+    }
+  },
+  "checksummed_generated_assets": 10,
+  "raw_entries": {
+    "bootstrap.py": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "stable/install.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "test/install.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "test/test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+    "test/test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "test/security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c"
+  },
+  "obsolete_entry_status": 404,
+  "earlier_releases_preserved": 34,
+  "installed_hashes": {
+    "mas": "d3adad8d91070906e6809d72062df864406274636bdd51473963ee7a481349e0",
+    "mas-test": "dbd8d78996d1c24ba88c2503723bae8542a5c49c671acdf592fbbb16c28bb609"
+  },
+  "public_standalone": {
+    "target": "test-fe93067e2ccf41b4a3e9559226dde2cb",
+    "report": "/tmp/mas-public-security-0.2.19-7xths6a5/security-20261002-171843-39d4e3ce.json",
+    "counts": {
+      "PASS": 75,
+      "FAIL": 0
+    },
+    "lifecycle": {
+      "initial_status": "Stopped",
+      "identity": "6e4dc79b-abfb-46a2-8189-f2b4968ed48b",
+      "actions": [
+        "start",
+        "stop"
+      ],
+      "final_status": "Stopped"
+    },
+    "installed_hashes_unchanged": {
+      "/home/gordon/.local/bin/mas": "d3adad8d91070906e6809d72062df864406274636bdd51473963ee7a481349e0",
+      "/home/gordon/.local/bin/mas-test": "dbd8d78996d1c24ba88c2503723bae8542a5c49c671acdf592fbbb16c28bb609"
+    },
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash",
+    "calls": [
+      {
+        "args": [
+          "new",
+          "test-fe93067e2ccf41b4a3e9559226dde2cb"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": "[成功] 配置 GPU test-fe93067e2ccf41b4a3e9559226dde2cb：已开启 — 已等待 1.1 秒\n[成功] 创建 test-fe93067e2ccf41b4a3e9559226dde2cb：已停止 — 已等待 4.7 秒\n"
+      },
+      {
+        "args": [
+          "info",
+          "test-fe93067e2ccf41b4a3e9559226dde2cb"
+        ],
+        "code": 0,
+        "stdout": "{\n  \"name\": \"test-fe93067e2ccf41b4a3e9559226dde2cb\",\n  \"description\": \"\",\n  \"status\": \"Stopped\",\n  \"status_code\": 102,\n  \"created_at\": \"2026-10-02T22:18:37.064170839Z\",\n  \"last_used_at\": \"2026-10-02T22:18:44.623513895Z\",\n  \"location\": \"none\",\n  \"type\": \"container\",\n  \"project\": \"mas\",\n  \"architecture\": \"x86_64\",\n  \"ephemeral\": false,\n  \"stateful\": false,\n  \"profiles\": [\n    \"mas\"\n  ],\n  \"config\": {\n    \"image.architecture\": \"amd64\",\n    \"image.description\": \"ubuntu 26.04 LTS (release)\",\n    \"image.label\": \"release\",\n    \"image.os\": \"ubuntu\",\n    \"image.release\": \"resolute\",\n    \"image.serial\": \"20260927\",\n    \"image.type\": \"squashfs\",\n    \"image.version\": \"26.04\",\n    \"user.mas.gpu\": \"{\\\"backend\\\": \\\"wsl-nvidia\\\", \\\"devices\\\": {\\\"mas-gpu-driver-0\\\": {\\\"path\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"type\\\": \\\"disk\\\"}, \\\"mas-gpu-dxg\\\": {\\\"mode\\\": \\\"0666\\\", \\\"path\\\": \\\"/dev/dxg\\\", \\\"source\\\": \\\"/dev/dxg\\\", \\\"type\\\": \\\"unix-char\\\"}, \\\"mas-gpu-lib\\\": {\\\"path\\\": \\\"/usr/lib/wsl/lib\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/lib\\\", \\\"type\\\": \\\"disk\\\"}}, \\\"driver_paths\\\": [\\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\"], \\\"enabled\\\": true, \\\"runtime_file\\\": \\\"/etc/ld.so.conf.d/mas-gpu.conf\\\", \\\"runtime_profile\\\": \\\"/etc/profile.d/mas-gpu.sh\\\", \\\"version\\\": 1}\",\n    \"user.mas.managed\": \"true\",\n    \"volatile.base_image\": \"3472ae3d6695211a1e81e3ab207d88e4b5562ccef5e0ac766f840c08c605822e\",\n    \"volatile.cloud-init.instance-id\": \"8ab7cfeb-daaf-4dc1-a898-345fe509d631\",\n    \"volatile.eth0.hwaddr\": \"00:16:3e:17:25:ab\",\n    \"volatile.idmap.base\": \"1131072\",\n    \"volatile.idmap.current\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.idmap.next\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.last_state.idmap\": \"[]\",\n    \"volatile.last_state.power\": \"STOPPED\",\n    \"volatile.last_state.ready\": \"false\",\n    \"volatile.uuid\": \"6e4dc79b-abfb-46a2-8189-f2b4968ed48b\",\n    \"volatile.uuid.generation\": \"6e4dc79b-abfb-46a2-8189-f2b4968ed48b\"\n  },\n  \"devices\": {\n    \"mas-gpu-driver-0\": {\n      \"path\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"type\": \"disk\"\n    },\n    \"mas-gpu-dxg\": {\n      \"mode\": \"0666\",\n      \"path\": \"/dev/dxg\",\n      \"source\": \"/dev/dxg\",\n      \"type\": \"unix-char\"\n    },\n    \"mas-gpu-lib\": {\n      \"path\": \"/usr/lib/wsl/lib\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/lib\",\n      \"type\": \"disk\"\n    }\n  },\n  \"expanded_config\": {\n    \"image.architecture\": \"amd64\",\n    \"image.description\": \"ubuntu 26.04 LTS (release)\",\n    \"image.label\": \"release\",\n    \"image.os\": \"ubuntu\",\n    \"image.release\": \"resolute\",\n    \"image.serial\": \"20260927\",\n    \"image.type\": \"squashfs\",\n    \"image.version\": \"26.04\",\n    \"security.devlxd.management.volumes\": \"false\",\n    \"security.idmap.isolated\": \"true\",\n    \"security.nesting\": \"false\",\n    \"security.privileged\": \"false\",\n    \"security.syscalls.deny_default\": \"true\",\n    \"user.mas.gpu\": \"{\\\"backend\\\": \\\"wsl-nvidia\\\", \\\"devices\\\": {\\\"mas-gpu-driver-0\\\": {\\\"path\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\", \\\"type\\\": \\\"disk\\\"}, \\\"mas-gpu-dxg\\\": {\\\"mode\\\": \\\"0666\\\", \\\"path\\\": \\\"/dev/dxg\\\", \\\"source\\\": \\\"/dev/dxg\\\", \\\"type\\\": \\\"unix-char\\\"}, \\\"mas-gpu-lib\\\": {\\\"path\\\": \\\"/usr/lib/wsl/lib\\\", \\\"readonly\\\": \\\"true\\\", \\\"source\\\": \\\"/usr/lib/wsl/lib\\\", \\\"type\\\": \\\"disk\\\"}}, \\\"driver_paths\\\": [\\\"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\\\"], \\\"enabled\\\": true, \\\"runtime_file\\\": \\\"/etc/ld.so.conf.d/mas-gpu.conf\\\", \\\"runtime_profile\\\": \\\"/etc/profile.d/mas-gpu.sh\\\", \\\"version\\\": 1}\",\n    \"user.mas.managed\": \"true\",\n    \"user.mas.profile\": \"1\",\n    \"volatile.base_image\": \"3472ae3d6695211a1e81e3ab207d88e4b5562ccef5e0ac766f840c08c605822e\",\n    \"volatile.cloud-init.instance-id\": \"8ab7cfeb-daaf-4dc1-a898-345fe509d631\",\n    \"volatile.eth0.hwaddr\": \"00:16:3e:17:25:ab\",\n    \"volatile.idmap.base\": \"1131072\",\n    \"volatile.idmap.current\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.idmap.next\": \"[{\\\"Isuid\\\":true,\\\"Isgid\\\":false,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536},{\\\"Isuid\\\":false,\\\"Isgid\\\":true,\\\"Hostid\\\":1131072,\\\"Nsid\\\":0,\\\"Maprange\\\":65536}]\",\n    \"volatile.last_state.idmap\": \"[]\",\n    \"volatile.last_state.power\": \"STOPPED\",\n    \"volatile.last_state.ready\": \"false\",\n    \"volatile.uuid\": \"6e4dc79b-abfb-46a2-8189-f2b4968ed48b\",\n    \"volatile.uuid.generation\": \"6e4dc79b-abfb-46a2-8189-f2b4968ed48b\"\n  },\n  \"expanded_devices\": {\n    \"eth0\": {\n      \"name\": \"eth0\",\n      \"network\": \"lxdbr0\",\n      \"type\": \"nic\"\n    },\n    \"mas-gpu-driver-0\": {\n      \"path\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\",\n      \"type\": \"disk\"\n    },\n    \"mas-gpu-dxg\": {\n      \"mode\": \"0666\",\n      \"path\": \"/dev/dxg\",\n      \"source\": \"/dev/dxg\",\n      \"type\": \"unix-char\"\n    },\n    \"mas-gpu-lib\": {\n      \"path\": \"/usr/lib/wsl/lib\",\n      \"readonly\": \"true\",\n      \"source\": \"/usr/lib/wsl/lib\",\n      \"type\": \"disk\"\n    },\n    \"root\": {\n      \"path\": \"/\",\n      \"pool\": \"default\",\n      \"type\": \"disk\"\n    }\n  },\n  \"backups\": null,\n  \"state\": {\n    \"status\": \"Stopped\",\n    \"status_code\": 102,\n    \"disk\": null,\n    \"memory\": {\n      \"usage\": 0,\n      \"usage_peak\": 0,\n      \"total\": 0,\n      \"swap_usage\": 0,\n      \"swap_usage_peak\": 0\n    },\n    \"network\": null,\n    \"pid\": 0,\n    \"processes\": 0,\n    \"cpu\": {\n      \"usage\": 0\n    }\n  },\n  \"snapshots\": null\n}\n",
+        "stderr": ""
+      },
+      {
+        "args": [
+          "stop",
+          "test-fe93067e2ccf41b4a3e9559226dde2cb"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": "[成功] 停止 test-fe93067e2ccf41b4a3e9559226dde2cb：已停止 — 已等待 0.0 秒\n"
+      },
+      {
+        "args": [
+          "delete",
+          "test-fe93067e2ccf41b4a3e9559226dde2cb",
+          "--yes"
+        ],
+        "code": 0,
+        "stdout": "",
+        "stderr": "[成功] 删除 test-fe93067e2ccf41b4a3e9559226dde2cb：不存在 — 已等待 1.3 秒\n"
+      }
+    ]
+  },
+  "publication_tag": "1556c1150dd2558bca46b5d0291ece683ae046fe",
+  "source_bytes_match_final_frozen": true,
+  "ordinary_installation": {
+    "product_hash_matches": true,
+    "tester_preserved": "dbd8d78996d1c24ba88c2503723bae8542a5c49c671acdf592fbbb16c28bb609",
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash"
+  },
+  "preferences_unchanged": {
+    "/home/gordon/.config/my-ai-sandbox/config.json": "82bc0dcc39d94b3bb5eaab2b5b2b0fa9bac3d45abeba33b3e6db8db6b999bc1d"
+  },
+  "independent_final_cleanup": {
+    "projects": [
+      "default",
+      "mas"
+    ],
+    "instances": {
+      "default": [],
+      "mas": []
+    },
+    "standalone_and_native_control_targets_removed": true
+  },
+  "public_suite": {
+    "units": 395,
+    "stages": 27,
+    "elapsed": 718.0645354529997,
+    "single_final_challenge": true,
+    "boundary_counts": {
+      "PASS": 75,
+      "FAIL": 0
+    },
+    "headers": 27,
+    "separators": 27,
+    "cleanup": "owned projects/instances/profiles/records/backups/canaries absent",
+    "terminal_colors": "green success and yellow foreground-only expected-error label verified in public PTY"
+  }
+}

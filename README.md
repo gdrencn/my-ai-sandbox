@@ -6,7 +6,7 @@
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-冻结包在项目外通过 395 项单元测试和全部 27 个测试环节（722.8 秒），最后的独立容器挑战通过 75 项检查；无跳过、未执行或清理错误。 实现和本地核验已完成，发布与公开命令核验待完成。 详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-38--ordered-tests-and-reusable-host-challenge-2026-10-02)。
+冻结包在项目外通过 395 项单元测试和全部 27 个测试环节（722.8 秒），最后的独立容器挑战通过 75 项检查；无跳过、未执行或清理错误。已发布 test v0.2.19，实际公开自动化命令也通过 395 项单元测试和全部 27 个环节（718.1 秒）。独立安全入口与 12 个附件已核验。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-38--ordered-tests-and-reusable-host-challenge-2026-10-02)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-0.2.19 待完成发布；当前公开安装仍解析 0.2.18。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+当前已发布测试版为 [0.2.19](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.19)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 
