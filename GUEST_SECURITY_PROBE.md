@@ -185,3 +185,8 @@ JSON schema 为 2。`checks` 中每项只有 PASS/FAIL（通过/失败），保�
 ## 0.2.21 发布验证
 
 公开 test.sh 在项目目录之外完成 419 项单元测试及全部 28 个环节，只在功能测试结束后运行一次独立完整挑战，76 项通过、0 项失败。独立公开 security.sh 在网络关闭、GPU 开启的临时容器上分别验证最初停止和最初运行，两次均为 76 项通过，原状态恢复，临时容器已删除。公开工具与冻结文件一致。验证环境为已准备好的 Ubuntu 26.04 WSL、LXD 6.9 和 NVIDIA GPU；检查数量随实际设备、挂载和 socket 清单变化。完整证据见 validation/V0_2_21_PUBLIC_REPORT.json、V0_2_21_PUBLIC_SECURITY_STOPPED.json、V0_2_21_PUBLIC_SECURITY_RUNNING.json。
+
+
+## 0.2.22 独立公开入口验证
+
+本批保留同一宿主挑战模块与既有断言。实际公开 security.sh 在网络关闭、GPU 开启的临时容器上验证最初 Stopped 的选择组件和最初 Running 的 CLI TARGET；两次均为 76 项通过、0 项失败，恢复原运行状态。临时容器按原 UUID 核验后删除。报告与清理证据见 validation/V0_2_22_PUBLIC_SECURITY_STOPPED.json、V0_2_22_PUBLIC_SECURITY_RUNNING.json、V0_2_22_PUBLIC_SECURITY_REVIEW.json 和 V0_2_22_PUBLIC_SECURITY_CLEANUP.json。本地冻结包与实际公开 test/test.sh 全套测试也各运行一次最终独立容器挑战，均为 76 项通过、0 项失败；两套完整测试均通过 428 项单元测试和全部 28 个环节，分别耗时 1448.8 秒和 1500.0 秒，无跳过项、未执行环节或清理错误。公开报告与独立清理证据见 validation/V0_2_22_PUBLIC_REPORT.json 和 V0_2_22_PUBLIC_REVIEW.json。本轮实测限于已准备好的 Ubuntu 26.04 WSL/LXD 6.9/NVIDIA x86_64 宿主。

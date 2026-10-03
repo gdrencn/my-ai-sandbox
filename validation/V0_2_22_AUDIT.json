@@ -1,6 +1,6 @@
 {
   "version": "0.2.22",
-  "status": "local_verification_complete_publication_pending",
+  "status": "published_and_verified",
   "cycles": [
     {
       "cycle": 1,
@@ -63,6 +63,19 @@
         "One final security challenge passed 76 checks",
         "Independent temporary Project, staging, legacy and mount cleanup passed"
       ]
+    },
+    {
+      "cycle": 5,
+      "findings": [],
+      "verification": [
+        "Published twelve assets match frozen bytes and GitHub SHA-256 digests",
+        "All 37 earlier release records/assets and stable/0.1.15 remain unchanged",
+        "Public ordinary installation preserves the tester",
+        "Public network-off independent security passes 76 checks from both Stopped and Running and restores original state",
+        "Exact public curl test/test.sh command passes 428 units and all 28 stages with one final 76-check challenge",
+        "Public run has no skipped or unexecuted stages or cleanup errors",
+        "Independent public resource reclamation, filesystem-helper absence and installed frozen hashes pass"
+      ]
     }
   ],
   "reviewed_code": [
@@ -103,5 +116,62 @@
       "FAIL": 0
     },
     "cleanup_independently_verified": true
+  },
+  "publication": {
+    "tag": "v0.2.22",
+    "assets": 12,
+    "earlier_releases_unchanged": 37,
+    "latest": "stable/0.1.15",
+    "public_entries_match": true,
+    "ordinary_install_preserves_tester": true,
+    "independent_security": [
+      {
+        "initial": "Stopped",
+        "final": "Stopped",
+        "network": "off",
+        "counts": {
+          "PASS": 76,
+          "FAIL": 0
+        }
+      },
+      {
+        "initial": "Running",
+        "final": "Running",
+        "network": "off",
+        "counts": {
+          "PASS": 76,
+          "FAIL": 0
+        }
+      }
+    ],
+    "security_fixture_reclaimed": true
+  },
+  "public_run": {
+    "units": 428,
+    "stages": 28,
+    "elapsed": 1500.0356795970001,
+    "boundary": {
+      "PASS": 76,
+      "FAIL": 0
+    },
+    "single_final_challenge": true,
+    "cleanup_independently_verified": true,
+    "no_matching_filesystem_helpers": true,
+    "installed_hashes_match": true,
+    "skipped": 0,
+    "unexecuted": 0,
+    "cleanup_errors": []
+  },
+  "final_review": {
+    "project_documents": 8,
+    "local_markdown_links_checked": 14,
+    "version_evidence_json_valid": true,
+    "source_and_frozen_artifacts_match": true,
+    "reproducible_build": true,
+    "python_310_grammar": true,
+    "bash_syntax": true,
+    "rendered_and_runtime_shellcheck": true,
+    "install_template_shellcheck_note": "Raw template SC2034 is excluded only for variables referenced by the inserted dependency payload; generated install scripts pass without exclusions.",
+    "diff_check": true
   }
 }
