@@ -18,7 +18,7 @@ NONE = {'available': False, 'backend': None, 'gpus': []}
 class GPUTests(unittest.TestCase):
     def setUp(self):
         self.item = {'name': 'test-unit', 'type': 'container', 'status': 'Stopped',
-                     'config': {MANAGED: 'true'}, 'devices': {'root': {'type': 'disk', 'path': '/', 'pool': 'default'}}}
+                     'config': {MANAGED: 'true','volatile.uuid':'owned-fixture'}, 'devices': {'root': {'type': 'disk', 'path': '/', 'pool': 'default'}}}
         self.manager = Mock()
         self.manager.lxd.timeout = 600
         self.manager.lxd.project = 'default'
@@ -177,6 +177,34 @@ class GPUTests(unittest.TestCase):
         self.assertEqual(args[0],'gpu-runtime')
         self.assertIn('ldconfig',args[2][-1])
         self.assertEqual(len(self.item['devices']),4)
+
+    def test_same_name_replacement_before_configuration_read_is_refused(self):
+        def replaced(target):
+            self.item['config']['volatile.uuid']='replacement'
+            return self.read_config(target)
+        self.manager.lxd.configuration.read.side_effect=replaced
+        with self.assertRaises(Error):self.gpu.set('test-unit',True)
+        self.assertEqual(self.edits,[])
+
+    def test_replacement_during_runtime_inspection_preserves_its_files(self):
+        self.gpu.set('test-unit',True); self.file=CONTENT; self.profile=PROFILE_CONTENT
+        self.edits.clear(); command=self.command
+        def replaced(args,**kwargs):
+            value=command(args,**kwargs)
+            if args[:2]==['file','pull']:self.item['config']['volatile.uuid']='replacement'
+            return value
+        self.manager.lxd.command.side_effect=replaced
+        with self.assertRaises(Error):self.gpu.set('test-unit',False)
+        self.assertEqual(self.file,CONTENT);self.assertEqual(self.profile,PROFILE_CONTENT)
+        self.assertEqual(self.edits,[])
+
+    def test_replacement_after_write_cannot_publish_success(self):
+        def replaced(target,value,etag,**kwargs):
+            self.write_config(target,value,etag,**kwargs)
+            self.item['config']['volatile.uuid']='replacement'
+        self.manager.lxd.configuration.write.side_effect=replaced
+        with self.assertRaises(Error):self.gpu.set('test-unit',True)
+        self.manager.emit.assert_not_called()
 
     def test_menu_switch_reuses_manager_and_network_remains_without_gpu(self):
         for available in (True,False):

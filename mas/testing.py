@@ -430,7 +430,7 @@ class Suite:
                         raise Error(t("wait_timeout", label=" ".join(args), timeout=self.timeout*3))
                     self.output.progress_lines([t("working", name=action + " " + " ".join(args[1:]), elapsed=elapsed),
                                                 *getattr(self, 'live_lines', [])])
-                    time.sleep(1)
+                    time.sleep(0.05)
         if process.returncode != code:
             raise AssertionError(t("cli_failed", args=args, expected=code, actual=process.returncode, stdout=out, stderr=err))
         return out

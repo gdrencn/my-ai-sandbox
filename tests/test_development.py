@@ -137,3 +137,37 @@ class DevelopmentTests(unittest.TestCase):
                 self.assertIn('Unpacking nodejs fixture',result.stdout)
                 self.assertIn('Setting up npm fixture',result.stdout)
                 if code:self.assertIn('Setting up npm fixture',result.stderr)
+
+    def test_delayed_log_creation_streams_without_normal_tail_diagnostics(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory); log=root/'cloud.log'
+            cloud=root/'cloud-init'
+            cloud.write_text('#!/bin/sh\nsleep 0.15\nprintf "Unpacking delayed fixture\\n" > '+str(log)+
+                             '\nsleep 0.15\nprintf "Setting up delayed fixture\\n" >> '+str(log)+'\nsleep 0.15\n')
+            cloud.chmod(0o755)
+            script='set -eu\n'+development.live_wait().replace('/var/log/cloud-init-output.log',str(log))
+            result=subprocess.run(['/bin/sh','-c',script],env={'PATH':str(root)+':/usr/bin:/bin'},
+                                  capture_output=True,text=True,timeout=3)
+            self.assertEqual(result.returncode,0)
+            self.assertIn('Unpacking delayed fixture',result.stdout)
+            self.assertIn('Setting up delayed fixture',result.stdout)
+            self.assertEqual(result.stderr,'')
+
+    def test_missing_log_does_not_delay_cloud_init_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory); cloud=root/'cloud-init'
+            cloud.write_text('#!/bin/sh\necho "cloud-init failed before log creation" >&2\nexit 7\n');cloud.chmod(0o755)
+            script='set -eu\n'+development.live_wait().replace('/var/log/cloud-init-output.log',str(root/'missing.log'))
+            result=subprocess.run(['/bin/sh','-c',script],env={'PATH':str(root)+':/usr/bin:/bin'},
+                                  capture_output=True,text=True,timeout=3)
+            self.assertEqual(result.returncode,7)
+            self.assertIn('cloud-init failed before log creation',result.stderr)
+
+    def test_real_follower_access_errors_remain_visible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory); cloud=root/'cloud-init'; log=root/'log-directory'; log.mkdir()
+            cloud.write_text('#!/bin/sh\nsleep 0.15\n');cloud.chmod(0o755)
+            script='set -eu\n'+development.live_wait().replace('/var/log/cloud-init-output.log',str(log))
+            result=subprocess.run(['/bin/sh','-c',script],env={'PATH':str(root)+':/usr/bin:/bin','LC_ALL':'C'},
+                                  capture_output=True,text=True,timeout=3)
+            self.assertIn('Is a directory',result.stderr)

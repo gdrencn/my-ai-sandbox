@@ -271,8 +271,15 @@ class Manager:
                 with tempfile.TemporaryFile(mode="w+t") as output, tempfile.TemporaryFile(mode="w+t") as errors:
                     process = subprocess.Popen((client or self.lxd).prefix + args, stdin=subprocess.DEVNULL,
                                                stdout=output, stderr=errors, text=True)
+                    next_query = start
+                    completed_seen = False
+                    sizes = None
                     while True:
-                        native_stdout, native_stderr = read_output(output), read_output(errors)
+                        current_sizes = (os.fstat(output.fileno()).st_size, os.fstat(errors.fileno()).st_size)
+                        changed = current_sizes != sizes
+                        if changed:
+                            native_stdout, native_stderr = read_output(output), read_output(errors)
+                            sizes = current_sizes
                         remaining = deadline - time.monotonic()
                         if remaining <= 0:
                             raise Error(t("operation_timeout", action=action, target=target, last=state(last)))
@@ -283,22 +290,28 @@ class Manager:
                         if code is not None and code != 0:
                             native_failure = True
                             raise Error(failure_text(native_stdout, native_stderr) or t("lxd_exit", code=code))
-                        instance = self.find(target, remaining)
-                        last = instance["status"] if instance else "Absent"
-                        if instance and last == "Error":
-                            raise Error(t("container_error", target=target))
-                        matches = last == expected
-                        if instance and require_marker:
-                            matches = matches and self.managed(instance)
+                        query = tick >= next_query or (code == 0 and not completed_seen)
+                        if query:
+                            instance = self.find(target, remaining)
+                            last = instance["status"] if instance else "Absent"
+                            if instance and last == "Error":
+                                raise Error(t("container_error", target=target))
+                            matches = last == expected
+                            if instance and require_marker:
+                                matches = matches and self.managed(instance)
+                            next_query = tick + 1
+                        completed_seen = code == 0
                         event = dict(action=action, target=target, status="waiting", scope="native",
                                      elapsed=round(time.monotonic() - start, 3), observation=last)
                         if live_output:
-                            event['live_lines'] = native_stdout.splitlines()[-3:]
-                        self.emit(event)
-                        if code == 0 and matches:
+                            event['live_lines'] = native_stdout.splitlines()[-1:]
+                        if query or (live_output and changed):
+                            self.emit(event)
+                        if code == 0 and query and matches:
                             outcome = "ok"
                             return instance
-                        time.sleep(max(0, min(1 - (time.monotonic() - tick), deadline - time.monotonic())))
+                        now = time.monotonic()
+                        time.sleep(max(0, min(0.05 if live_output else 1, next_query - now, deadline - now)))
             finally:
                 self.emit(dict(action=action, target=target, status=outcome, scope='native',
                                elapsed=round(time.monotonic() - start, 3), observation=last,

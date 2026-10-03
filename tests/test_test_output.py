@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -154,6 +155,31 @@ print('FINISHED')
                 visible = suite.output.stream.getvalue()
                 self.assertIn('unknown stderr retained',visible)
                 self.assertEqual('failed stop' in visible,failed)
+
+    def test_tester_forwards_live_events_promptly_in_one_transient_row(self):
+        with tempfile.TemporaryDirectory() as directory:
+            suite=Suite.__new__(Suite); suite.directory=Path(directory)
+            stream=io.StringIO(); stream.isatty=lambda: True
+            suite.output=Output(stream); suite.language='en_us'; suite.counter=0; suite.timeout=300
+            suite.events=[]; suite.cleanup_errors=[]
+            seen=[]; progress=suite.output.progress_lines
+            def observe(lines):
+                if len(lines)>1: seen.append((time.monotonic(),lines[-1]))
+                progress(lines)
+            suite.output.progress_lines=observe
+            def command(args):
+                suite.event_path=suite.directory/'events.jsonl'
+                source=("import json,time;f=open("+repr(str(suite.event_path))+",'a');"
+                        "f.write(json.dumps(dict(action='prepare-user',status='waiting',live_lines=['FIRST fixture']))+'\\n');f.flush();"
+                        "time.sleep(.15);f.write(json.dumps(dict(action='prepare-user',status='waiting',live_lines=['SECOND fixture']))+'\\n');f.flush();time.sleep(.3)")
+                return [sys.executable,'-c',source]
+            suite.command=command
+            suite.cli('new','fixture')
+            first=next(moment for moment,line in seen if line=='FIRST fixture')
+            second=next(moment for moment,line in seen if line=='SECOND fixture')
+            self.assertLess(second-first,.75)
+            self.assertNotIn('\n',stream.getvalue())
+            self.assertNotIn('\033[1A',stream.getvalue())
 
 
 if __name__ == '__main__':

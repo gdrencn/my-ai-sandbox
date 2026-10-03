@@ -232,6 +232,13 @@ class GPU:
             raise ValueError('enabled must be bool')
         with self.manager.filesystems.locked():
             instance = self.manager.require(target, stopped=True)
+            identity = instance['config'].get('volatile.uuid')
+            def same_instance(item=None):
+                item = self.manager.require(target, stopped=True) if item is None else item
+                if not isinstance(identity, str) or not identity or item['config'].get('volatile.uuid') != identity:
+                    raise Error(t('gpu_identity_changed', target=target))
+                return item
+            same_instance(instance)
             record = self.record(instance)
             self.check_owned(instance, record)
             capability = capability or ({'available': False, 'backend': record['backend']} if not enabled and record else self.detect())
@@ -251,9 +258,11 @@ class GPU:
                     for path, content in existing.items():
                         if content is None:
                             continue
+                        same_instance()
                         self.lxd.command(['file', 'delete', 'local:' + target + path])
                         deadline = time.monotonic() + self.lxd.timeout
                         while self._runtime_file(target, path) is not None:
+                            same_instance()
                             if time.monotonic() >= deadline:
                                 raise Error(t('gpu_wait_failed'))
                             time.sleep(1)
@@ -263,8 +272,9 @@ class GPU:
                        'devices': definition, 'runtime_file': CONF if enabled and backend == 'wsl-nvidia' else None,
                        'runtime_profile': PROFILE if enabled and backend == 'wsl-nvidia' else None}
             current, etag = self.lxd.configuration.read(target)
+            same_instance(current)
             # Recheck immediately before publication, including expanded profile devices.
-            instance = self.manager.require(target, stopped=True)
+            instance = same_instance()
             if self.record(instance) != record or self.record(current) != record:
                 raise Error(t('gpu_record_changed'))
             self.check_owned(instance, record)
@@ -285,7 +295,7 @@ class GPU:
                 on_wait=lambda elapsed: self.manager.emit(dict(action='gpu', target=target,
                     status='waiting', observation='not yet observed', elapsed=elapsed)))
             while True:
-                observed = self.manager.require(target, stopped=True)
+                observed = same_instance()
                 self.check_owned(observed, self.record(observed))
                 elapsed = time.monotonic() - start
                 matches = self.record(observed) == desired

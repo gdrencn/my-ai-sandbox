@@ -154,7 +154,8 @@ report=Progress()
 def event(status, **extra):
     return dict(action='prepare-user',target='fixture',status=status,scope='native',
                 observation='Running',elapsed=1,**extra)
-report(event('waiting',live_lines=['Unpacking nodejs fixture','Setting up npm fixture']))
+report(event('waiting',live_lines=['Unpacking nodejs fixture']))
+report(event('waiting',live_lines=['Setting up npm fixture']))
 report(event('waiting',live_lines=['Setting up npm fixture','Processing triggers fixture']))
 report(event('ok',live_output=True,native_stdout='Setting up npm fixture\\nWARNING: fixture diagnostic'))
 print('CREATION_COMPLETED', flush=True)
@@ -172,6 +173,21 @@ print('CREATION_COMPLETED', flush=True)
                 self.assertIn('CREATION_COMPLETED',history)
                 test_menu.MenuTests().assert_inline(raw)
             finally:terminal.close()
+
+    def test_live_output_uses_one_row_and_does_not_redraw_unchanged_lines(self):
+        stream = io.StringIO(); stream.isatty = lambda: True
+        report = Progress(stream)
+        with patch('mas.output.shutil.get_terminal_size', return_value=os.terminal_size((24, 5))):
+            report(event('waiting',live_lines=['older line','latest installation line']))
+            first = stream.getvalue()
+            report({**event('waiting',live_lines=['latest installation line']),'elapsed':3})
+            self.assertEqual(stream.getvalue(),first)
+            report(event('waiting',live_lines=['updated installation line']))
+        self.assertNotIn('\n',stream.getvalue())
+        self.assertNotIn('\033[1A',stream.getvalue())
+        self.assertNotIn('older line',stream.getvalue())
+        report.output.keep('DONE')
+        self.assertEqual(test_menu.MenuTests().render_history(stream.getvalue().encode()),'DONE\n')
 
     def test_width_uses_actual_output_terminal(self):
         stream = io.StringIO()

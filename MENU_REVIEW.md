@@ -24,3 +24,9 @@ Both language catalogs and real PTYs were checked, including exact heading count
 ## Subsequent approved change — 0.2.14
 
 Section 43 supersedes the prior unconditional exit after an entered terminal. The selected-container page now includes Restart after Stop. Terminal completion offers Stop container, Restart container, Return to mas and Exit mas; default/dismissal is Exit mas. Return to mas preserves Enter focus from that menu and bypasses the result page. CLI terminal entry opens the selected-container page on the same choice. Shell codes remain diagnostics rather than selecting a destination. The ten earlier menu refinements remain implemented.
+
+## Subsequent approved changes — 0.2.20–0.2.22
+
+The independent host security entry uses the same container selector as mas: names and states, arrow navigation, explicit cancellation and an empty-list message, with no interactive name input. Explicit command-line TARGET remains supported. The hardware page includes Network on/off even when GPU access is unavailable. Both entries retain shared lifecycle, result/return and selection behavior.
+
+The 0.2.22 preparation display uses one transient physical row containing the latest native output, with status as its fallback. Output is sampled independently of state checks and unchanged text is not redrawn. Normal output is cleared before summaries and diagnostics. This does not change menu navigation, confirmations or the agreed pending post-terminal restart-entry refinement. Verification details belong to TEST_COVERAGE.md and IMPLEMENTED.md.

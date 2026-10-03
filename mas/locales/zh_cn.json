@@ -214,6 +214,7 @@
   "gpu_runtime_conflict": "GPU 运行库配置文件内容冲突：{path}；未覆盖该文件。",
   "gpu_backend_changed": "GPU 接入方式发生变化；请先关闭原 GPU 配置。",
   "gpu_record_changed": "GPU 配置已被其他操作修改；请重新检查后重试。",
+  "gpu_identity_changed": "GPU 配置操作中无法核验原容器身份：{target}；请检查当前容器。",
   "gpu_wait_failed": "等待 GPU 配置生效超时，请检查实际配置。",
   "gpu_pending": "GPU 默认开启，尚未配置；下次从停止状态启动时应用。",
   "gpu_detect_timeout": "GPU 探测超过 600 秒，请检查宿主驱动状态。",

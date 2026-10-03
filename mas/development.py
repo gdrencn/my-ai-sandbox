@@ -38,13 +38,18 @@ def cloud_config():
 def live_wait():
     """Stream the first-boot log through the existing LXD exec connection."""
     return r'''
-tail -n +1 --follow=name --retry --sleep-interval=0.2 /var/log/cloud-init-output.log &
+(
+    while ! test -e /var/log/cloud-init-output.log; do sleep 0.05; done
+    exec tail -n +1 --follow=name --retry --sleep-interval=0.05 /var/log/cloud-init-output.log
+) &
 mas_log_pid=$!
 trap 'kill "$mas_log_pid" 2>/dev/null || true; wait "$mas_log_pid" 2>/dev/null || true' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 ''' + CLOUD_INIT_WAIT + r'''
 kill "$mas_log_pid" 2>/dev/null || true
 wait "$mas_log_pid" 2>/dev/null || true
-trap - EXIT
+trap - EXIT INT TERM
 '''
 
 

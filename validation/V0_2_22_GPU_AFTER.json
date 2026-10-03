@@ -1,0 +1,8 @@
+{
+  "archive": "/tmp/mas-v0.2.22-frozen/mas-test.pyz",
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "successful": true,
+  "details": "...\n----------------------------------------------------------------------\nRan 3 tests in 0.005s\n\nOK\n"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "case": "success",
+    "exit_code": 0,
+    "follower_reaped": true
+  },
+  {
+    "case": "failure",
+    "exit_code": 7,
+    "follower_reaped": true
+  },
+  {
+    "case": "term-with-log",
+    "exit_code": 143,
+    "follower_reaped": true
+  },
+  {
+    "case": "term-before-log",
+    "exit_code": 143,
+    "follower_reaped": true
+  }
+]

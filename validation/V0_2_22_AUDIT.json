@@ -1,0 +1,107 @@
+{
+  "version": "0.2.22",
+  "status": "local_verification_complete_publication_pending",
+  "cycles": [
+    {
+      "cycle": 1,
+      "findings": [
+        "Premature tail startup retained normal missing-file messages",
+        "Preparation progress displayed multiple physical rows",
+        "Product and tester sampled preparation output only once per second"
+      ],
+      "changes": [
+        "Wait for log creation under the existing preparation lifecycle",
+        "Render only the latest native line on one clipped transient row",
+        "Sample changed output every 50 ms independently of state queries and forward tester events promptly"
+      ],
+      "verification": [
+        "Focused 103-unit run passed",
+        "Native display: 418 subsecond updates, minimum 0.049366 seconds",
+        "Success/failure/SIGTERM follower reaping passed",
+        "Native absent-package failure preserved context and finished Stopped without completion"
+      ]
+    },
+    {
+      "cycle": 2,
+      "findings": [
+        "GPU mutation compared metadata without original UUID across file deletion and configuration completion"
+      ],
+      "changes": [
+        "Verify stopped original UUID before runtime-file removal, conditional configuration publication and final observation"
+      ],
+      "verification": [
+        "Three regressions failed against frozen v0.2.21",
+        "The same three regressions passed against frozen v0.2.22"
+      ]
+    },
+    {
+      "cycle": 3,
+      "findings": [
+        "Current core documentation still described create without start",
+        "Current requirements baseline was older than delivered APT/network behavior",
+        "Release notes omitted v0.2.18 through v0.2.21"
+      ],
+      "changes": [
+        "Correct current operation inventory and requirements baseline",
+        "Restore accurate historical release entries and label historical behavior",
+        "Document single-row output and UUID verification"
+      ],
+      "verification": [
+        "All eight project documents reviewed",
+        "Local Markdown targets exist",
+        "Catalog keys/placeholders match",
+        "Python 3.10 grammar and Bash syntax passed",
+        "ShellCheck with explicit Bash dialect passed",
+        "Build bytes reproduce frozen artifacts"
+      ]
+    },
+    {
+      "cycle": 4,
+      "findings": [],
+      "verification": [
+        "Full frozen suite passed 428 units and 28 stages",
+        "One final security challenge passed 76 checks",
+        "Independent temporary Project, staging, legacy and mount cleanup passed"
+      ]
+    }
+  ],
+  "reviewed_code": [
+    "Lifecycle and failure cleanup",
+    "ETag configuration updates",
+    "Fixed isolation and authorized GPU/network resources",
+    "Filesystem registry, helpers and native readiness",
+    "Installer dependencies, socket access and atomic file publication",
+    "Bootstrap release resolution and checksums",
+    "Shared menus, terminal input, progress and diagnostics",
+    "Unit discovery, integration sequencing and report completion",
+    "Host and guest security orchestration, assertions and original-state restoration",
+    "Archive contents and reproducible packaging"
+  ],
+  "documents": [
+    "README.md",
+    "REQUIREMENTS.md",
+    "IMPLEMENTED.md",
+    "CORE_BEHAVIOR.md",
+    "TEST_COVERAGE.md",
+    "GUEST_SECURITY_PROBE.md",
+    "MENU_REVIEW.md",
+    "RELEASE_NOTES.md"
+  ],
+  "pending_scope": [
+    "Native Ubuntu/cloud and ARM64 machine verification",
+    "Fresh host provisioning not repeated in this batch",
+    "Stable promotion and its stable-only branch remain separate user decisions",
+    "CPU/memory/process controls, traffic rules, disk quotas, devlxd/AppArmor changes and terminal restart-entry refinement remain pending"
+  ],
+  "optimization_policy": "Concrete defects and unnecessary redraw/read work corrected; no speculative feature or policy extension applied.",
+  "local_run": {
+    "units": 428,
+    "stages": 28,
+    "elapsed": 1448.7854122940043,
+    "boundary": {
+      "PASS": 76,
+      "FAIL": 0
+    },
+    "cleanup_independently_verified": true
+  }
+}

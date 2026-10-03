@@ -6,6 +6,8 @@ from pathlib import Path
 import subprocess
 import tarfile
 import tempfile
+import sys
+import time
 import unittest
 from unittest.mock import Mock, patch
 from mas.core import Error, LXD, MANAGED, Manager
@@ -54,6 +56,21 @@ class FailureTests(unittest.TestCase):
         self.assertEqual(elapsed, 2)
         self.assertEqual(manager.report.call_args.args[0]['status'], 'ok')
         process.kill.assert_not_called()
+
+    def test_live_output_arrives_between_state_queries_without_query_flooding(self):
+        manager=self.manager(); manager.lxd.prefix=[sys.executable]; manager.lxd.timeout=3
+        manager.find=Mock(return_value=instance('Running'))
+        seen=[]
+        manager.report=lambda event: seen.append((time.monotonic(),event.copy()))
+        source="import time;print('FIRST installation output',flush=True);time.sleep(.15);print('SECOND installation output',flush=True);time.sleep(.3)"
+        manager._run_lxd_until_state('prepare-user','test-fault',['-c',source],'Running',live_output=True)
+        first=next(moment for moment,event in seen if event.get('live_lines')==['FIRST installation output'])
+        second=next(moment for moment,event in seen if event.get('live_lines')==['SECOND installation output'])
+        self.assertLess(second-first,.75)
+        self.assertEqual(manager.find.call_count,2)  # Initial state and native completion.
+        self.assertIn('FIRST installation output',seen[-1][1]['native_stdout'])
+        self.assertIn('SECOND installation output',seen[-1][1]['native_stdout'])
+        self.assertEqual(seen[-1][1]['status'],'ok')
 
     def test_native_failure_wins_over_apparent_success(self):
         manager, process, elapsed = self.operation([instance('Running')], [7,7], error=Error)

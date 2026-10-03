@@ -2,11 +2,11 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 最新测试版：0.2.21
+## 最新测试版：0.2.22
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-新容器使用 Ubuntu APT 预装 Node.js/npm 和常用开发软件，初始化时实时刷新安装输出，完成后停止。硬件选项增加网络开关，关闭外部网卡后仍可通过宿主进入终端和挂载文件系统。0.2.21 的产品已通过全部 28 个真实 LXD 测试环节，完整挑战 76 项通过；最终冻结包的 419 项单元测试通过。公开一键测试命令也已完整通过，报告和文档已更新。详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+0.2.22 修正预装进度：等待日志生成后再跟随、只刷新一行、随新输出及时更新，完成后保留耗时和诊断。同时补齐 GPU 配置操作的容器 UUID 核验，并完成代码及八份项目文档复查。本地冻结包已通过 428 项单元测试、全部 28 个真实 LXD 环节和一次 76 项完整挑战，资源清理已独立核验；公开入口验证完成后补充记录。详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前已发布测试版为 [0.2.21](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.21)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+本批测试版为 [0.2.22](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.22)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -156,6 +156,8 @@ CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 
 0.2.21 起，完整的 25 个预装软件包均来自 Ubuntu APT，包括 `nodejs` 和 `npm`，提供 `node`、`npm`、`npx`。版本随所选 Ubuntu 镜像及其仓库确定，用户可按需自行安装 Node.js 官方 LTS 或版本管理器。已有容器的软件保持现状，升级 mas 不替换已有 Node.js 安装。Python 使用 Ubuntu 标准软件包；项目依赖可使用 `python3 -m venv .venv` 后安装。SSH 客户端提供 `ssh`、`scp`、`sftp`。
 
 准备成功后撤下本次 cloud-init 安装配置，软件和版本记录保存在容器 `/var/lib/mas/development.json`。后续 start、restart、enter、备份导入不会重复安装这些开发软件，也不会补回用户卸载的软件。新容器卸载 sudo 后，启动会提示缺少必需能力，由用户自行安装恢复；旧容器和未初始化的导入容器沿用原有用户准备行为。已有容器不会自动补装这份清单。
+
+0.2.22 的安装进度使用一行临时显示最新原生输出，随新日志及时更新；长行按终端宽度截断，正常输出在结束时清除。完成结果保留耗时，警告和错误保留原文。容器状态检查仍独立进行，不靠滚动输出判断安装完成；自动化测试保留完整原始日志。
 
 Codex、Ollama、herdr、模型文件和 LLM 框架由用户自行安装。GPU 接入保持原有功能，不加入 GPU 编译工具。
 
