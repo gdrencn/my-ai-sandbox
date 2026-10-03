@@ -1,0 +1,3112 @@
+{
+  "schema": 2,
+  "purpose": "complete-boundary-probe",
+  "checks": [
+    {
+      "check": "uid-map",
+      "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
+      "status": "PASS",
+      "message": "容器 root 不应映射到宿主 root",
+      "evidence": {
+        "mapping": "         0    1131072      65536\n"
+      }
+    },
+    {
+      "check": "gid-map",
+      "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
+      "status": "PASS",
+      "message": "容器 root 不应映射到宿主 root",
+      "evidence": {
+        "mapping": "         0    1131072      65536\n"
+      }
+    },
+    {
+      "check": "seccomp",
+      "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
+      "status": "PASS",
+      "message": "检查实际 seccomp 过滤状态",
+      "evidence": {
+        "mode": "2"
+      }
+    },
+    {
+      "check": "basic-interfaces",
+      "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
+      "status": "PASS",
+      "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
+      "evidence": {
+        "sys_present": true
+      }
+    },
+    {
+      "check": "device-inventory",
+      "method": "有界枚举 /dev 的设备类型及 major:minor；未知设备仅提示核对，不打开 watchdog/USB/PCI 设备",
+      "status": "PASS",
+      "message": "设备清单；非基础/GPU 设备需核对来源及授权，不据节点存在认定可操作宿主",
+      "evidence": {
+        "devices": [
+          {
+            "path": "/dev/console",
+            "kind": "char",
+            "major": 136,
+            "minor": 0,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/dxg",
+            "kind": "char",
+            "major": 10,
+            "minor": 258,
+            "basic": false,
+            "gpu": true
+          },
+          {
+            "path": "/dev/full",
+            "kind": "char",
+            "major": 1,
+            "minor": 7,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/fuse",
+            "kind": "char",
+            "major": 10,
+            "minor": 229,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/net/tun",
+            "kind": "char",
+            "major": 10,
+            "minor": 200,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/null",
+            "kind": "char",
+            "major": 1,
+            "minor": 3,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/ptmx",
+            "kind": "char",
+            "major": 5,
+            "minor": 2,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/pts/0",
+            "kind": "char",
+            "major": 136,
+            "minor": 0,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/pts/ptmx",
+            "kind": "char",
+            "major": 5,
+            "minor": 2,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/random",
+            "kind": "char",
+            "major": 1,
+            "minor": 8,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/tty",
+            "kind": "char",
+            "major": 5,
+            "minor": 0,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/urandom",
+            "kind": "char",
+            "major": 1,
+            "minor": 9,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/zero",
+            "kind": "char",
+            "major": 1,
+            "minor": 5,
+            "basic": true,
+            "gpu": false
+          }
+        ],
+        "unclassified": [],
+        "errors": [],
+        "inaccessible": [
+          {
+            "path": "/dev/.lxd-mounts",
+            "errno": 13,
+            "native_error": "[Errno 13] Permission denied: '/dev/.lxd-mounts'"
+          }
+        ],
+        "depth_limited": [],
+        "truncated": false
+      }
+    },
+    {
+      "check": "gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+      "method": "读取 mountinfo，核对 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd 的只读挂载选项",
+      "status": "PASS",
+      "message": "GPU 运行库映射应为只读",
+      "evidence": {
+        "mount": {
+          "root": "/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "path": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "options": [
+            "ro",
+            "noatime"
+          ],
+          "filesystem": "9p",
+          "source": "drivers",
+          "super_options": [
+            "ro",
+            "aname=drivers;fmask=222;dmask=222",
+            "cache=0x5",
+            "access=client",
+            "msize=65536",
+            "trans=fd",
+            "rfd=8",
+            "wfd=8"
+          ]
+        }
+      }
+    },
+    {
+      "check": "gpu-readonly:/usr/lib/wsl/lib",
+      "method": "读取 mountinfo，核对 /usr/lib/wsl/lib 的只读挂载选项",
+      "status": "PASS",
+      "message": "GPU 运行库映射应为只读",
+      "evidence": {
+        "mount": {
+          "root": "/",
+          "path": "/usr/lib/wsl/lib",
+          "options": [
+            "ro",
+            "noatime"
+          ],
+          "filesystem": "overlay",
+          "source": "none",
+          "super_options": [
+            "rw",
+            "lowerdir=/gpu_lib_packaged:/gpu_lib_inbox",
+            "upperdir=/gpu_lib/rw/upper",
+            "workdir=/gpu_lib/rw/work",
+            "uuid=on"
+          ]
+        }
+      }
+    },
+    {
+      "check": "mount-sources",
+      "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
+      "status": "PASS",
+      "message": "未发现典型 Windows/宿主 home 映射",
+      "evidence": {
+        "suspicious": []
+      }
+    },
+    {
+      "check": "management-socket:/run/containerd/containerd.sock",
+      "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/dbus/system_bus_socket",
+      "method": "检查 /run/dbus/system_bus_socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 154,
+        "inode": 223,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/docker.sock",
+      "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/libvirt/libvirt-sock",
+      "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/libvirt/virtqemud-sock",
+      "method": "检查 /run/libvirt/virtqemud-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/lxd-installer.socket",
+      "method": "检查 /run/lxd-installer.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 154,
+        "inode": 224,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/lxd.socket",
+      "method": "检查 /run/lxd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/lxd/unix.socket",
+      "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/podman/podman.sock",
+      "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/snapd-snap.socket",
+      "method": "检查 /run/snapd-snap.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 154,
+        "inode": 228,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/snapd.socket",
+      "method": "检查 /run/snapd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 154,
+        "inode": 227,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/systemd/private",
+      "method": "检查 /run/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 154,
+        "inode": 47,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/user/1001/bus",
+      "method": "检查 /run/user/1001/bus；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 171,
+        "inode": 22,
+        "host_reference_match": false,
+        "peer_pid": 389,
+        "peer_uid": 1001,
+        "peer_gid": 1001,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/user/1001/docker.sock",
+      "method": "检查 /run/user/1001/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/user/1001/podman/podman.sock",
+      "method": "检查 /run/user/1001/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/user/1001/snapd-session-agent.socket",
+      "method": "检查 /run/user/1001/snapd-session-agent.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 171,
+        "inode": 34,
+        "host_reference_match": false,
+        "peer_pid": 389,
+        "peer_uid": 1001,
+        "peer_gid": 1001,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/user/1001/systemd/private",
+      "method": "检查 /run/user/1001/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "服务进程属于当前容器 namespace；未发送管理请求",
+      "evidence": {
+        "device": 171,
+        "inode": 20,
+        "host_reference_match": false,
+        "peer_pid": 389,
+        "peer_uid": 1001,
+        "peer_gid": 1001,
+        "peer_namespaces": {
+          "pid": "pid:[4026532321]",
+          "mnt": "mnt:[4026532318]",
+          "user": "user:[4026532282]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/var/lib/lxd/unix.socket",
+      "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/var/run/docker.sock",
+      "method": "检查 /var/run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+      "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+      "status": "PASS",
+      "message": "管理 socket 路径不存在",
+      "evidence": {}
+    },
+    {
+      "check": "devlxd-api:/1.0",
+      "method": "对实例 devlxd 执行有界只读 GET /1.0；不创建、修改或删除资源",
+      "status": "PASS",
+      "message": "实例接口未开放卷管理能力",
+      "evidence": {
+        "http_status": 200,
+        "volume_management_advertised": false
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/config",
+      "method": "对实例 devlxd 执行有界只读 GET /1.0/config；不创建、修改或删除资源",
+      "status": "PASS",
+      "message": "只返回本实例允许的配置键名，不读取配置值",
+      "evidence": {
+        "http_status": 200,
+        "keys": [
+          "/1.0/config/user.mas.managed",
+          "/1.0/config/user.mas.network",
+          "/1.0/config/user.mas.gpu",
+          "/1.0/config/user.mas.profile"
+        ]
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/config/security.privileged",
+      "method": "对实例 devlxd 执行有界只读 GET /1.0/config/security.privileged；不创建、修改或删除资源",
+      "status": "PASS",
+      "message": "实例受限 API 的只读请求结果；404 不能证明权限已关闭",
+      "evidence": {
+        "http_status": 403
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/storage-pools/mas-probe-unowned/volumes/custom",
+      "method": "对实例 devlxd 执行有界只读 GET /1.0/storage-pools/mas-probe-unowned/volumes/custom；不创建、修改或删除资源",
+      "status": "PASS",
+      "message": "实例受限 API 的只读请求结果；404 不能证明权限已关闭",
+      "evidence": {
+        "http_status": 403
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export",
+      "method": "对实例 devlxd 执行有界只读 GET /1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export；不创建、修改或删除资源",
+      "status": "PASS",
+      "message": "实例受限 API 的只读请求结果；404 不能证明权限已关闭",
+      "evidence": {
+        "http_status": 403
+      }
+    },
+    {
+      "check": "windows-interop",
+      "method": "检查 Windows/WSL 路径、binfmt_misc 注册项和 WSL_INTEROP，不执行解释器或 Windows 命令",
+      "status": "PASS",
+      "message": "未发现典型 Windows/WSL 入口",
+      "evidence": {
+        "paths": [],
+        "registrations": [],
+        "truncated": false,
+        "wsl_interop_environment": null
+      }
+    },
+    {
+      "check": "gpu-expectation",
+      "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
+      "status": "PASS",
+      "message": "GPU 为获准资源例外；核对显式开关预期及设备类型",
+      "evidence": {
+        "expected": "on",
+        "devices": [
+          "/dev/dxg"
+        ],
+        "invalid_nodes": []
+      }
+    },
+    {
+      "check": "network-expectation",
+      "method": "核对网络开关预期、接口类型和 IPv4/IPv6 路由，不扫描网络或尝试登录",
+      "status": "PASS",
+      "message": "核对网络开关及 IPv4/IPv6 接口、路由；容器内部回环通信保留",
+      "evidence": {
+        "expected": "off",
+        "interfaces": [
+          "lo"
+        ],
+        "external_interfaces": [],
+        "routes": [
+          {
+            "family": "ipv6",
+            "interface": "lo"
+          },
+          {
+            "family": "ipv6",
+            "interface": "lo"
+          },
+          {
+            "family": "ipv6",
+            "interface": "lo"
+          }
+        ]
+      }
+    },
+    {
+      "check": "device:host-memory",
+      "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:kernel-memory",
+      "method": "在私有临时目录 mknod char 1:2，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:io-ports",
+      "method": "在私有临时目录 mknod char 1:4，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:kernel-log",
+      "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:kvm",
+      "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:host-disk",
+      "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:host-nvme",
+      "method": "在私有临时目录 mknod block 259:0，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:host-loop",
+      "method": "在私有临时目录 mknod block 7:0，再只读 open/close；不读取、写入或执行 ioctl",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "control:/proc/sysrq-trigger",
+      "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sysrq-trigger'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/modprobe",
+      "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/kexec_load_disabled",
+      "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/vm/drop_caches",
+      "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/core_pattern",
+      "method": "对 /proc/sys/kernel/core_pattern 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/core_pattern'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/hotplug",
+      "method": "对 /proc/sys/kernel/hotplug 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/hotplug'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/modules_disabled",
+      "method": "对 /proc/sys/kernel/modules_disabled 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modules_disabled'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/sysrq",
+      "method": "对 /proc/sys/kernel/sysrq 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/sysrq'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/panic",
+      "method": "对 /proc/sys/kernel/panic 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/panic_on_oops",
+      "method": "对 /proc/sys/kernel/panic_on_oops 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic_on_oops'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/unprivileged_bpf_disabled",
+      "method": "对 /proc/sys/kernel/unprivileged_bpf_disabled 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/unprivileged_bpf_disabled'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/perf_event_paranoid",
+      "method": "对 /proc/sys/kernel/perf_event_paranoid 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/perf_event_paranoid'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/yama/ptrace_scope",
+      "method": "对 /proc/sys/kernel/yama/ptrace_scope 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/yama/ptrace_scope'"
+      }
+    },
+    {
+      "check": "control:/sys/power/state",
+      "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/sys/power/state'"
+      }
+    },
+    {
+      "check": "control:/sys/power/disk",
+      "method": "对 /sys/power/disk 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/sys/power/disk'"
+      }
+    },
+    {
+      "check": "control:/sys/kernel/uevent_helper",
+      "method": "对 /sys/kernel/uevent_helper 尝试写模式 open/close，不写入任何字节",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/sys/kernel/uevent_helper'"
+      }
+    },
+    {
+      "check": "read-endpoint:/proc/kcore",
+      "method": "对 /proc/kcore 只读 open/close；不读取内存或日志内容",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/kcore'"
+      }
+    },
+    {
+      "check": "read-endpoint:/proc/kmsg",
+      "method": "对 /proc/kmsg 只读 open/close；不读取内存或日志内容",
+      "status": "PASS",
+      "message": "访问被权限或只读边界拒绝",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/kmsg'"
+      }
+    },
+    {
+      "check": "namespace:user",
+      "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "user:[4026532282]",
+        "host": "user:[4026531837]"
+      }
+    },
+    {
+      "check": "namespace:pid",
+      "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "pid:[4026532321]",
+        "host": "pid:[4026532216]"
+      }
+    },
+    {
+      "check": "namespace:mnt",
+      "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "mnt:[4026532318]",
+        "host": "mnt:[4026532214]"
+      }
+    },
+    {
+      "check": "namespace:net",
+      "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "net:[4026532324]",
+        "host": "net:[4026531833]"
+      }
+    },
+    {
+      "check": "namespace:ipc",
+      "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "ipc:[4026532320]",
+        "host": "ipc:[4026532202]"
+      }
+    },
+    {
+      "check": "namespace:uts",
+      "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
+      "status": "PASS",
+      "message": "比较容器与宿主 namespace",
+      "evidence": {
+        "guest": "uts:[4026532319]",
+        "host": "uts:[4026532215]"
+      }
+    },
+    {
+      "check": "process-roots",
+      "method": "有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境",
+      "status": "PASS",
+      "message": "已核对可见进程 namespace 与 root 路径，未发现宿主进程",
+      "evidence": {
+        "processes": [
+          {
+            "pid": 1,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 66,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 105,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532455]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 110,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532323]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 152,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532454]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 178,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532593]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 180,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 181,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 189,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 190,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532590]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 193,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 196,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532526]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 205,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 227,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 239,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 267,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 282,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532593]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 283,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532593]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 341,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532317]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 389,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 391,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 427,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 434,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 465,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 469,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          },
+          {
+            "pid": 508,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532282]",
+              "mnt": "mnt:[4026532318]",
+              "pid": "pid:[4026532321]"
+            }
+          }
+        ],
+        "host_matches": [],
+        "errors": [],
+        "truncated": false
+      }
+    },
+    {
+      "check": "binfmt:existing",
+      "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+      "status": "PASS",
+      "message": "当前 mount namespace 未暴露 binfmt_misc 挂载",
+      "evidence": {
+        "mounts": []
+      }
+    },
+    {
+      "check": "host-canary:0",
+      "method": "有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容",
+      "status": "PASS",
+      "message": "宿主标记不可读或不可见",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/1/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/self/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/66/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/105/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/110/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/152/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/178/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/180/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/181/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/189/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/190/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/193/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/196/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/205/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/227/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/239/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/267/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/282/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/283/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/341/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/389/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/391/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/427/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/434/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/465/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/469/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/508/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/524/root/tmp/mas-host-canary-zo0dj9o5/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          }
+        ],
+        "processes_truncated": false
+      }
+    },
+    {
+      "check": "binfmt:temporary-mount",
+      "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+      "status": "PASS",
+      "message": "临时挂载属于独立 user namespace，未暴露宿主实例",
+      "evidence": {
+        "device": 172,
+        "inode": 1,
+        "user_namespace": "user:[4026532458]",
+        "host_match": false
+      }
+    },
+    {
+      "check": "host-canary-integrity",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "PASS",
+      "message": "宿主唯一标记内容应保持不变",
+      "evidence": {}
+    },
+    {
+      "check": "binfmt:host-unchanged",
+      "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+      "status": "PASS",
+      "message": "宿主 binfmt_misc 注册规则应保持不变",
+      "evidence": {}
+    },
+    {
+      "check": "host-reference",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "PASS",
+      "message": "宿主启动身份应保持不变",
+      "evidence": {}
+    },
+    {
+      "check": "host-state-restore",
+      "method": "从宿主采集当次参照并核对挑战前后状态",
+      "status": "PASS",
+      "message": "已通过标准 mas 功能核验并恢复测试前的运行状态。",
+      "evidence": {
+        "initial_status": "Stopped",
+        "identity": "c91c9a96-7f22-4de0-97ce-ff60e847cf21",
+        "actions": [
+          "start",
+          "stop"
+        ],
+        "final_status": "Stopped"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "check": "capabilities",
+      "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
+      "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
+      "evidence": {
+        "effective": "000001ffffffffff",
+        "bounding": "000001ffffffffff"
+      }
+    },
+    {
+      "check": "apparmor",
+      "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
+      "message": "记录可选 AppArmor 的实际状态；不将未启用本身视为越界",
+      "evidence": {
+        "profile": "kernel\u0000",
+        "enabled": "N",
+        "errors": []
+      }
+    },
+    {
+      "check": "special-filesystems",
+      "method": "记录 debugfs/securityfs/pstore/efivarfs/bpffs 挂载与可见性，不修改其中内容",
+      "message": "记录内核接口挂载；可见不等于能读取或修改宿主",
+      "evidence": {
+        "mounts": [
+          {
+            "root": "/fs/pstore",
+            "path": "/sys/fs/pstore",
+            "options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "noatime"
+            ],
+            "filesystem": "sysfs",
+            "source": "sysfs",
+            "super_options": [
+              "rw"
+            ]
+          },
+          {
+            "root": "/",
+            "path": "/sys/kernel/debug",
+            "options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ],
+            "filesystem": "debugfs",
+            "source": "debugfs",
+            "super_options": [
+              "rw"
+            ]
+          },
+          {
+            "root": "/kernel/security",
+            "path": "/sys/kernel/security",
+            "options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "noatime"
+            ],
+            "filesystem": "sysfs",
+            "source": "sysfs",
+            "super_options": [
+              "rw"
+            ]
+          }
+        ],
+        "visible": [
+          "/sys/kernel/debug",
+          "/sys/kernel/security",
+          "/sys/fs/pstore",
+          "/sys/fs/bpf"
+        ]
+      }
+    },
+    {
+      "check": "socket-inventory",
+      "method": "读取 /proc/net/unix 与 /run/user 的管理 socket 路径，不连接抽象 socket 或扫描网络",
+      "message": "管理入口路径清单；逐项连接检查，不发送管理请求",
+      "evidence": {
+        "paths": [
+          "/var/snap/lxd/common/lxd/unix.socket",
+          "/var/lib/lxd/unix.socket",
+          "/run/lxd/unix.socket",
+          "/run/lxd.socket",
+          "/run/docker.sock",
+          "/var/run/docker.sock",
+          "/run/containerd/containerd.sock",
+          "/run/podman/podman.sock",
+          "/run/libvirt/libvirt-sock",
+          "/run/libvirt/virtqemud-sock",
+          "/run/dbus/system_bus_socket",
+          "/run/systemd/private",
+          "/run/snapd.socket",
+          "/run/snapd-snap.socket",
+          "/run/user/1001/systemd/private",
+          "/run/user/1001/bus",
+          "/run/user/1001/snapd-session-agent.socket",
+          "/run/lxd-installer.socket",
+          "/run/user/1001/docker.sock",
+          "/run/user/1001/podman/podman.sock"
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "check": "devlxd",
+      "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
+      "message": "基本实例接口与宿主管理接口不同，按当前兼容策略保留",
+      "evidence": {
+        "visible": true
+      }
+    },
+    {
+      "check": "network-policy",
+      "method": "说明网络测试范围，不进行网络扫描或登录",
+      "message": "已核对本地接口与路由；流量和登录策略另议，此脚本不扫描网络、不尝试登录",
+      "evidence": {}
+    }
+  ],
+  "project": "mas",
+  "target": "review-97bdaac97cc64c1fbf117cbf7f2b4f0e",
+  "source_sha256": "0f8de867cfcc2cb8edbdf3c706d2481c6d2e2918ebc96d498d2fce1aa791f516",
+  "host_source_sha256": "1e85ff3c79e4e0deb205540ecb4f7ce96e0bf775d8f38eac2adec01294727da5",
+  "lifecycle": {
+    "initial_status": "Stopped",
+    "identity": "c91c9a96-7f22-4de0-97ce-ff60e847cf21",
+    "actions": [
+      "start",
+      "stop"
+    ],
+    "final_status": "Stopped"
+  },
+  "gpu_expected": "on",
+  "network_expected": "off",
+  "reference": {
+    "schema": 1,
+    "boot_id": "92e65e4b-984b-4cfe-9321-ef21c2b5ecf7",
+    "namespaces": {
+      "user": "user:[4026531837]",
+      "pid": "pid:[4026532216]",
+      "mnt": "mnt:[4026532214]",
+      "net": "net:[4026531833]",
+      "ipc": "ipc:[4026532202]",
+      "uts": "uts:[4026532215]"
+    },
+    "canaries": [
+      {
+        "path": "/tmp/mas-host-canary-zo0dj9o5/marker",
+        "sha256": "e67088906c059fc9fab35e435aec1ca333b2813c9fff71c7005401f3ea9bdda5"
+      }
+    ],
+    "sockets": [
+      {
+        "path": "/var/snap/lxd/common/lxd/unix.socket",
+        "device": 2096,
+        "inode": 2305
+      },
+      {
+        "path": "/run/dbus/system_bus_socket",
+        "device": 62,
+        "inode": 885
+      },
+      {
+        "path": "/run/systemd/private",
+        "device": 62,
+        "inode": 67
+      },
+      {
+        "path": "/run/snapd.socket",
+        "device": 62,
+        "inode": 889
+      },
+      {
+        "path": "/run/snapd-snap.socket",
+        "device": 62,
+        "inode": 890
+      }
+    ],
+    "binfmt": [
+      {
+        "path": "/proc/sys/fs/binfmt_misc",
+        "device": 34,
+        "inode": 1,
+        "registrations": [
+          {
+            "name": "WSLInterop",
+            "sha256": "dc50348fcb8063ec34ddcbde6f21ab380027d63918299ba7253f802618d0c815",
+            "interpreter": "/init",
+            "flags": "PF"
+          },
+          {
+            "name": "python3.14",
+            "sha256": "56f6d188d45e1df44c1c83affeb389d2cb6f504a9535d5fc0b0604d2fa2d5b60",
+            "interpreter": "/usr/bin/python3.14",
+            "flags": ""
+          },
+          {
+            "name": "status",
+            "sha256": "e056a35db086947e2f5969d747f0a7517bff00c7ffff1f9e7b47b72bfac9d948",
+            "interpreter": "",
+            "flags": ""
+          }
+        ]
+      }
+    ]
+  },
+  "guest_stdout": "[通过] uid-map：容器 root 不应映射到宿主 root\n  方法：读取 /proc/self/uid_map，检查容器 root 对应的外层 UID\n  观察：{\"mapping\": \"         0    1131072      65536\\n\"}\n[通过] gid-map：容器 root 不应映射到宿主 root\n  方法：读取 /proc/self/gid_map，检查容器 root 对应的外层 GID\n  观察：{\"mapping\": \"         0    1131072      65536\\n\"}\n[通过] seccomp：检查实际 seccomp 过滤状态\n  方法：读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2\n  观察：{\"mode\": \"2\"}\n[记录] capabilities：能力位属于当前 namespace；不能单凭它判断拥有宿主权限\n  方法：读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位\n  观察：{\"effective\": \"000001ffffffffff\", \"bounding\": \"000001ffffffffff\"}\n[记录] apparmor：记录可选 AppArmor 的实际状态；不将未启用本身视为越界\n  方法：读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态\n  观察：{\"profile\": \"kernel\\u0000\", \"enabled\": \"N\", \"errors\": []}\n[通过] basic-interfaces：/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口\n  方法：读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys\n  观察：{\"sys_present\": true}\n[通过] device-inventory：设备清单；非基础/GPU 设备需核对来源及授权，不据节点存在认定可操作宿主\n  方法：有界枚举 /dev 的设备类型及 major:minor；未知设备仅提示核对，不打开 watchdog/USB/PCI 设备\n  观察：{\"devices\": [{\"path\": \"/dev/console\", \"kind\": \"char\", \"major\": 136, \"minor\": 0, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/dxg\", \"kind\": \"char\", \"major\": 10, \"minor\": 258, \"basic\": false, \"gpu\": true}, {\"path\": \"/dev/full\", \"kind\": \"char\", \"major\": 1, \"minor\": 7, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/fuse\", \"kind\": \"char\", \"major\": 10, \"minor\": 229, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/net/tun\", \"kind\": \"char\", \"major\": 10, \"minor\": 200, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/null\", \"kind\": \"char\", \"major\": 1, \"minor\": 3, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/ptmx\", \"kind\": \"char\", \"major\": 5, \"minor\": 2, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/pts/0\", \"kind\": \"char\", \"major\": 136, \"minor\": 0, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/pts/ptmx\", \"kind\": \"char\", \"major\": 5, \"minor\": 2, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/random\", \"kind\": \"char\", \"major\": 1, \"minor\": 8, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/tty\", \"kind\": \"char\", \"major\": 5, \"minor\": 0, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/urandom\", \"kind\": \"char\", \"major\": 1, \"minor\": 9, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/zero\", \"kind\": \"char\", \"major\": 1, \"minor\": 5, \"basic\": true, \"gpu\": false}], \"unclassified\": [], \"errors\": [], \"inaccessible\": [{\"path\": \"/dev/.lxd-mounts\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/dev/.lxd-mounts'\"}], \"depth_limited\": [], \"truncated\": false}\n[通过] gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd：GPU 运行库映射应为只读\n  方法：读取 mountinfo，核对 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd 的只读挂载选项\n  观察：{\"mount\": {\"root\": \"/nvrzi.inf_amd64_6a54f45845aaf4cd\", \"path\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\", \"options\": [\"ro\", \"noatime\"], \"filesystem\": \"9p\", \"source\": \"drivers\", \"super_options\": [\"ro\", \"aname=drivers;fmask=222;dmask=222\", \"cache=0x5\", \"access=client\", \"msize=65536\", \"trans=fd\", \"rfd=8\", \"wfd=8\"]}}\n[通过] gpu-readonly:/usr/lib/wsl/lib：GPU 运行库映射应为只读\n  方法：读取 mountinfo，核对 /usr/lib/wsl/lib 的只读挂载选项\n  观察：{\"mount\": {\"root\": \"/\", \"path\": \"/usr/lib/wsl/lib\", \"options\": [\"ro\", \"noatime\"], \"filesystem\": \"overlay\", \"source\": \"none\", \"super_options\": [\"rw\", \"lowerdir=/gpu_lib_packaged:/gpu_lib_inbox\", \"upperdir=/gpu_lib/rw/upper\", \"workdir=/gpu_lib/rw/work\", \"uuid=on\"]}}\n[通过] mount-sources：未发现典型 Windows/宿主 home 映射\n  方法：检查 mountinfo 的文件系统类型、挂载根和挂载点\n  观察：{\"suspicious\": []}\n[记录] special-filesystems：记录内核接口挂载；可见不等于能读取或修改宿主\n  方法：记录 debugfs/securityfs/pstore/efivarfs/bpffs 挂载与可见性，不修改其中内容\n  观察：{\"mounts\": [{\"root\": \"/fs/pstore\", \"path\": \"/sys/fs/pstore\", \"options\": [\"rw\", \"nosuid\", \"nodev\", \"noexec\", \"noatime\"], \"filesystem\": \"sysfs\", \"source\": \"sysfs\", \"super_options\": [\"rw\"]}, {\"root\": \"/\", \"path\": \"/sys/kernel/debug\", \"options\": [\"rw\", \"nosuid\", \"nodev\", \"noexec\", \"relatime\"], \"filesystem\": \"debugfs\", \"source\": \"debugfs\", \"super_options\": [\"rw\"]}, {\"root\": \"/kernel/security\", \"path\": \"/sys/kernel/security\", \"options\": [\"rw\", \"nosuid\", \"nodev\", \"noexec\", \"noatime\"], \"filesystem\": \"sysfs\", \"source\": \"sysfs\", \"super_options\": [\"rw\"]}], \"visible\": [\"/sys/kernel/debug\", \"/sys/kernel/security\", \"/sys/fs/pstore\", \"/sys/fs/bpf\"]}\n[记录] socket-inventory：管理入口路径清单；逐项连接检查，不发送管理请求\n  方法：读取 /proc/net/unix 与 /run/user 的管理 socket 路径，不连接抽象 socket 或扫描网络\n  观察：{\"paths\": [\"/var/snap/lxd/common/lxd/unix.socket\", \"/var/lib/lxd/unix.socket\", \"/run/lxd/unix.socket\", \"/run/lxd.socket\", \"/run/docker.sock\", \"/var/run/docker.sock\", \"/run/containerd/containerd.sock\", \"/run/podman/podman.sock\", \"/run/libvirt/libvirt-sock\", \"/run/libvirt/virtqemud-sock\", \"/run/dbus/system_bus_socket\", \"/run/systemd/private\", \"/run/snapd.socket\", \"/run/snapd-snap.socket\", \"/run/user/1001/systemd/private\", \"/run/user/1001/bus\", \"/run/user/1001/snapd-session-agent.socket\", \"/run/lxd-installer.socket\", \"/run/user/1001/docker.sock\", \"/run/user/1001/podman/podman.sock\"], \"truncated\": false}\n[通过] management-socket:/run/containerd/containerd.sock：管理 socket 路径不存在\n  方法：检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/dbus/system_bus_socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/dbus/system_bus_socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 154, \"inode\": 223, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/docker.sock：管理 socket 路径不存在\n  方法：检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/libvirt/libvirt-sock：管理 socket 路径不存在\n  方法：检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/libvirt/virtqemud-sock：管理 socket 路径不存在\n  方法：检查 /run/libvirt/virtqemud-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/lxd-installer.socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/lxd-installer.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 154, \"inode\": 224, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/lxd.socket：管理 socket 路径不存在\n  方法：检查 /run/lxd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/lxd/unix.socket：管理 socket 路径不存在\n  方法：检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/podman/podman.sock：管理 socket 路径不存在\n  方法：检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/snapd-snap.socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/snapd-snap.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 154, \"inode\": 228, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/snapd.socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/snapd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 154, \"inode\": 227, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/systemd/private：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 154, \"inode\": 47, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/user/1001/bus：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/user/1001/bus；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 171, \"inode\": 22, \"host_reference_match\": false, \"peer_pid\": 389, \"peer_uid\": 1001, \"peer_gid\": 1001, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/user/1001/docker.sock：管理 socket 路径不存在\n  方法：检查 /run/user/1001/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/user/1001/podman/podman.sock：管理 socket 路径不存在\n  方法：检查 /run/user/1001/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/run/user/1001/snapd-session-agent.socket：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/user/1001/snapd-session-agent.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 171, \"inode\": 34, \"host_reference_match\": false, \"peer_pid\": 389, \"peer_uid\": 1001, \"peer_gid\": 1001, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/run/user/1001/systemd/private：服务进程属于当前容器 namespace；未发送管理请求\n  方法：检查 /run/user/1001/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n  观察：{\"device\": 171, \"inode\": 20, \"host_reference_match\": false, \"peer_pid\": 389, \"peer_uid\": 1001, \"peer_gid\": 1001, \"peer_namespaces\": {\"pid\": \"pid:[4026532321]\", \"mnt\": \"mnt:[4026532318]\", \"user\": \"user:[4026532282]\"}}\n[通过] management-socket:/var/lib/lxd/unix.socket：管理 socket 路径不存在\n  方法：检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/var/run/docker.sock：管理 socket 路径不存在\n  方法：检查 /var/run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[通过] management-socket:/var/snap/lxd/common/lxd/unix.socket：管理 socket 路径不存在\n  方法：检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求\n[记录] devlxd：基本实例接口与宿主管理接口不同，按当前兼容策略保留\n  方法：检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口\n  观察：{\"visible\": true}\n[通过] devlxd-api:/1.0：实例接口未开放卷管理能力\n  方法：对实例 devlxd 执行有界只读 GET /1.0；不创建、修改或删除资源\n  观察：{\"http_status\": 200, \"volume_management_advertised\": false}\n[通过] devlxd-api:/1.0/config：只返回本实例允许的配置键名，不读取配置值\n  方法：对实例 devlxd 执行有界只读 GET /1.0/config；不创建、修改或删除资源\n  观察：{\"http_status\": 200, \"keys\": [\"/1.0/config/user.mas.managed\", \"/1.0/config/user.mas.network\", \"/1.0/config/user.mas.gpu\", \"/1.0/config/user.mas.profile\"]}\n[通过] devlxd-api:/1.0/config/security.privileged：实例受限 API 的只读请求结果；404 不能证明权限已关闭\n  方法：对实例 devlxd 执行有界只读 GET /1.0/config/security.privileged；不创建、修改或删除资源\n  观察：{\"http_status\": 403}\n[通过] devlxd-api:/1.0/storage-pools/mas-probe-unowned/volumes/custom：实例受限 API 的只读请求结果；404 不能证明权限已关闭\n  方法：对实例 devlxd 执行有界只读 GET /1.0/storage-pools/mas-probe-unowned/volumes/custom；不创建、修改或删除资源\n  观察：{\"http_status\": 403}\n[通过] devlxd-api:/1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export：实例受限 API 的只读请求结果；404 不能证明权限已关闭\n  方法：对实例 devlxd 执行有界只读 GET /1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export；不创建、修改或删除资源\n  观察：{\"http_status\": 403}\n[通过] windows-interop：未发现典型 Windows/WSL 入口\n  方法：检查 Windows/WSL 路径、binfmt_misc 注册项和 WSL_INTEROP，不执行解释器或 Windows 命令\n  观察：{\"paths\": [], \"registrations\": [], \"truncated\": false, \"wsl_interop_environment\": null}\n[通过] gpu-expectation：GPU 为获准资源例外；核对显式开关预期及设备类型\n  方法：列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期\n  观察：{\"expected\": \"on\", \"devices\": [\"/dev/dxg\"], \"invalid_nodes\": []}\n[通过] network-expectation：核对网络开关及 IPv4/IPv6 接口、路由；容器内部回环通信保留\n  方法：核对网络开关预期、接口类型和 IPv4/IPv6 路由，不扫描网络或尝试登录\n  观察：{\"expected\": \"off\", \"interfaces\": [\"lo\"], \"external_interfaces\": [], \"routes\": [{\"family\": \"ipv6\", \"interface\": \"lo\"}, {\"family\": \"ipv6\", \"interface\": \"lo\"}, {\"family\": \"ipv6\", \"interface\": \"lo\"}]}\n[通过] device:host-memory：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:kernel-memory：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod char 1:2，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:io-ports：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod char 1:4，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:kernel-log：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:kvm：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:host-disk：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:host-nvme：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod block 259:0，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] device:host-loop：访问被权限或只读边界拒绝\n  方法：在私有临时目录 mknod block 7:0，再只读 open/close；不读取、写入或执行 ioctl\n  观察：{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[通过] control:/proc/sysrq-trigger：访问被权限或只读边界拒绝\n  方法：对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sysrq-trigger'\"}\n[通过] control:/proc/sys/kernel/modprobe：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'\"}\n[通过] control:/proc/sys/kernel/kexec_load_disabled：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'\"}\n[通过] control:/proc/sys/vm/drop_caches：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'\"}\n[通过] control:/proc/sys/kernel/core_pattern：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/core_pattern 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/core_pattern'\"}\n[通过] control:/proc/sys/kernel/hotplug：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/hotplug 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/hotplug'\"}\n[通过] control:/proc/sys/kernel/modules_disabled：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/modules_disabled 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/modules_disabled'\"}\n[通过] control:/proc/sys/kernel/sysrq：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/sysrq 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/sysrq'\"}\n[通过] control:/proc/sys/kernel/panic：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/panic 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/panic'\"}\n[通过] control:/proc/sys/kernel/panic_on_oops：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/panic_on_oops 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/panic_on_oops'\"}\n[通过] control:/proc/sys/kernel/unprivileged_bpf_disabled：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/unprivileged_bpf_disabled 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/unprivileged_bpf_disabled'\"}\n[通过] control:/proc/sys/kernel/perf_event_paranoid：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/perf_event_paranoid 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/perf_event_paranoid'\"}\n[通过] control:/proc/sys/kernel/yama/ptrace_scope：访问被权限或只读边界拒绝\n  方法：对 /proc/sys/kernel/yama/ptrace_scope 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/yama/ptrace_scope'\"}\n[通过] control:/sys/power/state：访问被权限或只读边界拒绝\n  方法：对 /sys/power/state 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/sys/power/state'\"}\n[通过] control:/sys/power/disk：访问被权限或只读边界拒绝\n  方法：对 /sys/power/disk 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/sys/power/disk'\"}\n[通过] control:/sys/kernel/uevent_helper：访问被权限或只读边界拒绝\n  方法：对 /sys/kernel/uevent_helper 尝试写模式 open/close，不写入任何字节\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/sys/kernel/uevent_helper'\"}\n[通过] read-endpoint:/proc/kcore：访问被权限或只读边界拒绝\n  方法：对 /proc/kcore 只读 open/close；不读取内存或日志内容\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/kcore'\"}\n[通过] read-endpoint:/proc/kmsg：访问被权限或只读边界拒绝\n  方法：对 /proc/kmsg 只读 open/close；不读取内存或日志内容\n  观察：{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/kmsg'\"}\n[记录] network-policy：已核对本地接口与路由；流量和登录策略另议，此脚本不扫描网络、不尝试登录\n  方法：说明网络测试范围，不进行网络扫描或登录\n[通过] namespace:user：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/user，有宿主参照时比较标识\n  观察：{\"guest\": \"user:[4026532282]\", \"host\": \"user:[4026531837]\"}\n[通过] namespace:pid：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/pid，有宿主参照时比较标识\n  观察：{\"guest\": \"pid:[4026532321]\", \"host\": \"pid:[4026532216]\"}\n[通过] namespace:mnt：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/mnt，有宿主参照时比较标识\n  观察：{\"guest\": \"mnt:[4026532318]\", \"host\": \"mnt:[4026532214]\"}\n[通过] namespace:net：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/net，有宿主参照时比较标识\n  观察：{\"guest\": \"net:[4026532324]\", \"host\": \"net:[4026531833]\"}\n[通过] namespace:ipc：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/ipc，有宿主参照时比较标识\n  观察：{\"guest\": \"ipc:[4026532320]\", \"host\": \"ipc:[4026532202]\"}\n[通过] namespace:uts：比较容器与宿主 namespace\n  方法：读取 /proc/self/ns/uts，有宿主参照时比较标识\n  观察：{\"guest\": \"uts:[4026532319]\", \"host\": \"uts:[4026532215]\"}\n[通过] process-roots：已核对可见进程 namespace 与 root 路径，未发现宿主进程\n  方法：有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境\n  观察：{\"processes\": [{\"pid\": 1, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 66, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 105, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532455]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 110, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532323]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 152, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532454]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 178, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532593]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 180, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 181, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 189, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 190, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532590]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 193, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 196, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532526]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 205, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 227, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 239, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 267, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 282, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532593]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 283, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532593]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 341, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532317]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 389, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 391, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 427, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 434, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 465, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 469, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}, {\"pid\": 508, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532282]\", \"mnt\": \"mnt:[4026532318]\", \"pid\": \"pid:[4026532321]\"}}], \"host_matches\": [], \"errors\": [], \"truncated\": false}\n[通过] binfmt:existing：当前 mount namespace 未暴露 binfmt_misc 挂载\n  方法：核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则\n  观察：{\"mounts\": []}\n[通过] host-canary:0：宿主标记不可读或不可见\n  方法：有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容\n  观察：{\"attempts\": [{\"path\": \"/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/1/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/self/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/66/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/105/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/110/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/152/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/178/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/180/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/181/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/189/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/190/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/193/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/196/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/205/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/227/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/239/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/267/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/282/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/283/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/341/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/389/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/391/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/427/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/434/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/465/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/469/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/508/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/524/root/tmp/mas-host-canary-zo0dj9o5/marker\", \"outcome\": \"unavailable\", \"errno\": 2}], \"processes_truncated\": false}\n[通过] binfmt:temporary-mount：临时挂载属于独立 user namespace，未暴露宿主实例\n  方法：核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则\n  观察：{\"device\": 172, \"inode\": 1, \"user_namespace\": \"user:[4026532458]\", \"host_match\": false}\n\n测试汇总：通过 72，失败 0\n结论：本次列出的检查全部通过。\n报告：/tmp/mas-host-challenge-jblpdg5e/report.json\n",
+  "guest_report": {
+    "schema": 2,
+    "purpose": "complete-boundary-probe",
+    "checks": [
+      {
+        "check": "uid-map",
+        "method": "读取 /proc/self/uid_map，检查容器 root 对应的外层 UID",
+        "status": "PASS",
+        "message": "容器 root 不应映射到宿主 root",
+        "evidence": {
+          "mapping": "         0    1131072      65536\n"
+        }
+      },
+      {
+        "check": "gid-map",
+        "method": "读取 /proc/self/gid_map，检查容器 root 对应的外层 GID",
+        "status": "PASS",
+        "message": "容器 root 不应映射到宿主 root",
+        "evidence": {
+          "mapping": "         0    1131072      65536\n"
+        }
+      },
+      {
+        "check": "seccomp",
+        "method": "读取 /proc/self/status 的 Seccomp 值，核对过滤模式 2",
+        "status": "PASS",
+        "message": "检查实际 seccomp 过滤状态",
+        "evidence": {
+          "mode": "2"
+        }
+      },
+      {
+        "check": "basic-interfaces",
+        "method": "读取 /dev/null 和 /dev/zero，观察 /proc 与 /sys",
+        "status": "PASS",
+        "message": "/dev/null、/dev/zero、/proc 和 /sys 是正常容器接口",
+        "evidence": {
+          "sys_present": true
+        }
+      },
+      {
+        "check": "device-inventory",
+        "method": "有界枚举 /dev 的设备类型及 major:minor；未知设备仅提示核对，不打开 watchdog/USB/PCI 设备",
+        "status": "PASS",
+        "message": "设备清单；非基础/GPU 设备需核对来源及授权，不据节点存在认定可操作宿主",
+        "evidence": {
+          "devices": [
+            {
+              "path": "/dev/console",
+              "kind": "char",
+              "major": 136,
+              "minor": 0,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/dxg",
+              "kind": "char",
+              "major": 10,
+              "minor": 258,
+              "basic": false,
+              "gpu": true
+            },
+            {
+              "path": "/dev/full",
+              "kind": "char",
+              "major": 1,
+              "minor": 7,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/fuse",
+              "kind": "char",
+              "major": 10,
+              "minor": 229,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/net/tun",
+              "kind": "char",
+              "major": 10,
+              "minor": 200,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/null",
+              "kind": "char",
+              "major": 1,
+              "minor": 3,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/ptmx",
+              "kind": "char",
+              "major": 5,
+              "minor": 2,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/pts/0",
+              "kind": "char",
+              "major": 136,
+              "minor": 0,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/pts/ptmx",
+              "kind": "char",
+              "major": 5,
+              "minor": 2,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/random",
+              "kind": "char",
+              "major": 1,
+              "minor": 8,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/tty",
+              "kind": "char",
+              "major": 5,
+              "minor": 0,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/urandom",
+              "kind": "char",
+              "major": 1,
+              "minor": 9,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/zero",
+              "kind": "char",
+              "major": 1,
+              "minor": 5,
+              "basic": true,
+              "gpu": false
+            }
+          ],
+          "unclassified": [],
+          "errors": [],
+          "inaccessible": [
+            {
+              "path": "/dev/.lxd-mounts",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/dev/.lxd-mounts'"
+            }
+          ],
+          "depth_limited": [],
+          "truncated": false
+        }
+      },
+      {
+        "check": "gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+        "method": "读取 mountinfo，核对 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd 的只读挂载选项",
+        "status": "PASS",
+        "message": "GPU 运行库映射应为只读",
+        "evidence": {
+          "mount": {
+            "root": "/nvrzi.inf_amd64_6a54f45845aaf4cd",
+            "path": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+            "options": [
+              "ro",
+              "noatime"
+            ],
+            "filesystem": "9p",
+            "source": "drivers",
+            "super_options": [
+              "ro",
+              "aname=drivers;fmask=222;dmask=222",
+              "cache=0x5",
+              "access=client",
+              "msize=65536",
+              "trans=fd",
+              "rfd=8",
+              "wfd=8"
+            ]
+          }
+        }
+      },
+      {
+        "check": "gpu-readonly:/usr/lib/wsl/lib",
+        "method": "读取 mountinfo，核对 /usr/lib/wsl/lib 的只读挂载选项",
+        "status": "PASS",
+        "message": "GPU 运行库映射应为只读",
+        "evidence": {
+          "mount": {
+            "root": "/",
+            "path": "/usr/lib/wsl/lib",
+            "options": [
+              "ro",
+              "noatime"
+            ],
+            "filesystem": "overlay",
+            "source": "none",
+            "super_options": [
+              "rw",
+              "lowerdir=/gpu_lib_packaged:/gpu_lib_inbox",
+              "upperdir=/gpu_lib/rw/upper",
+              "workdir=/gpu_lib/rw/work",
+              "uuid=on"
+            ]
+          }
+        }
+      },
+      {
+        "check": "mount-sources",
+        "method": "检查 mountinfo 的文件系统类型、挂载根和挂载点",
+        "status": "PASS",
+        "message": "未发现典型 Windows/宿主 home 映射",
+        "evidence": {
+          "suspicious": []
+        }
+      },
+      {
+        "check": "management-socket:/run/containerd/containerd.sock",
+        "method": "检查 /run/containerd/containerd.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/dbus/system_bus_socket",
+        "method": "检查 /run/dbus/system_bus_socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 154,
+          "inode": 223,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/docker.sock",
+        "method": "检查 /run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/libvirt/libvirt-sock",
+        "method": "检查 /run/libvirt/libvirt-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/libvirt/virtqemud-sock",
+        "method": "检查 /run/libvirt/virtqemud-sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/lxd-installer.socket",
+        "method": "检查 /run/lxd-installer.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 154,
+          "inode": 224,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/lxd.socket",
+        "method": "检查 /run/lxd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/lxd/unix.socket",
+        "method": "检查 /run/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/podman/podman.sock",
+        "method": "检查 /run/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/snapd-snap.socket",
+        "method": "检查 /run/snapd-snap.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 154,
+          "inode": 228,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/snapd.socket",
+        "method": "检查 /run/snapd.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 154,
+          "inode": 227,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/systemd/private",
+        "method": "检查 /run/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 154,
+          "inode": 47,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/user/1001/bus",
+        "method": "检查 /run/user/1001/bus；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 171,
+          "inode": 22,
+          "host_reference_match": false,
+          "peer_pid": 389,
+          "peer_uid": 1001,
+          "peer_gid": 1001,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/user/1001/docker.sock",
+        "method": "检查 /run/user/1001/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/user/1001/podman/podman.sock",
+        "method": "检查 /run/user/1001/podman/podman.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/user/1001/snapd-session-agent.socket",
+        "method": "检查 /run/user/1001/snapd-session-agent.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 171,
+          "inode": 34,
+          "host_reference_match": false,
+          "peer_pid": 389,
+          "peer_uid": 1001,
+          "peer_gid": 1001,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/user/1001/systemd/private",
+        "method": "检查 /run/user/1001/systemd/private；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "服务进程属于当前容器 namespace；未发送管理请求",
+        "evidence": {
+          "device": 171,
+          "inode": 20,
+          "host_reference_match": false,
+          "peer_pid": 389,
+          "peer_uid": 1001,
+          "peer_gid": 1001,
+          "peer_namespaces": {
+            "pid": "pid:[4026532321]",
+            "mnt": "mnt:[4026532318]",
+            "user": "user:[4026532282]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/var/lib/lxd/unix.socket",
+        "method": "检查 /var/lib/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/var/run/docker.sock",
+        "method": "检查 /var/run/docker.sock；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+        "method": "检查 /var/snap/lxd/common/lxd/unix.socket；存在时尝试 Unix socket 连接并立即关闭，不发送请求",
+        "status": "PASS",
+        "message": "管理 socket 路径不存在",
+        "evidence": {}
+      },
+      {
+        "check": "devlxd-api:/1.0",
+        "method": "对实例 devlxd 执行有界只读 GET /1.0；不创建、修改或删除资源",
+        "status": "PASS",
+        "message": "实例接口未开放卷管理能力",
+        "evidence": {
+          "http_status": 200,
+          "volume_management_advertised": false
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/config",
+        "method": "对实例 devlxd 执行有界只读 GET /1.0/config；不创建、修改或删除资源",
+        "status": "PASS",
+        "message": "只返回本实例允许的配置键名，不读取配置值",
+        "evidence": {
+          "http_status": 200,
+          "keys": [
+            "/1.0/config/user.mas.managed",
+            "/1.0/config/user.mas.network",
+            "/1.0/config/user.mas.gpu",
+            "/1.0/config/user.mas.profile"
+          ]
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/config/security.privileged",
+        "method": "对实例 devlxd 执行有界只读 GET /1.0/config/security.privileged；不创建、修改或删除资源",
+        "status": "PASS",
+        "message": "实例受限 API 的只读请求结果；404 不能证明权限已关闭",
+        "evidence": {
+          "http_status": 403
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/storage-pools/mas-probe-unowned/volumes/custom",
+        "method": "对实例 devlxd 执行有界只读 GET /1.0/storage-pools/mas-probe-unowned/volumes/custom；不创建、修改或删除资源",
+        "status": "PASS",
+        "message": "实例受限 API 的只读请求结果；404 不能证明权限已关闭",
+        "evidence": {
+          "http_status": 403
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export",
+        "method": "对实例 devlxd 执行有界只读 GET /1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export；不创建、修改或删除资源",
+        "status": "PASS",
+        "message": "实例受限 API 的只读请求结果；404 不能证明权限已关闭",
+        "evidence": {
+          "http_status": 403
+        }
+      },
+      {
+        "check": "windows-interop",
+        "method": "检查 Windows/WSL 路径、binfmt_misc 注册项和 WSL_INTEROP，不执行解释器或 Windows 命令",
+        "status": "PASS",
+        "message": "未发现典型 Windows/WSL 入口",
+        "evidence": {
+          "paths": [],
+          "registrations": [],
+          "truncated": false,
+          "wsl_interop_environment": null
+        }
+      },
+      {
+        "check": "gpu-expectation",
+        "method": "列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期",
+        "status": "PASS",
+        "message": "GPU 为获准资源例外；核对显式开关预期及设备类型",
+        "evidence": {
+          "expected": "on",
+          "devices": [
+            "/dev/dxg"
+          ],
+          "invalid_nodes": []
+        }
+      },
+      {
+        "check": "network-expectation",
+        "method": "核对网络开关预期、接口类型和 IPv4/IPv6 路由，不扫描网络或尝试登录",
+        "status": "PASS",
+        "message": "核对网络开关及 IPv4/IPv6 接口、路由；容器内部回环通信保留",
+        "evidence": {
+          "expected": "off",
+          "interfaces": [
+            "lo"
+          ],
+          "external_interfaces": [],
+          "routes": [
+            {
+              "family": "ipv6",
+              "interface": "lo"
+            },
+            {
+              "family": "ipv6",
+              "interface": "lo"
+            },
+            {
+              "family": "ipv6",
+              "interface": "lo"
+            }
+          ]
+        }
+      },
+      {
+        "check": "device:host-memory",
+        "method": "在私有临时目录 mknod char 1:1，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:kernel-memory",
+        "method": "在私有临时目录 mknod char 1:2，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:io-ports",
+        "method": "在私有临时目录 mknod char 1:4，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:kernel-log",
+        "method": "在私有临时目录 mknod char 1:11，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:kvm",
+        "method": "在私有临时目录 mknod char 10:232，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:host-disk",
+        "method": "在私有临时目录 mknod block 8:0，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:host-nvme",
+        "method": "在私有临时目录 mknod block 259:0，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:host-loop",
+        "method": "在私有临时目录 mknod block 7:0，再只读 open/close；不读取、写入或执行 ioctl",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "control:/proc/sysrq-trigger",
+        "method": "对 /proc/sysrq-trigger 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sysrq-trigger'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/modprobe",
+        "method": "对 /proc/sys/kernel/modprobe 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/kexec_load_disabled",
+        "method": "对 /proc/sys/kernel/kexec_load_disabled 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/vm/drop_caches",
+        "method": "对 /proc/sys/vm/drop_caches 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/core_pattern",
+        "method": "对 /proc/sys/kernel/core_pattern 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/core_pattern'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/hotplug",
+        "method": "对 /proc/sys/kernel/hotplug 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/hotplug'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/modules_disabled",
+        "method": "对 /proc/sys/kernel/modules_disabled 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modules_disabled'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/sysrq",
+        "method": "对 /proc/sys/kernel/sysrq 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/sysrq'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/panic",
+        "method": "对 /proc/sys/kernel/panic 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/panic_on_oops",
+        "method": "对 /proc/sys/kernel/panic_on_oops 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic_on_oops'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/unprivileged_bpf_disabled",
+        "method": "对 /proc/sys/kernel/unprivileged_bpf_disabled 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/unprivileged_bpf_disabled'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/perf_event_paranoid",
+        "method": "对 /proc/sys/kernel/perf_event_paranoid 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/perf_event_paranoid'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/yama/ptrace_scope",
+        "method": "对 /proc/sys/kernel/yama/ptrace_scope 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/yama/ptrace_scope'"
+        }
+      },
+      {
+        "check": "control:/sys/power/state",
+        "method": "对 /sys/power/state 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/sys/power/state'"
+        }
+      },
+      {
+        "check": "control:/sys/power/disk",
+        "method": "对 /sys/power/disk 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/sys/power/disk'"
+        }
+      },
+      {
+        "check": "control:/sys/kernel/uevent_helper",
+        "method": "对 /sys/kernel/uevent_helper 尝试写模式 open/close，不写入任何字节",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/sys/kernel/uevent_helper'"
+        }
+      },
+      {
+        "check": "read-endpoint:/proc/kcore",
+        "method": "对 /proc/kcore 只读 open/close；不读取内存或日志内容",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/kcore'"
+        }
+      },
+      {
+        "check": "read-endpoint:/proc/kmsg",
+        "method": "对 /proc/kmsg 只读 open/close；不读取内存或日志内容",
+        "status": "PASS",
+        "message": "访问被权限或只读边界拒绝",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/kmsg'"
+        }
+      },
+      {
+        "check": "namespace:user",
+        "method": "读取 /proc/self/ns/user，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "user:[4026532282]",
+          "host": "user:[4026531837]"
+        }
+      },
+      {
+        "check": "namespace:pid",
+        "method": "读取 /proc/self/ns/pid，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "pid:[4026532321]",
+          "host": "pid:[4026532216]"
+        }
+      },
+      {
+        "check": "namespace:mnt",
+        "method": "读取 /proc/self/ns/mnt，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "mnt:[4026532318]",
+          "host": "mnt:[4026532214]"
+        }
+      },
+      {
+        "check": "namespace:net",
+        "method": "读取 /proc/self/ns/net，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "net:[4026532324]",
+          "host": "net:[4026531833]"
+        }
+      },
+      {
+        "check": "namespace:ipc",
+        "method": "读取 /proc/self/ns/ipc，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "ipc:[4026532320]",
+          "host": "ipc:[4026532202]"
+        }
+      },
+      {
+        "check": "namespace:uts",
+        "method": "读取 /proc/self/ns/uts，有宿主参照时比较标识",
+        "status": "PASS",
+        "message": "比较容器与宿主 namespace",
+        "evidence": {
+          "guest": "uts:[4026532319]",
+          "host": "uts:[4026532215]"
+        }
+      },
+      {
+        "check": "process-roots",
+        "method": "有界读取可见进程的 root/mnt/user namespace，和提供的宿主 namespace 比较；不读取进程内存或环境",
+        "status": "PASS",
+        "message": "已核对可见进程 namespace 与 root 路径，未发现宿主进程",
+        "evidence": {
+          "processes": [
+            {
+              "pid": 1,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 66,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 105,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532455]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 110,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532323]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 152,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532454]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 178,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532593]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 180,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 181,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 189,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 190,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532590]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 193,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 196,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532526]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 205,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 227,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 239,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 267,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 282,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532593]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 283,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532593]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 341,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532317]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 389,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 391,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 427,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 434,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 465,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 469,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            },
+            {
+              "pid": 508,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532282]",
+                "mnt": "mnt:[4026532318]",
+                "pid": "pid:[4026532321]"
+              }
+            }
+          ],
+          "host_matches": [],
+          "errors": [],
+          "truncated": false
+        }
+      },
+      {
+        "check": "binfmt:existing",
+        "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+        "status": "PASS",
+        "message": "当前 mount namespace 未暴露 binfmt_misc 挂载",
+        "evidence": {
+          "mounts": []
+        }
+      },
+      {
+        "check": "host-canary:0",
+        "method": "有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容",
+        "status": "PASS",
+        "message": "宿主标记不可读或不可见",
+        "evidence": {
+          "attempts": [
+            {
+              "path": "/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/1/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/self/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/66/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/105/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/110/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/152/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/178/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/180/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/181/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/189/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/190/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/193/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/196/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/205/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/227/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/239/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/267/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/282/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/283/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/341/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/389/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/391/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/427/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/434/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/465/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/469/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/508/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/524/root/tmp/mas-host-canary-zo0dj9o5/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            }
+          ],
+          "processes_truncated": false
+        }
+      },
+      {
+        "check": "binfmt:temporary-mount",
+        "method": "核对 binfmt_misc 来源；仅打开接口或在临时 user/mount namespace 挂载，不写注册规则",
+        "status": "PASS",
+        "message": "临时挂载属于独立 user namespace，未暴露宿主实例",
+        "evidence": {
+          "device": 172,
+          "inode": 1,
+          "user_namespace": "user:[4026532458]",
+          "host_match": false
+        }
+      }
+    ],
+    "observations": [
+      {
+        "check": "capabilities",
+        "method": "读取 /proc/self/status 的 CapEff 和 CapBnd，仅记录能力位",
+        "message": "能力位属于当前 namespace；不能单凭它判断拥有宿主权限",
+        "evidence": {
+          "effective": "000001ffffffffff",
+          "bounding": "000001ffffffffff"
+        }
+      },
+      {
+        "check": "apparmor",
+        "method": "读取 AppArmor enabled 和 /proc/self/attr/current，记录实际状态",
+        "message": "记录可选 AppArmor 的实际状态；不将未启用本身视为越界",
+        "evidence": {
+          "profile": "kernel\u0000",
+          "enabled": "N",
+          "errors": []
+        }
+      },
+      {
+        "check": "special-filesystems",
+        "method": "记录 debugfs/securityfs/pstore/efivarfs/bpffs 挂载与可见性，不修改其中内容",
+        "message": "记录内核接口挂载；可见不等于能读取或修改宿主",
+        "evidence": {
+          "mounts": [
+            {
+              "root": "/fs/pstore",
+              "path": "/sys/fs/pstore",
+              "options": [
+                "rw",
+                "nosuid",
+                "nodev",
+                "noexec",
+                "noatime"
+              ],
+              "filesystem": "sysfs",
+              "source": "sysfs",
+              "super_options": [
+                "rw"
+              ]
+            },
+            {
+              "root": "/",
+              "path": "/sys/kernel/debug",
+              "options": [
+                "rw",
+                "nosuid",
+                "nodev",
+                "noexec",
+                "relatime"
+              ],
+              "filesystem": "debugfs",
+              "source": "debugfs",
+              "super_options": [
+                "rw"
+              ]
+            },
+            {
+              "root": "/kernel/security",
+              "path": "/sys/kernel/security",
+              "options": [
+                "rw",
+                "nosuid",
+                "nodev",
+                "noexec",
+                "noatime"
+              ],
+              "filesystem": "sysfs",
+              "source": "sysfs",
+              "super_options": [
+                "rw"
+              ]
+            }
+          ],
+          "visible": [
+            "/sys/kernel/debug",
+            "/sys/kernel/security",
+            "/sys/fs/pstore",
+            "/sys/fs/bpf"
+          ]
+        }
+      },
+      {
+        "check": "socket-inventory",
+        "method": "读取 /proc/net/unix 与 /run/user 的管理 socket 路径，不连接抽象 socket 或扫描网络",
+        "message": "管理入口路径清单；逐项连接检查，不发送管理请求",
+        "evidence": {
+          "paths": [
+            "/var/snap/lxd/common/lxd/unix.socket",
+            "/var/lib/lxd/unix.socket",
+            "/run/lxd/unix.socket",
+            "/run/lxd.socket",
+            "/run/docker.sock",
+            "/var/run/docker.sock",
+            "/run/containerd/containerd.sock",
+            "/run/podman/podman.sock",
+            "/run/libvirt/libvirt-sock",
+            "/run/libvirt/virtqemud-sock",
+            "/run/dbus/system_bus_socket",
+            "/run/systemd/private",
+            "/run/snapd.socket",
+            "/run/snapd-snap.socket",
+            "/run/user/1001/systemd/private",
+            "/run/user/1001/bus",
+            "/run/user/1001/snapd-session-agent.socket",
+            "/run/lxd-installer.socket",
+            "/run/user/1001/docker.sock",
+            "/run/user/1001/podman/podman.sock"
+          ],
+          "truncated": false
+        }
+      },
+      {
+        "check": "devlxd",
+        "method": "检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口",
+        "message": "基本实例接口与宿主管理接口不同，按当前兼容策略保留",
+        "evidence": {
+          "visible": true
+        }
+      },
+      {
+        "check": "network-policy",
+        "method": "说明网络测试范围，不进行网络扫描或登录",
+        "message": "已核对本地接口与路由；流量和登录策略另议，此脚本不扫描网络、不尝试登录",
+        "evidence": {}
+      }
+    ],
+    "gpu_expected": "on",
+    "network_expected": "off",
+    "elapsed": 1.9927496180025628,
+    "exit_code": 0,
+    "counts": {
+      "PASS": 72,
+      "FAIL": 0
+    },
+    "conclusion": "checks_passed",
+    "scope": "结论仅适用于列出的检查与当次观察；环境记录不计为测试。"
+  },
+  "guest_only_positive_controls": [
+    {
+      "check": "host-canary:0",
+      "method": "有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容",
+      "status": "FAIL",
+      "message": "读到了宿主提供的唯一标记文件",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-challenge-jblpdg5e/positive-canary",
+            "outcome": "readable",
+            "sha256": "9c61f65ccd78c49711a000ca3f586071d6c1cb722abb760555f429e50294036f",
+            "bytes": 51
+          }
+        ],
+        "processes_truncated": false
+      }
+    },
+    {
+      "check": "host-canary:0",
+      "method": "有界尝试直接路径及可见进程 root 下的唯一标记，比较 SHA-256；仅记录摘要，不保存内容",
+      "status": "FAIL",
+      "message": "读到了宿主提供的唯一标记文件",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-challenge-jblpdg5e/canary-alias",
+            "outcome": "readable",
+            "sha256": "9c61f65ccd78c49711a000ca3f586071d6c1cb722abb760555f429e50294036f",
+            "bytes": 51
+          }
+        ],
+        "processes_truncated": false
+      }
+    }
+  ],
+  "elapsed": 11.570238446001895,
+  "exit_code": 0,
+  "counts": {
+    "PASS": 76,
+    "FAIL": 0
+  },
+  "conclusion": "checks_passed",
+  "scope": "结论仅适用于列出的检查与当次观察；环境记录不计为测试。"
+}

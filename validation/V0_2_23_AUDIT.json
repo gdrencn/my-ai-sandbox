@@ -1,6 +1,6 @@
 {
   "version": "0.2.23",
-  "status": "final_frozen_native_passed_publication_pending",
+  "status": "published_and_verified",
   "guideline": "/home/gordon/.codex/CLI_TUI_GUIDELINES.md",
   "cycles": [
     {
@@ -81,6 +81,18 @@
         "Exactly one final security challenge passed 76 checks",
         "No skips, unexecuted stages or cleanup errors",
         "Owned Project/staging/legacy/mount cleanup independently verified; no matching native filesystem helper remained"
+      ]
+    },
+    {
+      "cycle": 6,
+      "findings": [],
+      "verification": [
+        "Exact public entry passed 439 packaged units and all 28 native stages in 1404.9 seconds",
+        "Exactly one final challenge passed 76 checks; no skips, unexecuted stages or cleanup errors",
+        "All owned resources and native filesystem helpers independently verified reclaimed",
+        "Ordinary installation, bilingual public cancellation and independent security from both initial states passed",
+        "Twelve assets/digests/manifest, four fixed raw entries and all 38 earlier releases verified; stable/0.1.15 unchanged",
+        "Final guideline, code and eight-document review has no unresolved finding in the reviewed scope"
       ]
     }
   ],
@@ -202,7 +214,8 @@
       "documents": 8,
       "local_links_checked": 14,
       "locale_keys": 338,
-      "locale_keys_and_placeholders_match": true
+      "locale_keys_and_placeholders_match": true,
+      "published_code_unchanged": true
     }
   },
   "documents": [
@@ -280,7 +293,7 @@
       "initial": "Stopped",
       "network": "off"
     },
-    "artifact_scope": "Preliminary archive; final correction changes CRLF consumption only; final native run pending",
+    "artifact_scope": "Preliminary archive evidence; final correction changes CRLF consumption only; corrected final frozen and public runs verified separately",
     "product_sha256": "6139bafdc43ef83689e9cfb283ef2e23529a66fdeb902feb9d58a8bcb66ccf39"
   },
   "native_title_review": {
@@ -354,6 +367,121 @@
       "mas-import-c58ec02cd92241f69ae69fd7cc6a5be7"
     ],
     "elapsed": 1424.5951583059941,
+    "product_sha256": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+    "installed_hashes_match": true,
+    "tester_sha256": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
+    "network_evidence_retained": true,
+    "packaging": {
+      "archives": [
+        {
+          "archive": "mas.pyz",
+          "files": 23,
+          "sources_match": true,
+          "python_310": true
+        },
+        {
+          "archive": "mas-install.pyz",
+          "files": 23,
+          "sources_match": true,
+          "python_310": true
+        },
+        {
+          "archive": "mas-test.pyz",
+          "files": 72,
+          "sources_match": true,
+          "python_310": true
+        }
+      ],
+      "reproducible_build": true,
+      "bash_syntax": true,
+      "diff_check": true,
+      "hashes": {
+        "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+        "install.sh": "05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+        "mas.pyz": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+        "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+        "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+        "SHA256SUMS": "4c2bba9d867be3f885a7c6edcbb7ea38b280048eea730d69ed91a976f53933f4",
+        "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+        "bootstrap.py": "fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+        "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+        "mas-install.pyz": "d74b667176901338c6fd6a5c13a37206c2e52d76a809c30d159febd46e081305",
+        "mas-test.pyz": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a"
+      }
+    },
+    "native_filesystem_helpers_absent": true
+  },
+  "publication": {
+    "tag": "v0.2.23",
+    "source_commit": "dd6893cc8bacf7b77ed0b93b398a59336ff3e88a",
+    "assets": 12,
+    "earlier_releases_unchanged": 38,
+    "latest": "stable/0.1.15",
+    "ordinary_install_preserves_tester": true,
+    "language_cancel_130_both_languages": true,
+    "independent_security": [
+      {
+        "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash",
+        "report": "/tmp/mas-v0.2.23-public-security/security-20261003-160824-a080bf04.json",
+        "counts": {
+          "PASS": 76,
+          "FAIL": 0
+        },
+        "network": "off",
+        "lifecycle": {
+          "initial_status": "Stopped",
+          "identity": "c91c9a96-7f22-4de0-97ce-ff60e847cf21",
+          "actions": [
+            "start",
+            "stop"
+          ],
+          "final_status": "Stopped"
+        }
+      },
+      {
+        "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- review-97bdaac97cc64c1fbf117cbf7f2b4f0e --report /tmp/mas-v0.2.23-public-security/running.json",
+        "report": "/tmp/mas-v0.2.23-public-security/running.json",
+        "counts": {
+          "PASS": 76,
+          "FAIL": 0
+        },
+        "network": "off",
+        "lifecycle": {
+          "initial_status": "Running",
+          "identity": "c91c9a96-7f22-4de0-97ce-ff60e847cf21",
+          "actions": [],
+          "final_status": "Running"
+        }
+      }
+    ],
+    "owned_security_fixture_removed": true,
+    "draft_asset_bytes_matched": true,
+    "draft_tag_api_lookup": "404 until publication; public asset bytes/digests/manifest subsequently verified",
+    "full_public_suite_verified": true,
+    "prerelease": true,
+    "release_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.23"
+  },
+  "public_run": {
+    "version": "0.2.23",
+    "report": "/tmp/mas-v0.2.23-public/test-results/20261003-161230/report.json",
+    "stages": 28,
+    "unit_tests": 439,
+    "boundary_counts": {
+      "PASS": 76,
+      "FAIL": 0
+    },
+    "single_final_challenge": true,
+    "cleanup_independently_verified": true,
+    "project": "test-d0ba238d17bc45b6b58b1fad9ccdb274",
+    "staging_projects": [
+      "mas-import-2298df9c1e9f4e7284be9e57d0a84737",
+      "mas-import-522965aa157d441288b0f06d4c7be901",
+      "mas-import-58992da3d0984cb896931be1cced2a4d",
+      "mas-import-71a30d720ab84241a5c4736858a0398a",
+      "mas-import-bfababbb7efc4d27b35869ffaf0c1cfe",
+      "mas-import-eb8ded6832ef4490ba3c6c18c56f0ade"
+    ],
+    "elapsed": 1404.9140160759998,
     "product_sha256": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
     "installed_hashes_match": true,
     "tester_sha256": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
