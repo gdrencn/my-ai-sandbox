@@ -8,9 +8,9 @@ from . import __version__
 from . import config
 from .core import Error, LXD, Manager, ShellExitError
 from .isolation import PROJECT
-from .presentation import Progress, show_mounts, format_info
+from .presentation import Progress, show_containers, show_mounts, format_info
 
-from .i18n import t, state, Parser
+from .i18n import t, Parser
 
 
 def parser():
@@ -81,20 +81,26 @@ def main(argv=None, manager=None):
             from .terminal_ui import run
             return 1 if run(manager) == 1 else 0
         elif args.command == "hardware":
-            result = (manager.hardware(args.target, None if args.value is None else args.value == "on", item=args.item)
-                      if args.item else {'gpu': manager.hardware(args.target),
-                                         'network': manager.hardware(args.target, item='network')})
+            with progress.output.waiting(t('hardware_loading', target=args.target)):
+                result = (manager.hardware(args.target, None if args.value is None else args.value == "on", item=args.item)
+                          if args.item else {'gpu': manager.hardware(args.target),
+                                             'network': manager.hardware(args.target, item='network')})
             print(json.dumps(result, ensure_ascii=False, indent=2))
         elif args.command == "list":
-            for item in manager.list():
-                print(f"{item['name']}\t{state(item['status'])}")
+            with progress.output.waiting(t('list_loading')):
+                items = manager.list()
+            show_containers(items)
         elif args.command == "info":
-            print(format_info(manager.info(args.target)))
+            with progress.output.waiting(t('info_loading', target=args.target)):
+                instance = manager.info(args.target)
+            print(format_info(instance))
         elif args.command in ("mountfs", "unmountfs"):
             result = getattr(manager, args.command)(args.target, args.path)
             print(t("fs_mounted_at", path=result) if args.command == "mountfs" else t("menu_done"))
         elif args.command == "mountedfs":
-            show_mounts(manager.mountedfs(args.target))
+            with progress.output.waiting(t('fs_list_loading', target=args.target)):
+                entries = manager.mountedfs(args.target)
+            show_mounts(entries)
         elif args.command == "new":
             manager.new(args.target, args.image)
         elif args.command == 'migrate':

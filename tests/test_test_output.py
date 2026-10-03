@@ -128,7 +128,7 @@ print('FINISHED')
 
     def test_separator_falls_back_for_a_plain_stream(self):
         output = Output(io.StringIO())
-        with patch('mas.config.language', return_value='en_us'), patch('mas.test_output.shutil.get_terminal_size') as size:
+        with patch('mas.config.language', return_value='en_us'), patch('mas.output.shutil.get_terminal_size') as size:
             size.return_value.columns = 12
             output.section('Resources','Fixture','All explanation text remains visible.')
         self.assertEqual(output.stream.getvalue().splitlines()[0], '─'*11)

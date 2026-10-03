@@ -3,7 +3,7 @@ import json
 from .diagnostics import diagnostic_lines
 from .output import Output
 from .i18n import t, state, progress_text
-from .menu import column_rows, rendered
+from .menu import column_rows, container_options, rendered
 import sys
 
 
@@ -30,6 +30,14 @@ def show_mounts(entries, write=print):
         write(t("fs_empty"))
     rows = column_rows([(entry['path'], entry['destination'], state(entry['status'])) for entry in entries])
     for row in rows:
+        write(rendered(row, sum(row.widths) + 2 * (len(row.widths) - 1), color=False))
+
+
+def show_containers(items, write=print):
+    if not items:
+        write(t('menu_empty'))
+        return
+    for _, row in container_options(items):
         write(rendered(row, sum(row.widths) + 2 * (len(row.widths) - 1), color=False))
 
 

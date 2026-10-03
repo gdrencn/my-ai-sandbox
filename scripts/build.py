@@ -8,9 +8,11 @@ from pathlib import Path
 import shutil
 import tempfile
 import zipfile
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
+sys.path.insert(0, str(ROOT))
 
 
 def main():
@@ -18,9 +20,17 @@ def main():
     messages = json.loads((ROOT / "mas/locales/zh_cn.json").read_text())
     installer = (ROOT / "scripts/install.template.sh").read_text()
     for token, key in {"LANGUAGE_TITLE": "language_title", "LANGUAGE_ZH": "language_zh",
-                       "LANGUAGE_EN": "language_en", "LANGUAGE_KEYS": "menu_keys"}.items():
+                       "LANGUAGE_EN": "language_en", "LANGUAGE_KEYS": "menu_keys",
+                       "LANGUAGE_TERMINAL_REQUIRED": "language_terminal_required", "CANCELLED": "cancelled"}.items():
         value = messages[key].format(action=messages['menu_cancel']) if key == 'menu_keys' else messages[key]
         installer = installer.replace("@" + token + "@", shlex.quote(value))
+    from mas.text import cells
+    minimum = max(cells(messages['language_title']), cells(messages['language_zh']) + 6,
+                  cells(messages['language_en']) + 6,
+                  cells(messages['menu_keys'].format(action=messages['menu_cancel']))) + 1
+    installer = installer.replace('@LANGUAGE_MIN_WIDTH@', str(minimum))
+    installer = installer.replace('@BOOTSTRAP_TERMINAL_NARROW@',
+        shlex.quote(messages['bootstrap_terminal_narrow'].format(columns=minimum)))
     installer = installer.replace('@DEPENDENCIES@', (ROOT / 'mas/dependencies.sh').read_text())
     for language, suffix in (('zh_cn', 'ZH'), ('en_us', 'EN')):
         catalog = json.loads((ROOT / 'mas/locales' / (language + '.json')).read_text())

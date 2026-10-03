@@ -1,0 +1,21 @@
+{
+  "checks": [
+    {
+      "language": "zh_cn",
+      "gpu_title_once": true,
+      "gpu_cancel": true,
+      "network_title_once": true,
+      "network_cancel": true
+    },
+    {
+      "language": "en_us",
+      "gpu_title_once": true,
+      "gpu_cancel": true,
+      "network_title_once": true,
+      "network_cancel": true
+    }
+  ],
+  "fixture_configuration_unchanged": true,
+  "version": "0.2.23",
+  "product_sha256": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a"
+}

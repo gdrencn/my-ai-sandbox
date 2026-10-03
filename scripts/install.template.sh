@@ -4,12 +4,28 @@ set -euo pipefail
 
 # Before Python exists, the bootstrap uses Bash's own terminal input.
 # Labels are generated from the same product catalog as the Python menus.
-mas_choose_language() {
-    local selected=0 key suffix
+mas_choose_language() (
+    local selected=0 key suffix columns rows minimum=@LANGUAGE_MIN_WIDTH@
+    if ! { : </dev/tty; } 2>/dev/null; then
+        printf '%s\n' @LANGUAGE_TERMINAL_REQUIRED@ >&2
+        return 1
+    fi
+    read -r rows columns < <(stty size </dev/tty)
+    if ((columns < minimum || rows < 5)); then
+        printf '%s\n' @BOOTSTRAP_TERMINAL_NARROW@ >&2
+        return 1
+    fi
     printf '\033[?25l' >/dev/tty
-    trap 'printf "\033[?25h" >/dev/tty' RETURN
+    trap 'printf "\033[0m\033[?25h" >/dev/tty' EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     printf '%s\n\n\n\n' @LANGUAGE_TITLE@ >/dev/tty
     while true; do
+        read -r rows columns < <(stty size </dev/tty)
+        if ((columns < minimum || rows < 5)); then
+            printf '\n%s\n' @BOOTSTRAP_TERMINAL_NARROW@ >&2
+            return 1
+        fi
         printf '\033[3A\r\033[2K' >/dev/tty
         if ((selected == 0)); then
             printf '\033[7m❯ ● %s\033[0m\n  ○ %s\n' @LANGUAGE_ZH@ @LANGUAGE_EN@ >/dev/tty
@@ -32,7 +48,7 @@ mas_choose_language() {
         esac
     done
     if ((selected == 0)); then printf zh_cn; else printf en_us; fi
-}
+)
 
 if ! command -v python3 >/dev/null; then
     mas_language=${MAS_LANGUAGE:-}
@@ -44,7 +60,12 @@ if ! command -v python3 >/dev/null; then
         esac
     done
     while [[ $mas_language != en_us && $mas_language != zh_cn ]]; do
-        mas_language=$(mas_choose_language)
+        if mas_language=$(mas_choose_language); then :
+        else
+            mas_selection_status=$?
+            if ((mas_selection_status == 130)); then printf '%s\n' @CANCELLED@ >&2; fi
+            exit "$mas_selection_status"
+        fi
     done
     export MAS_LANGUAGE=$mas_language
     case $mas_language in

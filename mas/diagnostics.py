@@ -3,7 +3,25 @@ import re
 import sys
 from contextlib import contextmanager
 
-WARNING = re.compile(r'(?<![\w-])(?:warning|error|failed|failure|fatal|traceback|deprecated)(?![\w-])|警告|错误|失败', re.I)
+WARNING = re.compile(r'^\s*(?:[WE]:|Err:)|(?<![\w-])(?:warning|error|failed|failure|fatal|traceback|deprecated)(?![\w-])|警告|错误|失败', re.I)
+
+
+APT_NORMAL = (
+    'Hit:', 'Get:', 'Ign:', 'Reading package lists', 'Building dependency tree',
+    'Reading state information', 'Solving dependencies', 'The following ', 'Suggested packages:',
+    'Recommended packages:', 'Need to get ', 'After this operation,', 'Fetched ',
+    'Selecting previously unselected package ', 'Preparing to unpack ', 'Unpacking ',
+    'Setting up ', 'Processing triggers for ', '(Reading database ', 'Scanning ',
+    'All packages are up to date.', 'Reading changelogs', 'Extracting templates from packages:')
+
+
+def normal_apt_line(line, complete=True, package_list=False):
+    if WARNING.search(line):
+        return False
+    return (not line or any(line.startswith(prefix) or not complete and prefix.startswith(line)
+                           for prefix in APT_NORMAL)
+            or package_list and re.fullmatch(r'\s+[a-z0-9][a-z0-9.+:~_ -]*', line) is not None
+            or re.match(r'^\d+ upgraded,', line) is not None)
 
 
 def diagnostic_lines(stdout, stderr):
@@ -30,7 +48,7 @@ def warn(message, error):
     """Best-effort secondary diagnostics; never replace the primary exception."""
     try:
         from .i18n import t
-        print(t(message, error=error), file=sys.stderr)
+        emit_native(t(message, error=error))
     except Exception:
         pass
 

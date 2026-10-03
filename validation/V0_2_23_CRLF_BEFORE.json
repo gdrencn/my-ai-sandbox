@@ -1,0 +1,6 @@
+{
+  "expected_regression_failure": true,
+  "failures": [
+    "Traceback (most recent call last):\n  File \"/home/gordon/my-ai-sandbox/tests/test_ui_guidelines.py\", line 252, in test_apt_crlf_preserves_package_list_context_across_read_boundaries\n    self.assertEqual(result.stdout,'W: native detail\\n')\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '  fixture\\nW: native detail\\n' != 'W: native detail\\n'\n-   fixture\n  W: native detail\n\n"
+  ]
+}

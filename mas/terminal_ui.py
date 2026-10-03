@@ -33,9 +33,9 @@ class UI:
     def choose(self, title, actions, default=None, **options):
         return self.view.choose(title, [(key, t(label)) for key, label in actions], default=default, **options)
 
-    def present(self, title, callback, back=True):
+    def present(self, title, callback, back=True, *, prompt_title=False):
         """Actions own entry headings; navigation selectors own their titles."""
-        if back:
+        if back and not prompt_title:
             self.view.heading(title)
         result = None
         failure = None
@@ -68,10 +68,11 @@ class UI:
                 selected = menu.language(self.view, config.get('language'))
                 config.set_value('language', selected)
                 self.write(t('language_saved', language=selected))
-            self.present(t('language_title'), change_language)
+            self.present(t('language_title'), change_language, prompt_title=True)
 
     def info(self, target):
-        instance = self.manager.info(target)
+        with Output(sys.stderr).waiting(t('info_loading', target=target)):
+            instance = self.manager.info(target)
         record = self.manager.gpu.record(instance)
         gpu = t('state_enabled' if record['enabled'] else 'state_disabled') if record else t('gpu_unconfigured')
         from .network import enabled as network_enabled
@@ -146,7 +147,8 @@ class UI:
                     self.write(t('fs_mounted_at', path=destination))
                     return
                 from .presentation import show_mounts
-                entries = self.manager.mountedfs(target)
+                with Output(sys.stderr).waiting(t('fs_list_loading', target=target)):
+                    entries = self.manager.mountedfs(target)
                 if selected == 'mountedfs' or not entries:
                     show_mounts(entries, self.write)
                 if selected == 'unmountfs' and entries:
@@ -168,9 +170,11 @@ class UI:
         selected = None
         while True:
             if status is None:
-                status = self.manager.hardware(target)
+                with Output(sys.stderr).waiting(t('hardware_loading', target=target)):
+                    status = self.manager.hardware(target)
             if network is None:
-                network = self.manager.hardware(target, item='network')
+                with Output(sys.stderr).waiting(t('hardware_loading', target=target)):
+                    network = self.manager.hardware(target, item='network')
             choices = []
             if status['available']:
                 choices.append(('gpu', t('gpu_switch', value=t('state_enabled' if status['enabled'] else 'state_disabled'))))
@@ -192,7 +196,7 @@ class UI:
                         network = None
                         raise
                     network = {'enabled': saved['enabled'], 'configured': True, 'resources': saved}
-                self.present(t('network_choose'), change_network)
+                self.present(t('network_choose'), change_network, prompt_title=True)
                 continue
             def change():
                 nonlocal status
@@ -206,13 +210,14 @@ class UI:
                     # again, without repeating host discovery for this menu flow.
                     status = None
                     try:
-                        status = self.manager.hardware(target, capability=capability)
+                        with Output(sys.stderr).waiting(t('hardware_loading', target=target)):
+                            status = self.manager.hardware(target, capability=capability)
                     except (Error, OSError) as refresh_error:
                         self.write(t('error', error=refresh_error), error=True)
                     raise
                 status = {**capability, 'enabled': record['enabled'],
                           'configured': True, 'resources': record}
-            self.present(t('gpu_choose'), change)
+            self.present(t('gpu_choose'), change, prompt_title=True)
             if status is None:
                 return
 
@@ -236,7 +241,8 @@ class UI:
                 self.present(t('page_container', target=selected), lambda: self.container(selected), back=False)
 
     def migration(self):
-        items = self.manager.legacy_list()
+        with Output(sys.stderr).waiting(t('migration_loading')):
+            items = self.manager.legacy_list()
         if not items:
             self.view.choose(t('menu_migrate'), [(None, t('menu_back'))],
                              description=[t('migration_help'), t('migration_empty')])

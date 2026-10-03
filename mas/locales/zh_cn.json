@@ -331,5 +331,10 @@
   "network_conflict": "网络设备配置冲突或已被修改；未覆盖该设备。",
   "network_changed": "容器身份、状态或配置已改变；网络更新未完成，请重新检查。",
   "action_network": "配置网络",
-  "info_network": "网络配置：{value}"
+  "info_network": "网络配置：{value}",
+  "info_loading": "正在读取容器 {target} 的信息…",
+  "hardware_loading": "正在读取容器 {target} 的硬件配置…",
+  "migration_loading": "正在读取可迁移的旧版本容器…",
+  "fs_list_loading": "正在读取容器 {target} 的文件系统挂载…",
+  "bootstrap_terminal_narrow": "尚未安装 Python 的语言菜单需要至少 {columns} 列、5 行；请扩大终端或显式传入 --language zh_cn / --language en_us。"
 }

@@ -1,9 +1,7 @@
 """Transient terminal progress with permanent diagnostics and stage summaries."""
 import re
-import os
-import shutil
 from collections import Counter
-from .output import Output as TerminalOutput
+from .output import Output as TerminalOutput, terminal_size
 from .i18n import t
 
 # Raw external output is never translated. Unknown stderr is kept, not hidden.
@@ -12,33 +10,27 @@ from .diagnostics import WARNING
 
 
 class Output(TerminalOutput):
-    def foreground(self, text, color):
-        return f'\033[{color}m{text}\033[0m' if self.tty else text
-
     def section(self, category, name, description):
-        try:
-            columns = os.get_terminal_size(self.stream.fileno()).columns
-        except (AttributeError, OSError, ValueError):
-            columns = shutil.get_terminal_size().columns
+        columns = terminal_size(self.stream).columns
         self.keep('─' * max(1, min(80, columns - 1)))
         self.keep(t('test_stage', category=category, name=name, description=description))
 
     def result(self, message, passed):
         mark = '✓' if passed else '✗'
         if message.startswith(mark):
-            message = self.foreground(mark, 32 if passed else 31) + message[1:]
+            message = self.foreground(mark, 'green' if passed else 'red') + message[1:]
         self.keep(message)
 
     def expected_error(self, command):
-        label = self.foreground(t('expected_error_label'), 33)
+        label = self.foreground(t('expected_error_label'), 'yellow')
         self.keep(t('expected_error', label=label, command=command))
 
     def challenge(self, message):
         # Only owned status lines receive color; commands/evidence stay intact.
         if message.startswith('[通过]'):
-            message = self.foreground('✓', 32) + ' ' + message
+            message = self.foreground('✓', 'green') + ' ' + message
         elif message.startswith('[失败]'):
-            message = self.foreground('✗', 31) + ' ' + message
+            message = self.foreground('✗', 'red') + ' ' + message
         self.keep(message)
 
     def diagnostics(self, stdout, stderr, failed=False, exclude=()):

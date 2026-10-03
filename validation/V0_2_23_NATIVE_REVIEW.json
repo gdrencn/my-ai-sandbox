@@ -1,0 +1,59 @@
+{
+  "target": "review-97bdaac97cc64c1fbf117cbf7f2b4f0e",
+  "packages": {
+    "node": "v22.22.1",
+    "node_source": "ubuntu-apt",
+    "npm": "9.2.0",
+    "packages": {
+      "build-essential": "12.12ubuntu2.26.04.2",
+      "ca-certificates": "20260601~26.04.1",
+      "curl": "8.18.0-1ubuntu2.7",
+      "file": "1:5.46-5build2",
+      "git": "1:2.53.0-1ubuntu1",
+      "gzip": "1.14-1~exp2ubuntu1.1",
+      "jq": "1.8.1-4ubuntu2",
+      "nodejs": "22.22.1+dfsg+~cs22.19.15-1ubuntu1",
+      "npm": "9.2.0~ds3-1",
+      "openssh-client": "1:10.2p1-2ubuntu3.6",
+      "patch": "2.8-2build1",
+      "pkg-config": "2.5.1-4",
+      "python3": "3.14.3-0ubuntu2",
+      "python3-dev": "3.14.3-0ubuntu2",
+      "python3-pip": "25.1.1+dfsg-1ubuntu2",
+      "python3-venv": "3.14.3-0ubuntu2",
+      "ripgrep": "15.1.0-1ubuntu1",
+      "shellcheck": "0.11.0-2",
+      "sudo": "1.9.17p2-1ubuntu3.1",
+      "tar": "1.35+dfsg-4ubuntu0.4",
+      "unzip": "6.0-29ubuntu1",
+      "wget": "1.25.0-2ubuntu4.4",
+      "xz-utils": "5.8.3-1",
+      "zip": "3.0-15ubuntu3",
+      "zstd": "1.5.7+dfsg-3"
+    },
+    "version": 1
+  },
+  "live_native_output": true,
+  "normal_output_cleared": true,
+  "single_row": true,
+  "subsecond_updates": 293,
+  "minimum_update_interval": 0.050286600991967134,
+  "menu_checks": [
+    {
+      "language": "zh_cn",
+      "network": false,
+      "menu": true,
+      "mac_preserved": true
+    },
+    {
+      "language": "en_us",
+      "network": true,
+      "menu": true,
+      "mac_preserved": true
+    }
+  ],
+  "public_security_fixture": {
+    "initial": "Stopped",
+    "network": "off"
+  }
+}

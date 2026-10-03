@@ -7,7 +7,7 @@ import sys
 import termios
 
 from .i18n import t
-from .output import boundary
+from .output import boundary, colored, terminal_size
 from .text import cells, clipped
 
 
@@ -73,10 +73,9 @@ def rendered(label, width, color=True):
         largest = max(range(len(widths)), key=widths.__getitem__)
         widths[largest] -= 1
     result = prefix
-    colors = {'green': '\x1b[32m', 'yellow': '\x1b[33m', 'red': '\x1b[31m'} if color else {}
     for index, (cell, size) in enumerate(zip(label.values, widths)):
         value = clipped(cell.text, min(size, available))
-        result += colors.get(cell.tone, '') + value + ('\x1b[39m' if cell.tone in colors else '')
+        result += colored(value, cell.tone, enabled=color, foreground_only=True)
         available -= cells(value)
         if index < len(widths)-1:
             padding = max(0, min(available, size - cells(value) + gap))
@@ -124,7 +123,7 @@ class Screen:
         self.needs_gap = True
 
     def size(self):
-        value = os.get_terminal_size(self.fd)
+        value = terminal_size(self.terminal)
         return max(2, value.columns), max(4, value.lines)
 
     @contextmanager

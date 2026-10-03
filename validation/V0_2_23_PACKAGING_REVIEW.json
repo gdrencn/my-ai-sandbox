@@ -1,0 +1,38 @@
+{
+  "archives": [
+    {
+      "archive": "mas.pyz",
+      "files": 23,
+      "sources_match": true,
+      "python_310": true
+    },
+    {
+      "archive": "mas-install.pyz",
+      "files": 23,
+      "sources_match": true,
+      "python_310": true
+    },
+    {
+      "archive": "mas-test.pyz",
+      "files": 72,
+      "sources_match": true,
+      "python_310": true
+    }
+  ],
+  "reproducible_build": true,
+  "bash_syntax": true,
+  "diff_check": true,
+  "hashes": {
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+    "install.sh": "05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+    "mas.pyz": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+    "SHA256SUMS": "4c2bba9d867be3f885a7c6edcbb7ea38b280048eea730d69ed91a976f53933f4",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "bootstrap.py": "fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+    "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+    "mas-install.pyz": "d74b667176901338c6fd6a5c13a37206c2e52d76a809c30d159febd46e081305",
+    "mas-test.pyz": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a"
+  }
+}

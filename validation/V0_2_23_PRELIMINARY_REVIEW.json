@@ -1,0 +1,13 @@
+{
+  "reason": "Agent interrupted preliminary native run after reproducing CRLF rendering defect",
+  "version": "0.2.23",
+  "counts": {
+    "passed": 26,
+    "failed": 1,
+    "not_run": 1
+  },
+  "elapsed": 1065.5510181160062,
+  "cleanup_independently_verified": true,
+  "not_final_validation": true,
+  "archive": "/tmp/mas-v0.2.23-preliminary-frozen/mas-test.pyz"
+}

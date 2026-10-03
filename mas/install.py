@@ -46,8 +46,10 @@ def run(args, privileged=False, capture=False, display=True, label=None):
     return result.stdout or ""
 
 
-def dependency_script():
-    return files('mas').joinpath('dependencies.sh').read_text()
+def dependency_script(*, python=None, root=None):
+    root = root or str(Path(__file__).resolve().parent.parent)
+    return ('MAS_APT_PYTHON=' + shlex.quote(python or sys.executable) + '\nMAS_APT_ROOT=' + shlex.quote(root) + '\n'
+            + files('mas').joinpath('dependencies.sh').read_text())
 
 
 def prepare_dependencies():

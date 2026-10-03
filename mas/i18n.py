@@ -41,8 +41,6 @@ def choose_language(selected=None):
         chosen = menu.interactive(lambda ui: menu.language(ui, config.get("language")))
     except OSError as exc:
         raise ValueError(t("language_terminal_required")) from exc
-    except menu.Cancelled as exc:
-        raise ValueError(t("cancelled")) from exc
     config.set_value("language", chosen)
     return chosen
 

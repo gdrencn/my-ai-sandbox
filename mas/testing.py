@@ -19,6 +19,7 @@ import select
 import signal
 import stat
 import shutil
+import shlex
 import struct
 import subprocess
 import sys
@@ -1343,21 +1344,31 @@ try {
     def dependencies(self, target):
         """Real privileged package installation, confined to this test container."""
         from .install import dependency_script
-        script = dependency_script() + '\nmas_run_apt update && mas_run_apt install -y sshfs\n'
-        path = Path(self.workspace.name)/'dependency-probe.sh'
-        path.write_text(script)
-        remote = '/tmp/mas-dependency-probe.sh'
-        self.manager.lxd.command(['file', 'push', str(path), 'local:'+target+remote])
-        # sandbox already has the ordinary mas passwordless-sudo setup.
-        command = self.manager.lxd.prefix + ['exec', 'local:'+target, '--', 'su', '--login', 'sandbox', '-c', 'bash '+remote]
-        terminal = Terminal(command, self.timeout, self.directory/'dependency-install.log',
-            on_wait=lambda elapsed: self.output.progress(t('working', name=t('case_dependency-install'), elapsed=elapsed)))
-        try:
-            terminal.expect('Dependency preparation completed: apt-get install -y sshfs')
-            terminal.finish()
-        finally:
-            terminal.close()
-            self.output.diagnostics(terminal.buffer.decode(errors='replace'), '', failed=terminal.status != 0)
+        with tempfile.TemporaryDirectory(prefix='mas-dependency-', dir=self.workspace.name) as directory:
+            path = Path(directory)
+            path.chmod(0o755)
+            package = path/'mas'
+            package.mkdir()
+            # Transport the same shared renderer bytes from the tester archive.
+            # The guest cannot import modules through this host's archive path.
+            for name in ('__init__.py', 'output.py', 'text.py', 'diagnostics.py'):
+                (package/name).write_bytes(files('mas').joinpath(name).read_bytes())
+            remote = '/tmp/'+path.name
+            script = dependency_script(python='/usr/bin/python3', root=remote)
+            (path/'probe.sh').write_text(script+'\nmas_run_apt update && mas_run_apt install -y sshfs\n')
+            with cleanup_scope(lambda: self.exec(target, 'rm -rf -- '+shlex.quote(remote))):
+                self.manager.lxd.command(['file', 'push', '-r', str(path), 'local:'+target+'/tmp/'])
+                # sandbox already has the ordinary mas passwordless-sudo setup.
+                command = self.manager.lxd.prefix + ['exec', 'local:'+target, '--', 'su', '--login', 'sandbox', '-c',
+                                                    'bash '+shlex.quote(remote+'/probe.sh')]
+                terminal = Terminal(command, self.timeout, self.directory/'dependency-install.log',
+                    on_wait=lambda elapsed: self.output.progress(t('working', name=t('case_dependency-install'), elapsed=elapsed)))
+                try:
+                    terminal.expect('Dependency preparation completed: apt-get install -y sshfs')
+                    terminal.finish()
+                finally:
+                    terminal.close()
+                    self.output.diagnostics(terminal.buffer.decode(errors='replace'), '', failed=terminal.status != 0)
         assert self.exec(target, 'command -v sshfs').strip()
         versions = self.exec(target, 'sudo --version; apt-get --version')
         self.events.append(dict(action='dependency-install', target=target, status='ok', versions=versions))

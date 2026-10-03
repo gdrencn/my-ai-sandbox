@@ -120,7 +120,14 @@ def main():
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
+    except KeyboardInterrupt:
+        print(t('interrupted'), file=sys.stderr)
+        raise SystemExit(130)
     except Exception as exc:
+        from mas.menu import Cancelled
+        if isinstance(exc, Cancelled):
+            print(t('cancelled'), file=sys.stderr)
+            raise SystemExit(130)
         detail = t(exc.key, **exc.values) if isinstance(exc, config.ConfigError) else str(exc)
         print(t("install_failed", error=detail), file=sys.stderr)
         raise SystemExit(1)

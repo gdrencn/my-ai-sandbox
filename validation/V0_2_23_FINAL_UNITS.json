@@ -1,0 +1,11 @@
+{
+  "version": "0.2.23",
+  "archive": "/tmp/mas-v0.2.23-frozen/mas-test.pyz",
+  "sha256": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
+  "tests_run": 439,
+  "failures": 0,
+  "errors": 0,
+  "skipped": [],
+  "elapsed": 25.315,
+  "log": "/tmp/mas-v0.2.23-local-final/results/unit.log"
+}

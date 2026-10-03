@@ -4,12 +4,28 @@ set -euo pipefail
 
 # Before Python exists, the bootstrap uses Bash's own terminal input.
 # Labels are generated from the same product catalog as the Python menus.
-mas_choose_language() {
-    local selected=0 key suffix
+mas_choose_language() (
+    local selected=0 key suffix columns rows minimum=43
+    if ! { : </dev/tty; } 2>/dev/null; then
+        printf '%s\n' '语言选择需要交互式终端；无人值守安装请指定 --language en_us 或 --language zh_cn。' >&2
+        return 1
+    fi
+    read -r rows columns < <(stty size </dev/tty)
+    if ((columns < minimum || rows < 5)); then
+        printf '%s\n' '尚未安装 Python 的语言菜单需要至少 43 列、5 行；请扩大终端或显式传入 --language zh_cn / --language en_us。' >&2
+        return 1
+    fi
     printf '\033[?25l' >/dev/tty
-    trap 'printf "\033[?25h" >/dev/tty' RETURN
+    trap 'printf "\033[0m\033[?25h" >/dev/tty' EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     printf '%s\n\n\n\n' '请选择界面语言 / Select interface language' >/dev/tty
     while true; do
+        read -r rows columns < <(stty size </dev/tty)
+        if ((columns < minimum || rows < 5)); then
+            printf '\n%s\n' '尚未安装 Python 的语言菜单需要至少 43 列、5 行；请扩大终端或显式传入 --language zh_cn / --language en_us。' >&2
+            return 1
+        fi
         printf '\033[3A\r\033[2K' >/dev/tty
         if ((selected == 0)); then
             printf '\033[7m❯ ● %s\033[0m\n  ○ %s\n' '简体中文 (zh_cn)' 'English (en_us)' >/dev/tty
@@ -32,7 +48,7 @@ mas_choose_language() {
         esac
     done
     if ((selected == 0)); then printf zh_cn; else printf en_us; fi
-}
+)
 
 if ! command -v python3 >/dev/null; then
     mas_language=${MAS_LANGUAGE:-}
@@ -44,15 +60,20 @@ if ! command -v python3 >/dev/null; then
         esac
     done
     while [[ $mas_language != en_us && $mas_language != zh_cn ]]; do
-        mas_language=$(mas_choose_language)
+        if mas_language=$(mas_choose_language); then :
+        else
+            mas_selection_status=$?
+            if ((mas_selection_status == 130)); then printf '%s\n' '已取消。' >&2; fi
+            exit "$mas_selection_status"
+        fi
     done
     export MAS_LANGUAGE=$mas_language
     case $mas_language in
         zh_cn) MAS_APT_SETUP='环境准备'; MAS_APT_DONE='依赖准备完成'; MAS_APT_FAILED='依赖准备失败' ;;
         en_us) MAS_APT_SETUP=Setup; MAS_APT_DONE='Dependency preparation completed'; MAS_APT_FAILED='Dependency preparation failed' ;;
     esac
-# Shared by the pre-Python bootstrap and the Python installer. Bash built-ins
-# handle presentation so preparing Python itself uses the same dependency flow.
+# Shared dependency execution; Python UI is used when available. The Bash
+# renderer below is solely the adapter for preparing Python itself.
 mas_missing_dependencies() {
     command -v python3 >/dev/null || printf '%s\n' python3
     if ! command -v lxd >/dev/null && [[ ! -x /snap/bin/lxd ]]; then
@@ -66,6 +87,9 @@ mas_missing_dependencies() {
 mas_apt_normal() {
     local line=$1 complete=$2 package_list=$3 prefix
     [[ $line =~ [Ww][Aa][Rr][Nn][Ii][Nn][Gg]|[Ee][Rr][Rr][Oo][Rr]|[Ff][Aa][Ii][Ll][Ee][Dd]|^[WE]:|^Err: ]] && return 1
+    # Before Python exists, only ASCII normal output can be safely clipped by
+    # Bash's character count. Preserve other text as permanent native output.
+    [[ $line =~ [^\ -~] ]] && return 1
     [[ -z $line ]] && return 0
     for prefix in 'Hit:' 'Get:' 'Ign:' 'Reading package lists' 'Building dependency tree' \
         'Reading state information' 'Solving dependencies' 'The following ' 'Suggested packages:' \
@@ -86,6 +110,9 @@ mas_apt_emit() {
     local complete=$1
     if ((committed == 0)) && mas_apt_normal "$pending" "$complete" "$package_list"; then
         if [[ -t 1 && -n $pending ]]; then
+            # Query the actual output terminal on each update, including resize.
+            read -r _ width < <(stty size <&1 2>/dev/null) || width=${COLUMNS:-80}
+            [[ $width =~ ^[0-9]+$ ]] && ((width > 1)) || width=80
             printf '\r\033[2K%s' "${pending:0:width-1}"
             active=1
         fi
@@ -103,11 +130,18 @@ mas_apt_emit() {
 }
 
 mas_apt_render() {
-    local char status pending='' committed=0 active=0 package_list=0 width=${COLUMNS:-80}
+    if [[ -n ${MAS_APT_PYTHON:-} && -n ${MAS_APT_ROOT:-} ]]; then
+        "$MAS_APT_PYTHON" -c 'import sys;sys.path.insert(0,sys.argv[1]);from mas.output import apt_stream;apt_stream()' "$MAS_APT_ROOT"
+        return $?
+    fi
+    local char status pending='' committed=0 active=0 package_list=0 after_cr=0 width=${COLUMNS:-80}
     while true; do
         if IFS= read -r -N 1 -t 0.1 char; then
+            if [[ $char == $'\n' && $after_cr -eq 1 ]]; then after_cr=0; continue; fi
+            after_cr=0
             case $char in
-                $'\r'|$'\n') mas_apt_emit 1 ;;
+                $'\r') after_cr=1; mas_apt_emit 1 ;;
+                $'\n') mas_apt_emit 1 ;;
                 *) pending+=$char ;;
             esac
         else
@@ -153,7 +187,8 @@ mas_run_apt() {
     worker=$(declare -f mas_apt_normal mas_apt_emit mas_apt_render mas_apt_execute)
     worker+=$'\nmas_apt_execute "$@"'
     printf '%s: apt-get %s\n' "${MAS_APT_SETUP:-Preparing dependencies}" "$*"
-    if "${privilege[@]}" env LC_ALL=C bash -o pipefail -c "$worker" mas-apt "$@" <&"$input"; then
+    if "${privilege[@]}" env LC_ALL=C MAS_APT_PYTHON="${MAS_APT_PYTHON:-}" MAS_APT_ROOT="${MAS_APT_ROOT:-}" \
+        bash -o pipefail -c "$worker" mas-apt "$@" <&"$input"; then
         result=0
         printf '%s: apt-get %s\n' "${MAS_APT_DONE:-Dependency preparation completed}" "$*"
     else

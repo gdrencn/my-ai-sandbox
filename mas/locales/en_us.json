@@ -331,5 +331,10 @@
   "network_conflict": "Network device configuration conflicts or was modified; the device was not overwritten.",
   "network_changed": "Container identity, state or configuration changed; check again before updating the network.",
   "action_network": "Configure network",
-  "info_network": "Network configuration: {value}"
+  "info_network": "Network configuration: {value}",
+  "info_loading": "Reading information for container {target}…",
+  "hardware_loading": "Reading hardware configuration for container {target}…",
+  "migration_loading": "Reading earlier-version containers available for migration…",
+  "fs_list_loading": "Reading filesystem mounts for container {target}…",
+  "bootstrap_terminal_narrow": "The language menu before Python installation needs at least {columns} columns and 5 rows; enlarge the terminal or pass --language zh_cn / --language en_us."
 }

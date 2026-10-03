@@ -1,0 +1,401 @@
+{
+  "version": "0.2.23",
+  "status": "final_frozen_native_passed_publication_pending",
+  "guideline": "/home/gordon/.codex/CLI_TUI_GUIDELINES.md",
+  "cycles": [
+    {
+      "cycle": 1,
+      "findings": [
+        "Host APT renderer diverged from product/tester output",
+        "APT prefix diagnostics could be discarded",
+        "GPU/network/language decision titles repeated",
+        "Installer language cancellation had inconsistent failure semantics",
+        "CLI container rows used tabs",
+        "Read-only information/hardware/migration/filesystem queries lacked task feedback"
+      ],
+      "changes": [
+        "Share Python terminal renderer, actual dimensions and semantic colors",
+        "Use one diagnostic predicate including W:/E:/Err:",
+        "Assign prompt title ownership explicitly",
+        "Cancel language selection with localized feedback and exit 130 before setup",
+        "Reuse common column rows",
+        "Scope transient waiting feedback around blocking reads"
+      ],
+      "verification": [
+        "Focused regression runs passed",
+        "Real PTYs cover both languages, title counts, focus, delayed/failing reads, fragments/prompts and resize"
+      ]
+    },
+    {
+      "cycle": 2,
+      "findings": [
+        "CLI empty list had no explicit feedback",
+        "Secondary reporter diagnostics could bypass active progress clearing"
+      ],
+      "changes": [
+        "Report empty result without opening a prompt",
+        "Clear active shared progress before permanent output from another reporter"
+      ],
+      "verification": [
+        "Both-language empty-list and real renderer-history regressions passed"
+      ]
+    },
+    {
+      "cycle": 3,
+      "findings": [
+        "Native dependency fixture inherited host-only renderer import paths",
+        "Pre-Python clipping had no explicit Unicode limitation",
+        "Raw template arithmetic placeholders were not valid ShellCheck syntax"
+      ],
+      "changes": [
+        "Transport exact shared modules into an owned guest fixture and use guest Python/root",
+        "Render ASCII normally and preserve non-ASCII native output permanently before Python",
+        "Assign generated minimum width before arithmetic comparisons"
+      ],
+      "verification": [
+        "Source discovery: 438 passed with one archive-only skip",
+        "Final packaged unit stage passed without skips",
+        "Explicit-Bash ShellCheck passed for rendered scripts; raw template excludes only generated-use SC2034",
+        "Python 3.10 grammar, Bash syntax and frozen reproducibility passed"
+      ]
+    },
+    {
+      "cycle": 4,
+      "findings": [
+        "CRLF split across native read boundaries reset package-list context and retained normal package rows"
+      ],
+      "changes": [
+        "Treat adjacent CR/LF as one boundary in shared Python renderer and minimal Bash adapter"
+      ],
+      "verification": [
+        "New regression fails against preliminary frozen renderer",
+        "Focused 29-test run including new regression passes",
+        "Agent-interrupted preliminary native run is excluded from final verification; cleanup independently confirmed"
+      ]
+    },
+    {
+      "cycle": 5,
+      "findings": [],
+      "verification": [
+        "Corrected final frozen suite passed 439 units and all 28 stages in 1424.6 seconds",
+        "Exactly one final security challenge passed 76 checks",
+        "No skips, unexecuted stages or cleanup errors",
+        "Owned Project/staging/legacy/mount cleanup independently verified; no matching native filesystem helper remained"
+      ]
+    }
+  ],
+  "component_ownership": {
+    "mas/output.py": "Shared transient/permanent output, scoped waits, active-row boundary, dimensions, colors and native stream consumption",
+    "mas/text.py": "Shared display-width and safe clipping primitives",
+    "mas/menu.py": "Shared selection, text input, prompt layout, aligned rows and terminal modes",
+    "mas/presentation.py": "Product-specific event/info/list formatting through shared components",
+    "mas/test_output.py": "Test-specific sections/status labels through shared components",
+    "mas/dependencies.sh": "One dependency execution helper; shared Python renderer when available, minimal ASCII bootstrap adapter otherwise",
+    "scripts/install.template.sh": "Pre-Python language adapter, generated catalogs and minimum dimensions",
+    "Snap": "Upstream native progress; no local generic renderer implementation"
+  },
+  "guideline_review": [
+    {
+      "sections": [
+        2
+      ],
+      "scope": "CLI help/arguments/exit codes, cancellation, noninteractive and stdout/stderr separation",
+      "evidence": [
+        "tests/test_menu.py",
+        "tests/test_i18n.py",
+        "tests/test_ui_guidelines.py"
+      ]
+    },
+    {
+      "sections": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "scope": "Inline menus, selection/input, conditional options, empty/error results, column widths, prompt title ownership, result-before-navigation and focus",
+      "evidence": [
+        "tests/test_menu.py",
+        "tests/test_menu_contract.py",
+        "tests/test_menu_refinements.py",
+        "tests/test_ui_guidelines.py"
+      ]
+    },
+    {
+      "sections": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "scope": "Progress/diagnostics, prompts, localization, Unicode/narrow/resize, redirection and normal/error/cancel terminal restoration",
+      "evidence": [
+        "tests/test_shared_setup.py",
+        "tests/test_progress.py",
+        "tests/test_test_output.py",
+        "tests/test_ui_guidelines.py"
+      ]
+    }
+  ],
+  "static_scope": {
+    "previous": "0.2.22",
+    "current": "0.2.23",
+    "product_changed": [
+      "mas/__init__.py",
+      "mas/cli.py",
+      "mas/diagnostics.py",
+      "mas/i18n.py",
+      "mas/locales/en_us.json",
+      "mas/locales/zh_cn.json",
+      "mas/menu.py",
+      "mas/output.py",
+      "mas/presentation.py",
+      "mas/terminal_ui.py"
+    ],
+    "unchanged_operation_modules": [
+      "mas/core.py",
+      "mas/isolation.py",
+      "mas/gpu.py",
+      "mas/network.py",
+      "mas/filesystems.py",
+      "mas/development.py"
+    ],
+    "static": {
+      "archives": [
+        {
+          "archive": "mas.pyz",
+          "files": 23,
+          "sources_match": true,
+          "python_310": true
+        },
+        {
+          "archive": "mas-install.pyz",
+          "files": 23,
+          "sources_match": true,
+          "python_310": true
+        },
+        {
+          "archive": "mas-test.pyz",
+          "files": 72,
+          "sources_match": true,
+          "python_310": true
+        }
+      ],
+      "reproducible_build": true,
+      "bash_syntax": true,
+      "diff_check": true,
+      "hashes": {
+        "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+        "install.sh": "05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+        "mas.pyz": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+        "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+        "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+        "SHA256SUMS": "4c2bba9d867be3f885a7c6edcbb7ea38b280048eea730d69ed91a976f53933f4",
+        "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+        "bootstrap.py": "fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+        "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+        "mas-install.pyz": "d74b667176901338c6fd6a5c13a37206c2e52d76a809c30d159febd46e081305",
+        "mas-test.pyz": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a"
+      }
+    },
+    "docs": {
+      "documents": 8,
+      "local_links_checked": 14,
+      "locale_keys": 338,
+      "locale_keys_and_placeholders_match": true
+    }
+  },
+  "documents": [
+    "README.md",
+    "REQUIREMENTS.md",
+    "IMPLEMENTED.md",
+    "CORE_BEHAVIOR.md",
+    "TEST_COVERAGE.md",
+    "GUEST_SECURITY_PROBE.md",
+    "MENU_REVIEW.md",
+    "RELEASE_NOTES.md"
+  ],
+  "limits": [
+    "Prepared Ubuntu 26.04 WSL/LXD 6.9/NVIDIA x86_64 native evidence only",
+    "Native Ubuntu/cloud, ARM64 and fresh host provisioning not newly exercised",
+    "Pre-Python language menu needs its generated minimum width and five rows; explicit --language remains available",
+    "PTY byte/interaction validation does not certify every terminal emulator resize/reflow behavior",
+    "Stable promotion and pending resource/policy/terminal workflow features remain separate"
+  ],
+  "native_component_review": {
+    "target": "review-97bdaac97cc64c1fbf117cbf7f2b4f0e",
+    "packages": {
+      "node": "v22.22.1",
+      "node_source": "ubuntu-apt",
+      "npm": "9.2.0",
+      "packages": {
+        "build-essential": "12.12ubuntu2.26.04.2",
+        "ca-certificates": "20260601~26.04.1",
+        "curl": "8.18.0-1ubuntu2.7",
+        "file": "1:5.46-5build2",
+        "git": "1:2.53.0-1ubuntu1",
+        "gzip": "1.14-1~exp2ubuntu1.1",
+        "jq": "1.8.1-4ubuntu2",
+        "nodejs": "22.22.1+dfsg+~cs22.19.15-1ubuntu1",
+        "npm": "9.2.0~ds3-1",
+        "openssh-client": "1:10.2p1-2ubuntu3.6",
+        "patch": "2.8-2build1",
+        "pkg-config": "2.5.1-4",
+        "python3": "3.14.3-0ubuntu2",
+        "python3-dev": "3.14.3-0ubuntu2",
+        "python3-pip": "25.1.1+dfsg-1ubuntu2",
+        "python3-venv": "3.14.3-0ubuntu2",
+        "ripgrep": "15.1.0-1ubuntu1",
+        "shellcheck": "0.11.0-2",
+        "sudo": "1.9.17p2-1ubuntu3.1",
+        "tar": "1.35+dfsg-4ubuntu0.4",
+        "unzip": "6.0-29ubuntu1",
+        "wget": "1.25.0-2ubuntu4.4",
+        "xz-utils": "5.8.3-1",
+        "zip": "3.0-15ubuntu3",
+        "zstd": "1.5.7+dfsg-3"
+      },
+      "version": 1
+    },
+    "live_native_output": true,
+    "normal_output_cleared": true,
+    "single_row": true,
+    "subsecond_updates": 293,
+    "minimum_update_interval": 0.050286600991967134,
+    "menu_checks": [
+      {
+        "language": "zh_cn",
+        "network": false,
+        "menu": true,
+        "mac_preserved": true
+      },
+      {
+        "language": "en_us",
+        "network": true,
+        "menu": true,
+        "mac_preserved": true
+      }
+    ],
+    "public_security_fixture": {
+      "initial": "Stopped",
+      "network": "off"
+    },
+    "artifact_scope": "Preliminary archive; final correction changes CRLF consumption only; final native run pending",
+    "product_sha256": "6139bafdc43ef83689e9cfb283ef2e23529a66fdeb902feb9d58a8bcb66ccf39"
+  },
+  "native_title_review": {
+    "checks": [
+      {
+        "language": "zh_cn",
+        "gpu_title_once": true,
+        "gpu_cancel": true,
+        "network_title_once": true,
+        "network_cancel": true
+      },
+      {
+        "language": "en_us",
+        "gpu_title_once": true,
+        "gpu_cancel": true,
+        "network_title_once": true,
+        "network_cancel": true
+      }
+    ],
+    "fixture_configuration_unchanged": true,
+    "version": "0.2.23",
+    "product_sha256": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a"
+  },
+  "documentation_corrections": [
+    "Current shared-output ownership replaces independent host Python renderer wording",
+    "Previous v0.2.22 review and current v0.2.23 review have distinct status",
+    "Historical Stage 37 status corrected to reflect its recorded completed publication/public validation"
+  ],
+  "preliminary_run": {
+    "reason": "Agent interrupted preliminary native run after reproducing CRLF rendering defect",
+    "version": "0.2.23",
+    "counts": {
+      "passed": 26,
+      "failed": 1,
+      "not_run": 1
+    },
+    "elapsed": 1065.5510181160062,
+    "cleanup_independently_verified": true,
+    "not_final_validation": true,
+    "archive": "/tmp/mas-v0.2.23-preliminary-frozen/mas-test.pyz"
+  },
+  "final_packaged_units": {
+    "version": "0.2.23",
+    "archive": "/tmp/mas-v0.2.23-frozen/mas-test.pyz",
+    "sha256": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
+    "tests_run": 439,
+    "failures": 0,
+    "errors": 0,
+    "skipped": [],
+    "elapsed": 25.315,
+    "log": "/tmp/mas-v0.2.23-local-final/results/unit.log"
+  },
+  "local_run": {
+    "version": "0.2.23",
+    "report": "/tmp/mas-v0.2.23-local-final/results/report.json",
+    "stages": 28,
+    "unit_tests": 439,
+    "boundary_counts": {
+      "PASS": 76,
+      "FAIL": 0
+    },
+    "single_final_challenge": true,
+    "cleanup_independently_verified": true,
+    "project": "test-6548306e1a6344818fab160252707160",
+    "staging_projects": [
+      "mas-import-7cfd77847f0f4ab784c20c20b30ae96e",
+      "mas-import-82a1094355d64c7bb6b1825004fbcb23",
+      "mas-import-8b65c07712034ea3aa3ef397d99b4969",
+      "mas-import-99603660cbbe46d58c95a0399d40a29a",
+      "mas-import-b005523afc844a0d86433680b8f61157",
+      "mas-import-c58ec02cd92241f69ae69fd7cc6a5be7"
+    ],
+    "elapsed": 1424.5951583059941,
+    "product_sha256": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+    "installed_hashes_match": true,
+    "tester_sha256": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
+    "network_evidence_retained": true,
+    "packaging": {
+      "archives": [
+        {
+          "archive": "mas.pyz",
+          "files": 23,
+          "sources_match": true,
+          "python_310": true
+        },
+        {
+          "archive": "mas-install.pyz",
+          "files": 23,
+          "sources_match": true,
+          "python_310": true
+        },
+        {
+          "archive": "mas-test.pyz",
+          "files": 72,
+          "sources_match": true,
+          "python_310": true
+        }
+      ],
+      "reproducible_build": true,
+      "bash_syntax": true,
+      "diff_check": true,
+      "hashes": {
+        "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+        "install.sh": "05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+        "mas.pyz": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+        "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+        "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+        "SHA256SUMS": "4c2bba9d867be3f885a7c6edcbb7ea38b280048eea730d69ed91a976f53933f4",
+        "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+        "bootstrap.py": "fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+        "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+        "mas-install.pyz": "d74b667176901338c6fd6a5c13a37206c2e52d76a809c30d159febd46e081305",
+        "mas-test.pyz": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a"
+      }
+    },
+    "native_filesystem_helpers_absent": true
+  }
+}

@@ -1,5 +1,5 @@
-# Shared by the pre-Python bootstrap and the Python installer. Bash built-ins
-# handle presentation so preparing Python itself uses the same dependency flow.
+# Shared dependency execution; Python UI is used when available. The Bash
+# renderer below is solely the adapter for preparing Python itself.
 mas_missing_dependencies() {
     command -v python3 >/dev/null || printf '%s\n' python3
     if ! command -v lxd >/dev/null && [[ ! -x /snap/bin/lxd ]]; then
@@ -13,6 +13,9 @@ mas_missing_dependencies() {
 mas_apt_normal() {
     local line=$1 complete=$2 package_list=$3 prefix
     [[ $line =~ [Ww][Aa][Rr][Nn][Ii][Nn][Gg]|[Ee][Rr][Rr][Oo][Rr]|[Ff][Aa][Ii][Ll][Ee][Dd]|^[WE]:|^Err: ]] && return 1
+    # Before Python exists, only ASCII normal output can be safely clipped by
+    # Bash's character count. Preserve other text as permanent native output.
+    [[ $line =~ [^\ -~] ]] && return 1
     [[ -z $line ]] && return 0
     for prefix in 'Hit:' 'Get:' 'Ign:' 'Reading package lists' 'Building dependency tree' \
         'Reading state information' 'Solving dependencies' 'The following ' 'Suggested packages:' \
@@ -33,6 +36,9 @@ mas_apt_emit() {
     local complete=$1
     if ((committed == 0)) && mas_apt_normal "$pending" "$complete" "$package_list"; then
         if [[ -t 1 && -n $pending ]]; then
+            # Query the actual output terminal on each update, including resize.
+            read -r _ width < <(stty size <&1 2>/dev/null) || width=${COLUMNS:-80}
+            [[ $width =~ ^[0-9]+$ ]] && ((width > 1)) || width=80
             printf '\r\033[2K%s' "${pending:0:width-1}"
             active=1
         fi
@@ -50,11 +56,18 @@ mas_apt_emit() {
 }
 
 mas_apt_render() {
-    local char status pending='' committed=0 active=0 package_list=0 width=${COLUMNS:-80}
+    if [[ -n ${MAS_APT_PYTHON:-} && -n ${MAS_APT_ROOT:-} ]]; then
+        "$MAS_APT_PYTHON" -c 'import sys;sys.path.insert(0,sys.argv[1]);from mas.output import apt_stream;apt_stream()' "$MAS_APT_ROOT"
+        return $?
+    fi
+    local char status pending='' committed=0 active=0 package_list=0 after_cr=0 width=${COLUMNS:-80}
     while true; do
         if IFS= read -r -N 1 -t 0.1 char; then
+            if [[ $char == $'\n' && $after_cr -eq 1 ]]; then after_cr=0; continue; fi
+            after_cr=0
             case $char in
-                $'\r'|$'\n') mas_apt_emit 1 ;;
+                $'\r') after_cr=1; mas_apt_emit 1 ;;
+                $'\n') mas_apt_emit 1 ;;
                 *) pending+=$char ;;
             esac
         else
@@ -100,7 +113,8 @@ mas_run_apt() {
     worker=$(declare -f mas_apt_normal mas_apt_emit mas_apt_render mas_apt_execute)
     worker+=$'\nmas_apt_execute "$@"'
     printf '%s: apt-get %s\n' "${MAS_APT_SETUP:-Preparing dependencies}" "$*"
-    if "${privilege[@]}" env LC_ALL=C bash -o pipefail -c "$worker" mas-apt "$@" <&"$input"; then
+    if "${privilege[@]}" env LC_ALL=C MAS_APT_PYTHON="${MAS_APT_PYTHON:-}" MAS_APT_ROOT="${MAS_APT_ROOT:-}" \
+        bash -o pipefail -c "$worker" mas-apt "$@" <&"$input"; then
         result=0
         printf '%s: apt-get %s\n' "${MAS_APT_DONE:-Dependency preparation completed}" "$*"
     else

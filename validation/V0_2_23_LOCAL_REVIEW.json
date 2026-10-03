@@ -1,0 +1,65 @@
+{
+  "version": "0.2.23",
+  "report": "/tmp/mas-v0.2.23-local-final/results/report.json",
+  "stages": 28,
+  "unit_tests": 439,
+  "boundary_counts": {
+    "PASS": 76,
+    "FAIL": 0
+  },
+  "single_final_challenge": true,
+  "cleanup_independently_verified": true,
+  "project": "test-6548306e1a6344818fab160252707160",
+  "staging_projects": [
+    "mas-import-7cfd77847f0f4ab784c20c20b30ae96e",
+    "mas-import-82a1094355d64c7bb6b1825004fbcb23",
+    "mas-import-8b65c07712034ea3aa3ef397d99b4969",
+    "mas-import-99603660cbbe46d58c95a0399d40a29a",
+    "mas-import-b005523afc844a0d86433680b8f61157",
+    "mas-import-c58ec02cd92241f69ae69fd7cc6a5be7"
+  ],
+  "elapsed": 1424.5951583059941,
+  "product_sha256": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+  "installed_hashes_match": true,
+  "tester_sha256": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
+  "network_evidence_retained": true,
+  "packaging": {
+    "archives": [
+      {
+        "archive": "mas.pyz",
+        "files": 23,
+        "sources_match": true,
+        "python_310": true
+      },
+      {
+        "archive": "mas-install.pyz",
+        "files": 23,
+        "sources_match": true,
+        "python_310": true
+      },
+      {
+        "archive": "mas-test.pyz",
+        "files": 72,
+        "sources_match": true,
+        "python_310": true
+      }
+    ],
+    "reproducible_build": true,
+    "bash_syntax": true,
+    "diff_check": true,
+    "hashes": {
+      "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "install.sh": "05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+      "mas.pyz": "2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+      "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "SHA256SUMS": "4c2bba9d867be3f885a7c6edcbb7ea38b280048eea730d69ed91a976f53933f4",
+      "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "bootstrap.py": "fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+      "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+      "mas-install.pyz": "d74b667176901338c6fd6a5c13a37206c2e52d76a809c30d159febd46e081305",
+      "mas-test.pyz": "674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a"
+    }
+  },
+  "native_filesystem_helpers_absent": true
+}
