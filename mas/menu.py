@@ -37,6 +37,13 @@ def status_cell(text, status):
     return Cell(text, tone)
 
 
+def container_options(items):
+    """Shared container selector rows, including localized status columns."""
+    from .i18n import state
+    rows = column_rows([(item['name'], status_cell(state(item['status']), item['status'])) for item in items])
+    return [(item['name'], row) for item, row in zip(items, rows)]
+
+
 @dataclass(frozen=True)
 class Columns:
     values: tuple

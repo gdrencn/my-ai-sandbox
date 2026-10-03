@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlsplit
 from .core import Error, LXD, Manager, validate_target
 from .i18n import Parser, t
 from .menu import Cancelled, interactive
+from .menu import container_options
 from .presentation import Progress
 from .test_output import Output
 
@@ -45,19 +46,18 @@ def choose_target(manager, target, output):
     if target is not None:
         target_instance(manager, target)
         return target
-    output.keep(t('security_select'))
-    for item in manager.list():
-        output.keep('  ' + item['name'] + '  ' + item['status'])
+    with output.waiting(t('list_loading')):
+        items = manager.list()
+    if not items:
+        output.keep(t('security_empty'))
+        return None
     def choose(ui):
-        while True:
-            name = ui.input(t('security_target_prompt')).strip()
-            if not name:
-                raise Cancelled()
-            try:
-                target_instance(manager, name)
-                return name
-            except Error as exc:
-                output.keep(str(exc))
+        name = ui.choose(t('security_select'), container_options(items) + [(None, t('menu_cancel'))],
+                         default=items[0]['name'], cancel='cancel')
+        if name is None:
+            raise Cancelled()
+        target_instance(manager, name)
+        return name
     try:
         return interactive(choose)
     except OSError:
@@ -214,6 +214,8 @@ def main(argv=None):
         from .isolation import PROJECT
         manager = Manager(LXD(project=PROJECT, diagnostic=progress.output.keep), report=progress)
         target = choose_target(manager, args.target, output)
+        if target is None:
+            return 0
         output.section(t('test_category_security'), t('case_isolation-runtime'), t('security_help'))
         code, _, _ = run_challenge(manager, target, args.report, output, project=PROJECT, timeout=args.timeout)
         return code

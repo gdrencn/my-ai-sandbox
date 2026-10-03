@@ -19,11 +19,27 @@ from .diagnostics import cleanup_scope, notify, emit_native, failure_text
 MANAGED = "user.mas.managed"
 DEFAULT_TIMEOUT = 600
 
-USER_SETUP = r'''set -eu
+CLOUD_INIT_WAIT = r'''
 if command -v cloud-init >/dev/null 2>&1; then
-    cloud-init status --wait || test "$?" = 2
+    if cloud-init status --wait; then
+        :
+    else
+        code=$?
+        if test "$code" -ne 2; then
+            tail -n 60 /var/log/cloud-init-output.log >&2 || true
+            exit "$code"
+        fi
+    fi
 fi
+'''
+
+USER_SETUP = r'''set -eu
+''' + CLOUD_INIT_WAIT + r'''
 if ! command -v sudo >/dev/null 2>&1; then
+    if test -f /var/lib/mas/development.json; then
+        echo 'sudo was removed from this prepared container; install it explicitly to restore the required sandbox sudo capability' >&2
+        exit 1
+    fi
     apt-get update
     DEBIAN_FRONTEND=noninteractive apt-get install -y sudo
 fi
@@ -286,11 +302,31 @@ class Manager:
             raise Error(t('invalid_image'))
         self.isolation.check()
         from .isolation import PROFILE
+        from . import development
+        data = development.cloud_config()
         result = self._run_lxd_until_state("new", target,
-                               ["init", image, "local:" + target, "-p", PROFILE, "-c", MANAGED + "=true"], "Stopped")
+                               ["init", image, "local:" + target, "-p", PROFILE, "-c", MANAGED + "=true",
+                                '-c', 'cloud-init.user-data=' + data], "Stopped")
         self.isolation.audit(result)
         self.gpu.ensure(target)
         self.isolation.audit(self.find(target))
+        identity = result['config'].get('volatile.uuid')
+        def prepared_instance():
+            current = self.require(target)
+            if not identity or current['config'].get('volatile.uuid') != identity:
+                raise Error(t('new_identity_changed', target=target))
+            return current
+        def stop_prepared():
+            prepared_instance()
+            self.stop(target)
+        with cleanup_scope(stop_prepared, lambda error: self._cleanup_warning('new', target, error)):
+            prepared_instance()
+            self.start(target)
+            prepared_instance()
+            self._run_lxd_until_state('prepare-development', target,
+                ['exec', 'local:' + target, '--', '/bin/sh', '-c', development.verification()], 'Running')
+            development.finish(self, target, data, identity)
+        result = self.require(target, stopped=True)
         self._completed('new', target, 'Stopped', started)
         return result
 

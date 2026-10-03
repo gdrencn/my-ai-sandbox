@@ -107,7 +107,7 @@
   "action_delete": "删除",
   "action_import": "导入",
   "action_export": "导出",
-  "action_prepare-user": "准备用户",
+  "action_prepare-user": "等待初始化并准备用户",
   "action_mark-import": "标记导入",
   "path_configured": "已配置 shell PATH，请打开新终端后直接运行 mas。",
   "unsupported_shell": "暂不支持为 shell {shell} 自动配置 PATH。",
@@ -247,7 +247,7 @@
   "help_export_file": "备份输出文件；父目录须存在；覆盖现有文件需确认，默认否",
   "help_mountfs_path": "容器内绝对目录；省略时挂载 sandbox home；目标宿主路径必须未占用",
   "help_unmountfs_path": "已记录的精确挂载路径；省略时卸载先前以默认 home 挂载的路径",
-  "help_cmd_new": "创建停止状态的容器；默认镜像版本与宿主 Ubuntu 一致",
+  "help_cmd_new": "创建并初始化开发环境，完成后容器保持停止；默认镜像版本与宿主 Ubuntu 一致",
   "example_new": "示例：mas new sandbox --image ubuntu:24.04",
   "help_cmd_list": "列出由 mas 管理的容器及其状态",
   "example_list": "示例：mas list",
@@ -320,5 +320,8 @@
   "help_restart_enter": "停止后进入容器终端（复用 enter 的启动准备）",
   "cli_restart_consent": "restart 的 --yes/--no 仅可与 -e/--enter 一起使用。",
   "help_install_security": "仅下载测试工具，从宿主挑战指定容器；不安装 mas。",
-  "security_loading": "正在下载 {version} 安全挑战工具"
+  "security_loading": "正在下载 {version} 安全挑战工具",
+  "action_prepare-development": "准备开发环境",
+  "new_identity_changed": "创建期间容器 {target} 的身份已改变；未停止替换后的容器。",
+  "development_config_changed": "容器 {target} 的初始化配置已改变或未完成清理；创建未完成。"
 }

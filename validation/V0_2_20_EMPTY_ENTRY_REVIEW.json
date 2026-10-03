@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "没有可测试的 mas 容器，请先创建容器。\n",
+  "stderr": ""
+}

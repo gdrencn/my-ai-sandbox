@@ -1,6 +1,6 @@
 # 容器安全挑战
 
-v0.2.19 的自动化测试与独立宿主入口共用 mas/security_testing.py，以及原有 host_security_probe.py、guest_security_probe.py。宿主采集参照并传入容器，内部探针在容器运行，完整结果在宿主输出。security-host.sh 不提供，容器内不提供独立一键入口。
+v0.2.20 的自动化测试与独立宿主入口共用 mas/security_testing.py，以及原有 host_security_probe.py、guest_security_probe.py。宿主采集参照并传入容器，内部探针在容器运行，完整结果在宿主输出。security-host.sh 不提供，容器内不提供独立一键入口。
 
 ## 使用入口
 
@@ -14,7 +14,7 @@ v0.2.19 的自动化测试与独立宿主入口共用 mas/security_testing.py，
 
     curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
 
-交互时输入容器名，留空或 Esc 取消。无终端必须提供 TARGET，例如：
+交互时使用与 mas 相同的容器选择组件；显示容器名和状态，默认选中第一个容器，↑/↓ 移动，Enter/→ 确定，Esc/← 取消。没有可测试容器时提示并正常结束，不请求输入名称，不改变状态。无终端且列表非空时必须提供 TARGET，例如：
 
     curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test --report /home/gordon/security-test.json
 

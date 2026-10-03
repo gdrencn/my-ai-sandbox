@@ -107,7 +107,7 @@
   "action_delete": "delete",
   "action_import": "import",
   "action_export": "export",
-  "action_prepare-user": "prepare-user",
+  "action_prepare-user": "wait-initialization-and-prepare-user",
   "action_mark-import": "mark-import",
   "path_configured": "Shell PATH configured. Open a new terminal, then run mas.",
   "unsupported_shell": "Automatic PATH configuration does not support shell {shell}.",
@@ -247,7 +247,7 @@
   "help_export_file": "Backup output file; parent directory must exist; overwriting an existing file requires confirmation, default No",
   "help_mountfs_path": "Absolute container directory; omit for sandbox home; the corresponding host destination must be unused",
   "help_unmountfs_path": "Exact recorded mount path; omit to unmount the previously recorded default-home mount",
-  "help_cmd_new": "Create a stopped container; default image matches the host Ubuntu release",
+  "help_cmd_new": "Create and prepare a development container, leaving it stopped; default image matches the host Ubuntu release",
   "example_new": "Examples: mas new sandbox --image ubuntu:24.04",
   "help_cmd_list": "List mas-managed containers and their states",
   "example_list": "Examples: mas list",
@@ -320,5 +320,8 @@
   "help_restart_enter": "Enter the container terminal after stopping (reuse enter startup preparation)",
   "cli_restart_consent": "restart --yes/--no requires -e/--enter.",
   "help_install_security": "Download only the tester and challenge a container from its host; do not install mas.",
-  "security_loading": "Downloading {version} security challenge tool"
+  "security_loading": "Downloading {version} security challenge tool",
+  "action_prepare-development": "prepare-development",
+  "new_identity_changed": "Container {target} changed identity during creation; the replacement was not stopped.",
+  "development_config_changed": "Container {target} initialization configuration changed or could not be retired; creation is incomplete."
 }

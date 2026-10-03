@@ -1,6 +1,22 @@
 # my-ai-sandbox Requirements
 
-## Current authorized work: ordered tests and reusable host security entry
+## Current authorized batch: prepared development containers and shared selection
+
+Status: Implemented and locally verified. Frozen v0.2.20 passed 410 packaged units and all 27 stages on real LXD in 1038.1 seconds, with one final complete challenge (75 checks), no skips, unexecuted stages or cleanup errors. Test publication and public-entry validation are in progress. This batch supersedes the earlier create-without-start behavior and the independent challenge's text-input selection. Package preparation is for ordinary application development. The user selected the latest official Node.js LTS distribution; other packages use the Ubuntu archive.
+
+- When the independent host `test/security.sh` entry has no explicit TARGET, reuse the existing shared container-selection component instead of printing a list and asking the user to type a name.
+- Resolve and list mas-managed containers in the dedicated mas Project. When the list is empty, show the empty-list message and finish without requesting a name or changing container state. When containers are available, let the user choose from the list using the same navigation, confirmation and cancellation behavior as other container-selection flows.
+- Preserve explicit TARGET for noninteractive execution, target ownership/state/identity validation, standard start/stop behavior and restoration of the initial running state. Cancelling selection must not start or stop any container.
+- Define successful `new` as create, shared standard start, completed initialization/package installation, explicit verification, shared standard stop and confirmed Stopped state. Do not report creation complete before all phases succeed. Display progress throughout initial preparation. Preserve native errors and distinguish preparation failure from a secondary stop failure; do not delete a failed new container or overwrite an existing one.
+- Configure the newly created Ubuntu container with native LXD cloud-init package provisioning before its first start. Refresh the package index and install the complete agreed list without a full system upgrade. Await native cloud-init completion and verify installed package state, executable availability, Python venv creation with pip and usable Node.js/npm before success. Reject an image without the required Ubuntu/cloud-init capability with a clear error.
+- The exact Ubuntu package list is: sudo, ca-certificates, curl, wget, openssh-client, git, python3, python3-venv, python3-pip, python3-dev, build-essential, pkg-config, ripgrep, jq, patch, file, tar, gzip, xz-utils, zip, unzip, zstd and shellcheck. Install Node.js/npm from the latest LTS release in the official nodejs.org index, verify its architecture-specific archive against that release's official SHA-256 manifest, verify executable versions and record source/version/digest. Do not execute downloaded installer scripts or install a version manager. Unsupported official architectures and invalid downloads fail explicitly.
+- Provision packages only as part of new-container creation. Ordinary start, restart and enter must not rerun provisioning or reinstall software removed by the user. Existing and imported containers keep their current software. Use standard cloud-init first-instance execution rather than a package-maintenance hook on every start.
+- After successful verification, retire the new container's provisioning-only cloud-init payload through the shared conditional configuration API, preserving all unrelated configuration. Verify retirement before successful creation. This prevents a future imported instance or changed cloud-init identity from repeating package installation. Reject identity or configuration conflicts without overwriting competing changes.
+- Do not preinstall Codex, Ollama, herdr, LLM frameworks, model files, GPU compilation toolkits, terminal applications, editors, CMake, Ninja or additional language toolchains. Preserve standard sandbox-user provisioning, isolation, GPU configuration and filesystem lifecycle handling.
+- Verify package preparation and final stop on real LXD, successful use as sandbox, failure/stop-error behavior, subsequent start without reinstalling removed packages, shared terminal selection including empty/cancel/noninteractive paths, and the frozen full suite followed by its single final challenge. Update implementation/coverage/usage documentation after verification and publish test v0.2.20, preserving stable and earlier release assets.
+
+
+## Previous batch: ordered tests and reusable host security entry
 
 Status: Frozen v0.2.19 passed 395 packaged units and all 27 reported stages on real LXD in 722.8 seconds, with one final complete challenge (75 checks), no skips, unexecuted stages or cleanup errors. Published as test v0.2.19; the exact public test/test.sh command passed 395 units and all 27 stages in 718.1 seconds. The fixed public security.sh entry and twelve release assets also passed validation. This supersedes v0.2.18 entry removal and challenge placement.
 
@@ -15,7 +31,8 @@ Status: Frozen v0.2.19 passed 395 packaged units and all 27 reported stages on r
 
 Sections 1–26 describe phase 1 requirements and delivery history. Sections 27–39 describe phase 2 plans and subsequent batches; section 40 describes the independently delivered guest diagnostic; section 41 records its integrated test review and SSHFS completion repair; section 42 records the approved menu refinements and final test-release review; section 43 records the restart and post-terminal action batch; section 44 separates guest and host-assisted security challenges; section 45 adds container-list query feedback. Section 46 records the published v0.2.17 host-selection workflow. The current authorized-work section above supersedes v0.2.18 entry removal and challenge placement; sections 40, 44 and 46 remain historical records. Later implemented and verified requirements supersede earlier defaults; pending sections do not describe current behavior.
 
-Current baseline: batch 0.2.19 orders functional tests before one new-container challenge and restores the host-only security.sh entry using one shared module. Frozen v0.2.19 passed 395 packaged units and all 27 reported stages on real LXD in 722.8 seconds, with one final complete challenge (75 checks), no skips, unexecuted stages or cleanup errors. Published as test v0.2.19; the exact public test/test.sh command passed 395 units and all 27 stages in 718.1 seconds. The fixed public security.sh entry and twelve release assets also passed validation. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas, the stable-only release branch and the post-terminal restart-entry refinement remain pending.
+Current baseline: v0.2.20 prepares the agreed development environment during new-container creation and uses shared selection for independent host challenges. Frozen v0.2.20 passed 410 packaged units and all 27 stages on real LXD in 1038.1 seconds, with one final complete challenge (75 checks), no skips, unexecuted stages or cleanup errors. Test publication and public-entry validation are in progress. Stable remains stable/0.1.15. CPU/memory/process controls, network-policy changes, disabling basic devlxd, host AppArmor enablement, disk quotas, the stable-only release branch and the post-terminal restart-entry refinement remain pending.
+
 
 ## 1. Scope
 
@@ -27,7 +44,7 @@ Use LXD's existing functionality instead of reimplementing it. Each basic operat
 
 | Command | Behavior |
 | --- | --- |
-| `mas new TARGET [--image IMAGE]` | Create, but do not start, a standard container. TARGET is required; the image override is optional. Default to an Ubuntu image matching the host Ubuntu release. |
+| `mas new TARGET [--image IMAGE]` | Create, standard start, initialize and verify the agreed development environment, then standard stop. Completion requires a prepared stopped container. TARGET is required; the image override is optional. Default to an Ubuntu image matching the host Ubuntu release. |
 | `mas list` | List only managed containers. |
 | `mas start TARGET` | Start one managed container. |
 | `mas stop TARGET` | Stop one managed container. |
@@ -110,7 +127,7 @@ Keep REQUIREMENTS.md and IMPLEMENTED.md inside this project. Before updating IMP
 
 ## 10. Exclusions
 
-Historical phase 1 exclusions were GPU access, host-directory sharing into containers, a general resource whitelist, model installation, model service management, custom port forwarding, non-Ubuntu support, plugins and a general diagnostic framework. Section 16 subsequently added container-to-host filesystem mounting, and section 28 added the independent GPU module and its explicitly recorded resource mappings. General host-directory sharing, a general resource whitelist, model installation/service management, custom port forwarding, non-Ubuntu support and plugins remain outside the implemented scope. A general container package-preinstallation feature has no agreed package list or installation policy and is not required by filesystem mounting; its priority and scope remain to be confirmed. The existing installation of sudo when needed for the sandbox user remains authorized.
+Historical phase 1 exclusions were GPU access, host-directory sharing into containers, a general resource whitelist, model installation, model service management, custom port forwarding, non-Ubuntu support, plugins and a general diagnostic framework. Section 16 subsequently added container-to-host filesystem mounting, and section 28 added the independent GPU module and its explicitly recorded resource mappings. General host-directory sharing, a general resource whitelist, model installation/service management, custom port forwarding, non-Ubuntu support and plugins remain outside the implemented scope. The current authorized batch adds the exact ordinary-development package list and one-time new-container provisioning policy above. Previously unprepared containers retain the authorized sudo setup; prepared containers do not automatically reinstall removed sudo and report its missing required capability explicitly.
 
 
 ## 11. Batch 0.1.4 acceptance criteria

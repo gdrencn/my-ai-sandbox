@@ -2,11 +2,11 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 最新测试版：0.2.19
+## 最新测试版：0.2.20
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-冻结包在项目外通过 395 项单元测试和全部 27 个测试环节（722.8 秒），最后的独立容器挑战通过 75 项检查；无跳过、未执行或清理错误。已发布 test v0.2.19，实际公开自动化命令也通过 395 项单元测试和全部 27 个环节（718.1 秒）。独立安全入口与 12 个附件已核验。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-38--ordered-tests-and-reusable-host-challenge-2026-10-02)。
+新容器首次创建时准备常用开发环境，完成后停止；后续启停不重复安装。冻结包已通过 410 项单元测试和全部 27 个环节（1038.1 秒），最终安全挑战通过 75 项检查。test v0.2.20 正在发布并验证公开入口。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-39--prepared-development-containers-and-shared-selection-2026-10-02)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前已发布测试版为 [0.2.19](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.19)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+本批测试版为 [0.2.20](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.20)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -70,7 +70,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 独立安全挑战
 
-在管理 LXD 的 Linux/WSL 宿主运行，按提示输入容器名：
+在管理 LXD 的 Linux/WSL 宿主运行，用方向键选择容器，Enter/→ 确定，Esc/← 取消；没有容器时显示提示并结束：
 
     curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash
 
@@ -118,7 +118,7 @@ mas delete demo                        # 菜单默认选“否”，可选择“
 mas import restored demo.tar.gz
 ```
 
-- 创建后容器保持停止。WSL 的默认镜像版本取自 WSL 内部的 Ubuntu；对应镜像不可用时明确报错，不降级。
+- `new` 按创建、标准启动、初始化安装与验证、标准停止的顺序执行；全部完成后才报告成功，容器保持停止。首次创建需要下载软件，持续显示当前步骤和等待时长。初始化失败保留容器和原始诊断，仍尝试标准停止；停止失败单独报告。WSL 的默认镜像版本取自 WSL 内部的 Ubuntu；对应镜像不可用时明确报错，不降级。
 - 启动功能内部准备默认用户 `sandbox`，允许其免密 sudo；用户准备成功后，mas 启动功能才算完成。进入容器使用 sandbox 的登录 shell；root 账户不设空密码。
 - `restart` 顺序调用标准 `stop → start`；`restart -e/--enter` 调用 `stop → enter`，由 enter 完成启动准备。停止失败时不继续。`start` 不增加参数；重启默认不进入终端。
 - `enter` 调用共享启动功能。终端结束后提供“停止容器”“重启容器”“返回 mas”“退出 mas”，默认退出，Esc/← 也退出。停止或重启复用标准功能，输出后回宿主终端；返回 mas 打开该容器菜单，不经过操作结果页。非零终端退出码仍报告，不据此猜测 exit/reboot/shutdown；选择返回菜单后，最终 mas 退出状态仍保留失败。CLI `enter --yes/--no` 保持明确停止/退出的兼容行为，`restart --enter` 同样支持；非交互输入默认退出。
@@ -138,6 +138,25 @@ mas import restored demo.tar.gz
 所有输入提示明确说明要输入的内容和空值含义；标题、输入、结果和返回页之间统一空行。多列选择按显示宽度用空格左对齐；需要状态列时整列统一显示。卸载菜单直接列出容器路径，不重复输出表格；有异常条目时全部条目显示状态。
 
 CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 `mas delete demo --yes`、`mas export demo backup.tar.gz --yes`；`--no` 明确拒绝。`mas enter demo --yes` 表示终端退出后停止容器，`--no` 表示保持运行。没有交互终端且未指定确认参数时默认拒绝；不再使用管道输入 `y` 确认。
+
+## 新容器开发环境（0.2.20 起）
+
+`new` 在首次启动中使用 Ubuntu 原生 cloud-init 和 APT 准备常用应用开发环境。完整预装清单如下：
+
+| 用途 | 软件包 |
+| --- | --- |
+| 基础权限与网络、SSH 客户端 | sudo、ca-certificates、curl、wget、openssh-client |
+| 版本管理 | git |
+| Python | python3、python3-venv、python3-pip、python3-dev |
+| 编译基础 | build-essential、pkg-config |
+| 常用命令与 Shell 检查 | ripgrep、jq、patch、file、shellcheck |
+| 压缩与归档 | tar、gzip、xz-utils、zip、unzip、zstd |
+
+Node.js/npm 使用创建时 Node.js 官网发布的最新 LTS，下载对应架构的官方压缩包，验证官方 SHA-256 后安装，并提供 `node`、`npm`、`npx`。使用系统级 `/usr/local/lib/nodejs` 安装目录和 `/usr/local/bin` 命令链接，不安装版本管理器，不执行远程安装脚本。Python 使用 Ubuntu 标准软件包；项目依赖可使用 `python3 -m venv .venv` 后安装。SSH 客户端提供 `ssh`、`scp`、`sftp`。
+
+准备成功后撤下本次 cloud-init 安装配置，软件和版本记录保存在容器 `/var/lib/mas/development.json`。后续 start、restart、enter、备份导入不会重复安装这些开发软件，也不会补回用户卸载的软件。新容器卸载 sudo 后，启动会提示缺少必需能力，由用户自行安装恢复；旧容器和未初始化的导入容器沿用原有用户准备行为。已有容器不会自动补装这份清单。
+
+Codex、Ollama、herdr、模型文件和 LLM 框架由用户自行安装。GPU 接入保持原有功能，不加入 GPU 编译工具。
 
 ## 固定隔离配置与旧容器迁移（0.2.11 起）
 

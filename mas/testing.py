@@ -697,6 +697,15 @@ class Suite:
             self.cli("new", target)
             assert self.state(target, "Stopped")
             assert self.manager.info(target)["config"]["image.version"] == host_image().split(":")[1]
+            assert 'cloud-init.user-data' not in self.manager.info(target)['config']
+            from .development import PACKAGES, RECORD
+            prepared = json.loads(self.manager.lxd.command(['file','pull','local:'+target+RECORD,'-']))
+            assert set(prepared['packages']) == set(PACKAGES)
+            assert prepared['node'] == prepared['node_lts']['version']
+            assert prepared['npm'] == prepared['node_lts']['npm']
+            assert prepared['node_lts']['source'].startswith('https://nodejs.org/dist/')
+            assert re.fullmatch('[0-9a-f]{64}', prepared['node_lts']['sha256'])
+        self.results['new-default']['development'] = prepared
         with self.case('isolation-policy'):
             self.isolation_policy(target)
         with self.case('legacy-migration'):
@@ -760,6 +769,8 @@ class Suite:
         with self.case("dependency-install"):
             self.dependencies(target)
         with self.case("lifecycle-repeat"):
+            before = self.exec(target, 'sha256sum /var/lib/mas/development.json')
+            self.exec(target, 'dpkg --remove zstd; ! command -v zstd')
             identity = self.exec(target, "id -u sandbox; getent passwd sandbox")
             self.exec(target, "printf preserve > /home/sandbox/mas-retain; usermod --shell /bin/sh sandbox")
             try:
@@ -772,12 +783,15 @@ class Suite:
                 self.cli('start', target)
                 assert self.exec(target, 'cat /home/sandbox/mas-retain') == 'preserve'
                 assert self.exec(target, "su --login sandbox -c 'sudo -n id -u'").strip() == '0'
+                self.exec(target, '! command -v zstd')
+                assert self.exec(target, 'sha256sum /var/lib/mas/development.json') == before
             finally:
                 self.exec(target, 'usermod --shell /bin/bash sandbox')
         with self.case('restart'):
             boot = self.exec(target, 'cat /proc/sys/kernel/random/boot_id')
             self.cli('restart', target)
             assert self.state(target, 'Running')
+            self.exec(target, '! command -v zstd')
             assert self.exec(target, 'cat /proc/sys/kernel/random/boot_id') != boot
             assert self.exec(target, 'cat /home/sandbox/mas-retain') == 'preserve'
             self.cli('stop', target)
@@ -829,6 +843,7 @@ class Suite:
             assert self.state(imported, "Stopped")
             self.cli("start", imported)
             assert self.exec(imported, "cat /home/sandbox/mas-proof") == "mas-roundtrip-data"
+            self.exec(imported, '! command -v zstd')
             self.cli("new", target, "--image", host_image())
         with self.case("overwrite-confirmation"):
             sentinel = Path(self.workspace.name) / "overwrite.tar.gz"

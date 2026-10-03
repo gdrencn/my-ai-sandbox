@@ -90,7 +90,7 @@
   "test_category_interaction": "Menu interaction",
   "test_category_security": "Security challenge",
   "test_description_unit": "Verify shared behavior, failure handling, packaging and test entries.",
-  "test_description_new-default": "Verify dedicated configuration and default image creation, leaving the container stopped.",
+  "test_description_new-default": "Verify default image, initial development environment and standard start/stop, leaving the prepared container stopped.",
   "test_description_missing-image": "Verify unavailable images are rejected without leaving a target container.",
   "test_description_list-info": "Verify container listing, state information and name collision protection.",
   "test_description_start-user-network": "Verify standard startup, the container user, sudo and outbound networking.",
@@ -104,7 +104,7 @@
   "test_description_language-config": "Verify saved language preferences, switching and help in both languages.",
   "test_description_tui": "Verify menu navigation and complete operation flows in a real terminal.",
   "test_description_invalid-inputs": "Verify invalid names, missing targets and corrupt backups are refused.",
-  "test_description_lifecycle-repeat": "Verify repeated startup and shutdown preserve users and their data.",
+  "test_description_lifecycle-repeat": "Verify repeated start/stop preserves users and data without rerunning provisioning or reinstalling removed software.",
   "test_description_restart": "Verify standard restart, data preservation and entering after restart.",
   "test_description_unmarked-import": "Verify unmarked native backups become managed on import and retain their data.",
   "test_description_filesystems": "Verify mounted reads and writes, exact unmounting, path protection and lifecycle restoration.",
@@ -119,7 +119,6 @@
   "security_host_required": "Run security.sh on the Linux/WSL host managing LXD, not inside a container.",
   "security_target_state": "Container {target} must be running or stopped and have a verifiable instance identity.",
   "security_select": "Select a mas container to test:",
-  "security_target_prompt": "Enter the container name; leave empty or press Escape to cancel.",
   "security_target_required": "Noninteractive execution requires TARGET, for example security.sh test.",
   "security_identity_changed": "Container identity changed; the replacement container was not operated on.",
   "security_restore_failed": "Restoring or verifying the original container state failed.",
@@ -130,5 +129,6 @@
   "security_report_help": "Host JSON report path; generate a unique file by default, with a matching .log.",
   "security_timeout_help": "Individual probe timeout: 1–10 seconds, default 3 seconds.",
   "security_cancelled": "Security challenge cancelled or interrupted.",
-  "security_wait_start": "Waiting for the submitted LXD start operation before restoring the original state."
+  "security_wait_start": "Waiting for the submitted LXD start operation before restoring the original state.",
+  "security_empty": "No mas containers are available for testing. Create a container first."
 }

@@ -90,7 +90,7 @@
   "test_category_interaction": "菜单交互",
   "test_category_security": "安全挑战",
   "test_description_unit": "验证共享行为、失败处理、打包和测试入口。",
-  "test_description_new-default": "验证专用配置及默认镜像创建，创建后应保持停止。",
+  "test_description_new-default": "验证默认镜像、首次开发环境准备与标准启停，全部完成后容器应保持停止。",
   "test_description_missing-image": "验证不可用镜像被拒绝，且不会留下目标容器。",
   "test_description_list-info": "验证容器列表、状态信息及同名目标保护。",
   "test_description_start-user-network": "验证标准启动、容器用户、sudo 与出站网络。",
@@ -104,7 +104,7 @@
   "test_description_language-config": "验证语言保存、切换及中英文帮助。",
   "test_description_tui": "验证真实终端中的菜单导航及完整操作流程。",
   "test_description_invalid-inputs": "验证无效名称、不存在的目标及损坏备份被拒绝。",
-  "test_description_lifecycle-repeat": "验证重复启停仍保留用户和用户数据。",
+  "test_description_lifecycle-repeat": "验证重复启停保留用户和数据，不重复预装或补装用户已卸载的软件。",
   "test_description_restart": "验证标准重启、数据保留及重启后进入终端。",
   "test_description_unmarked-import": "验证原生无标记备份导入后纳入管理且保留数据。",
   "test_description_filesystems": "验证挂载读写、精确卸载、路径保护及启停后的恢复。",
@@ -119,7 +119,6 @@
   "security_host_required": "请从管理 LXD 的 Linux/WSL 宿主侧运行 security.sh，不能在容器内运行。",
   "security_target_state": "容器 {target} 必须处于运行或停止状态，并有可核验的实例身份。",
   "security_select": "请选择要测试的 mas 容器：",
-  "security_target_prompt": "请输入容器名；留空或 Esc 取消。",
   "security_target_required": "非交互运行必须提供 TARGET，例如 security.sh test。",
   "security_identity_changed": "容器身份已变化，未操作替换后的容器。",
   "security_restore_failed": "容器原状态恢复或核验失败。",
@@ -130,5 +129,6 @@
   "security_report_help": "宿主 JSON 报告路径，默认生成唯一文件；同时保存同名 .log。",
   "security_timeout_help": "单项探测超时 1–10 秒，默认 3 秒。",
   "security_cancelled": "安全挑战已取消或中断。",
-  "security_wait_start": "等待 LXD 已提交的启动操作完成，再恢复容器原状态。"
+  "security_wait_start": "等待 LXD 已提交的启动操作完成，再恢复容器原状态。",
+  "security_empty": "没有可测试的 mas 容器，请先创建容器。"
 }

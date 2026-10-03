@@ -102,22 +102,33 @@ class SecurityEntryTests(unittest.TestCase):
         self.manager.start.assert_not_called(); self.manager.stop.assert_not_called()
         self.challenge.run_target.assert_not_called()
 
-    def test_prompt_retries_invalid_name_and_explicit_target_does_not_prompt(self):
-        ui = Mock(); ui.input.side_effect = ['bad/name','fixture']
-        self.manager.list.return_value = []
+    def test_shared_list_selection_and_explicit_target_do_not_request_text(self):
+        ui = Mock(); ui.choose.return_value = 'fixture'
+        self.manager.list.return_value = [dict(name='fixture', status='Stopped')]
         output=Output(io.StringIO())
         with patch.object(security,'interactive',side_effect=lambda callback:callback(ui)) as prompt:
             self.assertEqual(security.choose_target(self.manager,None,output),'fixture')
             self.assertEqual(security.choose_target(self.manager,'fixture',output),'fixture')
         prompt.assert_called_once()
-        self.assertEqual(ui.input.call_count,2)
+        ui.input.assert_not_called()
+        self.assertEqual(ui.choose.call_args.args[1][0][0], 'fixture')
+        self.assertEqual(ui.choose.call_args.kwargs['cancel'], 'cancel')
+
+    def test_empty_container_list_finishes_without_prompt_or_lifecycle_changes(self):
+        self.manager.list.return_value = []
+        output=Output(io.StringIO())
+        with patch.object(security,'interactive') as prompt:
+            self.assertIsNone(security.choose_target(self.manager,None,output))
+        prompt.assert_not_called()
+        self.manager.start.assert_not_called(); self.manager.stop.assert_not_called()
+        self.assertIn('No mas containers', output.stream.getvalue())
 
     def test_noninteractive_missing_target_and_cancellation_do_not_choose_implicitly(self):
-        self.manager.list.return_value=[]
+        self.manager.list.return_value=[dict(name='fixture',status='Stopped')]
         with patch.object(security,'interactive',side_effect=OSError('no tty')):
             with self.assertRaisesRegex(Error,'requires TARGET'):
                 security.choose_target(self.manager,None,Output(io.StringIO()))
-        ui=Mock();ui.input.return_value=''
+        ui=Mock();ui.choose.return_value=None
         with patch.object(security,'interactive',side_effect=lambda callback:callback(ui)):
             with self.assertRaises(security.Cancelled):
                 security.choose_target(self.manager,None,Output(io.StringIO()))

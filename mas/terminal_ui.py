@@ -200,8 +200,7 @@ class UI:
         while True:
             with Output(sys.stderr).waiting(t('list_loading')):
                 items = self.manager.list()
-            rows = menu.column_rows([(item['name'], menu.status_cell(state(item['status']), item['status'])) for item in items])
-            choices = [(item['name'], row) for item, row in zip(items, rows)]
+            choices = menu.container_options(items)
             if len(items) > 1 and any(item['status'] != 'Stopped' for item in items):
                 choices.append((STOP_ALL, t('menu_stop_all')))
             choices.append((None, t('menu_back')))
@@ -221,8 +220,7 @@ class UI:
             self.view.choose(t('menu_migrate'), [(None, t('menu_back'))],
                              description=[t('migration_help'), t('migration_empty')])
             return
-        rows = menu.column_rows([(i['name'], menu.status_cell(state(i['status']), i['status'])) for i in items])
-        target = self.view.choose(t('menu_migrate'), [(i['name'], row) for i, row in zip(items, rows)]
+        target = self.view.choose(t('menu_migrate'), menu.container_options(items)
                                   + [(None, t('menu_back'))], default=items[0]['name'],
                                   description=[t('migration_help')])
         if target is None:

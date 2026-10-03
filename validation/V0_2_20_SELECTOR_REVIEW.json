@@ -1,0 +1,55 @@
+{
+  "checks": [
+    {
+      "language": "zh_cn",
+      "names": "alpha",
+      "width": 80,
+      "expected": "SELECTED=alpha"
+    },
+    {
+      "language": "zh_cn",
+      "names": "alpha,beta",
+      "width": 42,
+      "expected": "SELECTED=beta"
+    },
+    {
+      "language": "zh_cn",
+      "names": "alpha,beta",
+      "width": 80,
+      "expected": "CANCELLED"
+    },
+    {
+      "language": "zh_cn",
+      "names": "alpha",
+      "width": 42,
+      "expected": "CANCELLED"
+    },
+    {
+      "language": "en_us",
+      "names": "alpha",
+      "width": 80,
+      "expected": "SELECTED=alpha"
+    },
+    {
+      "language": "en_us",
+      "names": "alpha,beta",
+      "width": 42,
+      "expected": "SELECTED=beta"
+    },
+    {
+      "language": "en_us",
+      "names": "alpha,beta",
+      "width": 80,
+      "expected": "CANCELLED"
+    },
+    {
+      "language": "en_us",
+      "names": "alpha",
+      "width": 42,
+      "expected": "CANCELLED"
+    }
+  ],
+  "shared_component": true,
+  "no_name_input": true,
+  "no_lifecycle_on_selection": true
+}
