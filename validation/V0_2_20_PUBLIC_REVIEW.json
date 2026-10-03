@@ -1,0 +1,140 @@
+{
+  "empty_entry": {
+    "exit_code": 0,
+    "stdout": "没有可测试的 mas 容器，请先创建容器。\n",
+    "stderr": ""
+  },
+  "version": "0.2.20",
+  "units": 410,
+  "stages": 27,
+  "elapsed": 1001.6833523090027,
+  "development": {
+    "node": "v24.21.0",
+    "node_lts": {
+      "architecture": "x64",
+      "npm": "11.19.0",
+      "sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+      "source": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
+      "version": "v24.21.0"
+    },
+    "npm": "11.19.0",
+    "packages": {
+      "build-essential": "12.12ubuntu2.26.04.2",
+      "ca-certificates": "20260601~26.04.1",
+      "curl": "8.18.0-1ubuntu2.7",
+      "file": "1:5.46-5build2",
+      "git": "1:2.53.0-1ubuntu1",
+      "gzip": "1.14-1~exp2ubuntu1.1",
+      "jq": "1.8.1-4ubuntu2",
+      "openssh-client": "1:10.2p1-2ubuntu3.6",
+      "patch": "2.8-2build1",
+      "pkg-config": "2.5.1-4",
+      "python3": "3.14.3-0ubuntu2",
+      "python3-dev": "3.14.3-0ubuntu2",
+      "python3-pip": "25.1.1+dfsg-1ubuntu2",
+      "python3-venv": "3.14.3-0ubuntu2",
+      "ripgrep": "15.1.0-1ubuntu1",
+      "shellcheck": "0.11.0-2",
+      "sudo": "1.9.17p2-1ubuntu3.1",
+      "tar": "1.35+dfsg-4ubuntu0.4",
+      "unzip": "6.0-29ubuntu1",
+      "wget": "1.25.0-2ubuntu4.4",
+      "xz-utils": "5.8.3-1",
+      "zip": "3.0-15ubuntu3",
+      "zstd": "1.5.7+dfsg-3"
+    },
+    "version": 1
+  },
+  "package_count": 23,
+  "subsequent_start_restart_import": "removed zstd remains absent; initialization record unchanged",
+  "single_final_challenge": true,
+  "boundary_counts": {
+    "PASS": 75,
+    "FAIL": 0
+  },
+  "positive_controls": 2,
+  "headers": 27,
+  "separators": 27,
+  "source_hashes_unchanged": true,
+  "artifact_hashes": {
+    "mas-test.pyz": "3698ddab3e28dd95b6e892c7f5c3f316f07c0d103f6d385cb01fa8fbb8e0c8b5",
+    "mas-install.pyz": "ce37b4be4ab8359adefaa88f82a2653585e2977d2d20ab7e95d629cb18ffa9a1",
+    "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+    "bootstrap.py": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+    "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+    "SHA256SUMS": "19b1244a33cf88cef08028ebb3d8cdbe8cb8158e1547f463256ed5bb07bdb4d9",
+    "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+    "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+    "mas.pyz": "80e84b91b37699275bd1d96970907f8597b981f4500986658854f1fedf685382",
+    "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+    "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72"
+  },
+  "selector": {
+    "checks": [
+      {
+        "language": "zh_cn",
+        "names": "alpha",
+        "width": 80,
+        "expected": "SELECTED=alpha"
+      },
+      {
+        "language": "zh_cn",
+        "names": "alpha,beta",
+        "width": 42,
+        "expected": "SELECTED=beta"
+      },
+      {
+        "language": "zh_cn",
+        "names": "alpha,beta",
+        "width": 80,
+        "expected": "CANCELLED"
+      },
+      {
+        "language": "zh_cn",
+        "names": "alpha",
+        "width": 42,
+        "expected": "CANCELLED"
+      },
+      {
+        "language": "en_us",
+        "names": "alpha",
+        "width": 80,
+        "expected": "SELECTED=alpha"
+      },
+      {
+        "language": "en_us",
+        "names": "alpha,beta",
+        "width": 42,
+        "expected": "SELECTED=beta"
+      },
+      {
+        "language": "en_us",
+        "names": "alpha,beta",
+        "width": 80,
+        "expected": "CANCELLED"
+      },
+      {
+        "language": "en_us",
+        "names": "alpha",
+        "width": 42,
+        "expected": "CANCELLED"
+      }
+    ],
+    "shared_component": true,
+    "no_name_input": true,
+    "no_lifecycle_on_selection": true
+  },
+  "native_package_failure": {
+    "target": "test-8667aedfa6a34a738e077d4ceec73fc1",
+    "error": "..........................................................................status: error\nNo user sessions are running outdated binaries.\n\nNo VM guests are running outdated hypervisor (qemu) binaries on this host.\n2026-10-03 02:45:48,889 - log_util.py[WARNING]: Failure when attempting to install packages: ['sudo', 'ca-certificates', 'curl', 'wget', 'openssh-client', 'git', 'python3', 'python3-venv', 'python3-pip', 'python3-dev', 'build-essential', 'pkg-config', 'ripgrep', 'jq', 'patch', 'file', 'tar', 'gzip', 'xz-utils', 'zip', 'unzip', 'zstd', 'shellcheck', 'mas-missing-00484b456bab481eb5955894b5e6d8dc']\n2026-10-03 02:45:48,890 - cc_package_update_upgrade_install.py[WARNING]: 1 failed with exceptions, re-raising the last one\n2026-10-03 02:45:48,891 - log_util.py[WARNING]: Running module package_update_upgrade_install (<module 'cloudinit.config.cc_package_update_upgrade_install' from '/usr/lib/python3/dist-packages/cloudinit/config/cc_package_update_upgrade_install.py'>) failed\n{\"architecture\": \"x64\", \"npm\": \"11.19.0\", \"sha256\": \"fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6\", \"source\": \"https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz\", \"version\": \"v24.21.0\"}\nCloud-init v. 26.1-0ubuntu3~26.04.1 finished at Sat, 03 Oct 2026 02:45:50 +0000. Datasource DataSourceLXD.  Up 19.99 seconds\nGenerating public/private rsa key pair.\nYour identification has been saved in /etc/ssh/ssh_host_rsa_key\nYour public key has been saved in /etc/ssh/ssh_host_rsa_key.pub\nThe key fingerprint is:\nSHA256:gheykwG8PvGHHXelOhxd5zyX4pK9XWpAEaAwGAK2sCM root@test-8667aedfa6a34a738e077d4ceec73fc1\nThe key's randomart image is:\n+---[RSA 3072]----+\n|o+o .oo   ....   |\n|o.oo.  o .  + .  |\n|E. .o . .. + =  .|\n|..o  *..o + ..+..|\n| . o=oo+S+ .+ .o |\n|  o ooo.+  o.o  .|\n|   . .   .  ..o..|\n|             .o. |\n|             .   |\n+----[SHA256]-----+\nGenerating public/private ecdsa key pair.\nYour identification has been saved in /etc/ssh/ssh_host_ecdsa_key\nYour public key has been saved in /etc/ssh/ssh_host_ecdsa_key.pub\nThe key fingerprint is:\nSHA256:AC9ASYS7iOGI8bdtIYoDJgDzeLGc0pr4+tweK82rx3c root@test-8667aedfa6a34a738e077d4ceec73fc1\nThe key's randomart image is:\n+---[ECDSA 256]---+\n| ==..            |\n|+ o. o           |\n|.B +. o          |\n|B B  . .         |\n|OX      S        |\n|%o. o .          |\n|+o *.+ .         |\n|o.+.*o+ E        |\n|.++==+ .         |\n+----[SHA256]-----+\nGenerating public/private ed25519 key pair.\nYour identification has been saved in /etc/ssh/ssh_host_ed25519_key\nYour public key has been saved in /etc/ssh/ssh_host_ed25519_key.pub\nThe key fingerprint is:\nSHA256:Lqui3/SXq6rKOWqOFHLvJMaRPDeEPRTOYol9Q3C2fCk root@test-8667aedfa6a34a738e077d4ceec73fc1\nThe key's randomart image is:\n+--[ED25519 256]--+\n|  ..*.           |\n| o % . .         |\n|. * E o          |\n| o = =           |\n|..* o   S        |\n|.o.= . .         |\n| .+ + . ..       |\n|++o* . oo        |\n|OB+o=o+o..       |\n+----[SHA256]-----+",
+    "final_status": "Stopped",
+    "completion_record_absent": true
+  },
+  "cleanup": "owned projects/instances/profiles/records/backups/canaries absent",
+  "remaining_projects": [
+    "default",
+    "mas"
+  ],
+  "platform_limits": "Prepared Ubuntu WSL/LXD/NVIDIA x86_64 host only; native Ubuntu/cloud/fresh provisioning/ARM64 not newly certified",
+  "terminal_colors": "green success and yellow foreground-only expected-error label verified in public PTY"
+}

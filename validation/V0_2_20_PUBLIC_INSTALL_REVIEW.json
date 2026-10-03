@@ -1,0 +1,5 @@
+{
+  "product_hash_matches": true,
+  "tester_preserved": "3698ddab3e28dd95b6e892c7f5c3f316f07c0d103f6d385cb01fa8fbb8e0c8b5",
+  "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash"
+}
