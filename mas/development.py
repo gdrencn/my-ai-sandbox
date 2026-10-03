@@ -1,12 +1,11 @@
 """One-time Ubuntu development environment, provisioned by native cloud-init."""
 import json
-from importlib.resources import files
 from .core import CLOUD_INIT_WAIT, Error
 from .i18n import t
 
 
 PACKAGES = (
-    'sudo', 'ca-certificates', 'curl', 'wget', 'openssh-client', 'git',
+    'sudo', 'ca-certificates', 'curl', 'wget', 'openssh-client', 'git', 'nodejs', 'npm',
     'python3', 'python3-venv', 'python3-pip', 'python3-dev',
     'build-essential', 'pkg-config', 'ripgrep', 'jq', 'patch', 'file',
     'tar', 'gzip', 'xz-utils', 'zip', 'unzip', 'zstd', 'shellcheck',
@@ -32,12 +31,21 @@ def finish(manager, target, data, identity):
 
 def cloud_config():
     # JSON is a YAML subset, avoiding an extra YAML dependency.
-    path = '/var/lib/mas/install-node-lts.py'
     return '#cloud-config\n' + json.dumps(dict(package_update=True,
-        package_upgrade=False, packages=list(PACKAGES),
-        write_files=[dict(path=path, permissions='0644',
-                          content=files('mas').joinpath('node_setup.py').read_text())],
-        runcmd=[['/usr/bin/python3', path]])) + '\n'
+        package_upgrade=False, packages=list(PACKAGES))) + '\n'
+
+
+def live_wait():
+    """Stream the first-boot log through the existing LXD exec connection."""
+    return r'''
+tail -n +1 --follow=name --retry --sleep-interval=0.2 /var/log/cloud-init-output.log &
+mas_log_pid=$!
+trap 'kill "$mas_log_pid" 2>/dev/null || true; wait "$mas_log_pid" 2>/dev/null || true' EXIT
+''' + CLOUD_INIT_WAIT + r'''
+kill "$mas_log_pid" 2>/dev/null || true
+wait "$mas_log_pid" 2>/dev/null || true
+trap - EXIT
+'''
 
 
 def verification():
@@ -67,10 +75,7 @@ subprocess.run(['su', '--login', 'sandbox', '-c',
     'python3 -m venv "$work/venv"; "$work/venv/bin/python" -m pip --version'], check=True)
 record = dict(version=1, packages=versions, node=subprocess.check_output(['node','--version'],text=True).strip(),
               npm=subprocess.check_output(['npm','--version'],text=True).strip())
-official = json.loads(Path('/usr/local/lib/nodejs/mas-lts.json').read_text())
-if record['node'] != official['version'] or record['npm'] != official['npm']:
-    raise RuntimeError('Installed Node.js/npm do not match the verified official LTS')
-record['node_lts'] = official
+record['node_source'] = 'ubuntu-apt'
 path = Path(RECORD_LITERAL)
 path.parent.mkdir(parents=True, exist_ok=True)
 with tempfile.NamedTemporaryFile(mode='w', dir=path.parent, delete=False) as stream:

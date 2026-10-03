@@ -1,0 +1,65 @@
+{
+  "version": "0.2.21",
+  "report": "/tmp/mas-v0.2.21-clean-results/report.json",
+  "stages": 28,
+  "unit_tests": 419,
+  "boundary_counts": {
+    "PASS": 76,
+    "FAIL": 0
+  },
+  "single_final_challenge": true,
+  "cleanup_independently_verified": true,
+  "project": "test-9d259d3e10b64befafbd733942e6e254",
+  "staging_projects": [
+    "mas-import-20e3f5bdf7034f2eb33ce19b9f3e2bb3",
+    "mas-import-4fe804995c5e4e29b8f04eb1b618e9d5",
+    "mas-import-9dfd9e17c6cd4499aa4f3eda3e59169b",
+    "mas-import-c5c90a36ac534dd8a693ffdf836a931e",
+    "mas-import-e03240946b2e41bfaaeb04c2520b6783",
+    "mas-import-f83d6f9fc19a4c87b71213b5ba90fa47"
+  ],
+  "elapsed": 1533.599566789002,
+  "product_sha256": "42713d477e0065a55ebe0470ad695bfe534102cacc42ad423d33aab589225c01",
+  "installed_hashes_match": true,
+  "tester_sha256": "9ccc1d62b7e400bc4f45296bffb06efee6261c917160a87240912378e408a3b6",
+  "network_evidence_retained": false,
+  "packaging": {
+    "archives": [
+      {
+        "archive": "mas.pyz",
+        "files": 23,
+        "sources_match": true,
+        "python_310": true
+      },
+      {
+        "archive": "mas-install.pyz",
+        "files": 23,
+        "sources_match": true,
+        "python_310": true
+      },
+      {
+        "archive": "mas-test.pyz",
+        "files": 71,
+        "sources_match": true,
+        "python_310": true
+      }
+    ],
+    "reproducible_build": true,
+    "bash_syntax": true,
+    "diff_check": true,
+    "hashes": {
+      "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+      "mas.pyz": "42713d477e0065a55ebe0470ad695bfe534102cacc42ad423d33aab589225c01",
+      "mas-test.pyz": "9ccc1d62b7e400bc4f45296bffb06efee6261c917160a87240912378e408a3b6",
+      "mas-install.pyz": "b3b8d6ffb343598aa2cdf03f169714eca3b7e9e649aae17518334e6bffb3c2bd",
+      "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+      "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "bootstrap.py": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+      "WSL_REPORT.json": "f69a866ad4325bc03a48afc28d85bbe08754770d59b170050c0dcc5058ddce30",
+      "SHA256SUMS": "06f5bfb9501262ccb80d982ef76b1db7b12fbcfd5d203e4043fd966c5d634293"
+    }
+  }
+}

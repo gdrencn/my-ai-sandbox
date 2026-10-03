@@ -253,6 +253,7 @@ class Suite:
         'invalid-inputs': 'management',
         'start-user-network': 'management',
         'gpu': 'resources',
+        'network-switch': 'resources',
         'dependency-install': 'environment',
         'lifecycle-repeat': 'management',
         'restart': 'management',
@@ -319,7 +320,7 @@ class Suite:
 
     def report(self, event):
         self.events.append(event)
-        self.output.progress(progress_text(event))
+        self.output.progress_lines([progress_text(event), *event['live_lines']] if event.get('live_lines') else [progress_text(event)])
         self.output.diagnostics(event.get("native_stdout", ""), event.get("native_stderr", ""))
 
     @contextlib.contextmanager
@@ -335,11 +336,11 @@ class Suite:
         try:
             yield
         except BaseException as exc:
-            self.results[name] = {"status": "failed", "elapsed": time.monotonic() - start, "error": str(exc), **metadata}
+            self.results[name] = {**self.results.get(name, {}), "status": "failed", "elapsed": time.monotonic() - start, "error": str(exc), **metadata}
             self.output.result(t("stage_failed", name=title, elapsed=time.monotonic()-start, error=exc), passed=False)
             raise
         else:
-            self.results[name] = {"status": "passed", "elapsed": time.monotonic() - start, **metadata}
+            self.results[name] = {**self.results.get(name, {}), "status": "passed", "elapsed": time.monotonic() - start, **metadata}
             self.output.result(t("test_pass", name=title, elapsed=self.results[name]["elapsed"]), passed=True)
 
     def target(self):
@@ -374,6 +375,11 @@ class Suite:
                 event.setdefault('case', getattr(self, 'current_case', None))
                 event.setdefault('source', path.name)
             self.events.extend(events)
+            for event in events:
+                if 'live_lines' in event:
+                    self.live_lines = event['live_lines']
+                elif event.get('live_output'):
+                    self.live_lines = []
             if diagnostics:
                 for event in events:
                     # The failed command's final stderr contains its native
@@ -422,7 +428,8 @@ class Suite:
                     elapsed = time.monotonic() - start
                     if elapsed >= self.timeout * 3:
                         raise Error(t("wait_timeout", label=" ".join(args), timeout=self.timeout*3))
-                    self.output.progress(t("working", name=action + " " + " ".join(args[1:]), elapsed=elapsed))
+                    self.output.progress_lines([t("working", name=action + " " + " ".join(args[1:]), elapsed=elapsed),
+                                                *getattr(self, 'live_lines', [])])
                     time.sleep(1)
         if process.returncode != code:
             raise AssertionError(t("cli_failed", args=args, expected=code, actual=process.returncode, stdout=out, stderr=err))
@@ -701,10 +708,9 @@ class Suite:
             from .development import PACKAGES, RECORD
             prepared = json.loads(self.manager.lxd.command(['file','pull','local:'+target+RECORD,'-']))
             assert set(prepared['packages']) == set(PACKAGES)
-            assert prepared['node'] == prepared['node_lts']['version']
-            assert prepared['npm'] == prepared['node_lts']['npm']
-            assert prepared['node_lts']['source'].startswith('https://nodejs.org/dist/')
-            assert re.fullmatch('[0-9a-f]{64}', prepared['node_lts']['sha256'])
+            assert prepared['node_source'] == 'ubuntu-apt'
+            assert 'nodejs' in prepared['packages'] and 'npm' in prepared['packages']
+            assert 'node_lts' not in prepared
         self.results['new-default']['development'] = prepared
         with self.case('isolation-policy'):
             self.isolation_policy(target)
@@ -766,6 +772,8 @@ class Suite:
             self.exec(target, "printf '%s' mas-roundtrip-data > /home/sandbox/mas-proof")
         with self.case("gpu"):
             self.gpu_test()
+        with self.case('network-switch'):
+            self.network_test()
         with self.case("dependency-install"):
             self.dependencies(target)
         with self.case("lifecycle-repeat"):
@@ -997,6 +1005,83 @@ class Suite:
         record = self.manager.gpu.record(self.manager.info(target))
         assert record is not None and not record['enabled']
 
+    def network_test(self):
+        from .network import KEY, MASK
+        target = self.target()
+        self.cli('new', target)
+        original = self.manager.info(target)
+        mac = original['config']['volatile.eth0.hwaddr']
+        gpu = original['config'].get('user.mas.gpu')
+        all_hardware = json.loads(self.cli('hardware', target))
+        assert set(all_hardware) == {'gpu','network'}
+        assert all_hardware['network']['enabled'] is True
+        self.cli('start', target)
+        self.cli('hardware', target, 'network', 'off', code=1)
+        self.cli('stop', target)
+        for _ in range(2):
+            disabled = json.loads(self.cli('hardware', target, 'network', 'off'))
+            assert disabled['enabled'] is False and disabled['restore']['hwaddr'] == mac
+        current = self.manager.info(target)
+        assert current['devices']['eth0'] == MASK
+        assert current['config'].get('user.mas.gpu') == gpu
+        self.cli('start', target)
+        offline = r"""python3 - <<'PYOFF'
+import errno, json, socket
+assert socket.if_nameindex() == [(1, 'lo')], socket.if_nameindex()
+for family, local, remote in ((socket.AF_INET,'127.0.0.1','192.0.2.1'),
+                              (socket.AF_INET6,'::1','2001:db8::1')):
+    with socket.socket(family, socket.SOCK_STREAM) as listener:
+        listener.bind((local, 0)); listener.listen(1)
+        with socket.socket(family, socket.SOCK_STREAM) as client:
+            client.settimeout(2); client.connect(listener.getsockname())
+            with listener.accept()[0] as peer:
+                client.sendall(b'loopback'); assert peer.recv(8) == b'loopback'
+    with socket.socket(family, socket.SOCK_STREAM) as client:
+        client.settimeout(2)
+        try: client.connect((remote,443))
+        except OSError as exc: assert exc.errno == errno.ENETUNREACH, repr(exc)
+        else: raise AssertionError('External connection succeeded without a NIC')
+print('offline IPv4 IPv6 loopback verified')
+PYOFF"""
+        assert self.exec(target, offline).strip() == 'offline IPv4 IPv6 loopback verified'
+        with self.terminal(['enter', target]) as terminal:
+            self.check_shell(terminal)
+            terminal.send('exit\n');terminal.expect('Container terminal finished: '+target)
+            terminal.send('\n');terminal.finish()
+        self.exec(target, "printf offline-data > /home/sandbox/offline-proof")
+        home = self.fs_root/target/'home/sandbox'
+        self.cli('mountfs',target)
+        assert home.joinpath('offline-proof').read_text() == 'offline-data'
+        home.joinpath('offline-host').write_text('offline-host-data')
+        assert self.exec(target,'cat /home/sandbox/offline-host') == 'offline-host-data'
+        self.cli('restart',target)
+        assert home.joinpath('offline-host').read_text() == 'offline-host-data'
+        assert self.exec(target,offline).strip() == 'offline IPv4 IPv6 loopback verified'
+        self.cli('stop',target)
+        assert home.joinpath('offline-host').read_text() == 'offline-host-data'
+        self.cli('unmountfs',target)
+        backup = Path(self.workspace.name)/'offline.tar.gz'
+        self.cli('export',target,str(backup))
+        self.cli('delete',target,'--yes')
+        self.cli('import',target,str(backup))
+        saved = json.loads(self.manager.info(target)['config'][KEY])
+        assert saved == disabled
+        self.cli('start',target)
+        assert self.exec(target,offline).strip() == 'offline IPv4 IPv6 loopback verified'
+        assert self.exec(target,'cat /home/sandbox/offline-host') == 'offline-host-data'
+        self.cli('stop',target)
+        for _ in range(2):
+            restored = json.loads(self.cli('hardware',target,'network','on'))
+            assert restored['enabled'] is True and restored['restore']['hwaddr'] == mac
+        self.cli('start',target)
+        assert self.exec(target,'cat /sys/class/net/eth0/address').strip() == mac
+        self.wait('outbound HTTPS', lambda: self.network(target))
+        self.cli('stop',target)
+        self.cli('delete',target,'--yes')
+        self.results['network-switch']['evidence'] = dict(mac=mac, ipv4_off=True, ipv6_off=True,
+            loopback=True, enter=True, offline_filesystems=True, offline_restart=True,
+            backup_state_preserved=True, nic_restored=True, outbound_restored=True)
+
     def gpu_test(self):
         from .gpu import KEY, CONF, PROFILE
         capability = self.manager.gpu.detect()
@@ -1007,7 +1092,7 @@ class Suite:
             return
         target = self.target()
         self.cli('new', target)
-        initial = json.loads(self.cli('hardware', target))
+        initial = json.loads(self.cli('hardware', target, 'gpu'))
         assert initial['enabled'] and initial['configured']
         assert initial['resources']['driver_paths'] == capability['driver_paths']
         self.gpu_results['resources'] = initial['resources']

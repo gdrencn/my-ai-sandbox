@@ -271,8 +271,8 @@
   "example_unmountfs": "示例：mas unmountfs sandbox; mas unmountfs sandbox /var/log",
   "help_cmd_mountedfs": "显示已记录的文件系统挂载及其当前状态",
   "example_mountedfs": "示例：mas mountedfs sandbox",
-  "help_cmd_hardware": "查询硬件信息或修改已停止容器的 GPU 开关；仅在支持的 NVIDIA 宿主可用",
-  "example_hardware": "示例：mas hardware sandbox; mas hardware sandbox gpu off",
+  "help_cmd_hardware": "查询 GPU 和网络信息；已停止的容器可以修改 GPU 或网络开关。",
+  "example_hardware": "示例：mas hardware sandbox; mas hardware sandbox gpu off; mas hardware sandbox network off",
   "help_cmd_config": "查看或修改 mas 选项；无需 LXD，省略操作时显示所有选项",
   "example_config": "示例：mas config; mas config get language; mas config set language zh_cn",
   "policy_refused": "隔离配置不符合要求，已拒绝操作。请检查并手动处理以下差异：\n{differences}",
@@ -291,7 +291,7 @@
   "policy_profile_devices": "Profile {name}：设备与批准的根磁盘、网卡资源不同。",
   "policy_unset": "{key}：必须保持未设置。",
   "policy_device": "设备 {name}：未经批准的配置 {definition}",
-  "policy_root_nic_count": "必须恰好有一个批准的根磁盘和一个管理网卡。",
+  "policy_root_nic_count": "必须恰好有一个批准的根磁盘；网络开启时恰好有一个管理网卡，关闭时不得有网卡。",
   "policy_gpu_resources": "GPU 资源不属于 Project 批准的后端或驱动路径。",
   "action_quarantine-import": "隔离未通过核验的导入容器",
   "policy_profile_difference": "Profile {name} 的 {key}：当前 {actual}，要求 {expected}",
@@ -323,5 +323,12 @@
   "security_loading": "正在下载 {version} 安全挑战工具",
   "action_prepare-development": "准备开发环境",
   "new_identity_changed": "创建期间容器 {target} 的身份已改变；未停止替换后的容器。",
-  "development_config_changed": "容器 {target} 的初始化配置已改变或未完成清理；创建未完成。"
+  "development_config_changed": "容器 {target} 的初始化配置已改变或未完成清理；创建未完成。",
+  "network_switch": "网络：{value}",
+  "network_choose": "请选择是否向容器提供网络（修改前须停止容器）",
+  "network_record_invalid": "网络配置记录无效；未执行操作。",
+  "network_conflict": "网络设备配置冲突或已被修改；未覆盖该设备。",
+  "network_changed": "容器身份、状态或配置已改变；网络更新未完成，请重新检查。",
+  "action_network": "配置网络",
+  "info_network": "网络配置：{value}"
 }

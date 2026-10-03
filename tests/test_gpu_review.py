@@ -51,17 +51,17 @@ class ReviewTests(unittest.TestCase):
         manager.hardware.return_value={'available':True,'enabled':True,'configured':True}
         view.choose.side_effect=['gpu',Cancelled(),None,None]
         with contextlib.redirect_stdout(io.StringIO()):UI(view,manager).hardware('test-example')
-        manager.hardware.assert_called_once_with('test-example')
+        self.assertEqual(manager.hardware.call_args_list, [unittest.mock.call('test-example'), unittest.mock.call('test-example', item='network')])
 
     def test_menu_refresh_failure_preserves_primary_error_and_leaves(self):
         view, manager = Mock(), Mock()
         manager.hardware.side_effect = [
-            {'available': True, 'enabled': True, 'configured': True},
+            {'available': True, 'enabled': True, 'configured': True}, {'enabled': True},
             Error('original mutation failure'), Error('configuration read failure')]
         view.choose.side_effect = ['gpu', False, None]
         with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
             UI(view, manager).hardware('test-example')
-        self.assertEqual(manager.hardware.call_count, 3)
+        self.assertEqual(manager.hardware.call_count, 4)
         self.assertIn('original mutation failure', err.getvalue())
         self.assertIn('configuration read failure', err.getvalue())
 

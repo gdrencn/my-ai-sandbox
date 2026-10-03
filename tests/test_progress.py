@@ -146,6 +146,33 @@ print('FINISHED=' + str(status), flush=True)
         self.assertIn('QUERY_WARNING', history)
         self.assertNotIn('[等待中]', history)
 
+    def test_live_install_region_clears_normal_logs_and_preserves_warning(self):
+        source = """
+import sys
+from mas.presentation import Progress
+report=Progress()
+def event(status, **extra):
+    return dict(action='prepare-user',target='fixture',status=status,scope='native',
+                observation='Running',elapsed=1,**extra)
+report(event('waiting',live_lines=['Unpacking nodejs fixture','Setting up npm fixture']))
+report(event('waiting',live_lines=['Setting up npm fixture','Processing triggers fixture']))
+report(event('ok',live_output=True,native_stdout='Setting up npm fixture\\nWARNING: fixture diagnostic'))
+print('CREATION_COMPLETED', flush=True)
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            terminal=Terminal(python_command(source),300,Path(directory)/'live.log')
+            try:
+                terminal.expect('CREATION_COMPLETED');terminal.finish()
+                raw=terminal.buffer
+                self.assertIn(b'Unpacking nodejs fixture',raw)
+                history=test_menu.MenuTests().render_history(raw)
+                for text in ('Unpacking nodejs fixture','Setting up npm fixture','Processing triggers fixture'):
+                    self.assertNotIn(text,history)
+                self.assertIn('WARNING: fixture diagnostic',history)
+                self.assertIn('CREATION_COMPLETED',history)
+                test_menu.MenuTests().assert_inline(raw)
+            finally:terminal.close()
+
     def test_width_uses_actual_output_terminal(self):
         stream = io.StringIO()
         stream.isatty = lambda: True

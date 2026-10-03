@@ -174,10 +174,10 @@ def binfmt_existing(reference):
     return results
 
 
-def guest_checks(reference, timeout, emit, gpu):
+def guest_checks(reference, timeout, emit, gpu, network='on'):
     probe.environment_check()
     validate_host_reference(reference)
-    probe.run_checks(gpu, timeout, emit, reference=reference)
+    probe.run_checks(gpu, timeout, emit, reference=reference, network=network)
     for name in probe.NAMESPACES:
         try:
             guest = os.readlink('/proc/self/ns/' + name)
@@ -199,10 +199,10 @@ def guest_checks(reference, timeout, emit, gpu):
     emit(bounded_mount(reference, timeout))
 
 
-def validate_guest_report(data, reference, gpu):
+def validate_guest_report(data, reference, gpu, network='on'):
     if (not isinstance(data, dict) or data.get('schema') != 2
             or type(data.get('exit_code')) is not int or data['exit_code'] not in (0, 1, 2, 130)
-            or data.get('gpu_expected') != gpu or not isinstance(data.get('checks'), list)
+            or data.get('gpu_expected') != gpu or data.get('network_expected') != network or not isinstance(data.get('checks'), list)
             or not isinstance(data.get('observations'), list)):
         raise ValueError('容器挑战报告格式无效')
     checks = data['checks']
@@ -218,6 +218,7 @@ def validate_guest_report(data, reference, gpu):
     required |= {'management-socket:'+path for path in probe.SOCKETS}
     required |= {'management-socket:'+item['path'] for item in reference['sockets']}
     required |= {'uid-map','gid-map','seccomp','basic-interfaces','device-inventory','mount-sources','windows-interop','gpu-expectation'}
+    required.add('network-expectation')
     required |= {'device:'+name for name in probe.DEVICES}
     required |= {'control:'+path for path in probe.CONTROLS}
     required |= {'read-endpoint:'+path for path in probe.READ_ENDPOINTS}
@@ -243,10 +244,12 @@ def validate_guest_report(data, reference, gpu):
     return data
 
 
-def run_target(command, target, report, *, gpu, timeout=3, positive=False):
+def run_target(command, target, report, *, gpu, network='on', timeout=3, positive=False):
     """Run all guest probes once, recover evidence, then verify host integrity."""
     if gpu not in ('on', 'off'):
         raise ValueError('完整挑战需要明确的 GPU 开关预期。')
+    if network not in ('on', 'off'):
+        raise ValueError('完整挑战需要明确的网络开关预期。')
     primary = None
     remote = None
     with tempfile.TemporaryDirectory(prefix='mas-host-security-') as directory:
@@ -277,7 +280,7 @@ def run_target(command, target, report, *, gpu, timeout=3, positive=False):
                 guest = None
                 try:
                     output = command(['exec', 'local:' + target, '--', 'python3', remote + '/host_security_probe.py',
-                        '--_guest-reference', remote + '/host-reference.json', '--gpu', gpu, '--timeout', str(timeout),
+                        '--_guest-reference', remote + '/host-reference.json', '--gpu', gpu, '--network', network, '--timeout', str(timeout),
                         '--report', remote + '/report.json'])
                     report.data['guest_stdout'] = output
                 except (Exception, KeyboardInterrupt) as exc:
@@ -285,7 +288,7 @@ def run_target(command, target, report, *, gpu, timeout=3, positive=False):
                     report.data['guest_stdout'] = str(exc)
                 try:
                     command(['file', 'pull', 'local:' + target + remote + '/report.json', str(root / 'report.json')])
-                    guest = validate_guest_report(json.loads((root / 'report.json').read_text()), reference, gpu)
+                    guest = validate_guest_report(json.loads((root / 'report.json').read_text()), reference, gpu, network)
                     report.data['guest_report'] = guest
                     for item in guest['checks']:
                         if item.get('status') not in ('PASS', 'FAIL'):
@@ -356,12 +359,13 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description='自动化测试内部的完整容器安全挑战模块。')
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--gpu', choices=('on','off'), required=True)
+    parser.add_argument('--network', choices=('on','off'), required=True)
     parser.add_argument('--timeout', type=float, default=3)
     parser.add_argument('--_guest-reference', type=Path, required=True)
     options = parser.parse_args(args)
     if not 1 <= options.timeout <= 10:
         parser.error('--timeout 必须为 1–10 秒')
-    report = probe.ChallengeReport('complete-boundary-probe', gpu_expected=options.gpu)
+    report = probe.ChallengeReport('complete-boundary-probe', gpu_expected=options.gpu, network_expected=options.network)
     try:
         path = probe.report_path(options.report, 'host-security-')
     except ValueError as exc:
@@ -371,7 +375,7 @@ def main(argv=None):
     try:
         probe.environment_check()
         reference = validate_host_reference(json.loads(options._guest_reference.read_text()))
-        guest_checks(reference, options.timeout, report.emit, options.gpu)
+        guest_checks(reference, options.timeout, report.emit, options.gpu, options.network)
     except KeyboardInterrupt:
         interrupted = True
         report.emit(probe.result('host-execution', 'ERROR', '挑战中断'))

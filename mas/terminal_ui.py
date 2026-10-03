@@ -74,8 +74,10 @@ class UI:
         instance = self.manager.info(target)
         record = self.manager.gpu.record(instance)
         gpu = t('state_enabled' if record['enabled'] else 'state_disabled') if record else t('gpu_unconfigured')
+        from .network import enabled as network_enabled
         summary = [t('info_name', name=instance['name']),
-                   t('info_state', status=state(instance['status'])), t('info_gpu', value=gpu)]
+                   t('info_state', status=state(instance['status'])), t('info_gpu', value=gpu),
+                   t('info_network', value=t('state_enabled' if network_enabled(instance) else 'state_disabled'))]
         selected = 'configuration'
         while True:
             selected = self.choose(t('menu_info_title', target=target),
@@ -162,17 +164,36 @@ class UI:
 
     def hardware(self, target):
         status = None
+        network = None
+        selected = None
         while True:
             if status is None:
                 status = self.manager.hardware(target)
+            if network is None:
+                network = self.manager.hardware(target, item='network')
             choices = []
             if status['available']:
                 choices.append(('gpu', t('gpu_switch', value=t('state_enabled' if status['enabled'] else 'state_disabled'))))
+            choices.append(('network', t('network_switch', value=t('state_enabled' if network['enabled'] else 'state_disabled'))))
             notice = ([t('gpu_pending')] if not status.get('configured', True) else []) if status['available'] else [t('gpu_unavailable')]
             choices.append((None, t('menu_back')))
-            if self.view.choose(t('page_hardware', target=target), choices,
-                                default='gpu' if status['available'] else None, description=notice) is None:
+            selected = self.view.choose(t('page_hardware', target=target), choices,
+                                default=selected or ('gpu' if status['available'] else 'network'), description=notice)
+            if selected is None:
                 return
+            if selected == 'network':
+                def change_network():
+                    nonlocal network
+                    requested = self.view.choose(t('network_choose'),
+                        [(True, t('state_enabled')), (False, t('state_disabled'))], default=network['enabled'], radio=True)
+                    try:
+                        saved = self.manager.hardware(target, requested, item='network')
+                    except (Error, OSError):
+                        network = None
+                        raise
+                    network = {'enabled': saved['enabled'], 'configured': True, 'resources': saved}
+                self.present(t('network_choose'), change_network)
+                continue
             def change():
                 nonlocal status
                 enabled = self.view.choose(t('gpu_choose'), [(True, t('state_enabled')), (False, t('state_disabled'))],

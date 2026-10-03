@@ -78,6 +78,7 @@ def check_method(check):
         'devlxd': '检查 /dev/lxd/sock 是否可见，区分实例接口与宿主管理接口',
         'windows-interop': '检查 Windows/WSL 路径、binfmt_misc 注册项和 WSL_INTEROP，不执行解释器或 Windows 命令',
         'gpu-expectation': '列出 /dev/dxg 与 /dev/nvidiaN，核对显式 GPU 开关预期',
+        'network-expectation': '核对网络开关预期、接口类型和 IPv4/IPv6 路由，不扫描网络或尝试登录',
         'host-canaries': '有宿主非敏感唯一标记参照时，尝试路径读取并比较 SHA-256',
         'network-policy': '说明网络测试范围，不进行网络扫描或登录',
         'execution': '检查执行条件、输入与报告路径，运行各项探测',
@@ -511,7 +512,39 @@ def devlxd_check(endpoint):
         return result(check, status, '实例受限 API 的只读请求结果；404 不能证明权限已关闭', http_status=response.status)
 
 
-def run_checks(gpu, timeout, emit, reference=None):
+def network_check(expected):
+    """Observe both IP families locally, without sending network traffic."""
+    names = sorted(name for _, name in socket.if_nameindex())
+    if len(names) > MAX_INVENTORY:
+        raise ValueError('网络接口清单超过上限')
+    external = []
+    for name in names:
+        flags = int(read_text('/sys/class/net/' + name + '/flags').strip(), 16)
+        if not flags & 0x8:  # IFF_LOOPBACK
+            external.append(name)
+    routes = []
+    for family, path in (('ipv4', '/proc/net/route'), ('ipv6', '/proc/net/ipv6_route')):
+        try:
+            lines = read_text(path).splitlines()
+        except FileNotFoundError:
+            if family == 'ipv6':
+                continue
+            raise
+        for line in lines[1:] if family == 'ipv4' else lines:
+            fields = line.split()
+            if len(fields) != (11 if family == 'ipv4' else 10):
+                raise ValueError('网络路由数据格式无效')
+            routes.append(dict(family=family, interface=fields[0] if family == 'ipv4' else fields[-1]))
+            if len(routes) > MAX_INVENTORY:
+                raise ValueError('网络路由清单超过上限')
+    external_routes = [route for route in routes if route['interface'] not in names or route['interface'] in external]
+    matches = external == ['eth0'] if expected == 'on' else not external and not external_routes
+    return result('network-expectation', 'INFO' if expected == 'unknown' else 'PASS' if matches else 'FAIL',
+                  '核对网络开关及 IPv4/IPv6 接口、路由；容器内部回环通信保留',
+                  expected=expected, interfaces=names, external_interfaces=external, routes=routes)
+
+
+def run_checks(gpu, timeout, emit, reference=None, network='unknown'):
     def observe(check, operation):
         try:
             emit(operation())
@@ -617,6 +650,7 @@ def run_checks(gpu, timeout, emit, reference=None):
         return result('gpu-expectation', 'REVIEW' if invalid else status,
                       'GPU 为获准资源例外；核对显式开关预期及设备类型', expected=gpu, devices=devices, invalid_nodes=invalid)
     observe('gpu-expectation', gpu_check)
+    observe('network-expectation', lambda: network_check(network))
     with tempfile.TemporaryDirectory(prefix='mas-guest-security-') as work:
         for name in DEVICES:
             emit(bounded_probe('device', name, work, timeout))
@@ -624,7 +658,7 @@ def run_checks(gpu, timeout, emit, reference=None):
             emit(bounded_probe('control', path, work, timeout))
         for path in READ_ENDPOINTS:
             emit(bounded_probe('read-endpoint', path, work, timeout))
-    emit(result('network-policy', 'INFO', '网络流量及网络登录另议；此脚本不扫描网络、不尝试登录'))
+    emit(result('network-policy', 'INFO', '已核对本地接口与路由；流量和登录策略另议，此脚本不扫描网络、不尝试登录'))
 
 
 def publish_report(path, report):

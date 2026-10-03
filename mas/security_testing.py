@@ -130,7 +130,11 @@ def challenge_target(manager, target, challenge, report, *, timeout, positive):
         record = manager.gpu.record(current)
         gpu = 'on' if record and record['enabled'] else 'off'
         report.data['gpu_expected'] = gpu
-        return challenge.run_target(manager.lxd.command, target, report, gpu=gpu, timeout=timeout, positive=positive)
+        from .network import enabled as network_enabled
+        manager.isolation.audit(current)
+        network = 'on' if network_enabled(current) else 'off'
+        report.data['network_expected'] = network
+        return challenge.run_target(manager.lxd.command, target, report, gpu=gpu, network=network, timeout=timeout, positive=positive)
     finally:
         try:
             current = manager.require(target)
@@ -188,6 +192,7 @@ def run_challenge(manager, target, report_path, output, *, project, timeout=3, p
                 report.emit(challenge.probe.result('host-execution', 'ERROR', t('security_execution_failed'), native_error=str(exc)))
             code = report.finish(path, interrupted=isinstance(primary, KeyboardInterrupt))
             evidence.update(gpu_expected=report.data.get('gpu_expected'), report=report.data, reference=report.data.get('reference'),
+                            network_expected=report.data.get('network_expected'),
                             guest_report=report.data.get('guest_report'),
                             guest_only_positive_controls=report.data.get('guest_only_positive_controls', []),
                             status='passed' if code == 0 and primary is None else 'failed')

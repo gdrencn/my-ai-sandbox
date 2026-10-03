@@ -271,8 +271,8 @@
   "example_unmountfs": "Examples: mas unmountfs sandbox; mas unmountfs sandbox /var/log",
   "help_cmd_mountedfs": "Show recorded filesystem mounts and their current states",
   "example_mountedfs": "Examples: mas mountedfs sandbox",
-  "help_cmd_hardware": "Query hardware or change GPU access on a stopped container; available on supported NVIDIA hosts",
-  "example_hardware": "Examples: mas hardware sandbox; mas hardware sandbox gpu off",
+  "help_cmd_hardware": "Query GPU and network; change either switch on a stopped container.",
+  "example_hardware": "Examples: mas hardware sandbox; mas hardware sandbox gpu off; mas hardware sandbox network off",
   "help_cmd_config": "Read or change mas preferences without LXD; omit the action to show all preferences",
   "example_config": "Examples: mas config; mas config get language; mas config set language zh_cn",
   "policy_refused": "Isolation policy is not satisfied; operation refused. Review these differences manually:\n{differences}",
@@ -291,7 +291,7 @@
   "policy_profile_devices": "Profile {name}: devices differ from approved root/NIC resources.",
   "policy_unset": "{key}: must be unset.",
   "policy_device": "Device {name}: unapproved definition {definition}",
-  "policy_root_nic_count": "Exactly one approved root disk and one managed NIC are required.",
+  "policy_root_nic_count": "Exactly one approved root disk is required; network on requires one managed NIC and network off requires no NICs.",
   "policy_gpu_resources": "GPU resources are not in the project-approved backend/path inventory.",
   "action_quarantine-import": "Quarantine unverified import",
   "policy_profile_difference": "Profile {name} {key}: observed {actual}, required {expected}",
@@ -323,5 +323,12 @@
   "security_loading": "Downloading {version} security challenge tool",
   "action_prepare-development": "prepare-development",
   "new_identity_changed": "Container {target} changed identity during creation; the replacement was not stopped.",
-  "development_config_changed": "Container {target} initialization configuration changed or could not be retired; creation is incomplete."
+  "development_config_changed": "Container {target} initialization configuration changed or could not be retired; creation is incomplete.",
+  "network_switch": "Network: {value}",
+  "network_choose": "Choose network access (stop the container before changing)",
+  "network_record_invalid": "Invalid network configuration record; no operation performed.",
+  "network_conflict": "Network device configuration conflicts or was modified; the device was not overwritten.",
+  "network_changed": "Container identity, state or configuration changed; check again before updating the network.",
+  "action_network": "Configure network",
+  "info_network": "Network configuration: {value}"
 }

@@ -15,10 +15,12 @@ class Progress:
     def __call__(self, event):
         message = progress_text(event)
         if event["status"] == "waiting" or (event.get("scope") == "native" and event["status"] == "ok"):
-            self.output.progress(message)
+            self.output.progress_lines([message, *event['live_lines']] if event.get('live_lines') else [message])
         else:
             self.output.keep(message)
         if not event.get("native_failure"):
+            if event.get('live_output') and event['status'] == 'error':
+                self.output.keep('\n'.join(event.get('native_stdout', '').splitlines()[-60:]))
             for line in diagnostic_lines(event.get("native_stdout", ""), event.get("native_stderr", "")):
                 self.output.keep(line)
 

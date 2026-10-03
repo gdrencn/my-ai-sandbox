@@ -130,5 +130,7 @@
   "security_timeout_help": "Individual probe timeout: 1–10 seconds, default 3 seconds.",
   "security_cancelled": "Security challenge cancelled or interrupted.",
   "security_wait_start": "Waiting for the submitted LXD start operation before restoring the original state.",
-  "security_empty": "No mas containers are available for testing. Create a container first."
+  "security_empty": "No mas containers are available for testing. Create a container first.",
+  "case_network-switch": "Network switch and offline operations",
+  "test_description_network-switch": "Verify network isolation, loopback, terminal access, filesystem read/write, backup restoration and original NIC restoration."
 }

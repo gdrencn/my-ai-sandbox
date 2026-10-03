@@ -130,5 +130,7 @@
   "security_timeout_help": "单项探测超时 1–10 秒，默认 3 秒。",
   "security_cancelled": "安全挑战已取消或中断。",
   "security_wait_start": "等待 LXD 已提交的启动操作完成，再恢复容器原状态。",
-  "security_empty": "没有可测试的 mas 容器，请先创建容器。"
+  "security_empty": "没有可测试的 mas 容器，请先创建容器。",
+  "case_network-switch": "网络开关与断网操作",
+  "test_description_network-switch": "验证断网、回环通信、终端进入、文件系统读写、备份恢复及原网卡恢复。"
 }

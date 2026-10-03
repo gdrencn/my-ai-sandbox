@@ -34,6 +34,7 @@ class TestOutputTests(unittest.TestCase):
         suite.results = {}
         with patch('mas.config.language', return_value='en_us'):
             with suite.case('unit'):
+                suite.results['unit'] = {'status': 'not_run', 'evidence': {'native_observation': 'retained'}}
                 suite.output.keep('first detail')
             with suite.case('new-default'):
                 suite.output.keep('second detail')
@@ -44,6 +45,8 @@ class TestOutputTests(unittest.TestCase):
         self.assertLess(text.index('first detail'), text.index('✓ Unit tests passed'))
         self.assertLess(text.index('✓ Unit tests passed'), text.index('[Container management]'))
         self.assertEqual(suite.results['unit']['category'], 'foundation')
+        self.assertEqual(suite.results['unit']['status'], 'passed')
+        self.assertEqual(suite.results['unit']['evidence'], {'native_observation': 'retained'})
         self.assertIn('Verify shared behavior', suite.results['unit']['description'])
         self.assertNotIn('\033', json.dumps(suite.results))
 
@@ -54,9 +57,11 @@ class TestOutputTests(unittest.TestCase):
         error = KeyboardInterrupt('interrupted fixture')
         with patch('mas.config.language', return_value='en_us'), self.assertRaises(KeyboardInterrupt) as caught:
             with suite.case('isolation-runtime'):
+                suite.results['isolation-runtime'] = {'evidence': {'completed_check': 'retained'}}
                 raise error
         self.assertIs(caught.exception, error)
         self.assertEqual(suite.results['isolation-runtime']['status'], 'failed')
+        self.assertEqual(suite.results['isolation-runtime']['evidence'], {'completed_check': 'retained'})
         self.assertEqual(suite.results['isolation-runtime']['category'], 'security')
         self.assertIn('[Security challenge]', suite.output.stream.getvalue())
         self.assertIn('✗', suite.output.stream.getvalue())

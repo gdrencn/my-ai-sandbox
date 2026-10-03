@@ -1,0 +1,43 @@
+{
+  "status": "preliminary; interrupted for tester fixture correction",
+  "passed": [
+    "unit",
+    "new-default",
+    "isolation-policy",
+    "legacy-migration",
+    "missing-image",
+    "configuration-concurrency",
+    "list-info",
+    "invalid-inputs",
+    "start-user-network",
+    "gpu",
+    "network-switch",
+    "dependency-install",
+    "lifecycle-repeat",
+    "restart",
+    "running-guards",
+    "enter-running-default-exit",
+    "enter-stopped-stop-exit",
+    "export-import",
+    "overwrite-confirmation",
+    "ownership-and-stop-all",
+    "unmarked-import",
+    "filesystems",
+    "filesystem-recovery",
+    "filesystem-menu",
+    "delete-confirmation",
+    "language-config"
+  ],
+  "failed": {
+    "tui": {
+      "status": "failed",
+      "elapsed": 478.79127354799857,
+      "error": "",
+      "category": "interaction",
+      "description": "\u9a8c\u8bc1\u771f\u5b9e\u7ec8\u7aef\u4e2d\u7684\u83dc\u5355\u5bfc\u822a\u53ca\u5b8c\u6574\u64cd\u4f5c\u6d41\u7a0b\u3002"
+    }
+  },
+  "cleanup_errors": [],
+  "elapsed": 1660.5781293479959,
+  "correction": "Delete the network-stage fixture after its successful checks; later menu tests require an empty managed list."
+}

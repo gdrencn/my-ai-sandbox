@@ -21,26 +21,34 @@ class Output:
         self.stream = stream or sys.stdout
         self.tty = self.stream.isatty()
         self.active = False
+        self.rows = 1
 
     def clear(self):
         if self.active:
-            self.stream.write('\r\033[2K')
+            self.stream.write('\r\033[2K' + '\033[1A\r\033[2K' * (self.rows - 1))
             self.stream.flush()
             self.active = False
 
     def progress(self, message, *, separate=True):
+        self.progress_lines([message], separate=separate)
+
+    def progress_lines(self, lines, *, separate=True):
         if not self.tty:
             return
         if separate:
             before_output()
         try:
-            columns = os.get_terminal_size(self.stream.fileno()).columns
+            size = os.get_terminal_size(self.stream.fileno())
         except (AttributeError, OSError, ValueError):
-            columns = shutil.get_terminal_size().columns
-        text = clipped(message, max(0, columns - 1))
+            size = shutil.get_terminal_size()
+        lines = list(lines)[-max(1, min(4, size.lines - 2)):]
+        if self.active and self.rows > 1:
+            self.clear()
+        text = '\n'.join(clipped(line, max(0, size.columns - 1)) for line in lines)
         self.stream.write('\r\033[2K' + text)
         self.stream.flush()
         self.active = True
+        self.rows = max(1, len(lines))
 
     def keep(self, message):
         before_output()

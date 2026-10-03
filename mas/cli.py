@@ -20,7 +20,7 @@ def parser():
     commands = result.add_subparsers(dest="command")
     hardware = commands.add_parser("hardware", help=t("help_hardware"), description=t('help_cmd_hardware'), epilog=t('example_hardware'))
     hardware.add_argument("target", metavar="TARGET", help=t('help_target'))
-    hardware.add_argument("item", nargs="?", choices=["gpu"], help=t('help_hardware_item'))
+    hardware.add_argument("item", nargs="?", choices=["gpu", "network"], help=t('help_hardware_item'))
     hardware.add_argument("value", nargs="?", choices=["on", "off"], help=t('help_hardware_value'))
     settings = commands.add_parser("config", help=t("help_config"), description=t('help_cmd_config'), epilog=t('example_config'))
     actions = settings.add_subparsers(dest="config_action")
@@ -81,7 +81,9 @@ def main(argv=None, manager=None):
             from .terminal_ui import run
             return 1 if run(manager) == 1 else 0
         elif args.command == "hardware":
-            result = manager.hardware(args.target, None if args.value is None else args.value == "on")
+            result = (manager.hardware(args.target, None if args.value is None else args.value == "on", item=args.item)
+                      if args.item else {'gpu': manager.hardware(args.target),
+                                         'network': manager.hardware(args.target, item='network')})
             print(json.dumps(result, ensure_ascii=False, indent=2))
         elif args.command == "list":
             for item in manager.list():

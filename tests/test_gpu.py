@@ -178,20 +178,21 @@ class GPUTests(unittest.TestCase):
         self.assertIn('ldconfig',args[2][-1])
         self.assertEqual(len(self.item['devices']),4)
 
-    def test_menu_switch_reuses_manager_and_no_gpu_has_only_back(self):
+    def test_menu_switch_reuses_manager_and_network_remains_without_gpu(self):
         for available in (True,False):
             view, manager=Mock(),Mock()
             manager.hardware.return_value={'available':available,'enabled':True}
             view.choose.side_effect=['gpu',False,None,None] if available else [None]
             with patch('mas.terminal_ui.sys.stdout',io.StringIO()):UI(view,manager).hardware('test-unit')
             choices=view.choose.call_args_list[0].args[1]
-            self.assertEqual(len(choices),2 if available else 1)
+            self.assertEqual(len(choices),3 if available else 2)
             if available: self.assertIn(unittest.mock.call('test-unit',False, capability={'available':True,'enabled':True}), manager.hardware.call_args_list)
 
     def test_menu_reuses_discovery_for_switches_and_refresh(self):
         self.gpu.ensure('test-unit')
         from mas.core import Manager
         self.manager.gpu = self.gpu
+        self.manager.network.status.return_value = {'enabled': True}
         self.manager.hardware.side_effect = lambda *a, **kw: Manager.hardware(self.manager, *a, **kw)
         view = Mock()
         view.choose.side_effect = ['gpu', False, None, 'gpu', True, None, None]
@@ -206,6 +207,7 @@ class GPUTests(unittest.TestCase):
         self.gpu.ensure('test-unit')
         from mas.core import Manager
         self.manager.gpu = self.gpu
+        self.manager.network.status.return_value = {'enabled': True}
         def hardware(target, enabled=None, **kwargs):
             result = Manager.hardware(self.manager, target, enabled, **kwargs)
             if enabled is not None:

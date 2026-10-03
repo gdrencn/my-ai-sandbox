@@ -1,7 +1,4 @@
-"""Preparation completion, native failure preservation and official LTS integrity."""
-import contextlib
-import hashlib
-import io
+"""Preparation completion, native failure preservation and APT development packages."""
 import json
 from pathlib import Path
 import tempfile
@@ -9,7 +6,7 @@ import subprocess
 import unittest
 from unittest.mock import Mock, patch
 
-from mas import development, node_setup
+from mas import development
 from mas.core import CLOUD_INIT_WAIT, Error, MANAGED, Manager, USER_SETUP
 
 FINISH = development.finish
@@ -45,9 +42,8 @@ class DevelopmentTests(unittest.TestCase):
         conf=json.loads(data.split('\n',1)[1])
         self.assertEqual(conf['packages'],list(development.PACKAGES))
         self.assertTrue(conf['package_update']);self.assertFalse(conf['package_upgrade'])
-        self.assertNotIn('nodejs',conf['packages']);self.assertNotIn('npm',conf['packages'])
-        self.assertEqual(conf['runcmd'],[['/usr/bin/python3','/var/lib/mas/install-node-lts.py']])
-        self.assertIn('SHASUMS256.txt',conf['write_files'][0]['content'])
+        self.assertIn('nodejs',conf['packages']);self.assertIn('npm',conf['packages'])
+        self.assertNotIn('runcmd',conf);self.assertNotIn('write_files',conf)
 
     def test_preparation_failure_stops_without_publishing_creation_success(self):
         primary=Error('native package preparation failed')
@@ -128,31 +124,16 @@ class DevelopmentTests(unittest.TestCase):
             self.assertIs(caught.exception,error)
             self.manager.stop.assert_called_once_with('fixture')
 
-    def test_latest_lts_ignores_current_and_older_major_point_releases(self):
-        items=[dict(version='v26.1.0',lts=False,files=['linux-x64']),
-               dict(version='v22.99.0',lts='Jod',files=['linux-x64']),
-               dict(version='v24.1.0',lts='Krypton',files=['linux-x64'])]
-        self.assertEqual(node_setup.latest_lts(items,'x64'),'v24.1.0')
-        with self.assertRaisesRegex(ValueError,'no Linux build'):node_setup.latest_lts(items,'arm64')
-        with self.assertRaisesRegex(ValueError,'no LTS'):node_setup.latest_lts(items[:1],'x64')
-
-    def test_corrupt_official_archive_is_rejected_before_extraction(self):
-        index=json.dumps([dict(version='v24.1.0',lts='Krypton',files=['linux-x64'])]).encode()
-        sums=(hashlib.sha256(b'correct').hexdigest()+'  node-v24.1.0-linux-x64.tar.xz\n').encode()
-        with tempfile.TemporaryDirectory() as directory,patch.object(node_setup.platform,'machine',return_value='x86_64'), \
-                patch.object(node_setup,'fetch',side_effect=[index,sums]), \
-                patch.object(node_setup.urllib.request,'urlopen',return_value=contextlib.closing(io.BytesIO(b'corrupt'))), \
-                patch.object(node_setup.subprocess,'run') as extract:
-            root=Path(directory)
-            with self.assertRaisesRegex(ValueError,'SHA-256 does not match'):node_setup.main(root/'lib',root/'bin')
-            extract.assert_not_called()
-            self.assertFalse((root/'bin').exists())
-
-    def test_official_architecture_and_duplicate_hash_fail_closed(self):
-        with patch.object(node_setup.platform,'machine',return_value='unknown'),patch.object(node_setup,'fetch') as fetch:
-            with self.assertRaisesRegex(ValueError,'Unsupported architecture'):node_setup.main()
-            fetch.assert_not_called()
-        index=json.dumps([dict(version='v24.1.0',lts='Krypton',files=['linux-x64'])]).encode()
-        sums=('0'*64+'  node-v24.1.0-linux-x64.tar.xz\n')*2
-        with patch.object(node_setup.platform,'machine',return_value='x86_64'),patch.object(node_setup,'fetch',side_effect=[index,sums.encode()]):
-            with self.assertRaisesRegex(ValueError,'Missing or invalid'):node_setup.main()
+    def test_live_wait_streams_log_and_reaps_tail_after_success_or_failure(self):
+        for code in (0,1):
+            with self.subTest(code=code), tempfile.TemporaryDirectory() as directory:
+                root=Path(directory)
+                cloud=root/'cloud-init'
+                cloud.write_text('#!/bin/sh\nsleep 0.1\nexit '+str(code)+'\n');cloud.chmod(0o755)
+                log=root/'cloud.log';log.write_text('Unpacking nodejs fixture\nSetting up npm fixture\n')
+                script='set -eu\n'+development.live_wait().replace('/var/log/cloud-init-output.log',str(log))
+                result=subprocess.run(['/bin/sh','-c',script],env={'PATH':str(root)+':/usr/bin:/bin'},capture_output=True,text=True,timeout=3)
+                self.assertEqual(result.returncode,code)
+                self.assertIn('Unpacking nodejs fixture',result.stdout)
+                self.assertIn('Setting up npm fixture',result.stdout)
+                if code:self.assertIn('Setting up npm fixture',result.stderr)

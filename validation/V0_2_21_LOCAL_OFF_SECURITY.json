@@ -1,0 +1,3112 @@
+{
+  "schema": 2,
+  "purpose": "complete-boundary-probe",
+  "checks": [
+    {
+      "check": "uid-map",
+      "method": "\u8bfb\u53d6 /proc/self/uid_map\uff0c\u68c0\u67e5\u5bb9\u5668 root \u5bf9\u5e94\u7684\u5916\u5c42 UID",
+      "status": "PASS",
+      "message": "\u5bb9\u5668 root \u4e0d\u5e94\u6620\u5c04\u5230\u5bbf\u4e3b root",
+      "evidence": {
+        "mapping": "         0    1262144      65536\n"
+      }
+    },
+    {
+      "check": "gid-map",
+      "method": "\u8bfb\u53d6 /proc/self/gid_map\uff0c\u68c0\u67e5\u5bb9\u5668 root \u5bf9\u5e94\u7684\u5916\u5c42 GID",
+      "status": "PASS",
+      "message": "\u5bb9\u5668 root \u4e0d\u5e94\u6620\u5c04\u5230\u5bbf\u4e3b root",
+      "evidence": {
+        "mapping": "         0    1262144      65536\n"
+      }
+    },
+    {
+      "check": "seccomp",
+      "method": "\u8bfb\u53d6 /proc/self/status \u7684 Seccomp \u503c\uff0c\u6838\u5bf9\u8fc7\u6ee4\u6a21\u5f0f 2",
+      "status": "PASS",
+      "message": "\u68c0\u67e5\u5b9e\u9645 seccomp \u8fc7\u6ee4\u72b6\u6001",
+      "evidence": {
+        "mode": "2"
+      }
+    },
+    {
+      "check": "basic-interfaces",
+      "method": "\u8bfb\u53d6 /dev/null \u548c /dev/zero\uff0c\u89c2\u5bdf /proc \u4e0e /sys",
+      "status": "PASS",
+      "message": "/dev/null\u3001/dev/zero\u3001/proc \u548c /sys \u662f\u6b63\u5e38\u5bb9\u5668\u63a5\u53e3",
+      "evidence": {
+        "sys_present": true
+      }
+    },
+    {
+      "check": "device-inventory",
+      "method": "\u6709\u754c\u679a\u4e3e /dev \u7684\u8bbe\u5907\u7c7b\u578b\u53ca major:minor\uff1b\u672a\u77e5\u8bbe\u5907\u4ec5\u63d0\u793a\u6838\u5bf9\uff0c\u4e0d\u6253\u5f00 watchdog/USB/PCI \u8bbe\u5907",
+      "status": "PASS",
+      "message": "\u8bbe\u5907\u6e05\u5355\uff1b\u975e\u57fa\u7840/GPU \u8bbe\u5907\u9700\u6838\u5bf9\u6765\u6e90\u53ca\u6388\u6743\uff0c\u4e0d\u636e\u8282\u70b9\u5b58\u5728\u8ba4\u5b9a\u53ef\u64cd\u4f5c\u5bbf\u4e3b",
+      "evidence": {
+        "devices": [
+          {
+            "path": "/dev/console",
+            "kind": "char",
+            "major": 136,
+            "minor": 0,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/dxg",
+            "kind": "char",
+            "major": 10,
+            "minor": 258,
+            "basic": false,
+            "gpu": true
+          },
+          {
+            "path": "/dev/full",
+            "kind": "char",
+            "major": 1,
+            "minor": 7,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/fuse",
+            "kind": "char",
+            "major": 10,
+            "minor": 229,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/net/tun",
+            "kind": "char",
+            "major": 10,
+            "minor": 200,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/null",
+            "kind": "char",
+            "major": 1,
+            "minor": 3,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/ptmx",
+            "kind": "char",
+            "major": 5,
+            "minor": 2,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/pts/0",
+            "kind": "char",
+            "major": 136,
+            "minor": 0,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/pts/ptmx",
+            "kind": "char",
+            "major": 5,
+            "minor": 2,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/random",
+            "kind": "char",
+            "major": 1,
+            "minor": 8,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/tty",
+            "kind": "char",
+            "major": 5,
+            "minor": 0,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/urandom",
+            "kind": "char",
+            "major": 1,
+            "minor": 9,
+            "basic": true,
+            "gpu": false
+          },
+          {
+            "path": "/dev/zero",
+            "kind": "char",
+            "major": 1,
+            "minor": 5,
+            "basic": true,
+            "gpu": false
+          }
+        ],
+        "unclassified": [],
+        "errors": [],
+        "inaccessible": [
+          {
+            "path": "/dev/.lxd-mounts",
+            "errno": 13,
+            "native_error": "[Errno 13] Permission denied: '/dev/.lxd-mounts'"
+          }
+        ],
+        "depth_limited": [],
+        "truncated": false
+      }
+    },
+    {
+      "check": "gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+      "method": "\u8bfb\u53d6 mountinfo\uff0c\u6838\u5bf9 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd \u7684\u53ea\u8bfb\u6302\u8f7d\u9009\u9879",
+      "status": "PASS",
+      "message": "GPU \u8fd0\u884c\u5e93\u6620\u5c04\u5e94\u4e3a\u53ea\u8bfb",
+      "evidence": {
+        "mount": {
+          "root": "/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "path": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+          "options": [
+            "ro",
+            "noatime"
+          ],
+          "filesystem": "9p",
+          "source": "drivers",
+          "super_options": [
+            "ro",
+            "aname=drivers;fmask=222;dmask=222",
+            "cache=0x5",
+            "access=client",
+            "msize=65536",
+            "trans=fd",
+            "rfd=8",
+            "wfd=8"
+          ]
+        }
+      }
+    },
+    {
+      "check": "gpu-readonly:/usr/lib/wsl/lib",
+      "method": "\u8bfb\u53d6 mountinfo\uff0c\u6838\u5bf9 /usr/lib/wsl/lib \u7684\u53ea\u8bfb\u6302\u8f7d\u9009\u9879",
+      "status": "PASS",
+      "message": "GPU \u8fd0\u884c\u5e93\u6620\u5c04\u5e94\u4e3a\u53ea\u8bfb",
+      "evidence": {
+        "mount": {
+          "root": "/",
+          "path": "/usr/lib/wsl/lib",
+          "options": [
+            "ro",
+            "noatime"
+          ],
+          "filesystem": "overlay",
+          "source": "none",
+          "super_options": [
+            "rw",
+            "lowerdir=/gpu_lib_packaged:/gpu_lib_inbox",
+            "upperdir=/gpu_lib/rw/upper",
+            "workdir=/gpu_lib/rw/work",
+            "uuid=on"
+          ]
+        }
+      }
+    },
+    {
+      "check": "mount-sources",
+      "method": "\u68c0\u67e5 mountinfo \u7684\u6587\u4ef6\u7cfb\u7edf\u7c7b\u578b\u3001\u6302\u8f7d\u6839\u548c\u6302\u8f7d\u70b9",
+      "status": "PASS",
+      "message": "\u672a\u53d1\u73b0\u5178\u578b Windows/\u5bbf\u4e3b home \u6620\u5c04",
+      "evidence": {
+        "suspicious": []
+      }
+    },
+    {
+      "check": "management-socket:/run/containerd/containerd.sock",
+      "method": "\u68c0\u67e5 /run/containerd/containerd.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/dbus/system_bus_socket",
+      "method": "\u68c0\u67e5 /run/dbus/system_bus_socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 176,
+        "inode": 223,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/docker.sock",
+      "method": "\u68c0\u67e5 /run/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/libvirt/libvirt-sock",
+      "method": "\u68c0\u67e5 /run/libvirt/libvirt-sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/libvirt/virtqemud-sock",
+      "method": "\u68c0\u67e5 /run/libvirt/virtqemud-sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/lxd-installer.socket",
+      "method": "\u68c0\u67e5 /run/lxd-installer.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 176,
+        "inode": 224,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/lxd.socket",
+      "method": "\u68c0\u67e5 /run/lxd.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/lxd/unix.socket",
+      "method": "\u68c0\u67e5 /run/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/podman/podman.sock",
+      "method": "\u68c0\u67e5 /run/podman/podman.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/snapd-snap.socket",
+      "method": "\u68c0\u67e5 /run/snapd-snap.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 176,
+        "inode": 228,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/snapd.socket",
+      "method": "\u68c0\u67e5 /run/snapd.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 176,
+        "inode": 227,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/systemd/private",
+      "method": "\u68c0\u67e5 /run/systemd/private\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 176,
+        "inode": 47,
+        "host_reference_match": false,
+        "peer_pid": 1,
+        "peer_uid": 0,
+        "peer_gid": 0,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/user/1001/bus",
+      "method": "\u68c0\u67e5 /run/user/1001/bus\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 193,
+        "inode": 22,
+        "host_reference_match": false,
+        "peer_pid": 390,
+        "peer_uid": 1001,
+        "peer_gid": 1001,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/user/1001/docker.sock",
+      "method": "\u68c0\u67e5 /run/user/1001/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/user/1001/podman/podman.sock",
+      "method": "\u68c0\u67e5 /run/user/1001/podman/podman.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/run/user/1001/snapd-session-agent.socket",
+      "method": "\u68c0\u67e5 /run/user/1001/snapd-session-agent.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 193,
+        "inode": 34,
+        "host_reference_match": false,
+        "peer_pid": 390,
+        "peer_uid": 1001,
+        "peer_gid": 1001,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/run/user/1001/systemd/private",
+      "method": "\u68c0\u67e5 /run/user/1001/systemd/private\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "device": 193,
+        "inode": 20,
+        "host_reference_match": false,
+        "peer_pid": 390,
+        "peer_uid": 1001,
+        "peer_gid": 1001,
+        "peer_namespaces": {
+          "pid": "pid:[4026532465]",
+          "mnt": "mnt:[4026532462]",
+          "user": "user:[4026532461]"
+        }
+      }
+    },
+    {
+      "check": "management-socket:/var/lib/lxd/unix.socket",
+      "method": "\u68c0\u67e5 /var/lib/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/var/run/docker.sock",
+      "method": "\u68c0\u67e5 /var/run/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+      "method": "\u68c0\u67e5 /var/snap/lxd/common/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+      "status": "PASS",
+      "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+      "evidence": {}
+    },
+    {
+      "check": "devlxd-api:/1.0",
+      "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+      "status": "PASS",
+      "message": "\u5b9e\u4f8b\u63a5\u53e3\u672a\u5f00\u653e\u5377\u7ba1\u7406\u80fd\u529b",
+      "evidence": {
+        "http_status": 200,
+        "volume_management_advertised": false
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/config",
+      "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/config\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+      "status": "PASS",
+      "message": "\u53ea\u8fd4\u56de\u672c\u5b9e\u4f8b\u5141\u8bb8\u7684\u914d\u7f6e\u952e\u540d\uff0c\u4e0d\u8bfb\u53d6\u914d\u7f6e\u503c",
+      "evidence": {
+        "http_status": 200,
+        "keys": [
+          "/1.0/config/user.mas.gpu",
+          "/1.0/config/user.mas.managed",
+          "/1.0/config/user.mas.network",
+          "/1.0/config/user.mas.profile"
+        ]
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/config/security.privileged",
+      "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/config/security.privileged\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+      "status": "PASS",
+      "message": "\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed",
+      "evidence": {
+        "http_status": 403
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/storage-pools/mas-probe-unowned/volumes/custom",
+      "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/storage-pools/mas-probe-unowned/volumes/custom\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+      "status": "PASS",
+      "message": "\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed",
+      "evidence": {
+        "http_status": 403
+      }
+    },
+    {
+      "check": "devlxd-api:/1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export",
+      "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+      "status": "PASS",
+      "message": "\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed",
+      "evidence": {
+        "http_status": 403
+      }
+    },
+    {
+      "check": "windows-interop",
+      "method": "\u68c0\u67e5 Windows/WSL \u8def\u5f84\u3001binfmt_misc \u6ce8\u518c\u9879\u548c WSL_INTEROP\uff0c\u4e0d\u6267\u884c\u89e3\u91ca\u5668\u6216 Windows \u547d\u4ee4",
+      "status": "PASS",
+      "message": "\u672a\u53d1\u73b0\u5178\u578b Windows/WSL \u5165\u53e3",
+      "evidence": {
+        "paths": [],
+        "registrations": [],
+        "truncated": false,
+        "wsl_interop_environment": null
+      }
+    },
+    {
+      "check": "gpu-expectation",
+      "method": "\u5217\u51fa /dev/dxg \u4e0e /dev/nvidiaN\uff0c\u6838\u5bf9\u663e\u5f0f GPU \u5f00\u5173\u9884\u671f",
+      "status": "PASS",
+      "message": "GPU \u4e3a\u83b7\u51c6\u8d44\u6e90\u4f8b\u5916\uff1b\u6838\u5bf9\u663e\u5f0f\u5f00\u5173\u9884\u671f\u53ca\u8bbe\u5907\u7c7b\u578b",
+      "evidence": {
+        "expected": "on",
+        "devices": [
+          "/dev/dxg"
+        ],
+        "invalid_nodes": []
+      }
+    },
+    {
+      "check": "network-expectation",
+      "method": "\u6838\u5bf9\u7f51\u7edc\u5f00\u5173\u9884\u671f\u3001\u63a5\u53e3\u7c7b\u578b\u548c IPv4/IPv6 \u8def\u7531\uff0c\u4e0d\u626b\u63cf\u7f51\u7edc\u6216\u5c1d\u8bd5\u767b\u5f55",
+      "status": "PASS",
+      "message": "\u6838\u5bf9\u7f51\u7edc\u5f00\u5173\u53ca IPv4/IPv6 \u63a5\u53e3\u3001\u8def\u7531\uff1b\u5bb9\u5668\u5185\u90e8\u56de\u73af\u901a\u4fe1\u4fdd\u7559",
+      "evidence": {
+        "expected": "off",
+        "interfaces": [
+          "lo"
+        ],
+        "external_interfaces": [],
+        "routes": [
+          {
+            "family": "ipv6",
+            "interface": "lo"
+          },
+          {
+            "family": "ipv6",
+            "interface": "lo"
+          },
+          {
+            "family": "ipv6",
+            "interface": "lo"
+          }
+        ]
+      }
+    },
+    {
+      "check": "device:host-memory",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:1\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:kernel-memory",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:2\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:io-ports",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:4\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:kernel-log",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:11\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:kvm",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 10:232\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:host-disk",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 8:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:host-nvme",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 259:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "device:host-loop",
+      "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 7:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "mknod",
+        "errno": 1,
+        "native_error": "[Errno 1] Operation not permitted"
+      }
+    },
+    {
+      "check": "control:/proc/sysrq-trigger",
+      "method": "\u5bf9 /proc/sysrq-trigger \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sysrq-trigger'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/modprobe",
+      "method": "\u5bf9 /proc/sys/kernel/modprobe \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/kexec_load_disabled",
+      "method": "\u5bf9 /proc/sys/kernel/kexec_load_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/vm/drop_caches",
+      "method": "\u5bf9 /proc/sys/vm/drop_caches \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/core_pattern",
+      "method": "\u5bf9 /proc/sys/kernel/core_pattern \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/core_pattern'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/hotplug",
+      "method": "\u5bf9 /proc/sys/kernel/hotplug \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/hotplug'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/modules_disabled",
+      "method": "\u5bf9 /proc/sys/kernel/modules_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modules_disabled'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/sysrq",
+      "method": "\u5bf9 /proc/sys/kernel/sysrq \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/sysrq'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/panic",
+      "method": "\u5bf9 /proc/sys/kernel/panic \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/panic_on_oops",
+      "method": "\u5bf9 /proc/sys/kernel/panic_on_oops \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic_on_oops'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/unprivileged_bpf_disabled",
+      "method": "\u5bf9 /proc/sys/kernel/unprivileged_bpf_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/unprivileged_bpf_disabled'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/perf_event_paranoid",
+      "method": "\u5bf9 /proc/sys/kernel/perf_event_paranoid \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/perf_event_paranoid'"
+      }
+    },
+    {
+      "check": "control:/proc/sys/kernel/yama/ptrace_scope",
+      "method": "\u5bf9 /proc/sys/kernel/yama/ptrace_scope \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/yama/ptrace_scope'"
+      }
+    },
+    {
+      "check": "control:/sys/power/state",
+      "method": "\u5bf9 /sys/power/state \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/sys/power/state'"
+      }
+    },
+    {
+      "check": "control:/sys/power/disk",
+      "method": "\u5bf9 /sys/power/disk \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/sys/power/disk'"
+      }
+    },
+    {
+      "check": "control:/sys/kernel/uevent_helper",
+      "method": "\u5bf9 /sys/kernel/uevent_helper \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/sys/kernel/uevent_helper'"
+      }
+    },
+    {
+      "check": "read-endpoint:/proc/kcore",
+      "method": "\u5bf9 /proc/kcore \u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u5185\u5b58\u6216\u65e5\u5fd7\u5185\u5bb9",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/kcore'"
+      }
+    },
+    {
+      "check": "read-endpoint:/proc/kmsg",
+      "method": "\u5bf9 /proc/kmsg \u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u5185\u5b58\u6216\u65e5\u5fd7\u5185\u5bb9",
+      "status": "PASS",
+      "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+      "evidence": {
+        "step": "open",
+        "errno": 13,
+        "native_error": "[Errno 13] Permission denied: '/proc/kmsg'"
+      }
+    },
+    {
+      "check": "namespace:user",
+      "method": "\u8bfb\u53d6 /proc/self/ns/user\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+      "status": "PASS",
+      "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+      "evidence": {
+        "guest": "user:[4026532461]",
+        "host": "user:[4026531837]"
+      }
+    },
+    {
+      "check": "namespace:pid",
+      "method": "\u8bfb\u53d6 /proc/self/ns/pid\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+      "status": "PASS",
+      "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+      "evidence": {
+        "guest": "pid:[4026532465]",
+        "host": "pid:[4026532216]"
+      }
+    },
+    {
+      "check": "namespace:mnt",
+      "method": "\u8bfb\u53d6 /proc/self/ns/mnt\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+      "status": "PASS",
+      "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+      "evidence": {
+        "guest": "mnt:[4026532462]",
+        "host": "mnt:[4026532214]"
+      }
+    },
+    {
+      "check": "namespace:net",
+      "method": "\u8bfb\u53d6 /proc/self/ns/net\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+      "status": "PASS",
+      "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+      "evidence": {
+        "guest": "net:[4026532468]",
+        "host": "net:[4026531833]"
+      }
+    },
+    {
+      "check": "namespace:ipc",
+      "method": "\u8bfb\u53d6 /proc/self/ns/ipc\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+      "status": "PASS",
+      "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+      "evidence": {
+        "guest": "ipc:[4026532464]",
+        "host": "ipc:[4026532202]"
+      }
+    },
+    {
+      "check": "namespace:uts",
+      "method": "\u8bfb\u53d6 /proc/self/ns/uts\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+      "status": "PASS",
+      "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+      "evidence": {
+        "guest": "uts:[4026532463]",
+        "host": "uts:[4026532215]"
+      }
+    },
+    {
+      "check": "process-roots",
+      "method": "\u6709\u754c\u8bfb\u53d6\u53ef\u89c1\u8fdb\u7a0b\u7684 root/mnt/user namespace\uff0c\u548c\u63d0\u4f9b\u7684\u5bbf\u4e3b namespace \u6bd4\u8f83\uff1b\u4e0d\u8bfb\u53d6\u8fdb\u7a0b\u5185\u5b58\u6216\u73af\u5883",
+      "status": "PASS",
+      "message": "\u5df2\u6838\u5bf9\u53ef\u89c1\u8fdb\u7a0b namespace \u4e0e root \u8def\u5f84\uff0c\u672a\u53d1\u73b0\u5bbf\u4e3b\u8fdb\u7a0b",
+      "evidence": {
+        "processes": [
+          {
+            "pid": 1,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 66,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 93,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532657]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 112,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532658]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 152,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532467]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 178,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532721]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 180,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 181,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 189,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 190,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532798]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 193,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 196,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532723]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 210,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 221,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 225,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 272,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 283,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532721]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 284,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532721]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 342,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532460]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 390,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 392,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 427,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 434,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 466,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 470,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          },
+          {
+            "pid": 508,
+            "root": "/",
+            "namespaces": {
+              "user": "user:[4026532461]",
+              "mnt": "mnt:[4026532462]",
+              "pid": "pid:[4026532465]"
+            }
+          }
+        ],
+        "host_matches": [],
+        "errors": [],
+        "truncated": false
+      }
+    },
+    {
+      "check": "binfmt:existing",
+      "method": "\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219",
+      "status": "PASS",
+      "message": "\u5f53\u524d mount namespace \u672a\u66b4\u9732 binfmt_misc \u6302\u8f7d",
+      "evidence": {
+        "mounts": []
+      }
+    },
+    {
+      "check": "host-canary:0",
+      "method": "\u6709\u754c\u5c1d\u8bd5\u76f4\u63a5\u8def\u5f84\u53ca\u53ef\u89c1\u8fdb\u7a0b root \u4e0b\u7684\u552f\u4e00\u6807\u8bb0\uff0c\u6bd4\u8f83 SHA-256\uff1b\u4ec5\u8bb0\u5f55\u6458\u8981\uff0c\u4e0d\u4fdd\u5b58\u5185\u5bb9",
+      "status": "PASS",
+      "message": "\u5bbf\u4e3b\u6807\u8bb0\u4e0d\u53ef\u8bfb\u6216\u4e0d\u53ef\u89c1",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/1/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/self/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/66/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/93/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/112/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/152/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/178/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/180/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/181/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/189/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/190/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/193/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/196/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/210/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/221/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/225/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/272/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/283/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/284/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/342/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/390/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/392/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/427/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/434/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/466/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/470/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/508/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          },
+          {
+            "path": "/proc/525/root/tmp/mas-host-canary-d8lt1qy6/marker",
+            "outcome": "unavailable",
+            "errno": 2
+          }
+        ],
+        "processes_truncated": false
+      }
+    },
+    {
+      "check": "binfmt:temporary-mount",
+      "method": "\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219",
+      "status": "PASS",
+      "message": "\u4e34\u65f6\u6302\u8f7d\u5c5e\u4e8e\u72ec\u7acb user namespace\uff0c\u672a\u66b4\u9732\u5bbf\u4e3b\u5b9e\u4f8b",
+      "evidence": {
+        "device": 194,
+        "inode": 1,
+        "user_namespace": "user:[4026532664]",
+        "host_match": false
+      }
+    },
+    {
+      "check": "host-canary-integrity",
+      "method": "\u4ece\u5bbf\u4e3b\u91c7\u96c6\u5f53\u6b21\u53c2\u7167\u5e76\u6838\u5bf9\u6311\u6218\u524d\u540e\u72b6\u6001",
+      "status": "PASS",
+      "message": "\u5bbf\u4e3b\u552f\u4e00\u6807\u8bb0\u5185\u5bb9\u5e94\u4fdd\u6301\u4e0d\u53d8",
+      "evidence": {}
+    },
+    {
+      "check": "binfmt:host-unchanged",
+      "method": "\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219",
+      "status": "PASS",
+      "message": "\u5bbf\u4e3b binfmt_misc \u6ce8\u518c\u89c4\u5219\u5e94\u4fdd\u6301\u4e0d\u53d8",
+      "evidence": {}
+    },
+    {
+      "check": "host-reference",
+      "method": "\u4ece\u5bbf\u4e3b\u91c7\u96c6\u5f53\u6b21\u53c2\u7167\u5e76\u6838\u5bf9\u6311\u6218\u524d\u540e\u72b6\u6001",
+      "status": "PASS",
+      "message": "\u5bbf\u4e3b\u542f\u52a8\u8eab\u4efd\u5e94\u4fdd\u6301\u4e0d\u53d8",
+      "evidence": {}
+    },
+    {
+      "check": "host-state-restore",
+      "method": "\u4ece\u5bbf\u4e3b\u91c7\u96c6\u5f53\u6b21\u53c2\u7167\u5e76\u6838\u5bf9\u6311\u6218\u524d\u540e\u72b6\u6001",
+      "status": "PASS",
+      "message": "\u5df2\u901a\u8fc7\u6807\u51c6 mas \u529f\u80fd\u6838\u9a8c\u5e76\u6062\u590d\u6d4b\u8bd5\u524d\u7684\u8fd0\u884c\u72b6\u6001\u3002",
+      "evidence": {
+        "initial_status": "Stopped",
+        "identity": "236f6ecc-40b8-45c8-ad89-423291b3c5dc",
+        "actions": [
+          "start",
+          "stop"
+        ],
+        "final_status": "Stopped"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "check": "capabilities",
+      "method": "\u8bfb\u53d6 /proc/self/status \u7684 CapEff \u548c CapBnd\uff0c\u4ec5\u8bb0\u5f55\u80fd\u529b\u4f4d",
+      "message": "\u80fd\u529b\u4f4d\u5c5e\u4e8e\u5f53\u524d namespace\uff1b\u4e0d\u80fd\u5355\u51ed\u5b83\u5224\u65ad\u62e5\u6709\u5bbf\u4e3b\u6743\u9650",
+      "evidence": {
+        "effective": "000001ffffffffff",
+        "bounding": "000001ffffffffff"
+      }
+    },
+    {
+      "check": "apparmor",
+      "method": "\u8bfb\u53d6 AppArmor enabled \u548c /proc/self/attr/current\uff0c\u8bb0\u5f55\u5b9e\u9645\u72b6\u6001",
+      "message": "\u8bb0\u5f55\u53ef\u9009 AppArmor \u7684\u5b9e\u9645\u72b6\u6001\uff1b\u4e0d\u5c06\u672a\u542f\u7528\u672c\u8eab\u89c6\u4e3a\u8d8a\u754c",
+      "evidence": {
+        "profile": "kernel\u0000",
+        "enabled": "N",
+        "errors": []
+      }
+    },
+    {
+      "check": "special-filesystems",
+      "method": "\u8bb0\u5f55 debugfs/securityfs/pstore/efivarfs/bpffs \u6302\u8f7d\u4e0e\u53ef\u89c1\u6027\uff0c\u4e0d\u4fee\u6539\u5176\u4e2d\u5185\u5bb9",
+      "message": "\u8bb0\u5f55\u5185\u6838\u63a5\u53e3\u6302\u8f7d\uff1b\u53ef\u89c1\u4e0d\u7b49\u4e8e\u80fd\u8bfb\u53d6\u6216\u4fee\u6539\u5bbf\u4e3b",
+      "evidence": {
+        "mounts": [
+          {
+            "root": "/fs/pstore",
+            "path": "/sys/fs/pstore",
+            "options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "noatime"
+            ],
+            "filesystem": "sysfs",
+            "source": "sysfs",
+            "super_options": [
+              "rw"
+            ]
+          },
+          {
+            "root": "/",
+            "path": "/sys/kernel/debug",
+            "options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "relatime"
+            ],
+            "filesystem": "debugfs",
+            "source": "debugfs",
+            "super_options": [
+              "rw"
+            ]
+          },
+          {
+            "root": "/kernel/security",
+            "path": "/sys/kernel/security",
+            "options": [
+              "rw",
+              "nosuid",
+              "nodev",
+              "noexec",
+              "noatime"
+            ],
+            "filesystem": "sysfs",
+            "source": "sysfs",
+            "super_options": [
+              "rw"
+            ]
+          }
+        ],
+        "visible": [
+          "/sys/kernel/debug",
+          "/sys/kernel/security",
+          "/sys/fs/pstore",
+          "/sys/fs/bpf"
+        ]
+      }
+    },
+    {
+      "check": "socket-inventory",
+      "method": "\u8bfb\u53d6 /proc/net/unix \u4e0e /run/user \u7684\u7ba1\u7406 socket \u8def\u5f84\uff0c\u4e0d\u8fde\u63a5\u62bd\u8c61 socket \u6216\u626b\u63cf\u7f51\u7edc",
+      "message": "\u7ba1\u7406\u5165\u53e3\u8def\u5f84\u6e05\u5355\uff1b\u9010\u9879\u8fde\u63a5\u68c0\u67e5\uff0c\u4e0d\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+      "evidence": {
+        "paths": [
+          "/var/snap/lxd/common/lxd/unix.socket",
+          "/var/lib/lxd/unix.socket",
+          "/run/lxd/unix.socket",
+          "/run/lxd.socket",
+          "/run/docker.sock",
+          "/var/run/docker.sock",
+          "/run/containerd/containerd.sock",
+          "/run/podman/podman.sock",
+          "/run/libvirt/libvirt-sock",
+          "/run/libvirt/virtqemud-sock",
+          "/run/dbus/system_bus_socket",
+          "/run/systemd/private",
+          "/run/snapd.socket",
+          "/run/snapd-snap.socket",
+          "/run/user/1001/systemd/private",
+          "/run/user/1001/bus",
+          "/run/user/1001/snapd-session-agent.socket",
+          "/run/lxd-installer.socket",
+          "/run/user/1001/docker.sock",
+          "/run/user/1001/podman/podman.sock"
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "check": "devlxd",
+      "method": "\u68c0\u67e5 /dev/lxd/sock \u662f\u5426\u53ef\u89c1\uff0c\u533a\u5206\u5b9e\u4f8b\u63a5\u53e3\u4e0e\u5bbf\u4e3b\u7ba1\u7406\u63a5\u53e3",
+      "message": "\u57fa\u672c\u5b9e\u4f8b\u63a5\u53e3\u4e0e\u5bbf\u4e3b\u7ba1\u7406\u63a5\u53e3\u4e0d\u540c\uff0c\u6309\u5f53\u524d\u517c\u5bb9\u7b56\u7565\u4fdd\u7559",
+      "evidence": {
+        "visible": true
+      }
+    },
+    {
+      "check": "network-policy",
+      "method": "\u8bf4\u660e\u7f51\u7edc\u6d4b\u8bd5\u8303\u56f4\uff0c\u4e0d\u8fdb\u884c\u7f51\u7edc\u626b\u63cf\u6216\u767b\u5f55",
+      "message": "\u5df2\u6838\u5bf9\u672c\u5730\u63a5\u53e3\u4e0e\u8def\u7531\uff1b\u6d41\u91cf\u548c\u767b\u5f55\u7b56\u7565\u53e6\u8bae\uff0c\u6b64\u811a\u672c\u4e0d\u626b\u63cf\u7f51\u7edc\u3001\u4e0d\u5c1d\u8bd5\u767b\u5f55",
+      "evidence": {}
+    }
+  ],
+  "project": "mas",
+  "target": "review-d29e874030594c1a887e5eac13c06f4a",
+  "source_sha256": "0f8de867cfcc2cb8edbdf3c706d2481c6d2e2918ebc96d498d2fce1aa791f516",
+  "host_source_sha256": "1e85ff3c79e4e0deb205540ecb4f7ce96e0bf775d8f38eac2adec01294727da5",
+  "lifecycle": {
+    "initial_status": "Stopped",
+    "identity": "236f6ecc-40b8-45c8-ad89-423291b3c5dc",
+    "actions": [
+      "start",
+      "stop"
+    ],
+    "final_status": "Stopped"
+  },
+  "gpu_expected": "on",
+  "network_expected": "off",
+  "reference": {
+    "schema": 1,
+    "boot_id": "92e65e4b-984b-4cfe-9321-ef21c2b5ecf7",
+    "namespaces": {
+      "user": "user:[4026531837]",
+      "pid": "pid:[4026532216]",
+      "mnt": "mnt:[4026532214]",
+      "net": "net:[4026531833]",
+      "ipc": "ipc:[4026532202]",
+      "uts": "uts:[4026532215]"
+    },
+    "canaries": [
+      {
+        "path": "/tmp/mas-host-canary-d8lt1qy6/marker",
+        "sha256": "d7d8b5588d117ebbe799d7c89e110dea1f47ce12c8efaa781e3931d8bce09b98"
+      }
+    ],
+    "sockets": [
+      {
+        "path": "/var/snap/lxd/common/lxd/unix.socket",
+        "device": 2096,
+        "inode": 2305
+      },
+      {
+        "path": "/run/dbus/system_bus_socket",
+        "device": 62,
+        "inode": 885
+      },
+      {
+        "path": "/run/systemd/private",
+        "device": 62,
+        "inode": 67
+      },
+      {
+        "path": "/run/snapd.socket",
+        "device": 62,
+        "inode": 889
+      },
+      {
+        "path": "/run/snapd-snap.socket",
+        "device": 62,
+        "inode": 890
+      }
+    ],
+    "binfmt": [
+      {
+        "path": "/proc/sys/fs/binfmt_misc",
+        "device": 34,
+        "inode": 1,
+        "registrations": [
+          {
+            "name": "WSLInterop",
+            "sha256": "dc50348fcb8063ec34ddcbde6f21ab380027d63918299ba7253f802618d0c815",
+            "interpreter": "/init",
+            "flags": "PF"
+          },
+          {
+            "name": "python3.14",
+            "sha256": "56f6d188d45e1df44c1c83affeb389d2cb6f504a9535d5fc0b0604d2fa2d5b60",
+            "interpreter": "/usr/bin/python3.14",
+            "flags": ""
+          },
+          {
+            "name": "status",
+            "sha256": "e056a35db086947e2f5969d747f0a7517bff00c7ffff1f9e7b47b72bfac9d948",
+            "interpreter": "",
+            "flags": ""
+          }
+        ]
+      }
+    ]
+  },
+  "guest_stdout": "[\u901a\u8fc7] uid-map\uff1a\u5bb9\u5668 root \u4e0d\u5e94\u6620\u5c04\u5230\u5bbf\u4e3b root\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/uid_map\uff0c\u68c0\u67e5\u5bb9\u5668 root \u5bf9\u5e94\u7684\u5916\u5c42 UID\n  \u89c2\u5bdf\uff1a{\"mapping\": \"         0    1262144      65536\\n\"}\n[\u901a\u8fc7] gid-map\uff1a\u5bb9\u5668 root \u4e0d\u5e94\u6620\u5c04\u5230\u5bbf\u4e3b root\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/gid_map\uff0c\u68c0\u67e5\u5bb9\u5668 root \u5bf9\u5e94\u7684\u5916\u5c42 GID\n  \u89c2\u5bdf\uff1a{\"mapping\": \"         0    1262144      65536\\n\"}\n[\u901a\u8fc7] seccomp\uff1a\u68c0\u67e5\u5b9e\u9645 seccomp \u8fc7\u6ee4\u72b6\u6001\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/status \u7684 Seccomp \u503c\uff0c\u6838\u5bf9\u8fc7\u6ee4\u6a21\u5f0f 2\n  \u89c2\u5bdf\uff1a{\"mode\": \"2\"}\n[\u8bb0\u5f55] capabilities\uff1a\u80fd\u529b\u4f4d\u5c5e\u4e8e\u5f53\u524d namespace\uff1b\u4e0d\u80fd\u5355\u51ed\u5b83\u5224\u65ad\u62e5\u6709\u5bbf\u4e3b\u6743\u9650\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/status \u7684 CapEff \u548c CapBnd\uff0c\u4ec5\u8bb0\u5f55\u80fd\u529b\u4f4d\n  \u89c2\u5bdf\uff1a{\"effective\": \"000001ffffffffff\", \"bounding\": \"000001ffffffffff\"}\n[\u8bb0\u5f55] apparmor\uff1a\u8bb0\u5f55\u53ef\u9009 AppArmor \u7684\u5b9e\u9645\u72b6\u6001\uff1b\u4e0d\u5c06\u672a\u542f\u7528\u672c\u8eab\u89c6\u4e3a\u8d8a\u754c\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 AppArmor enabled \u548c /proc/self/attr/current\uff0c\u8bb0\u5f55\u5b9e\u9645\u72b6\u6001\n  \u89c2\u5bdf\uff1a{\"profile\": \"kernel\\u0000\", \"enabled\": \"N\", \"errors\": []}\n[\u901a\u8fc7] basic-interfaces\uff1a/dev/null\u3001/dev/zero\u3001/proc \u548c /sys \u662f\u6b63\u5e38\u5bb9\u5668\u63a5\u53e3\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /dev/null \u548c /dev/zero\uff0c\u89c2\u5bdf /proc \u4e0e /sys\n  \u89c2\u5bdf\uff1a{\"sys_present\": true}\n[\u901a\u8fc7] device-inventory\uff1a\u8bbe\u5907\u6e05\u5355\uff1b\u975e\u57fa\u7840/GPU \u8bbe\u5907\u9700\u6838\u5bf9\u6765\u6e90\u53ca\u6388\u6743\uff0c\u4e0d\u636e\u8282\u70b9\u5b58\u5728\u8ba4\u5b9a\u53ef\u64cd\u4f5c\u5bbf\u4e3b\n  \u65b9\u6cd5\uff1a\u6709\u754c\u679a\u4e3e /dev \u7684\u8bbe\u5907\u7c7b\u578b\u53ca major:minor\uff1b\u672a\u77e5\u8bbe\u5907\u4ec5\u63d0\u793a\u6838\u5bf9\uff0c\u4e0d\u6253\u5f00 watchdog/USB/PCI \u8bbe\u5907\n  \u89c2\u5bdf\uff1a{\"devices\": [{\"path\": \"/dev/console\", \"kind\": \"char\", \"major\": 136, \"minor\": 0, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/dxg\", \"kind\": \"char\", \"major\": 10, \"minor\": 258, \"basic\": false, \"gpu\": true}, {\"path\": \"/dev/full\", \"kind\": \"char\", \"major\": 1, \"minor\": 7, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/fuse\", \"kind\": \"char\", \"major\": 10, \"minor\": 229, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/net/tun\", \"kind\": \"char\", \"major\": 10, \"minor\": 200, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/null\", \"kind\": \"char\", \"major\": 1, \"minor\": 3, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/ptmx\", \"kind\": \"char\", \"major\": 5, \"minor\": 2, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/pts/0\", \"kind\": \"char\", \"major\": 136, \"minor\": 0, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/pts/ptmx\", \"kind\": \"char\", \"major\": 5, \"minor\": 2, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/random\", \"kind\": \"char\", \"major\": 1, \"minor\": 8, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/tty\", \"kind\": \"char\", \"major\": 5, \"minor\": 0, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/urandom\", \"kind\": \"char\", \"major\": 1, \"minor\": 9, \"basic\": true, \"gpu\": false}, {\"path\": \"/dev/zero\", \"kind\": \"char\", \"major\": 1, \"minor\": 5, \"basic\": true, \"gpu\": false}], \"unclassified\": [], \"errors\": [], \"inaccessible\": [{\"path\": \"/dev/.lxd-mounts\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/dev/.lxd-mounts'\"}], \"depth_limited\": [], \"truncated\": false}\n[\u901a\u8fc7] gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\uff1aGPU \u8fd0\u884c\u5e93\u6620\u5c04\u5e94\u4e3a\u53ea\u8bfb\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 mountinfo\uff0c\u6838\u5bf9 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd \u7684\u53ea\u8bfb\u6302\u8f7d\u9009\u9879\n  \u89c2\u5bdf\uff1a{\"mount\": {\"root\": \"/nvrzi.inf_amd64_6a54f45845aaf4cd\", \"path\": \"/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd\", \"options\": [\"ro\", \"noatime\"], \"filesystem\": \"9p\", \"source\": \"drivers\", \"super_options\": [\"ro\", \"aname=drivers;fmask=222;dmask=222\", \"cache=0x5\", \"access=client\", \"msize=65536\", \"trans=fd\", \"rfd=8\", \"wfd=8\"]}}\n[\u901a\u8fc7] gpu-readonly:/usr/lib/wsl/lib\uff1aGPU \u8fd0\u884c\u5e93\u6620\u5c04\u5e94\u4e3a\u53ea\u8bfb\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 mountinfo\uff0c\u6838\u5bf9 /usr/lib/wsl/lib \u7684\u53ea\u8bfb\u6302\u8f7d\u9009\u9879\n  \u89c2\u5bdf\uff1a{\"mount\": {\"root\": \"/\", \"path\": \"/usr/lib/wsl/lib\", \"options\": [\"ro\", \"noatime\"], \"filesystem\": \"overlay\", \"source\": \"none\", \"super_options\": [\"rw\", \"lowerdir=/gpu_lib_packaged:/gpu_lib_inbox\", \"upperdir=/gpu_lib/rw/upper\", \"workdir=/gpu_lib/rw/work\", \"uuid=on\"]}}\n[\u901a\u8fc7] mount-sources\uff1a\u672a\u53d1\u73b0\u5178\u578b Windows/\u5bbf\u4e3b home \u6620\u5c04\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 mountinfo \u7684\u6587\u4ef6\u7cfb\u7edf\u7c7b\u578b\u3001\u6302\u8f7d\u6839\u548c\u6302\u8f7d\u70b9\n  \u89c2\u5bdf\uff1a{\"suspicious\": []}\n[\u8bb0\u5f55] special-filesystems\uff1a\u8bb0\u5f55\u5185\u6838\u63a5\u53e3\u6302\u8f7d\uff1b\u53ef\u89c1\u4e0d\u7b49\u4e8e\u80fd\u8bfb\u53d6\u6216\u4fee\u6539\u5bbf\u4e3b\n  \u65b9\u6cd5\uff1a\u8bb0\u5f55 debugfs/securityfs/pstore/efivarfs/bpffs \u6302\u8f7d\u4e0e\u53ef\u89c1\u6027\uff0c\u4e0d\u4fee\u6539\u5176\u4e2d\u5185\u5bb9\n  \u89c2\u5bdf\uff1a{\"mounts\": [{\"root\": \"/fs/pstore\", \"path\": \"/sys/fs/pstore\", \"options\": [\"rw\", \"nosuid\", \"nodev\", \"noexec\", \"noatime\"], \"filesystem\": \"sysfs\", \"source\": \"sysfs\", \"super_options\": [\"rw\"]}, {\"root\": \"/\", \"path\": \"/sys/kernel/debug\", \"options\": [\"rw\", \"nosuid\", \"nodev\", \"noexec\", \"relatime\"], \"filesystem\": \"debugfs\", \"source\": \"debugfs\", \"super_options\": [\"rw\"]}, {\"root\": \"/kernel/security\", \"path\": \"/sys/kernel/security\", \"options\": [\"rw\", \"nosuid\", \"nodev\", \"noexec\", \"noatime\"], \"filesystem\": \"sysfs\", \"source\": \"sysfs\", \"super_options\": [\"rw\"]}], \"visible\": [\"/sys/kernel/debug\", \"/sys/kernel/security\", \"/sys/fs/pstore\", \"/sys/fs/bpf\"]}\n[\u8bb0\u5f55] socket-inventory\uff1a\u7ba1\u7406\u5165\u53e3\u8def\u5f84\u6e05\u5355\uff1b\u9010\u9879\u8fde\u63a5\u68c0\u67e5\uff0c\u4e0d\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/net/unix \u4e0e /run/user \u7684\u7ba1\u7406 socket \u8def\u5f84\uff0c\u4e0d\u8fde\u63a5\u62bd\u8c61 socket \u6216\u626b\u63cf\u7f51\u7edc\n  \u89c2\u5bdf\uff1a{\"paths\": [\"/var/snap/lxd/common/lxd/unix.socket\", \"/var/lib/lxd/unix.socket\", \"/run/lxd/unix.socket\", \"/run/lxd.socket\", \"/run/docker.sock\", \"/var/run/docker.sock\", \"/run/containerd/containerd.sock\", \"/run/podman/podman.sock\", \"/run/libvirt/libvirt-sock\", \"/run/libvirt/virtqemud-sock\", \"/run/dbus/system_bus_socket\", \"/run/systemd/private\", \"/run/snapd.socket\", \"/run/snapd-snap.socket\", \"/run/user/1001/systemd/private\", \"/run/user/1001/bus\", \"/run/user/1001/snapd-session-agent.socket\", \"/run/lxd-installer.socket\", \"/run/user/1001/docker.sock\", \"/run/user/1001/podman/podman.sock\"], \"truncated\": false}\n[\u901a\u8fc7] management-socket:/run/containerd/containerd.sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/containerd/containerd.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/dbus/system_bus_socket\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/dbus/system_bus_socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 176, \"inode\": 223, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/docker.sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/libvirt/libvirt-sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/libvirt/libvirt-sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/libvirt/virtqemud-sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/libvirt/virtqemud-sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/lxd-installer.socket\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/lxd-installer.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 176, \"inode\": 224, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/lxd.socket\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/lxd.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/lxd/unix.socket\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/podman/podman.sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/podman/podman.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/snapd-snap.socket\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/snapd-snap.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 176, \"inode\": 228, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/snapd.socket\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/snapd.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 176, \"inode\": 227, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/systemd/private\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/systemd/private\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 176, \"inode\": 47, \"host_reference_match\": false, \"peer_pid\": 1, \"peer_uid\": 0, \"peer_gid\": 0, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/user/1001/bus\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/user/1001/bus\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 193, \"inode\": 22, \"host_reference_match\": false, \"peer_pid\": 390, \"peer_uid\": 1001, \"peer_gid\": 1001, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/user/1001/docker.sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/user/1001/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/user/1001/podman/podman.sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/user/1001/podman/podman.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/run/user/1001/snapd-session-agent.socket\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/user/1001/snapd-session-agent.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 193, \"inode\": 34, \"host_reference_match\": false, \"peer_pid\": 390, \"peer_uid\": 1001, \"peer_gid\": 1001, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/run/user/1001/systemd/private\uff1a\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /run/user/1001/systemd/private\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n  \u89c2\u5bdf\uff1a{\"device\": 193, \"inode\": 20, \"host_reference_match\": false, \"peer_pid\": 390, \"peer_uid\": 1001, \"peer_gid\": 1001, \"peer_namespaces\": {\"pid\": \"pid:[4026532465]\", \"mnt\": \"mnt:[4026532462]\", \"user\": \"user:[4026532461]\"}}\n[\u901a\u8fc7] management-socket:/var/lib/lxd/unix.socket\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /var/lib/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/var/run/docker.sock\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /var/run/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u901a\u8fc7] management-socket:/var/snap/lxd/common/lxd/unix.socket\uff1a\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /var/snap/lxd/common/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42\n[\u8bb0\u5f55] devlxd\uff1a\u57fa\u672c\u5b9e\u4f8b\u63a5\u53e3\u4e0e\u5bbf\u4e3b\u7ba1\u7406\u63a5\u53e3\u4e0d\u540c\uff0c\u6309\u5f53\u524d\u517c\u5bb9\u7b56\u7565\u4fdd\u7559\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 /dev/lxd/sock \u662f\u5426\u53ef\u89c1\uff0c\u533a\u5206\u5b9e\u4f8b\u63a5\u53e3\u4e0e\u5bbf\u4e3b\u7ba1\u7406\u63a5\u53e3\n  \u89c2\u5bdf\uff1a{\"visible\": true}\n[\u901a\u8fc7] devlxd-api:/1.0\uff1a\u5b9e\u4f8b\u63a5\u53e3\u672a\u5f00\u653e\u5377\u7ba1\u7406\u80fd\u529b\n  \u65b9\u6cd5\uff1a\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90\n  \u89c2\u5bdf\uff1a{\"http_status\": 200, \"volume_management_advertised\": false}\n[\u901a\u8fc7] devlxd-api:/1.0/config\uff1a\u53ea\u8fd4\u56de\u672c\u5b9e\u4f8b\u5141\u8bb8\u7684\u914d\u7f6e\u952e\u540d\uff0c\u4e0d\u8bfb\u53d6\u914d\u7f6e\u503c\n  \u65b9\u6cd5\uff1a\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/config\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90\n  \u89c2\u5bdf\uff1a{\"http_status\": 200, \"keys\": [\"/1.0/config/user.mas.gpu\", \"/1.0/config/user.mas.managed\", \"/1.0/config/user.mas.network\", \"/1.0/config/user.mas.profile\"]}\n[\u901a\u8fc7] devlxd-api:/1.0/config/security.privileged\uff1a\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed\n  \u65b9\u6cd5\uff1a\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/config/security.privileged\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90\n  \u89c2\u5bdf\uff1a{\"http_status\": 403}\n[\u901a\u8fc7] devlxd-api:/1.0/storage-pools/mas-probe-unowned/volumes/custom\uff1a\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed\n  \u65b9\u6cd5\uff1a\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/storage-pools/mas-probe-unowned/volumes/custom\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90\n  \u89c2\u5bdf\uff1a{\"http_status\": 403}\n[\u901a\u8fc7] devlxd-api:/1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export\uff1a\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed\n  \u65b9\u6cd5\uff1a\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90\n  \u89c2\u5bdf\uff1a{\"http_status\": 403}\n[\u901a\u8fc7] windows-interop\uff1a\u672a\u53d1\u73b0\u5178\u578b Windows/WSL \u5165\u53e3\n  \u65b9\u6cd5\uff1a\u68c0\u67e5 Windows/WSL \u8def\u5f84\u3001binfmt_misc \u6ce8\u518c\u9879\u548c WSL_INTEROP\uff0c\u4e0d\u6267\u884c\u89e3\u91ca\u5668\u6216 Windows \u547d\u4ee4\n  \u89c2\u5bdf\uff1a{\"paths\": [], \"registrations\": [], \"truncated\": false, \"wsl_interop_environment\": null}\n[\u901a\u8fc7] gpu-expectation\uff1aGPU \u4e3a\u83b7\u51c6\u8d44\u6e90\u4f8b\u5916\uff1b\u6838\u5bf9\u663e\u5f0f\u5f00\u5173\u9884\u671f\u53ca\u8bbe\u5907\u7c7b\u578b\n  \u65b9\u6cd5\uff1a\u5217\u51fa /dev/dxg \u4e0e /dev/nvidiaN\uff0c\u6838\u5bf9\u663e\u5f0f GPU \u5f00\u5173\u9884\u671f\n  \u89c2\u5bdf\uff1a{\"expected\": \"on\", \"devices\": [\"/dev/dxg\"], \"invalid_nodes\": []}\n[\u901a\u8fc7] network-expectation\uff1a\u6838\u5bf9\u7f51\u7edc\u5f00\u5173\u53ca IPv4/IPv6 \u63a5\u53e3\u3001\u8def\u7531\uff1b\u5bb9\u5668\u5185\u90e8\u56de\u73af\u901a\u4fe1\u4fdd\u7559\n  \u65b9\u6cd5\uff1a\u6838\u5bf9\u7f51\u7edc\u5f00\u5173\u9884\u671f\u3001\u63a5\u53e3\u7c7b\u578b\u548c IPv4/IPv6 \u8def\u7531\uff0c\u4e0d\u626b\u63cf\u7f51\u7edc\u6216\u5c1d\u8bd5\u767b\u5f55\n  \u89c2\u5bdf\uff1a{\"expected\": \"off\", \"interfaces\": [\"lo\"], \"external_interfaces\": [], \"routes\": [{\"family\": \"ipv6\", \"interface\": \"lo\"}, {\"family\": \"ipv6\", \"interface\": \"lo\"}, {\"family\": \"ipv6\", \"interface\": \"lo\"}]}\n[\u901a\u8fc7] device:host-memory\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:1\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:kernel-memory\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:2\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:io-ports\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:4\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:kernel-log\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:11\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:kvm\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 10:232\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:host-disk\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 8:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:host-nvme\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 259:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] device:host-loop\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 7:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl\n  \u89c2\u5bdf\uff1a{\"step\": \"mknod\", \"errno\": 1, \"native_error\": \"[Errno 1] Operation not permitted\"}\n[\u901a\u8fc7] control:/proc/sysrq-trigger\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sysrq-trigger \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sysrq-trigger'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/modprobe\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/modprobe \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/kexec_load_disabled\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/kexec_load_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'\"}\n[\u901a\u8fc7] control:/proc/sys/vm/drop_caches\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/vm/drop_caches \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/core_pattern\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/core_pattern \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/core_pattern'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/hotplug\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/hotplug \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/hotplug'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/modules_disabled\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/modules_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/modules_disabled'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/sysrq\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/sysrq \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/sysrq'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/panic\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/panic \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/panic'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/panic_on_oops\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/panic_on_oops \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/panic_on_oops'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/unprivileged_bpf_disabled\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/unprivileged_bpf_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/unprivileged_bpf_disabled'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/perf_event_paranoid\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/perf_event_paranoid \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/perf_event_paranoid'\"}\n[\u901a\u8fc7] control:/proc/sys/kernel/yama/ptrace_scope\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/sys/kernel/yama/ptrace_scope \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/sys/kernel/yama/ptrace_scope'\"}\n[\u901a\u8fc7] control:/sys/power/state\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /sys/power/state \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/sys/power/state'\"}\n[\u901a\u8fc7] control:/sys/power/disk\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /sys/power/disk \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/sys/power/disk'\"}\n[\u901a\u8fc7] control:/sys/kernel/uevent_helper\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /sys/kernel/uevent_helper \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/sys/kernel/uevent_helper'\"}\n[\u901a\u8fc7] read-endpoint:/proc/kcore\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/kcore \u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u5185\u5b58\u6216\u65e5\u5fd7\u5185\u5bb9\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/kcore'\"}\n[\u901a\u8fc7] read-endpoint:/proc/kmsg\uff1a\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd\n  \u65b9\u6cd5\uff1a\u5bf9 /proc/kmsg \u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u5185\u5b58\u6216\u65e5\u5fd7\u5185\u5bb9\n  \u89c2\u5bdf\uff1a{\"step\": \"open\", \"errno\": 13, \"native_error\": \"[Errno 13] Permission denied: '/proc/kmsg'\"}\n[\u8bb0\u5f55] network-policy\uff1a\u5df2\u6838\u5bf9\u672c\u5730\u63a5\u53e3\u4e0e\u8def\u7531\uff1b\u6d41\u91cf\u548c\u767b\u5f55\u7b56\u7565\u53e6\u8bae\uff0c\u6b64\u811a\u672c\u4e0d\u626b\u63cf\u7f51\u7edc\u3001\u4e0d\u5c1d\u8bd5\u767b\u5f55\n  \u65b9\u6cd5\uff1a\u8bf4\u660e\u7f51\u7edc\u6d4b\u8bd5\u8303\u56f4\uff0c\u4e0d\u8fdb\u884c\u7f51\u7edc\u626b\u63cf\u6216\u767b\u5f55\n[\u901a\u8fc7] namespace:user\uff1a\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/ns/user\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6\n  \u89c2\u5bdf\uff1a{\"guest\": \"user:[4026532461]\", \"host\": \"user:[4026531837]\"}\n[\u901a\u8fc7] namespace:pid\uff1a\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/ns/pid\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6\n  \u89c2\u5bdf\uff1a{\"guest\": \"pid:[4026532465]\", \"host\": \"pid:[4026532216]\"}\n[\u901a\u8fc7] namespace:mnt\uff1a\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/ns/mnt\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6\n  \u89c2\u5bdf\uff1a{\"guest\": \"mnt:[4026532462]\", \"host\": \"mnt:[4026532214]\"}\n[\u901a\u8fc7] namespace:net\uff1a\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/ns/net\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6\n  \u89c2\u5bdf\uff1a{\"guest\": \"net:[4026532468]\", \"host\": \"net:[4026531833]\"}\n[\u901a\u8fc7] namespace:ipc\uff1a\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/ns/ipc\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6\n  \u89c2\u5bdf\uff1a{\"guest\": \"ipc:[4026532464]\", \"host\": \"ipc:[4026532202]\"}\n[\u901a\u8fc7] namespace:uts\uff1a\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace\n  \u65b9\u6cd5\uff1a\u8bfb\u53d6 /proc/self/ns/uts\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6\n  \u89c2\u5bdf\uff1a{\"guest\": \"uts:[4026532463]\", \"host\": \"uts:[4026532215]\"}\n[\u901a\u8fc7] process-roots\uff1a\u5df2\u6838\u5bf9\u53ef\u89c1\u8fdb\u7a0b namespace \u4e0e root \u8def\u5f84\uff0c\u672a\u53d1\u73b0\u5bbf\u4e3b\u8fdb\u7a0b\n  \u65b9\u6cd5\uff1a\u6709\u754c\u8bfb\u53d6\u53ef\u89c1\u8fdb\u7a0b\u7684 root/mnt/user namespace\uff0c\u548c\u63d0\u4f9b\u7684\u5bbf\u4e3b namespace \u6bd4\u8f83\uff1b\u4e0d\u8bfb\u53d6\u8fdb\u7a0b\u5185\u5b58\u6216\u73af\u5883\n  \u89c2\u5bdf\uff1a{\"processes\": [{\"pid\": 1, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 66, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 93, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532657]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 112, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532658]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 152, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532467]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 178, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532721]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 180, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 181, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 189, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 190, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532798]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 193, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 196, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532723]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 210, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 221, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 225, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 272, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 283, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532721]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 284, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532721]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 342, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532460]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 390, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 392, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 427, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 434, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 466, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 470, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}, {\"pid\": 508, \"root\": \"/\", \"namespaces\": {\"user\": \"user:[4026532461]\", \"mnt\": \"mnt:[4026532462]\", \"pid\": \"pid:[4026532465]\"}}], \"host_matches\": [], \"errors\": [], \"truncated\": false}\n[\u901a\u8fc7] binfmt:existing\uff1a\u5f53\u524d mount namespace \u672a\u66b4\u9732 binfmt_misc \u6302\u8f7d\n  \u65b9\u6cd5\uff1a\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219\n  \u89c2\u5bdf\uff1a{\"mounts\": []}\n[\u901a\u8fc7] host-canary:0\uff1a\u5bbf\u4e3b\u6807\u8bb0\u4e0d\u53ef\u8bfb\u6216\u4e0d\u53ef\u89c1\n  \u65b9\u6cd5\uff1a\u6709\u754c\u5c1d\u8bd5\u76f4\u63a5\u8def\u5f84\u53ca\u53ef\u89c1\u8fdb\u7a0b root \u4e0b\u7684\u552f\u4e00\u6807\u8bb0\uff0c\u6bd4\u8f83 SHA-256\uff1b\u4ec5\u8bb0\u5f55\u6458\u8981\uff0c\u4e0d\u4fdd\u5b58\u5185\u5bb9\n  \u89c2\u5bdf\uff1a{\"attempts\": [{\"path\": \"/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/1/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/self/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/66/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/93/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/112/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/152/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/178/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/180/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/181/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/189/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/190/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/193/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/196/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/210/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/221/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/225/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/272/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/283/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/284/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/342/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/390/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/392/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/427/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/434/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/466/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/470/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/508/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}, {\"path\": \"/proc/525/root/tmp/mas-host-canary-d8lt1qy6/marker\", \"outcome\": \"unavailable\", \"errno\": 2}], \"processes_truncated\": false}\n[\u901a\u8fc7] binfmt:temporary-mount\uff1a\u4e34\u65f6\u6302\u8f7d\u5c5e\u4e8e\u72ec\u7acb user namespace\uff0c\u672a\u66b4\u9732\u5bbf\u4e3b\u5b9e\u4f8b\n  \u65b9\u6cd5\uff1a\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219\n  \u89c2\u5bdf\uff1a{\"device\": 194, \"inode\": 1, \"user_namespace\": \"user:[4026532664]\", \"host_match\": false}\n\n\u6d4b\u8bd5\u6c47\u603b\uff1a\u901a\u8fc7 72\uff0c\u5931\u8d25 0\n\u7ed3\u8bba\uff1a\u672c\u6b21\u5217\u51fa\u7684\u68c0\u67e5\u5168\u90e8\u901a\u8fc7\u3002\n\u62a5\u544a\uff1a/tmp/mas-host-challenge-w6rfzcb8/report.json\n",
+  "guest_report": {
+    "schema": 2,
+    "purpose": "complete-boundary-probe",
+    "checks": [
+      {
+        "check": "uid-map",
+        "method": "\u8bfb\u53d6 /proc/self/uid_map\uff0c\u68c0\u67e5\u5bb9\u5668 root \u5bf9\u5e94\u7684\u5916\u5c42 UID",
+        "status": "PASS",
+        "message": "\u5bb9\u5668 root \u4e0d\u5e94\u6620\u5c04\u5230\u5bbf\u4e3b root",
+        "evidence": {
+          "mapping": "         0    1262144      65536\n"
+        }
+      },
+      {
+        "check": "gid-map",
+        "method": "\u8bfb\u53d6 /proc/self/gid_map\uff0c\u68c0\u67e5\u5bb9\u5668 root \u5bf9\u5e94\u7684\u5916\u5c42 GID",
+        "status": "PASS",
+        "message": "\u5bb9\u5668 root \u4e0d\u5e94\u6620\u5c04\u5230\u5bbf\u4e3b root",
+        "evidence": {
+          "mapping": "         0    1262144      65536\n"
+        }
+      },
+      {
+        "check": "seccomp",
+        "method": "\u8bfb\u53d6 /proc/self/status \u7684 Seccomp \u503c\uff0c\u6838\u5bf9\u8fc7\u6ee4\u6a21\u5f0f 2",
+        "status": "PASS",
+        "message": "\u68c0\u67e5\u5b9e\u9645 seccomp \u8fc7\u6ee4\u72b6\u6001",
+        "evidence": {
+          "mode": "2"
+        }
+      },
+      {
+        "check": "basic-interfaces",
+        "method": "\u8bfb\u53d6 /dev/null \u548c /dev/zero\uff0c\u89c2\u5bdf /proc \u4e0e /sys",
+        "status": "PASS",
+        "message": "/dev/null\u3001/dev/zero\u3001/proc \u548c /sys \u662f\u6b63\u5e38\u5bb9\u5668\u63a5\u53e3",
+        "evidence": {
+          "sys_present": true
+        }
+      },
+      {
+        "check": "device-inventory",
+        "method": "\u6709\u754c\u679a\u4e3e /dev \u7684\u8bbe\u5907\u7c7b\u578b\u53ca major:minor\uff1b\u672a\u77e5\u8bbe\u5907\u4ec5\u63d0\u793a\u6838\u5bf9\uff0c\u4e0d\u6253\u5f00 watchdog/USB/PCI \u8bbe\u5907",
+        "status": "PASS",
+        "message": "\u8bbe\u5907\u6e05\u5355\uff1b\u975e\u57fa\u7840/GPU \u8bbe\u5907\u9700\u6838\u5bf9\u6765\u6e90\u53ca\u6388\u6743\uff0c\u4e0d\u636e\u8282\u70b9\u5b58\u5728\u8ba4\u5b9a\u53ef\u64cd\u4f5c\u5bbf\u4e3b",
+        "evidence": {
+          "devices": [
+            {
+              "path": "/dev/console",
+              "kind": "char",
+              "major": 136,
+              "minor": 0,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/dxg",
+              "kind": "char",
+              "major": 10,
+              "minor": 258,
+              "basic": false,
+              "gpu": true
+            },
+            {
+              "path": "/dev/full",
+              "kind": "char",
+              "major": 1,
+              "minor": 7,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/fuse",
+              "kind": "char",
+              "major": 10,
+              "minor": 229,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/net/tun",
+              "kind": "char",
+              "major": 10,
+              "minor": 200,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/null",
+              "kind": "char",
+              "major": 1,
+              "minor": 3,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/ptmx",
+              "kind": "char",
+              "major": 5,
+              "minor": 2,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/pts/0",
+              "kind": "char",
+              "major": 136,
+              "minor": 0,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/pts/ptmx",
+              "kind": "char",
+              "major": 5,
+              "minor": 2,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/random",
+              "kind": "char",
+              "major": 1,
+              "minor": 8,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/tty",
+              "kind": "char",
+              "major": 5,
+              "minor": 0,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/urandom",
+              "kind": "char",
+              "major": 1,
+              "minor": 9,
+              "basic": true,
+              "gpu": false
+            },
+            {
+              "path": "/dev/zero",
+              "kind": "char",
+              "major": 1,
+              "minor": 5,
+              "basic": true,
+              "gpu": false
+            }
+          ],
+          "unclassified": [],
+          "errors": [],
+          "inaccessible": [
+            {
+              "path": "/dev/.lxd-mounts",
+              "errno": 13,
+              "native_error": "[Errno 13] Permission denied: '/dev/.lxd-mounts'"
+            }
+          ],
+          "depth_limited": [],
+          "truncated": false
+        }
+      },
+      {
+        "check": "gpu-readonly:/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+        "method": "\u8bfb\u53d6 mountinfo\uff0c\u6838\u5bf9 /usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd \u7684\u53ea\u8bfb\u6302\u8f7d\u9009\u9879",
+        "status": "PASS",
+        "message": "GPU \u8fd0\u884c\u5e93\u6620\u5c04\u5e94\u4e3a\u53ea\u8bfb",
+        "evidence": {
+          "mount": {
+            "root": "/nvrzi.inf_amd64_6a54f45845aaf4cd",
+            "path": "/usr/lib/wsl/drivers/nvrzi.inf_amd64_6a54f45845aaf4cd",
+            "options": [
+              "ro",
+              "noatime"
+            ],
+            "filesystem": "9p",
+            "source": "drivers",
+            "super_options": [
+              "ro",
+              "aname=drivers;fmask=222;dmask=222",
+              "cache=0x5",
+              "access=client",
+              "msize=65536",
+              "trans=fd",
+              "rfd=8",
+              "wfd=8"
+            ]
+          }
+        }
+      },
+      {
+        "check": "gpu-readonly:/usr/lib/wsl/lib",
+        "method": "\u8bfb\u53d6 mountinfo\uff0c\u6838\u5bf9 /usr/lib/wsl/lib \u7684\u53ea\u8bfb\u6302\u8f7d\u9009\u9879",
+        "status": "PASS",
+        "message": "GPU \u8fd0\u884c\u5e93\u6620\u5c04\u5e94\u4e3a\u53ea\u8bfb",
+        "evidence": {
+          "mount": {
+            "root": "/",
+            "path": "/usr/lib/wsl/lib",
+            "options": [
+              "ro",
+              "noatime"
+            ],
+            "filesystem": "overlay",
+            "source": "none",
+            "super_options": [
+              "rw",
+              "lowerdir=/gpu_lib_packaged:/gpu_lib_inbox",
+              "upperdir=/gpu_lib/rw/upper",
+              "workdir=/gpu_lib/rw/work",
+              "uuid=on"
+            ]
+          }
+        }
+      },
+      {
+        "check": "mount-sources",
+        "method": "\u68c0\u67e5 mountinfo \u7684\u6587\u4ef6\u7cfb\u7edf\u7c7b\u578b\u3001\u6302\u8f7d\u6839\u548c\u6302\u8f7d\u70b9",
+        "status": "PASS",
+        "message": "\u672a\u53d1\u73b0\u5178\u578b Windows/\u5bbf\u4e3b home \u6620\u5c04",
+        "evidence": {
+          "suspicious": []
+        }
+      },
+      {
+        "check": "management-socket:/run/containerd/containerd.sock",
+        "method": "\u68c0\u67e5 /run/containerd/containerd.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/dbus/system_bus_socket",
+        "method": "\u68c0\u67e5 /run/dbus/system_bus_socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 176,
+          "inode": 223,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/docker.sock",
+        "method": "\u68c0\u67e5 /run/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/libvirt/libvirt-sock",
+        "method": "\u68c0\u67e5 /run/libvirt/libvirt-sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/libvirt/virtqemud-sock",
+        "method": "\u68c0\u67e5 /run/libvirt/virtqemud-sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/lxd-installer.socket",
+        "method": "\u68c0\u67e5 /run/lxd-installer.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 176,
+          "inode": 224,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/lxd.socket",
+        "method": "\u68c0\u67e5 /run/lxd.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/lxd/unix.socket",
+        "method": "\u68c0\u67e5 /run/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/podman/podman.sock",
+        "method": "\u68c0\u67e5 /run/podman/podman.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/snapd-snap.socket",
+        "method": "\u68c0\u67e5 /run/snapd-snap.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 176,
+          "inode": 228,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/snapd.socket",
+        "method": "\u68c0\u67e5 /run/snapd.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 176,
+          "inode": 227,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/systemd/private",
+        "method": "\u68c0\u67e5 /run/systemd/private\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 176,
+          "inode": 47,
+          "host_reference_match": false,
+          "peer_pid": 1,
+          "peer_uid": 0,
+          "peer_gid": 0,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/user/1001/bus",
+        "method": "\u68c0\u67e5 /run/user/1001/bus\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 193,
+          "inode": 22,
+          "host_reference_match": false,
+          "peer_pid": 390,
+          "peer_uid": 1001,
+          "peer_gid": 1001,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/user/1001/docker.sock",
+        "method": "\u68c0\u67e5 /run/user/1001/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/user/1001/podman/podman.sock",
+        "method": "\u68c0\u67e5 /run/user/1001/podman/podman.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/run/user/1001/snapd-session-agent.socket",
+        "method": "\u68c0\u67e5 /run/user/1001/snapd-session-agent.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 193,
+          "inode": 34,
+          "host_reference_match": false,
+          "peer_pid": 390,
+          "peer_uid": 1001,
+          "peer_gid": 1001,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/run/user/1001/systemd/private",
+        "method": "\u68c0\u67e5 /run/user/1001/systemd/private\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u670d\u52a1\u8fdb\u7a0b\u5c5e\u4e8e\u5f53\u524d\u5bb9\u5668 namespace\uff1b\u672a\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "device": 193,
+          "inode": 20,
+          "host_reference_match": false,
+          "peer_pid": 390,
+          "peer_uid": 1001,
+          "peer_gid": 1001,
+          "peer_namespaces": {
+            "pid": "pid:[4026532465]",
+            "mnt": "mnt:[4026532462]",
+            "user": "user:[4026532461]"
+          }
+        }
+      },
+      {
+        "check": "management-socket:/var/lib/lxd/unix.socket",
+        "method": "\u68c0\u67e5 /var/lib/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/var/run/docker.sock",
+        "method": "\u68c0\u67e5 /var/run/docker.sock\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "management-socket:/var/snap/lxd/common/lxd/unix.socket",
+        "method": "\u68c0\u67e5 /var/snap/lxd/common/lxd/unix.socket\uff1b\u5b58\u5728\u65f6\u5c1d\u8bd5 Unix socket \u8fde\u63a5\u5e76\u7acb\u5373\u5173\u95ed\uff0c\u4e0d\u53d1\u9001\u8bf7\u6c42",
+        "status": "PASS",
+        "message": "\u7ba1\u7406 socket \u8def\u5f84\u4e0d\u5b58\u5728",
+        "evidence": {}
+      },
+      {
+        "check": "devlxd-api:/1.0",
+        "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+        "status": "PASS",
+        "message": "\u5b9e\u4f8b\u63a5\u53e3\u672a\u5f00\u653e\u5377\u7ba1\u7406\u80fd\u529b",
+        "evidence": {
+          "http_status": 200,
+          "volume_management_advertised": false
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/config",
+        "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/config\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+        "status": "PASS",
+        "message": "\u53ea\u8fd4\u56de\u672c\u5b9e\u4f8b\u5141\u8bb8\u7684\u914d\u7f6e\u952e\u540d\uff0c\u4e0d\u8bfb\u53d6\u914d\u7f6e\u503c",
+        "evidence": {
+          "http_status": 200,
+          "keys": [
+            "/1.0/config/user.mas.gpu",
+            "/1.0/config/user.mas.managed",
+            "/1.0/config/user.mas.network",
+            "/1.0/config/user.mas.profile"
+          ]
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/config/security.privileged",
+        "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/config/security.privileged\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+        "status": "PASS",
+        "message": "\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed",
+        "evidence": {
+          "http_status": 403
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/storage-pools/mas-probe-unowned/volumes/custom",
+        "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/storage-pools/mas-probe-unowned/volumes/custom\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+        "status": "PASS",
+        "message": "\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed",
+        "evidence": {
+          "http_status": 403
+        }
+      },
+      {
+        "check": "devlxd-api:/1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export",
+        "method": "\u5bf9\u5b9e\u4f8b devlxd \u6267\u884c\u6709\u754c\u53ea\u8bfb GET /1.0/images/0000000000000000000000000000000000000000000000000000000000000000/export\uff1b\u4e0d\u521b\u5efa\u3001\u4fee\u6539\u6216\u5220\u9664\u8d44\u6e90",
+        "status": "PASS",
+        "message": "\u5b9e\u4f8b\u53d7\u9650 API \u7684\u53ea\u8bfb\u8bf7\u6c42\u7ed3\u679c\uff1b404 \u4e0d\u80fd\u8bc1\u660e\u6743\u9650\u5df2\u5173\u95ed",
+        "evidence": {
+          "http_status": 403
+        }
+      },
+      {
+        "check": "windows-interop",
+        "method": "\u68c0\u67e5 Windows/WSL \u8def\u5f84\u3001binfmt_misc \u6ce8\u518c\u9879\u548c WSL_INTEROP\uff0c\u4e0d\u6267\u884c\u89e3\u91ca\u5668\u6216 Windows \u547d\u4ee4",
+        "status": "PASS",
+        "message": "\u672a\u53d1\u73b0\u5178\u578b Windows/WSL \u5165\u53e3",
+        "evidence": {
+          "paths": [],
+          "registrations": [],
+          "truncated": false,
+          "wsl_interop_environment": null
+        }
+      },
+      {
+        "check": "gpu-expectation",
+        "method": "\u5217\u51fa /dev/dxg \u4e0e /dev/nvidiaN\uff0c\u6838\u5bf9\u663e\u5f0f GPU \u5f00\u5173\u9884\u671f",
+        "status": "PASS",
+        "message": "GPU \u4e3a\u83b7\u51c6\u8d44\u6e90\u4f8b\u5916\uff1b\u6838\u5bf9\u663e\u5f0f\u5f00\u5173\u9884\u671f\u53ca\u8bbe\u5907\u7c7b\u578b",
+        "evidence": {
+          "expected": "on",
+          "devices": [
+            "/dev/dxg"
+          ],
+          "invalid_nodes": []
+        }
+      },
+      {
+        "check": "network-expectation",
+        "method": "\u6838\u5bf9\u7f51\u7edc\u5f00\u5173\u9884\u671f\u3001\u63a5\u53e3\u7c7b\u578b\u548c IPv4/IPv6 \u8def\u7531\uff0c\u4e0d\u626b\u63cf\u7f51\u7edc\u6216\u5c1d\u8bd5\u767b\u5f55",
+        "status": "PASS",
+        "message": "\u6838\u5bf9\u7f51\u7edc\u5f00\u5173\u53ca IPv4/IPv6 \u63a5\u53e3\u3001\u8def\u7531\uff1b\u5bb9\u5668\u5185\u90e8\u56de\u73af\u901a\u4fe1\u4fdd\u7559",
+        "evidence": {
+          "expected": "off",
+          "interfaces": [
+            "lo"
+          ],
+          "external_interfaces": [],
+          "routes": [
+            {
+              "family": "ipv6",
+              "interface": "lo"
+            },
+            {
+              "family": "ipv6",
+              "interface": "lo"
+            },
+            {
+              "family": "ipv6",
+              "interface": "lo"
+            }
+          ]
+        }
+      },
+      {
+        "check": "device:host-memory",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:1\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:kernel-memory",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:2\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:io-ports",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:4\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:kernel-log",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 1:11\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:kvm",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod char 10:232\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:host-disk",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 8:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:host-nvme",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 259:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "device:host-loop",
+        "method": "\u5728\u79c1\u6709\u4e34\u65f6\u76ee\u5f55 mknod block 7:0\uff0c\u518d\u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u3001\u5199\u5165\u6216\u6267\u884c ioctl",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "mknod",
+          "errno": 1,
+          "native_error": "[Errno 1] Operation not permitted"
+        }
+      },
+      {
+        "check": "control:/proc/sysrq-trigger",
+        "method": "\u5bf9 /proc/sysrq-trigger \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sysrq-trigger'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/modprobe",
+        "method": "\u5bf9 /proc/sys/kernel/modprobe \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modprobe'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/kexec_load_disabled",
+        "method": "\u5bf9 /proc/sys/kernel/kexec_load_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/kexec_load_disabled'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/vm/drop_caches",
+        "method": "\u5bf9 /proc/sys/vm/drop_caches \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/vm/drop_caches'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/core_pattern",
+        "method": "\u5bf9 /proc/sys/kernel/core_pattern \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/core_pattern'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/hotplug",
+        "method": "\u5bf9 /proc/sys/kernel/hotplug \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/hotplug'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/modules_disabled",
+        "method": "\u5bf9 /proc/sys/kernel/modules_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/modules_disabled'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/sysrq",
+        "method": "\u5bf9 /proc/sys/kernel/sysrq \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/sysrq'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/panic",
+        "method": "\u5bf9 /proc/sys/kernel/panic \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/panic_on_oops",
+        "method": "\u5bf9 /proc/sys/kernel/panic_on_oops \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/panic_on_oops'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/unprivileged_bpf_disabled",
+        "method": "\u5bf9 /proc/sys/kernel/unprivileged_bpf_disabled \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/unprivileged_bpf_disabled'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/perf_event_paranoid",
+        "method": "\u5bf9 /proc/sys/kernel/perf_event_paranoid \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/perf_event_paranoid'"
+        }
+      },
+      {
+        "check": "control:/proc/sys/kernel/yama/ptrace_scope",
+        "method": "\u5bf9 /proc/sys/kernel/yama/ptrace_scope \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/sys/kernel/yama/ptrace_scope'"
+        }
+      },
+      {
+        "check": "control:/sys/power/state",
+        "method": "\u5bf9 /sys/power/state \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/sys/power/state'"
+        }
+      },
+      {
+        "check": "control:/sys/power/disk",
+        "method": "\u5bf9 /sys/power/disk \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/sys/power/disk'"
+        }
+      },
+      {
+        "check": "control:/sys/kernel/uevent_helper",
+        "method": "\u5bf9 /sys/kernel/uevent_helper \u5c1d\u8bd5\u5199\u6a21\u5f0f open/close\uff0c\u4e0d\u5199\u5165\u4efb\u4f55\u5b57\u8282",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/sys/kernel/uevent_helper'"
+        }
+      },
+      {
+        "check": "read-endpoint:/proc/kcore",
+        "method": "\u5bf9 /proc/kcore \u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u5185\u5b58\u6216\u65e5\u5fd7\u5185\u5bb9",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/kcore'"
+        }
+      },
+      {
+        "check": "read-endpoint:/proc/kmsg",
+        "method": "\u5bf9 /proc/kmsg \u53ea\u8bfb open/close\uff1b\u4e0d\u8bfb\u53d6\u5185\u5b58\u6216\u65e5\u5fd7\u5185\u5bb9",
+        "status": "PASS",
+        "message": "\u8bbf\u95ee\u88ab\u6743\u9650\u6216\u53ea\u8bfb\u8fb9\u754c\u62d2\u7edd",
+        "evidence": {
+          "step": "open",
+          "errno": 13,
+          "native_error": "[Errno 13] Permission denied: '/proc/kmsg'"
+        }
+      },
+      {
+        "check": "namespace:user",
+        "method": "\u8bfb\u53d6 /proc/self/ns/user\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+        "status": "PASS",
+        "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+        "evidence": {
+          "guest": "user:[4026532461]",
+          "host": "user:[4026531837]"
+        }
+      },
+      {
+        "check": "namespace:pid",
+        "method": "\u8bfb\u53d6 /proc/self/ns/pid\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+        "status": "PASS",
+        "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+        "evidence": {
+          "guest": "pid:[4026532465]",
+          "host": "pid:[4026532216]"
+        }
+      },
+      {
+        "check": "namespace:mnt",
+        "method": "\u8bfb\u53d6 /proc/self/ns/mnt\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+        "status": "PASS",
+        "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+        "evidence": {
+          "guest": "mnt:[4026532462]",
+          "host": "mnt:[4026532214]"
+        }
+      },
+      {
+        "check": "namespace:net",
+        "method": "\u8bfb\u53d6 /proc/self/ns/net\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+        "status": "PASS",
+        "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+        "evidence": {
+          "guest": "net:[4026532468]",
+          "host": "net:[4026531833]"
+        }
+      },
+      {
+        "check": "namespace:ipc",
+        "method": "\u8bfb\u53d6 /proc/self/ns/ipc\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+        "status": "PASS",
+        "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+        "evidence": {
+          "guest": "ipc:[4026532464]",
+          "host": "ipc:[4026532202]"
+        }
+      },
+      {
+        "check": "namespace:uts",
+        "method": "\u8bfb\u53d6 /proc/self/ns/uts\uff0c\u6709\u5bbf\u4e3b\u53c2\u7167\u65f6\u6bd4\u8f83\u6807\u8bc6",
+        "status": "PASS",
+        "message": "\u6bd4\u8f83\u5bb9\u5668\u4e0e\u5bbf\u4e3b namespace",
+        "evidence": {
+          "guest": "uts:[4026532463]",
+          "host": "uts:[4026532215]"
+        }
+      },
+      {
+        "check": "process-roots",
+        "method": "\u6709\u754c\u8bfb\u53d6\u53ef\u89c1\u8fdb\u7a0b\u7684 root/mnt/user namespace\uff0c\u548c\u63d0\u4f9b\u7684\u5bbf\u4e3b namespace \u6bd4\u8f83\uff1b\u4e0d\u8bfb\u53d6\u8fdb\u7a0b\u5185\u5b58\u6216\u73af\u5883",
+        "status": "PASS",
+        "message": "\u5df2\u6838\u5bf9\u53ef\u89c1\u8fdb\u7a0b namespace \u4e0e root \u8def\u5f84\uff0c\u672a\u53d1\u73b0\u5bbf\u4e3b\u8fdb\u7a0b",
+        "evidence": {
+          "processes": [
+            {
+              "pid": 1,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 66,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 93,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532657]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 112,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532658]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 152,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532467]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 178,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532721]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 180,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 181,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 189,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 190,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532798]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 193,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 196,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532723]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 210,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 221,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 225,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 272,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 283,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532721]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 284,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532721]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 342,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532460]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 390,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 392,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 427,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 434,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 466,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 470,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            },
+            {
+              "pid": 508,
+              "root": "/",
+              "namespaces": {
+                "user": "user:[4026532461]",
+                "mnt": "mnt:[4026532462]",
+                "pid": "pid:[4026532465]"
+              }
+            }
+          ],
+          "host_matches": [],
+          "errors": [],
+          "truncated": false
+        }
+      },
+      {
+        "check": "binfmt:existing",
+        "method": "\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219",
+        "status": "PASS",
+        "message": "\u5f53\u524d mount namespace \u672a\u66b4\u9732 binfmt_misc \u6302\u8f7d",
+        "evidence": {
+          "mounts": []
+        }
+      },
+      {
+        "check": "host-canary:0",
+        "method": "\u6709\u754c\u5c1d\u8bd5\u76f4\u63a5\u8def\u5f84\u53ca\u53ef\u89c1\u8fdb\u7a0b root \u4e0b\u7684\u552f\u4e00\u6807\u8bb0\uff0c\u6bd4\u8f83 SHA-256\uff1b\u4ec5\u8bb0\u5f55\u6458\u8981\uff0c\u4e0d\u4fdd\u5b58\u5185\u5bb9",
+        "status": "PASS",
+        "message": "\u5bbf\u4e3b\u6807\u8bb0\u4e0d\u53ef\u8bfb\u6216\u4e0d\u53ef\u89c1",
+        "evidence": {
+          "attempts": [
+            {
+              "path": "/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/1/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/self/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/66/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/93/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/112/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/152/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/178/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/180/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/181/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/189/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/190/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/193/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/196/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/210/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/221/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/225/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/272/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/283/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/284/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/342/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/390/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/392/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/427/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/434/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/466/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/470/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/508/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            },
+            {
+              "path": "/proc/525/root/tmp/mas-host-canary-d8lt1qy6/marker",
+              "outcome": "unavailable",
+              "errno": 2
+            }
+          ],
+          "processes_truncated": false
+        }
+      },
+      {
+        "check": "binfmt:temporary-mount",
+        "method": "\u6838\u5bf9 binfmt_misc \u6765\u6e90\uff1b\u4ec5\u6253\u5f00\u63a5\u53e3\u6216\u5728\u4e34\u65f6 user/mount namespace \u6302\u8f7d\uff0c\u4e0d\u5199\u6ce8\u518c\u89c4\u5219",
+        "status": "PASS",
+        "message": "\u4e34\u65f6\u6302\u8f7d\u5c5e\u4e8e\u72ec\u7acb user namespace\uff0c\u672a\u66b4\u9732\u5bbf\u4e3b\u5b9e\u4f8b",
+        "evidence": {
+          "device": 194,
+          "inode": 1,
+          "user_namespace": "user:[4026532664]",
+          "host_match": false
+        }
+      }
+    ],
+    "observations": [
+      {
+        "check": "capabilities",
+        "method": "\u8bfb\u53d6 /proc/self/status \u7684 CapEff \u548c CapBnd\uff0c\u4ec5\u8bb0\u5f55\u80fd\u529b\u4f4d",
+        "message": "\u80fd\u529b\u4f4d\u5c5e\u4e8e\u5f53\u524d namespace\uff1b\u4e0d\u80fd\u5355\u51ed\u5b83\u5224\u65ad\u62e5\u6709\u5bbf\u4e3b\u6743\u9650",
+        "evidence": {
+          "effective": "000001ffffffffff",
+          "bounding": "000001ffffffffff"
+        }
+      },
+      {
+        "check": "apparmor",
+        "method": "\u8bfb\u53d6 AppArmor enabled \u548c /proc/self/attr/current\uff0c\u8bb0\u5f55\u5b9e\u9645\u72b6\u6001",
+        "message": "\u8bb0\u5f55\u53ef\u9009 AppArmor \u7684\u5b9e\u9645\u72b6\u6001\uff1b\u4e0d\u5c06\u672a\u542f\u7528\u672c\u8eab\u89c6\u4e3a\u8d8a\u754c",
+        "evidence": {
+          "profile": "kernel\u0000",
+          "enabled": "N",
+          "errors": []
+        }
+      },
+      {
+        "check": "special-filesystems",
+        "method": "\u8bb0\u5f55 debugfs/securityfs/pstore/efivarfs/bpffs \u6302\u8f7d\u4e0e\u53ef\u89c1\u6027\uff0c\u4e0d\u4fee\u6539\u5176\u4e2d\u5185\u5bb9",
+        "message": "\u8bb0\u5f55\u5185\u6838\u63a5\u53e3\u6302\u8f7d\uff1b\u53ef\u89c1\u4e0d\u7b49\u4e8e\u80fd\u8bfb\u53d6\u6216\u4fee\u6539\u5bbf\u4e3b",
+        "evidence": {
+          "mounts": [
+            {
+              "root": "/fs/pstore",
+              "path": "/sys/fs/pstore",
+              "options": [
+                "rw",
+                "nosuid",
+                "nodev",
+                "noexec",
+                "noatime"
+              ],
+              "filesystem": "sysfs",
+              "source": "sysfs",
+              "super_options": [
+                "rw"
+              ]
+            },
+            {
+              "root": "/",
+              "path": "/sys/kernel/debug",
+              "options": [
+                "rw",
+                "nosuid",
+                "nodev",
+                "noexec",
+                "relatime"
+              ],
+              "filesystem": "debugfs",
+              "source": "debugfs",
+              "super_options": [
+                "rw"
+              ]
+            },
+            {
+              "root": "/kernel/security",
+              "path": "/sys/kernel/security",
+              "options": [
+                "rw",
+                "nosuid",
+                "nodev",
+                "noexec",
+                "noatime"
+              ],
+              "filesystem": "sysfs",
+              "source": "sysfs",
+              "super_options": [
+                "rw"
+              ]
+            }
+          ],
+          "visible": [
+            "/sys/kernel/debug",
+            "/sys/kernel/security",
+            "/sys/fs/pstore",
+            "/sys/fs/bpf"
+          ]
+        }
+      },
+      {
+        "check": "socket-inventory",
+        "method": "\u8bfb\u53d6 /proc/net/unix \u4e0e /run/user \u7684\u7ba1\u7406 socket \u8def\u5f84\uff0c\u4e0d\u8fde\u63a5\u62bd\u8c61 socket \u6216\u626b\u63cf\u7f51\u7edc",
+        "message": "\u7ba1\u7406\u5165\u53e3\u8def\u5f84\u6e05\u5355\uff1b\u9010\u9879\u8fde\u63a5\u68c0\u67e5\uff0c\u4e0d\u53d1\u9001\u7ba1\u7406\u8bf7\u6c42",
+        "evidence": {
+          "paths": [
+            "/var/snap/lxd/common/lxd/unix.socket",
+            "/var/lib/lxd/unix.socket",
+            "/run/lxd/unix.socket",
+            "/run/lxd.socket",
+            "/run/docker.sock",
+            "/var/run/docker.sock",
+            "/run/containerd/containerd.sock",
+            "/run/podman/podman.sock",
+            "/run/libvirt/libvirt-sock",
+            "/run/libvirt/virtqemud-sock",
+            "/run/dbus/system_bus_socket",
+            "/run/systemd/private",
+            "/run/snapd.socket",
+            "/run/snapd-snap.socket",
+            "/run/user/1001/systemd/private",
+            "/run/user/1001/bus",
+            "/run/user/1001/snapd-session-agent.socket",
+            "/run/lxd-installer.socket",
+            "/run/user/1001/docker.sock",
+            "/run/user/1001/podman/podman.sock"
+          ],
+          "truncated": false
+        }
+      },
+      {
+        "check": "devlxd",
+        "method": "\u68c0\u67e5 /dev/lxd/sock \u662f\u5426\u53ef\u89c1\uff0c\u533a\u5206\u5b9e\u4f8b\u63a5\u53e3\u4e0e\u5bbf\u4e3b\u7ba1\u7406\u63a5\u53e3",
+        "message": "\u57fa\u672c\u5b9e\u4f8b\u63a5\u53e3\u4e0e\u5bbf\u4e3b\u7ba1\u7406\u63a5\u53e3\u4e0d\u540c\uff0c\u6309\u5f53\u524d\u517c\u5bb9\u7b56\u7565\u4fdd\u7559",
+        "evidence": {
+          "visible": true
+        }
+      },
+      {
+        "check": "network-policy",
+        "method": "\u8bf4\u660e\u7f51\u7edc\u6d4b\u8bd5\u8303\u56f4\uff0c\u4e0d\u8fdb\u884c\u7f51\u7edc\u626b\u63cf\u6216\u767b\u5f55",
+        "message": "\u5df2\u6838\u5bf9\u672c\u5730\u63a5\u53e3\u4e0e\u8def\u7531\uff1b\u6d41\u91cf\u548c\u767b\u5f55\u7b56\u7565\u53e6\u8bae\uff0c\u6b64\u811a\u672c\u4e0d\u626b\u63cf\u7f51\u7edc\u3001\u4e0d\u5c1d\u8bd5\u767b\u5f55",
+        "evidence": {}
+      }
+    ],
+    "gpu_expected": "on",
+    "network_expected": "off",
+    "elapsed": 2.033426348003559,
+    "exit_code": 0,
+    "counts": {
+      "PASS": 72,
+      "FAIL": 0
+    },
+    "conclusion": "checks_passed",
+    "scope": "\u7ed3\u8bba\u4ec5\u9002\u7528\u4e8e\u5217\u51fa\u7684\u68c0\u67e5\u4e0e\u5f53\u6b21\u89c2\u5bdf\uff1b\u73af\u5883\u8bb0\u5f55\u4e0d\u8ba1\u4e3a\u6d4b\u8bd5\u3002"
+  },
+  "guest_only_positive_controls": [
+    {
+      "check": "host-canary:0",
+      "method": "\u6709\u754c\u5c1d\u8bd5\u76f4\u63a5\u8def\u5f84\u53ca\u53ef\u89c1\u8fdb\u7a0b root \u4e0b\u7684\u552f\u4e00\u6807\u8bb0\uff0c\u6bd4\u8f83 SHA-256\uff1b\u4ec5\u8bb0\u5f55\u6458\u8981\uff0c\u4e0d\u4fdd\u5b58\u5185\u5bb9",
+      "status": "FAIL",
+      "message": "\u8bfb\u5230\u4e86\u5bbf\u4e3b\u63d0\u4f9b\u7684\u552f\u4e00\u6807\u8bb0\u6587\u4ef6",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-challenge-w6rfzcb8/positive-canary",
+            "outcome": "readable",
+            "sha256": "6fcd294fcca84bfa02e8e211301c40472a1d9d81f5def6cc014cb433b11eb608",
+            "bytes": 51
+          }
+        ],
+        "processes_truncated": false
+      }
+    },
+    {
+      "check": "host-canary:0",
+      "method": "\u6709\u754c\u5c1d\u8bd5\u76f4\u63a5\u8def\u5f84\u53ca\u53ef\u89c1\u8fdb\u7a0b root \u4e0b\u7684\u552f\u4e00\u6807\u8bb0\uff0c\u6bd4\u8f83 SHA-256\uff1b\u4ec5\u8bb0\u5f55\u6458\u8981\uff0c\u4e0d\u4fdd\u5b58\u5185\u5bb9",
+      "status": "FAIL",
+      "message": "\u8bfb\u5230\u4e86\u5bbf\u4e3b\u63d0\u4f9b\u7684\u552f\u4e00\u6807\u8bb0\u6587\u4ef6",
+      "evidence": {
+        "attempts": [
+          {
+            "path": "/tmp/mas-host-challenge-w6rfzcb8/canary-alias",
+            "outcome": "readable",
+            "sha256": "6fcd294fcca84bfa02e8e211301c40472a1d9d81f5def6cc014cb433b11eb608",
+            "bytes": 51
+          }
+        ],
+        "processes_truncated": false
+      }
+    }
+  ],
+  "elapsed": 11.316760043999238,
+  "exit_code": 0,
+  "counts": {
+    "PASS": 76,
+    "FAIL": 0
+  },
+  "conclusion": "checks_passed",
+  "scope": "\u7ed3\u8bba\u4ec5\u9002\u7528\u4e8e\u5217\u51fa\u7684\u68c0\u67e5\u4e0e\u5f53\u6b21\u89c2\u5bdf\uff1b\u73af\u5883\u8bb0\u5f55\u4e0d\u8ba1\u4e3a\u6d4b\u8bd5\u3002"
+}

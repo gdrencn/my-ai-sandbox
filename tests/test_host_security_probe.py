@@ -60,6 +60,25 @@ class HostProbeTests(unittest.TestCase):
         self.assertNotIn('process-roots', [item['check'] for item in items])
         self.assertNotIn('/proc/sys/fs/binfmt_misc/register', probe.CONTROLS)
 
+    def test_network_expectation_catches_external_interfaces_and_both_route_families(self):
+        def files(path):
+            if path.endswith('/flags'):return '0x9' if '/lo/' in path else '0x1003'
+            if path.endswith('ipv6_route'):return '0 '*9+'lo\n'
+            return 'Iface Destination Gateway Flags RefCnt Use Metric Mask MTU Window IRTT\n'
+        with patch.object(probe.socket,'if_nameindex',return_value=[(1,'lo')]),patch.object(probe,'read_text',side_effect=files):
+            self.assertEqual(probe.network_check('off')['status'],'PASS')
+            self.assertEqual(probe.network_check('on')['status'],'FAIL')
+        with patch.object(probe.socket,'if_nameindex',return_value=[(1,'lo'),(2,'eth0')]),patch.object(probe,'read_text',side_effect=files):
+            self.assertEqual(probe.network_check('off')['status'],'FAIL')
+            self.assertEqual(probe.network_check('on')['status'],'PASS')
+        for route in ('ipv4','ipv6'):
+            def stale(path):
+                if route=='ipv6' and path.endswith('ipv6_route'):return '0 '*9+'eth0\n'
+                if route=='ipv4' and path.endswith('/route'):return files(path)+'eth0 '+'0 '*10+'\n'
+                return files(path)
+            with patch.object(probe.socket,'if_nameindex',return_value=[(1,'lo')]),patch.object(probe,'read_text',side_effect=stale):
+                self.assertEqual(probe.network_check('off')['status'],'FAIL')
+
     def test_observations_outside_totals_and_incomplete_checks_fail(self):
         report = probe.ChallengeReport('fixture')
         with tempfile.TemporaryDirectory() as directory, contextlib.redirect_stdout(io.StringIO()):
@@ -138,14 +157,14 @@ class HostProbeTests(unittest.TestCase):
     def complete_report(self, primary=False):
         ids = (['namespace:'+name for name in probe.NAMESPACES]
                + ['process-roots','host-canary:0','binfmt:existing','binfmt:temporary-mount']
-               + ['uid-map','gid-map','seccomp','basic-interfaces','device-inventory','mount-sources','windows-interop','gpu-expectation']
+               + ['uid-map','gid-map','seccomp','basic-interfaces','device-inventory','mount-sources','windows-interop','gpu-expectation','network-expectation']
                + ['management-socket:'+path for path in probe.SOCKETS]
                + ['device:'+name for name in probe.DEVICES]
                + ['control:'+path for path in probe.CONTROLS]
                + ['read-endpoint:'+path for path in probe.READ_ENDPOINTS]
                + ['devlxd-api:'+path for path in probe.DEVLXD_ENDPOINTS])
         checks = [probe.result(name, 'FAIL' if primary and i==0 else 'PASS', 'fixture') for i,name in enumerate(ids)]
-        return dict(schema=2, gpu_expected='off', observations=[],
+        return dict(schema=2, gpu_expected='off', network_expected='on', observations=[],
                     counts={'PASS':len(checks)-(1 if primary else 0),'FAIL':1 if primary else 0},
                     exit_code=1 if primary else 0, checks=checks)
 
@@ -261,7 +280,7 @@ class HostProbeTests(unittest.TestCase):
                 patch.object(probe,'bounded_call',side_effect=lambda check,args,timeout: probe.result(check,'PASS','fixture')), \
                 patch.object(host,'bounded_mount',return_value=probe.result('binfmt:temporary-mount','PASS','fixture')):
             host.guest_checks(reference,1,items.append,'on')
-        common.assert_called_once_with('on',1,items.append,reference=reference)
+        common.assert_called_once_with('on',1,items.append,reference=reference,network='on')
         self.assertEqual(len(items),10)
 
     def test_interruption_recovers_report_and_runs_host_postchecks_and_cleanup(self):

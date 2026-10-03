@@ -2,11 +2,11 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 最新测试版：0.2.20
+## 最新测试版：0.2.21（验证中）
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-新容器首次创建时准备常用开发环境，完成后停止；后续启停不重复安装。已发布 [test v0.2.20](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.20)。冻结包和实际公开命令均通过 410 项单元测试与全部 27 个环节（1038.1 / 1001.7 秒），最终安全挑战分别通过 75 / 75 项检查；独立安全入口的选择器和停止状态恢复也已通过。12 个附件及校验清单已核验。详见 [IMPLEMENTED.md](IMPLEMENTED.md#stage-39--prepared-development-containers-and-shared-selection-2026-10-02)。
+新容器使用 Ubuntu APT 预装 Node.js/npm 和常用开发软件，初始化时实时刷新安装输出，完成后停止。硬件选项增加网络开关，关闭外部网卡后仍可通过宿主进入终端和挂载文件系统。0.2.21 的产品已通过全部 28 个真实 LXD 测试环节，完整挑战 76 项通过；最终冻结包的 419 项单元测试通过。发布入口验证正在进行。详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -118,18 +118,18 @@ mas delete demo                        # 菜单默认选“否”，可选择“
 mas import restored demo.tar.gz
 ```
 
-- `new` 按创建、标准启动、初始化安装与验证、标准停止的顺序执行；全部完成后才报告成功，容器保持停止。首次创建需要下载软件，持续显示当前步骤和等待时长。初始化失败保留容器和原始诊断，仍尝试标准停止；停止失败单独报告。WSL 的默认镜像版本取自 WSL 内部的 Ubuntu；对应镜像不可用时明确报错，不降级。
+- `new` 按创建、标准启动、初始化安装与验证、标准停止的顺序执行；全部完成后才报告成功，容器保持停止。首次创建需要下载软件，原地滚动显示实际 cloud-init/APT 下载、解包和配置输出；正常输出完成后清除，保留耗时、警告和错误。重定向输出不包含临时滚动行或终端控制码。初始化失败保留容器和原始诊断，仍尝试标准停止；停止失败单独报告。WSL 的默认镜像版本取自 WSL 内部的 Ubuntu；对应镜像不可用时明确报错，不降级。
 - 启动功能内部准备默认用户 `sandbox`，允许其免密 sudo；用户准备成功后，mas 启动功能才算完成。进入容器使用 sandbox 的登录 shell；root 账户不设空密码。
 - `restart` 顺序调用标准 `stop → start`；`restart -e/--enter` 调用 `stop → enter`，由 enter 完成启动准备。停止失败时不继续。`start` 不增加参数；重启默认不进入终端。
 - `enter` 调用共享启动功能。终端结束后提供“停止容器”“重启容器”“返回 mas”“退出 mas”，默认退出，Esc/← 也退出。停止或重启复用标准功能，输出后回宿主终端；返回 mas 打开该容器菜单，不经过操作结果页。非零终端退出码仍报告，不据此猜测 exit/reboot/shutdown；选择返回菜单后，最终 mas 退出状态仍保留失败。CLI `enter --yes/--no` 保持明确停止/退出的兼容行为，`restart --enter` 同样支持；非交互输入默认退出。
 - 删除和导出要求容器已停止。CLI 和 终端文本菜单 删除都要确认；导出文件存在时询问是否覆盖，默认选“否”。导入要求目标名称不存在。
 - 0.2.11 起仅管理本地 LXD `mas` Project 内标记为 `user.mas.managed=true` 的容器；不接管原生 lxc 创建的其他容器。该标记用于管理范围区分，不是对拥有 LXD 管理权限的用户的安全隔离。
 - 每秒探测一次，默认每个底层操作最多等待 10 分钟。可使用 `mas --timeout 1800 start demo` 延长，最小 300 秒。明确失败立即返回，成功必须同时满足原生命令完成和目标状态。
-- 阶段 1 稳定版不配置 GPU。0.2.1 测试版新增下述 GPU 模块；网络仍使用原有默认配置，不增加端口映射或网络控制。
+- 阶段 1 稳定版不配置 GPU。0.2.1 测试版新增下述 GPU 模块；0.2.21 增加每个容器的网络开关，不增加端口映射或流量规则。
 
 **备份是恢复用途，并非克隆模板。** LXD 导出会保留网卡 MAC。源容器与导入副本同时存在时，LXD 可能拒绝启动副本。恢复前先处理原容器；mas 不静默改写备份中的网络身份。
 
-直接运行 `mas` 显示一级菜单“容器列表”“新建容器”“导入容器”“迁移旧版本容器”“mas 选项”“退出”。“停止全部容器”位于容器列表末尾、返回之前，仅在 mas 管理的容器超过一个且未全部处于 LXD 的 `Stopped` 状态时显示；CLI `stop --all` 的行为保持不变。选中容器后显示信息、启动、进入终端、停止、重启、导出、删除、文件系统、硬件选项和返回；文件系统内提供挂载查询、挂载和卸载。信息页先显示名称、状态与已记录的 GPU 配置，可选择“查看完整配置”；CLI `mas info` 仍输出完整 JSON。菜单每项独立一行、左对齐，↑/↓ 循环移动，Enter/→ 确定。Esc/← 在主菜单退出、子菜单返回、单选或多选决策中取消；终端结束菜单的 Esc/← 为退出。文本输入的左右键用于移动光标。
+直接运行 `mas` 显示一级菜单“容器列表”“新建容器”“导入容器”“迁移旧版本容器”“mas 选项”“退出”。“停止全部容器”位于容器列表末尾、返回之前，仅在 mas 管理的容器超过一个且未全部处于 LXD 的 `Stopped` 状态时显示；CLI `stop --all` 的行为保持不变。选中容器后显示信息、启动、进入终端、停止、重启、导出、删除、文件系统、硬件选项和返回；文件系统内提供挂载查询、挂载和卸载。信息页先显示名称、状态、GPU 配置与网络状态，可选择“查看完整配置”；CLI `mas info` 仍输出完整 JSON。菜单每项独立一行、左对齐，↑/↓ 循环移动，Enter/→ 确定。Esc/← 在主菜单退出、子菜单返回、单选或多选决策中取消；终端结束菜单的 Esc/← 为退出。文本输入的左右键用于移动光标。
 
 菜单直接显示在当前终端位置，不切换全屏、不清屏。标题和说明保留在历史中，只刷新活动选项；短窗口不会丢失输入说明。导航页面标题显示一次，操作先以空行和标题明确进入，等待进度原地刷新，最终结果和诊断保留。普通操作的结果、错误或取消后停留在“操作结果／返回”，主动返回才恢复上级菜单及原选中项。文件系统子菜单也保留选中项；容器终端按上文四选项直接到达所选目的地。
 
@@ -147,20 +147,42 @@ CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 
 | --- | --- |
 | 基础权限与网络、SSH 客户端 | sudo、ca-certificates、curl、wget、openssh-client |
 | 版本管理 | git |
+| Node.js/npm | nodejs、npm |
 | Python | python3、python3-venv、python3-pip、python3-dev |
 | 编译基础 | build-essential、pkg-config |
 | 常用命令与 Shell 检查 | ripgrep、jq、patch、file、shellcheck |
 | 压缩与归档 | tar、gzip、xz-utils、zip、unzip、zstd |
 
-Node.js/npm 使用创建时 Node.js 官网发布的最新 LTS，下载对应架构的官方压缩包，验证官方 SHA-256 后安装，并提供 `node`、`npm`、`npx`。使用系统级 `/usr/local/lib/nodejs` 安装目录和 `/usr/local/bin` 命令链接，不安装版本管理器，不执行远程安装脚本。Python 使用 Ubuntu 标准软件包；项目依赖可使用 `python3 -m venv .venv` 后安装。SSH 客户端提供 `ssh`、`scp`、`sftp`。
+0.2.21 起，完整的 25 个预装软件包均来自 Ubuntu APT，包括 `nodejs` 和 `npm`，提供 `node`、`npm`、`npx`。版本随所选 Ubuntu 镜像及其仓库确定，用户可按需自行安装 Node.js 官方 LTS 或版本管理器。已有容器的软件保持现状，升级 mas 不替换已有 Node.js 安装。Python 使用 Ubuntu 标准软件包；项目依赖可使用 `python3 -m venv .venv` 后安装。SSH 客户端提供 `ssh`、`scp`、`sftp`。
 
 准备成功后撤下本次 cloud-init 安装配置，软件和版本记录保存在容器 `/var/lib/mas/development.json`。后续 start、restart、enter、备份导入不会重复安装这些开发软件，也不会补回用户卸载的软件。新容器卸载 sudo 后，启动会提示缺少必需能力，由用户自行安装恢复；旧容器和未初始化的导入容器沿用原有用户准备行为。已有容器不会自动补装这份清单。
 
 Codex、Ollama、herdr、模型文件和 LLM 框架由用户自行安装。GPU 接入保持原有功能，不加入 GPU 编译工具。
 
+## 容器网络开关（0.2.21 起）
+
+硬件选项提供“GPU”和“网络”；没有可用 GPU 的宿主仍可设置网络。网络默认开启，修改前要求停止所选容器。
+
+```bash
+mas hardware demo                 # 查看 GPU 和网络
+mas hardware demo gpu             # 单独查看 GPU
+mas hardware demo network         # 查看网络状态
+mas stop demo
+mas hardware demo network off
+mas start demo                    # 断网后仍可启动和进入
+mas enter demo
+mas mountfs demo                  # 通过宿主 LXD SFTP/SSHFS 访问，不依赖容器网卡
+mas stop demo
+mas hardware demo network on
+```
+
+关闭通过容器本地 `eth0` 的 `type=none` 配置屏蔽原网卡，IPv4/IPv6 外部连接随之移除，内部回环通信保留。开启恢复批准的网卡定义和 MAC。网络状态随重启及备份恢复保留；共享网桥、Profile、其他容器和容器防火墙不受修改。发现设备、记录、身份或并发配置冲突时拒绝操作。此开关控制 LXD 提供的网卡，容器内 root 仍可创建自身 namespace 内的接口；不是宿主网络 ACL。
+
+网络关闭后，标准启动、进入终端、宿主侧文件挂载和安全挑战使用现有 LXD 管理通道。调整网络或 GPU 后，可从宿主重新运行 `test/security.sh`，挑战会核对当前开关预期；硬件修改本身不自动运行完整挑战。
+
 ## 固定隔离配置与旧容器迁移（0.2.11 起）
 
-安装程序创建专用的 `mas` Project，以及其中的 `mas` 和 `default` Profile。配置固定，不提供通用设置入口。容器使用非特权、独立 UID/GID 映射和 LXD 标准 namespace/seccomp；不启用 nesting、raw 配置、BPF 委派或宿主身份例外。容器内 root 和 sandbox 的免密 sudo 保留。网卡继续连接已有的 LXD managed bridge，本批不增加流量或登录限制。
+安装程序创建专用的 `mas` Project，以及其中的 `mas` 和 `default` Profile。配置固定，不提供通用设置入口。容器使用非特权、独立 UID/GID 映射和 LXD 标准 namespace/seccomp；不启用 nesting、raw 配置、BPF 委派或宿主身份例外。容器内 root 和 sandbox 的免密 sudo 保留。网络默认连接已有的 LXD managed bridge，可关闭该容器的网卡；不增加流量或登录规则。
 
 GPU 是明确授权的资源例外。WSL NVIDIA 映射 `/dev/dxg`、只读运行库和经过官方探测选择的驱动目录；Project 仅允许对应目录前缀。GPU 开关仍位于容器硬件选项。程序核验完整的 expanded 配置和设备，拒绝额外宿主目录、任意字符设备、额外存储卷、管理 socket、Windows 挂载及被改写的 GPU 映射；类别级的 Project 允许值不代表任意硬件已获授权。具体配置见 [需求文档第 39 节](REQUIREMENTS.md#39-fixed-isolation-policy-and-effective-configuration-verification--v0211)。
 

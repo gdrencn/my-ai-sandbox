@@ -44,7 +44,7 @@ class MenuFixture:
         self.info_calls += 1
         return copy.deepcopy(self.item)
 
-    def hardware(self, target):
+    def hardware(self, target, *, item=None):
         self.hardware_calls += 1
         return dict(available=True, enabled=False, configured=True)
 
@@ -214,7 +214,7 @@ print('FIXTURE_RESULT='+json.dumps(dict(info=manager.info_calls, hardware=manage
                         self.assertNotRegex(history, '\n' + title + r'\n\s*\n' + title + '\n')
                     raw = terminal.buffer.split(b'FIXTURE_RESULT=', 1)[1].splitlines()[0]
                     measured = json.loads(raw)
-                    self.assertEqual(measured, dict(info=1, hardware=1,
+                    self.assertEqual(measured, dict(info=1, hardware=2,
                         actions=[['mount', 'demo', '/var/log'], ['unmount', 'demo', '/var/log']]))
                     test_menu.MenuTests().assert_inline(terminal.buffer)
                 finally:

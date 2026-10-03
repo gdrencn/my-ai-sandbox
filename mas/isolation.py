@@ -261,6 +261,9 @@ class Isolation:
                     or not set(gpu_record['driver_paths']).issubset(record['driver_paths'])):
                 differences.append(t('policy_gpu_resources'))
         gpu_devices = (gpu_record or {}).get('devices', {})
+        from .network import record as network_record, check_owned as check_network_owned
+        network = network_record(instance)
+        check_network_owned(instance, network, record)
         roots = nics = 0
         for name, definition in devices.items():
             if name in gpu_devices:
@@ -285,7 +288,7 @@ class Isolation:
                     differences.append(t('policy_device', name=name, definition=repr(definition)))
             else:
                 differences.append(t('policy_device', name=name, definition=repr(definition)))
-        if roots != 1 or nics != 1:
+        if roots != 1 or nics != (0 if network and not network['enabled'] else 1):
             differences.append(t('policy_root_nic_count'))
         if differences:
             policy_error(differences)

@@ -199,7 +199,14 @@ class Manager:
         from .imports import Imports
         return Imports(self)
 
-    def hardware(self, target, enabled=None, *, capability=None):
+    @cached_property
+    def network(self):
+        from .network import Network
+        return Network(self)
+
+    def hardware(self, target, enabled=None, *, capability=None, item='gpu'):
+        if item == 'network':
+            return self.network.status(target) if enabled is None else self.network.set(target, enabled)
         if enabled is not None:
             self.isolation.audit(self.require(target, stopped=True))
         return (self.gpu.status(target, capability=capability) if enabled is None
@@ -245,7 +252,7 @@ class Manager:
     def info(self, target):
         return self.require(target)
 
-    def _run_lxd_until_state(self, action, target, args, expected, require_marker=True, client=None):
+    def _run_lxd_until_state(self, action, target, args, expected, require_marker=True, client=None, *, live_output=False):
         """Wait for BOTH native command completion and a structured postcondition.
 
         Capture output to a file to avoid pipe backpressure on long operations.
@@ -283,8 +290,11 @@ class Manager:
                         matches = last == expected
                         if instance and require_marker:
                             matches = matches and self.managed(instance)
-                        self.emit(dict(action=action, target=target, status="waiting", scope="native",
-                                         elapsed=round(time.monotonic() - start, 3), observation=last))
+                        event = dict(action=action, target=target, status="waiting", scope="native",
+                                     elapsed=round(time.monotonic() - start, 3), observation=last)
+                        if live_output:
+                            event['live_lines'] = native_stdout.splitlines()[-3:]
+                        self.emit(event)
                         if code == 0 and matches:
                             outcome = "ok"
                             return instance
@@ -292,7 +302,8 @@ class Manager:
             finally:
                 self.emit(dict(action=action, target=target, status=outcome, scope='native',
                                elapsed=round(time.monotonic() - start, 3), observation=last,
-                               native_stdout=native_stdout, native_stderr=native_stderr, native_failure=native_failure))
+                               native_stdout=native_stdout, native_stderr=native_stderr, native_failure=native_failure,
+                               live_output=live_output))
 
     def new(self, target, image=None):
         started = time.monotonic()
@@ -321,7 +332,11 @@ class Manager:
             self.stop(target)
         with cleanup_scope(stop_prepared, lambda error: self._cleanup_warning('new', target, error)):
             prepared_instance()
-            self.start(target)
+            self._development_target = target
+            try:
+                self.start(target)
+            finally:
+                self._development_target = None
             prepared_instance()
             self._run_lxd_until_state('prepare-development', target,
                 ['exec', 'local:' + target, '--', '/bin/sh', '-c', development.verification()], 'Running')
@@ -342,8 +357,14 @@ class Manager:
         return self.enter(target, ask) if enter else self.start(target)
 
     def _prepare_user(self, target):
+        live = getattr(self, '_development_target', None) == target
+        script = USER_SETUP
+        if live:
+            from .development import live_wait
+            script = script.replace(CLOUD_INIT_WAIT, live_wait())
         return self._run_lxd_until_state('prepare-user', target,
-                               ['exec', 'local:' + target, '--', '/bin/sh', '-c', USER_SETUP], 'Running')
+                               ['exec', 'local:' + target, '--', '/bin/sh', '-c', script], 'Running',
+                               **({'live_output': True} if live else {}))
 
     def _check_lifecycle_state(self, target, action):
         instance = self.require(target)
