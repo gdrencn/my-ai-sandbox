@@ -181,3 +181,7 @@ JSON schema 为 2。`checks` 中每项只有 PASS/FAIL（通过/失败），保�
 不加载内核模块、不改 sysctl/cgroup、不读物理内存/磁盘、不执行设备 ioctl、不读取凭据、不修改宿主服务、不耗尽资源。唯一新增挂载是上述隔离子进程的临时 binfmt_misc；不挂载宿主路径。LXD Project/Profile 的完整配置审计仍由 mas 和配置自动化测试负责。历史独立入口及 REVIEW/SKIP/INFO/ERROR 报告仅为历史证据。
 
 依据：[LXD 安全模型](https://canonical.com/lxd/docs/latest/explanation/security/)、[Linux binfmt_misc 文档](https://docs.kernel.org/6.12/admin-guide/binfmt-misc.html)、[Linux 6.12 按 user namespace 分离的 binfmt_misc 实现](https://github.com/torvalds/linux/blob/v6.12/fs/binfmt_misc.c)、[Linux 设备编号](https://docs.kernel.org/admin-guide/devices.html)、[Unix socket peer credentials](https://man7.org/linux/man-pages/man7/unix.7.html)。
+
+## 0.2.21 发布验证
+
+公开 test.sh 在项目目录之外完成 419 项单元测试及全部 28 个环节，只在功能测试结束后运行一次独立完整挑战，76 项通过、0 项失败。独立公开 security.sh 在网络关闭、GPU 开启的临时容器上分别验证最初停止和最初运行，两次均为 76 项通过，原状态恢复，临时容器已删除。公开工具与冻结文件一致。验证环境为已准备好的 Ubuntu 26.04 WSL、LXD 6.9 和 NVIDIA GPU；检查数量随实际设备、挂载和 socket 清单变化。完整证据见 validation/V0_2_21_PUBLIC_REPORT.json、V0_2_21_PUBLIC_SECURITY_STOPPED.json、V0_2_21_PUBLIC_SECURITY_RUNNING.json。

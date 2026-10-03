@@ -1,0 +1,12 @@
+{
+  "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash",
+  "tester_before": {
+    "sha256": "9ccc1d62b7e400bc4f45296bffb06efee6261c917160a87240912378e408a3b6",
+    "mtime_ns": 1791010946935838784
+  },
+  "tester_after": {
+    "sha256": "9ccc1d62b7e400bc4f45296bffb06efee6261c917160a87240912378e408a3b6",
+    "mtime_ns": 1791010946935838784
+  },
+  "product_sha256": "42713d477e0065a55ebe0470ad695bfe534102cacc42ad423d33aab589225c01"
+}

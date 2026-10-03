@@ -1,0 +1,12 @@
+{
+  "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash",
+  "cwd": "/tmp/mas-v0.2.21-public",
+  "report": "/tmp/mas-v0.2.21-public/test-results/20261003-023442/report.json",
+  "units": 419,
+  "stages": 28,
+  "elapsed": 1425.6432320930035,
+  "boundary": {
+    "PASS": 76,
+    "FAIL": 0
+  }
+}

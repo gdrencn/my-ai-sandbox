@@ -2,11 +2,11 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 最新测试版：0.2.21（验证中）
+## 最新测试版：0.2.21
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-新容器使用 Ubuntu APT 预装 Node.js/npm 和常用开发软件，初始化时实时刷新安装输出，完成后停止。硬件选项增加网络开关，关闭外部网卡后仍可通过宿主进入终端和挂载文件系统。0.2.21 的产品已通过全部 28 个真实 LXD 测试环节，完整挑战 76 项通过；最终冻结包的 419 项单元测试通过。发布入口验证正在进行。详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+新容器使用 Ubuntu APT 预装 Node.js/npm 和常用开发软件，初始化时实时刷新安装输出，完成后停止。硬件选项增加网络开关，关闭外部网卡后仍可通过宿主进入终端和挂载文件系统。0.2.21 的产品已通过全部 28 个真实 LXD 测试环节，完整挑战 76 项通过；最终冻结包的 419 项单元测试通过。公开一键测试命令也已完整通过，报告和文档已更新。详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
 ## 安装阶段 1 稳定版（0.1.15）
 
@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-当前已发布测试版为 [0.2.20](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.20)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+当前已发布测试版为 [0.2.21](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.21)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 

@@ -1,0 +1,108 @@
+{
+  "tag": "v0.2.21",
+  "assets": [
+    {
+      "name": "bootstrap.py",
+      "sha256": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+      "byte_identical": true
+    },
+    {
+      "name": "install-stable.sh",
+      "sha256": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "byte_identical": true
+    },
+    {
+      "name": "install-test.sh",
+      "sha256": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "byte_identical": true
+    },
+    {
+      "name": "install.sh",
+      "sha256": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+      "byte_identical": true
+    },
+    {
+      "name": "mas-install.pyz",
+      "sha256": "b3b8d6ffb343598aa2cdf03f169714eca3b7e9e649aae17518334e6bffb3c2bd",
+      "byte_identical": true
+    },
+    {
+      "name": "mas-test.pyz",
+      "sha256": "e96067b595704a833a62b243442de5b4f30efe58d4b8ace3fdf8758480f783a4",
+      "byte_identical": true
+    },
+    {
+      "name": "mas.pyz",
+      "sha256": "42713d477e0065a55ebe0470ad695bfe534102cacc42ad423d33aab589225c01",
+      "byte_identical": true
+    },
+    {
+      "name": "security.sh",
+      "sha256": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+      "byte_identical": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "sha256": "56d25aafd46e80e62de939d3dfc44e0e391445db3a355b31f631c54dbfbfff6b",
+      "byte_identical": true
+    },
+    {
+      "name": "test-stable.sh",
+      "sha256": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "byte_identical": true
+    },
+    {
+      "name": "test.sh",
+      "sha256": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "byte_identical": true
+    },
+    {
+      "name": "WSL_REPORT.json",
+      "sha256": "7296aedfdd19db8d10a1143af0fdb20dcc63870a24646658a8247baa1c367b44",
+      "byte_identical": true
+    }
+  ],
+  "earlier_releases_unchanged": 36,
+  "latest": "stable/0.1.15",
+  "public_entries_match": true,
+  "release_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.21",
+  "packaging": {
+    "archives": [
+      {
+        "archive": "mas.pyz",
+        "files": 23,
+        "sources_match": true,
+        "python_310": true
+      },
+      {
+        "archive": "mas-install.pyz",
+        "files": 23,
+        "sources_match": true,
+        "python_310": true
+      },
+      {
+        "archive": "mas-test.pyz",
+        "files": 71,
+        "sources_match": true,
+        "python_310": true
+      }
+    ],
+    "reproducible_build": true,
+    "bash_syntax": true,
+    "diff_check": true,
+    "hashes": {
+      "test.sh": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "test-stable.sh": "486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+      "security.sh": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+      "mas.pyz": "42713d477e0065a55ebe0470ad695bfe534102cacc42ad423d33aab589225c01",
+      "mas-test.pyz": "e96067b595704a833a62b243442de5b4f30efe58d4b8ace3fdf8758480f783a4",
+      "mas-install.pyz": "b3b8d6ffb343598aa2cdf03f169714eca3b7e9e649aae17518334e6bffb3c2bd",
+      "install.sh": "d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+      "install-test.sh": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "install-stable.sh": "ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+      "bootstrap.py": "ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+      "WSL_REPORT.json": "f69a866ad4325bc03a48afc28d85bbe08754770d59b170050c0dcc5058ddce30",
+      "SHA256SUMS": "56d25aafd46e80e62de939d3dfc44e0e391445db3a355b31f631c54dbfbfff6b"
+    }
+  }
+}
