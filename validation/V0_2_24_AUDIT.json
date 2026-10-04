@@ -1,0 +1,138 @@
+{
+  "version": "0.2.24",
+  "status": "local_final_verified_publication_pending",
+  "authorization": "对，这种就应该修复组件。没错。",
+  "component": "mas/menu.py Screen",
+  "code_changes": [
+    "Park hidden cursor at first active row and replace visible remainder with CSI 0J",
+    "Erase obsolete rows without inferring reflow height",
+    "Handle resize before queued input",
+    "Render final block and restore mode/cursor below prompt",
+    "Retain short-window instructions once"
+  ],
+  "verification": {
+    "portable_focused_tests": 46,
+    "packaged_units": 444,
+    "native_engine": "tmux 3.6",
+    "bilingual_emulator_cases": 8,
+    "grow_restore_height_only_cycles": 6,
+    "pre_python_adapter_resize": true,
+    "local_full_suite": {
+      "units": 444,
+      "stages": 28,
+      "boundary": {
+        "PASS": 76,
+        "FAIL": 0
+      },
+      "elapsed": 1444.8585458309972,
+      "cleanup_independently_verified": true
+    },
+    "public_verification": "pending",
+    "shellcheck": "Rendered scripts pass; raw install template excludes generated-use SC2034 only",
+    "python_310": true,
+    "locale_keys": 338,
+    "local_links": [
+      {
+        "document": "README.md",
+        "target": "IMPLEMENTED.md"
+      },
+      {
+        "document": "README.md",
+        "target": "validation/STABLE_0_1_15_AUDIT.md"
+      },
+      {
+        "document": "README.md",
+        "target": "IMPLEMENTED.md"
+      },
+      {
+        "document": "README.md",
+        "target": "IMPLEMENTED.md"
+      },
+      {
+        "document": "README.md",
+        "target": "GUEST_SECURITY_PROBE.md"
+      },
+      {
+        "document": "README.md",
+        "target": "IMPLEMENTED.md"
+      },
+      {
+        "document": "README.md",
+        "target": "GUEST_SECURITY_PROBE.md"
+      },
+      {
+        "document": "README.md",
+        "target": "REQUIREMENTS.md#39-fixed-isolation-policy-and-effective-configuration-verification--v0211"
+      },
+      {
+        "document": "README.md",
+        "target": "GUEST_SECURITY_PROBE.md"
+      },
+      {
+        "document": "README.md",
+        "target": "REQUIREMENTS.md"
+      },
+      {
+        "document": "README.md",
+        "target": "IMPLEMENTED.md"
+      },
+      {
+        "document": "README.md",
+        "target": "TEST_COVERAGE.md"
+      },
+      {
+        "document": "README.md",
+        "target": "CORE_BEHAVIOR.md"
+      },
+      {
+        "document": "README.md",
+        "target": "CORE_BEHAVIOR.md"
+      }
+    ],
+    "reproducible_archives": true,
+    "unique_packaged_test_identifiers": 444
+  },
+  "review_cycles": [
+    {
+      "cycle": 1,
+      "finding": "Dimension changes appended new blocks",
+      "evidence": "V0_2_24_RESIZE_BEFORE.json"
+    },
+    {
+      "cycle": 2,
+      "finding": "Native CJK reflow height differs from simple character-width estimates",
+      "correction": "Use live cursor anchor, not inferred prior height"
+    },
+    {
+      "cycle": 3,
+      "finding": "New regression imported an entire TestCase causing duplicate discovery",
+      "correction": "Import helper module instead; final units have 444 unique identifiers"
+    },
+    {
+      "cycle": 4,
+      "findings": [],
+      "evidence": [
+        "V0_2_24_RESIZE_AFTER.json",
+        "V0_2_24_EMULATOR_REVIEW.json",
+        "V0_2_24_BOOTSTRAP_RESIZE.json"
+      ]
+    }
+  ],
+  "limits": [
+    "Extreme native reflow can move old active rows into scrollback; preserve them as history",
+    "No actual graphical Windows Terminal maximize/restore session",
+    "GNU Screen detached hardcopy Unicode encoding prevented display verification and is excluded",
+    "Native Ubuntu/cloud, ARM64, fresh-host preparation not newly exercised"
+  ],
+  "documents_reviewed": [
+    "README.md",
+    "REQUIREMENTS.md",
+    "IMPLEMENTED.md",
+    "CORE_BEHAVIOR.md",
+    "TEST_COVERAGE.md",
+    "GUEST_SECURITY_PROBE.md",
+    "MENU_REVIEW.md",
+    "RELEASE_NOTES.md"
+  ],
+  "stable": "stable/0.1.15 unchanged"
+}

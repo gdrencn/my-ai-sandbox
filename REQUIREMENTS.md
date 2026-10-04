@@ -1,6 +1,15 @@
 # my-ai-sandbox Requirements
 
-## Current authorized review: shared CLI/TUI components (2026-10-03)
+## Current authorized correction: shared menu resizing (2026-10-03)
+
+Status: Authorized with “对，这种就应该修复组件。没错。” The user reproduced repeated language options and key hints after terminal maximization/restoration in v0.2.23. Source review confirms that Screen.draw appends another active block whenever dimensions change. Existing resize coverage checks selection/navigation but does not assert removal of the old display. Correct the shared inline component, preserving the accepted menu and operation behavior; publish the completed and verified batch as test v0.2.24 under section 8.
+
+- Resize must replace the active selection/input region instead of appending another copy. Remove obsolete rows when the region becomes shorter. Preserve permanent titles, descriptions, prior operation output, selected values, checked values and input editing position. Do not clear the screen/history or use an alternate screen.
+- Keep resize handling in the shared menu component used by installation language selection, product menus and the host security selector. Retain the minimal pre-Python adapter's documented terminal limits and verify that its supported resize behavior does not duplicate the language menu.
+- Check display cells and the actual terminal's resize/reflow behavior rather than assuming a PTY transcript is a terminal display. Reproduce the old defect and verify repeated grow/shrink cycles, height-only changes, narrower Chinese text/key hints, list viewport contraction, multiple selection and input. Check normal completion, cancellation and interruption restore terminal mode/cursor.
+- Run portable packaged regressions and the complete real suite outside the checkout, then verify public installation/test/security entry points, artifact hashes and owned-resource cleanup. Update implementation/usage/coverage records after verification. Keep earlier assets and stable/0.1.15 unchanged; record actual terminal/platform coverage and remaining compatibility limits precisely.
+
+## Previous completed review: shared CLI/TUI components (2026-10-03)
 
 Status: Implemented, published as test v0.2.23 and verified. Authorized with “首先，你可以修复这些已经确认的问题，然后迭代检查，直到没有问题为止。” The six corrections and iterative refinements passed final frozen and exact public-entry runs: 439 packaged units, all 28 native stages and one 76-check challenge in each run, in 1424.6 and 1404.9 seconds respectively, without skips, unexecuted stages or cleanup errors. Ordinary installation, both-language cancellation, independent challenges from Stopped/Running, twelve assets and independent cleanup passed. All 38 earlier releases and stable/0.1.15 are unchanged. Apply /home/gordon/.codex/CLI_TUI_GUIDELINES.md to all current CLI, inline menu, installer and tester entry points. Correct the six confirmed differences below, then iterate on concrete additional discrepancies found by source review and real-terminal verification. Preserve the agreed lifecycle, package list, security policies, installer privilege handling and release boundaries. Publish the completed batch as a test prerelease; stable promotion remains separate.
 

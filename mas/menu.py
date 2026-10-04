@@ -106,9 +106,10 @@ class Screen:
     def __init__(self, terminal):
         self.terminal = terminal
         self.fd = terminal.fileno()
-        self.rows = 0
+        self.drawn = []
         self.dimensions = None
         self.needs_gap = False
+        self.permanent_instructions = False
 
     def write(self, text):
         self.terminal.write(text.encode('utf-8'))
@@ -133,21 +134,29 @@ class Screen:
         changed[3] &= ~(termios.ICANON | termios.ECHO)
         changed[6][termios.VMIN] = 1
         changed[6][termios.VTIME] = 0
-        self.rows = 0
+        self.drawn = []
+        self.permanent_instructions = False
         try:
             termios.tcsetattr(self.fd, termios.TCSANOW, changed)
             self.write('\n\x1b[?25l')
             self.needs_gap = False
             yield
         finally:
-            termios.tcsetattr(self.fd, termios.TCSANOW, original)
-            self.write('\x1b[0m\x1b[?25h')
-            self.needs_gap = True
-            self.rows = 0
+            try:
+                if self.drawn:
+                    self.draw(self.drawn, park=False)
+            finally:
+                termios.tcsetattr(self.fd, termios.TCSANOW, original)
+                self.write('\x1b[0m\x1b[?25h')
+                self.needs_gap = True
+                self.drawn = []
 
     def key(self):
-        if not select.select([self.fd], [], [], 0.2)[0]:
-            return 'resize' if self.size() != self.dimensions else 'idle'
+        ready = select.select([self.fd], [], [], 0.2)[0]
+        if self.size() != self.dimensions:
+            return 'resize'
+        if not ready:
+            return 'idle'
         char = os.read(self.fd, 1)
         if not char or char == b'\x04':
             raise Cancelled
@@ -176,27 +185,40 @@ class Screen:
             char += os.read(self.fd, 1)
         return char.decode('utf-8', errors='replace')
 
-    def draw(self, lines):
-        dimensions = self.size()
-        # Resizing may reflow earlier rows. Append a fresh block instead of
-        # guessing cursor coordinates and overwriting historical output.
-        if self.rows and self.dimensions == dimensions:
-            self.write(f'\x1b[{self.rows}A')
-        self.dimensions = dimensions
-        width, height = dimensions
+    def clear(self):
+        """Erase the visible activity from its parked cursor, preserving history."""
+        if not self.drawn:
+            return
+        # Nothing below this anchor is permanent output: prompts append their
+        # active block after all titles, descriptions and prior diagnostics.
+        # Erase that remainder, never the screen or its scrollback history.
+        self.write('\r\x1b[0J')
+        self.drawn = []
+
+    def draw(self, lines, *, park=True):
+        lines = list(lines)
+        width, height = self.size()
+        self.clear()
+        self.dimensions = width, height
         lines = lines[:height - 1]
+        output = ''
         for label, focused in lines:
-            self.write('\r\x1b[2K' + ('\x1b[7m' if focused else '') +
+            output += ('\r\x1b[2K' + ('\x1b[7m' if focused else '') +
                        rendered(label, width - 1) + '\x1b[0m\n')
-        self.rows = len(lines)
+        if park and lines:
+            output += f'\x1b[{len(lines)}A\r'
+        self.write(output)
+        self.drawn = lines
 
     def instructions(self, text):
         """Keep complete key hints while reserving an active input/option row."""
         width, height = self.size()
         lines = wrapped(text, width - 1)
-        if len(lines) > height - 2:
-            if not self.rows or self.dimensions != (width, height):
+        if self.permanent_instructions or len(lines) > height - 2:
+            if not self.permanent_instructions:
+                self.clear()
                 self.write('\n'.join(lines) + '\n')
+                self.permanent_instructions = True
             return []
         return [(line, False) for line in lines]
 

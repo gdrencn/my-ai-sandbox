@@ -1,6 +1,12 @@
 # Container operation behavior
 
-This inventories the current shared behavior through batch 0.2.23. CLI and text menus call the same Manager; host installation is separate. Phase 1 stable remains the unchanged 0.1.15 release. Later sections labeled with earlier batches retain their historical scope.
+This inventories the current shared behavior through batch 0.2.24. CLI and text menus call the same Manager; host installation is separate. Phase 1 stable remains the unchanged 0.1.15 release. Later sections labeled with earlier batches retain their historical scope.
+
+## Shared menu resize boundary
+
+The Python Screen component used by installer language selection, product prompts and host security selection parks the hidden cursor at the first active row. Redraw erases the visible remainder from that anchor (CSI 0J), then writes the new bounded block and parks there again. It does not infer old reflowed row counts, enter an alternate screen or clear screen/scrollback history. Shorter blocks remove obsolete visible rows. Selection/checks/editing state survive resizing; queued keys are consumed after resize redraw. Prompt completion renders at the current size and restores input mode and cursor below the block before permanent output. Necessary key hints become permanent once when an extremely short window cannot contain them.
+
+Actual tmux 3.6 grow/restore and height-only tests retain one language menu in both languages. Narrow Unicode inputs, multiple selection and long-list viewports were checked through native reflow. Extreme shrink can move earlier active rows into the terminal's scrollback; those historical rows remain, while the currently visible activity is replaced. This preserves history and does not certify every emulator or an actual graphical Windows Terminal maximize/restore session. The pre-Python Bash menu retains its minimum-size restriction; supported-size grow/restore/height-only cycles keep one menu.
 
 ## Shared execution and validation
 

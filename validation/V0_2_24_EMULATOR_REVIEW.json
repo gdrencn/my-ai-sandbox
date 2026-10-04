@@ -1,0 +1,497 @@
+{
+  "engine": "tmux 3.6",
+  "source": "/tmp/mas-v0.2.24-frozen/mas.pyz",
+  "checks": [
+    {
+      "language": "zh_cn",
+      "case": "language",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "visible": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 30,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc\n/← 取消",
+          "visible": "请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc\n/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select\n interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 ·\nEsc/← 取消",
+          "cursor": "0,2,2\n"
+        },
+        {
+          "width": 180,
+          "height": 45,
+          "history": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "visible": "\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc\n/← 取消",
+          "old_cursor": "0,2,2\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc\n/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc\n/← 取消",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 18,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消",
+          "visible": "  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消",
+          "before": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MEN\nU\n\n请选择界面语\n言 / Select inter\nface language\n  ○ 简体中文 (\nzh_cn)\n❯ ● English (en_us\n)\n↑/↓ 选择 · Enter\n/→ 确定 · Esc/←\n取消",
+          "cursor": "0,0,8\n"
+        },
+        {
+          "width": 100,
+          "height": 30,
+          "history": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "visible": "  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消",
+          "old_cursor": "0,0,13\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消",
+          "physical": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消",
+          "cursor": "0,0,6\n"
+        }
+      ],
+      "result": "en_us",
+      "final": "HISTORY_BEFORE_MENU\n\n请选择界面语言 / Select interface language\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ 选择 · Enter/\n→ 确定 · Esc/← 取\n消\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 取消\n\nRESULT=en_us",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "zh_cn",
+      "case": "input",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "visible": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 30,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改\n · Enter 提交 · Esc 取消",
+          "visible": "INPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改\n · Enter 提交 · Esc 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace\n修改 · Enter 提交 · Esc 取\n消",
+          "cursor": "0,1,2\n"
+        },
+        {
+          "width": 180,
+          "height": 45,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "visible": "INPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改\n · Enter 提交 · Esc 取消",
+          "old_cursor": "0,1,2\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改\n · Enter 提交 · Esc 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改\n · Enter 提交 · Esc 取消",
+          "cursor": "0,1,2\n"
+        },
+        {
+          "width": 18,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消",
+          "visible": "中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "old_cursor": "0,1,2\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "physical": "HISTORY_BEFORE_MEN\nU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 ·\n Backspace 修改\n· Enter 提交 · E\nsc 取消",
+          "cursor": "0,0,6\n"
+        },
+        {
+          "width": 100,
+          "height": 30,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "visible": "中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消",
+          "old_cursor": "0,0,9\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消",
+          "cursor": "0,0,5\n"
+        }
+      ],
+      "result": "中文Xb",
+      "final": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文ab▏\n←/→ 移动光标 · Ba\nckspace 修改 · En\nter 提交 · Esc 取\n消\n中文ab▏\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文a▏b\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文▏b\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文X▏b\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n中文X▏b\n←/→ 移动光标 · Backspace 修改 · Enter 提交 · Esc 取消\n\nRESULT=中文Xb",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "zh_cn",
+      "case": "multiple",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "visible": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 30,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/\n→ 提交 · Esc/← 取消",
+          "visible": "\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/\n→ 提交 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · E\nnter/→ 提交 · Esc/← 取消",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 180,
+          "height": 45,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "visible": "\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/\n→ 提交 · Esc/← 取消",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/\n→ 提交 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/\n→ 提交 · Esc/← 取消",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 18,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 \n勾选 · Enter/→ 提\n交 · Esc/← 取消",
+          "visible": "  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 \n勾选 · Enter/→ 提\n交 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MEN\nU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格\n 勾选 · Enter/→\n 提交 · Esc/← 取\n消",
+          "cursor": "0,0,5\n"
+        },
+        {
+          "width": 100,
+          "height": 30,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 \n勾选 · Enter/→ 提\n交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "visible": "  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 \n勾选 · Enter/→ 提\n交 · Esc/← 取消",
+          "old_cursor": "0,0,16\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 \n勾选 · Enter/→ 提\n交 · Esc/← 取消",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格\n勾选 · Enter/→ 提\n交 · Esc/← 取消",
+          "cursor": "0,0,12\n"
+        }
+      ],
+      "result": "['2', '7']",
+      "final": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 \n勾选 · Enter/→ 提\n交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☑ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☑ OPTION_7\n↑/↓ 移动 · 空格 勾选 · Enter/→ 提交 · Esc/← 取消\n\nRESULT=['2', '7']",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "zh_cn",
+      "case": "viewport",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "visible": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 100,
+          "height": 14,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "visible": "  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 120,
+          "height": 32,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "visible": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "old_cursor": "0,0,3\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 80,
+          "height": 12,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "visible": "  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8",
+          "cursor": "0,3,0\n"
+        }
+      ],
+      "result": "23",
+      "final": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ 选择 · Enter/→ 确定 · Esc/← 返回\n\nRESULT=23",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "en_us",
+      "case": "language",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "visible": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 30,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · E\nsc/← Cancel",
+          "visible": "Select interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · E\nsc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请\n选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Es\nc/← Cancel",
+          "cursor": "0,2,2\n"
+        },
+        {
+          "width": 180,
+          "height": 45,
+          "history": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "visible": "\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · E\nsc/← Cancel",
+          "old_cursor": "0,2,2\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · E\nsc/← Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · E\nsc/← Cancel",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 18,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/← \nCancel",
+          "visible": "  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/← \nCancel",
+          "before": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MEN\nU\n\nSelect interface l\nanguage / 请选择\n界面语言\n  ○ 简体中文 (\nzh_cn)\n❯ ● English (en_us\n)\n↑/↓ Select · Enter\n/→ Open · Esc/← Ca\nncel",
+          "cursor": "0,0,8\n"
+        },
+        {
+          "width": 100,
+          "height": 30,
+          "history": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/← \nCancel\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "visible": "  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/← \nCancel",
+          "old_cursor": "0,0,13\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/← \nCancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/←\nCancel",
+          "cursor": "0,0,6\n"
+        }
+      ],
+      "result": "en_us",
+      "final": "HISTORY_BEFORE_MENU\n\nSelect interface language / 请选择界面语言\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_\n❯ ● English (en_u\n↑/↓ Select · Ente\nr/→ Open · Esc/← \nCancel\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n  ○ 简体中文 (zh_cn)\n❯ ● English (en_us)\n↑/↓ Select · Enter/→ Open · Esc/← Cancel\n\nRESULT=en_us",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "en_us",
+      "case": "input",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "visible": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 30,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace E\ndit · Enter Submit · Esc Canc\nel",
+          "visible": "\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace E\ndit · Enter Submit · Esc Canc\nel",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Ed\nit · Enter Submit · Esc Cancel",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 180,
+          "height": 45,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "visible": "\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace E\ndit · Enter Submit · Esc Canc\nel",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace E\ndit · Enter Submit · Esc Canc\nel",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace E\ndit · Enter Submit · Esc Canc\nel",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 18,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel",
+          "visible": "中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "physical": "HISTORY_BEFORE_MEN\nU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor ·\nBackspace Edit · E\nnter Submit · Esc\nCancel",
+          "cursor": "0,0,5\n"
+        },
+        {
+          "width": 100,
+          "height": 30,
+          "history": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "visible": "中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel",
+          "old_cursor": "0,0,9\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel",
+          "cursor": "0,0,5\n"
+        }
+      ],
+      "result": "中文Xb",
+      "final": "HISTORY_BEFORE_MENU\n\nINPUT_TITLE\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文ab▏\n←/→ Move cursor ·\n Backspace Edit ·\n Enter Submit · E\nsc Cancel\n中文ab▏\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文a▏b\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文▏b\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文X▏b\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n中文X▏b\n←/→ Move cursor · Backspace Edit · Enter Submit · Esc Cancel\n\nRESULT=中文Xb",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "en_us",
+      "case": "multiple",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "visible": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 30,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Ent\ner/→ Submit · Esc/← Cancel",
+          "visible": "\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Ent\ner/→ Submit · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Ente\nr/→ Submit · Esc/← Cancel",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 180,
+          "height": 45,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "visible": "\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Ent\ner/→ Submit · Esc/← Cancel",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Ent\ner/→ Submit · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Ent\ner/→ Submit · Esc/← Cancel",
+          "cursor": "0,2,1\n"
+        },
+        {
+          "width": 18,
+          "height": 40,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space \nToggle · Enter/→ \nSubmit · Esc/← Ca\nncel",
+          "visible": "  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space \nToggle · Enter/→ \nSubmit · Esc/← Ca\nncel",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "old_cursor": "0,2,1\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "physical": "HISTORY_BEFORE_MEN\nU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space T\noggle · Enter/→ Su\nbmit · Esc/← Cance\nl",
+          "cursor": "0,0,5\n"
+        },
+        {
+          "width": 100,
+          "height": 30,
+          "history": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space \nToggle · Enter/→ \nSubmit · Esc/← Ca\nncel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "visible": "  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel",
+          "before": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space \nToggle · Enter/→ \nSubmit · Esc/← Ca\nncel",
+          "old_cursor": "0,0,16\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space \nToggle · Enter/→ \nSubmit · Esc/← Ca\nncel",
+          "physical": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space\nToggle · Enter/→\nSubmit · Esc/← Ca\nncel",
+          "cursor": "0,0,12\n"
+        }
+      ],
+      "result": "['2', '7']",
+      "final": "HISTORY_BEFORE_MENU\n\nMULTIPLE_TITLE\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space \nToggle · Enter/→ \nSubmit · Esc/← Ca\nncel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☐ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☑ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n  ☐ OPTION_0\n  ☐ OPTION_1\n  ☑ OPTION_2\n  ☐ OPTION_3\n  ☐ OPTION_4\n  ☐ OPTION_5\n  ☐ OPTION_6\n❯ ☑ OPTION_7\n↑/↓ Move · Space Toggle · Enter/→ Submit · Esc/← Cancel\n\nRESULT=['2', '7']",
+      "terminal_modes_restored": true
+    },
+    {
+      "language": "en_us",
+      "case": "viewport",
+      "snapshots": [
+        {
+          "width": 160,
+          "height": 48,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "visible": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 100,
+          "height": 14,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "visible": "  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 120,
+          "height": 32,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "visible": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "old_cursor": "0,0,3\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "cursor": "0,3,0\n"
+        },
+        {
+          "width": 80,
+          "height": 12,
+          "history": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "visible": "  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "before": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8\n  OPTION_9\n  OPTION_10\n  OPTION_11\n  OPTION_12\n  OPTION_13\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back",
+          "old_cursor": "0,3,0\n",
+          "immediate": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8",
+          "physical": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_0\n  OPTION_1\n  OPTION_2\n  OPTION_3\n  OPTION_4\n  OPTION_5\n  OPTION_6\n  OPTION_7\n  OPTION_8",
+          "cursor": "0,3,0\n"
+        }
+      ],
+      "result": "23",
+      "final": "HISTORY_BEFORE_MENU\n\nVIEWPORT_TITLE\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back\n  OPTION_14\n  OPTION_15\n  OPTION_16\n  OPTION_17\n  OPTION_18\n  OPTION_19\n  OPTION_20\n  OPTION_21\n  OPTION_22\n❯ OPTION_23\n↑/↓ Select · Enter/→ Open · Esc/← Back\n\nRESULT=23",
+      "terminal_modes_restored": true
+    }
+  ],
+  "viewport_limit": "Rows moved into scrollback by the terminal itself remain history; only still-visible activity is erased"
+}

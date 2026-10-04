@@ -210,6 +210,8 @@ print('RESTORED')
                     self.assertGreaterEqual(row, 0)
                 elif token == '\x1b[2K':
                     rows[row] = ''
+                elif token == '\x1b[0J':
+                    rows[row:] = [''] * (len(rows) - row)
                 continue
             for char in token:
                 if char == '\r':
