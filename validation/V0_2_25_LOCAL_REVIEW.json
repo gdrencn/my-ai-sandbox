@@ -1,0 +1,28 @@
+{
+  "version": "0.2.25",
+  "units": 449,
+  "stages": 28,
+  "elapsed": 1414.4627441320044,
+  "boundary_counts": {
+    "PASS": 76
+  },
+  "single_final_challenge": true,
+  "cleanup_errors": [],
+  "project": "test-b3ccfc6e73cf4eadbf823c398e1c6cd4",
+  "staging_projects": [
+    "mas-import-0ca3e694f81a48549ef99df96f455788",
+    "mas-import-3596f7bf1d794cdfb37eed57d30fafe0",
+    "mas-import-75116e55dd7e4dc998c0e06498c31aaa",
+    "mas-import-af38a7c263724493ae8cd2f857ccf3ad",
+    "mas-import-b2bfeee366084c04a600173257fc2c9d",
+    "mas-import-df04554c63624a30af5cb4cc9f8d79e0"
+  ],
+  "legacy_resources_absent": true,
+  "mount_journal_empty": true,
+  "mount_directories_backups_helpers_absent": true,
+  "installed_hashes": {
+    "mas": "fc4acabba8c8974bd9c99f01b82f074b36424646d1c57c474d6eb763f8a50ffc",
+    "mas-test": "befd72eaf727736fc1a09e06c40728616ca3753e0c3c06b768e383e12a94bfa9"
+  },
+  "cleanup_independently_verified": true
+}

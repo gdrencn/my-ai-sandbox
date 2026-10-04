@@ -1,6 +1,10 @@
 # Container operation behavior
 
-This inventories the shared product behavior shipped in test v0.2.24 and stable/0.2.24. CLI and text menus call the same Manager; host installation is separate. Stable product and installer bytes match the accepted test release. The stable installation chain uses release source and stable assets; verification obtains only the exact paired tester from v0.2.24. Sections labeled with earlier batches retain their historical scope.
+This inventories shared product behavior through the verified 0.2.25 development batch; the published stable remains stable/0.2.24. CLI and text menus call the same Manager; host installation is separate. Stable 0.2.24 product and installer bytes match the accepted v0.2.24 test release; the later About page belongs to 0.2.25. The stable installation chain uses release source and stable assets; verification obtains only the exact paired tester from v0.2.24. Sections labeled with earlier batches retain their historical scope.
+
+## Preferences and About
+
+Preferences lists Language, About my-ai-sandbox and Back. About is a shared inline selection page containing the running product version from mas.__version__ and one Back choice. It reads no remote release or container state. Enter/Right and Escape/Left return to Preferences with About selected; leaving Preferences retains its main-menu position. The page owns its title, description and return control, with no separate operation-result page. Both languages use product catalogs. mas --version continues to expose the same numeric version.
 
 ## Shared menu resize boundary
 

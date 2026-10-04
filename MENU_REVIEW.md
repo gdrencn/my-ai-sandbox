@@ -1,5 +1,9 @@
 # Menu interaction review — October 2026
 
+## Preferences About page — 0.2.25
+
+The authorized About entry appears after Language and before Back. It uses the shared selection page to show the running product version and one Back choice; returns retain the parent focus. Real-PTY checks cover both languages, Enter/Right/Escape/Left navigation, title/spacing, terminal restoration and unchanged language configuration. The frozen native complete menu flow also visits About in both languages. This is a test-release change; stable 0.2.24 and the handoff work remain separate.
+
 ## Stable 0.2.24 user acceptance (2026-10-04)
 
 The user confirmed that terminal maximization/restoration no longer duplicates menus, supplied two successful complete v0.2.24 runs and an independent security run using shared container selection, and authorized stable publication. This is user-reported native-terminal acceptance, separate from the recorded tmux/PTy evidence. Stable product/installer bytes and all menu behavior remain identical to the accepted v0.2.24 test release; promotion changes distribution routing only.

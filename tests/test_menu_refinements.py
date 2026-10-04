@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 
-from mas import config, menu
+from mas import __version__, config, menu
 from mas.core import Error
 from mas.gpu import GPU, KEY
 from mas.i18n import t
@@ -154,6 +154,54 @@ class RefinementTests(unittest.TestCase):
     def terminal(self, source, directory):
         return Terminal(python_command(source), 30, Path(directory) / 'menu.log')
 
+    def test_about_version_and_parent_focus_in_both_languages(self):
+        for language in ('zh_cn', 'en_us'):
+            for back_key in ('\r', '\x1b[C', '\x1b', '\x1b[D'):
+                with (self.subTest(language=language, back_key=back_key),
+                      tempfile.TemporaryDirectory() as directory,
+                      patch.dict(os.environ, {'XDG_CONFIG_HOME': directory})):
+                    config.set_value('language', language)
+                    saved = (Path(directory) / 'my-ai-sandbox/config.json').read_bytes()
+                    source = '''import termios
+from mas import menu
+from mas.terminal_ui import UI
+original = termios.tcgetattr(0)
+menu.interactive(lambda view: UI(view, object()).loop())
+assert termios.tcgetattr(0) == original
+print('ABOUT_DONE', flush=True)
+'''
+                    terminal = self.terminal(source, directory)
+                    tr = lambda key, **values: t(key, locale=language, **values)
+                    try:
+                        terminal.expect_menu(tr('page_main'))
+                        terminal.send('\x1b[B' * 4 + '\r')
+                        terminal.expect_menu(tr('page_settings'))
+                        terminal.send('\x1b[B\r')
+                        terminal.expect(tr('about_version', version=__version__))
+                        terminal.expect('Esc/← ' + tr('menu_back'))
+                        terminal.send(back_key)
+                        terminal.expect_menu(tr('page_settings'))
+                        # Enter must reopen About without moving the selection.
+                        terminal.send('\r')
+                        terminal.expect(tr('about_version', version=__version__))
+                        terminal.expect('Esc/← ' + tr('menu_back'))
+                        terminal.send('\x1b[D')
+                        terminal.expect_menu(tr('page_settings'))
+                        terminal.send('\x1b[B\r')
+                        terminal.expect_menu(tr('page_main'))
+                        # Preferences retains its main-menu position.
+                        terminal.send('\x1b[B\r')
+                        terminal.expect('ABOUT_DONE'); terminal.finish()
+                        history = test_menu.MenuTests().render_history(terminal.buffer)
+                        self.assertEqual(history.splitlines().count(tr('menu_about')), 2)
+                        self.assertEqual(history.count(tr('about_version', version=__version__)), 2)
+                        self.assertNotIn(tr('page_result'), history)
+                        self.assertNotIn('\n\n\n', history)
+                        test_menu.MenuTests().assert_inline(terminal.buffer)
+                        self.assertEqual((Path(directory) / 'my-ai-sandbox/config.json').read_bytes(), saved)
+                    finally:
+                        terminal.close()
+
     def test_complete_menu_paths_in_both_languages(self):
         for language in ('zh_cn', 'en_us'):
             with (self.subTest(language=language), tempfile.TemporaryDirectory() as directory,
@@ -181,7 +229,7 @@ print('FIXTURE_RESULT='+json.dumps(dict(info=manager.info_calls, hardware=manage
                 try:
                     terminal.expect('my-ai-sandbox');terminal.expect('Esc/← ' + tr('menu_exit'))
                     send(down * 4 + '\n', tr('page_settings'))
-                    send(down + '\n', 'my-ai-sandbox')
+                    send(down * 2 + '\n', 'my-ai-sandbox')
                     send(up * 4 + '\n', tr('page_list'))
                     send('\n', tr('page_container', target='demo'))
                     send('\n', tr('info_name', name='demo'))

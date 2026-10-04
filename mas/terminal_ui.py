@@ -1,5 +1,6 @@
 """Inline text-menu application; operations reuse the ordinary CLI backend."""
 import sys
+from . import __version__
 from . import config, menu
 from .core import Error, ShellExitError
 from .output import Output, before_output
@@ -60,15 +61,26 @@ class UI:
         return result
 
     def settings(self):
+        selected = 'language'
         while True:
-            choice = self.view.choose(t('page_settings'), [('language', t('menu_language', language=config.get('language'))), ('back', t('menu_back'))])
+            choice = self.view.choose(t('page_settings'),
+                [('language', t('menu_language', language=config.get('language'))),
+                 ('about', t('menu_about')), ('back', t('menu_back'))], default=selected)
+            selected = choice
             if choice == 'back':
                 return
+            if choice == 'about':
+                self.present(t('menu_about'), self.about, back=False)
+                continue
             def change_language():
                 selected = menu.language(self.view, config.get('language'))
                 config.set_value('language', selected)
                 self.write(t('language_saved', language=selected))
             self.present(t('language_title'), change_language, prompt_title=True)
+
+    def about(self):
+        self.view.choose(t('menu_about'), [('back', t('menu_back'))],
+                         description=[t('about_version', version=__version__)])
 
     def info(self, target):
         with Output(sys.stderr).waiting(t('info_loading', target=target)):
