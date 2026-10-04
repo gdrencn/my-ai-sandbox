@@ -2,9 +2,9 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 测试开发版本：0.2.25；稳定版：0.2.24
+## 当前测试版：0.2.25；稳定版：0.2.24
 
-0.2.25 在“mas 选项”中新增“关于 my-ai-sandbox”，显示当前产品版本，并提供返回；沿用共享页面组件，返回保留选中位置。冻结包通过 449 项单元测试、28 个实机环节及一次 76 项安全挑战，耗时 1414.5 秒，无跳过、未执行或清理错误。当前正在准备 test 发布供用户验收；稳定版仍为 0.2.24，交接 bundle 延后。
+0.2.25 在“mas 选项”中新增“关于 my-ai-sandbox”，显示当前产品版本，并提供返回；沿用共享页面组件，返回保留选中位置。冻结包通过 449 项单元测试、28 个实机环节及一次 76 项安全挑战，耗时 1414.5 秒，无跳过、未执行或清理错误。已发布为 test 供用户验收；公开一键入口也通过相同的 449 项单元测试、28 个环节和一次 76 项安全挑战，耗时 1433.9 秒，无跳过、未执行或清理错误。稳定版仍为 0.2.24，交接 bundle 延后。
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
@@ -30,9 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
 ## 安装最新测试版
 
-0.2.25 尚在发布准备中；下述公开入口当前仍选择已发布的 v0.2.24。
-
-本批测试版为 [0.2.24](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.24)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+本批测试版为 [0.2.25](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.25)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
 
 在 Ubuntu 的交互式终端运行：
 

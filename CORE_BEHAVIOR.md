@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This inventories shared product behavior through the verified 0.2.25 development batch; the published stable remains stable/0.2.24. CLI and text menus call the same Manager; host installation is separate. Stable 0.2.24 product and installer bytes match the accepted v0.2.24 test release; the later About page belongs to 0.2.25. The stable installation chain uses release source and stable assets; verification obtains only the exact paired tester from v0.2.24. Sections labeled with earlier batches retain their historical scope.
+This inventories shared product behavior through published test v0.2.25; the published stable remains stable/0.2.24. CLI and text menus call the same Manager; host installation is separate. Stable 0.2.24 product and installer bytes match the accepted v0.2.24 test release; the later About page belongs to 0.2.25. The stable installation chain uses release source and stable assets; verification obtains only the exact paired tester from v0.2.24. Sections labeled with earlier batches retain their historical scope.
 
 ## Preferences and About
 
