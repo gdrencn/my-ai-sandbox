@@ -1,0 +1,148 @@
+"""Argument handling and terminal presentation; lifecycle logic lives in core."""
+
+import json
+
+import sys
+
+from . import __version__
+from . import config
+from .core import Error, LXD, Manager, ShellExitError
+from .isolation import PROJECT
+from .presentation import Progress, show_containers, show_mounts, format_info
+
+from .i18n import t, Parser
+
+
+def parser():
+    result = Parser(prog="mas", description=t('cli_description'), epilog=t('cli_examples'))
+    result.add_argument("--version", action="version", version=__version__, help=t("help_version"))
+    result.add_argument("--timeout", type=int, default=600, help=t('help_timeout'))
+    commands = result.add_subparsers(dest="command")
+    hardware = commands.add_parser("hardware", help=t("help_hardware"), description=t('help_cmd_hardware'), epilog=t('example_hardware'))
+    hardware.add_argument("target", metavar="TARGET", help=t('help_target'))
+    hardware.add_argument("item", nargs="?", choices=["gpu", "network"], help=t('help_hardware_item'))
+    hardware.add_argument("value", nargs="?", choices=["on", "off"], help=t('help_hardware_value'))
+    settings = commands.add_parser("config", help=t("help_config"), description=t('help_cmd_config'), epilog=t('example_config'))
+    actions = settings.add_subparsers(dest="config_action")
+    for action in ("get", "set"):
+        item = actions.add_parser(action, help=t('help_config_' + action), description=t('help_config_' + action))
+        item.add_argument("key", choices=["language"], help=t('help_config_key'))
+        if action == "set":
+            item.add_argument("value", choices=config.LANGUAGES, help=t('help_language_value'))
+    for name in ("new", "list", "start", "stop", "restart", "delete", "info", "import", "export", "enter", "mountfs", "unmountfs", "mountedfs", "migrate"):
+        command = commands.add_parser(name, help=t('help_cmd_' + name), description=t('help_cmd_' + name), epilog=t('example_' + name))
+        if name != "list":
+            command.add_argument("target", metavar="TARGET", help=t('help_target'), **({"nargs": "?"} if name == "stop" else {}))
+        if name in ("delete", "export", "enter", "restart", "migrate"):
+            consent = command.add_mutually_exclusive_group()
+            consent.add_argument("--yes", dest="consent", action="store_const", const=True, help=t("help_yes"))
+            consent.add_argument("--no", dest="consent", action="store_const", const=False, help=t("help_no"))
+        if name in ("mountfs", "unmountfs"):
+            command.add_argument("path", metavar="PATH", nargs="?", help=t("help_" + name + "_path"))
+        if name in ('mountedfs', 'unmountfs'):
+            command.add_argument('--legacy', action='store_true', help=t('help_legacy_mounts'))
+        if name == "stop":
+            command.add_argument("--all", action="store_true", help=t('help_all'))
+        if name == 'restart':
+            command.add_argument('-e', '--enter', action='store_true', help=t('help_restart_enter'))
+        if name == "new":
+            command.add_argument("--image", help=t('help_image'))
+        if name in ("import", "export"):
+            command.add_argument("file", metavar="FILE", help=t('help_' + name + '_file'))
+    return result
+
+
+def main(argv=None, manager=None):
+    arguments = parser()
+    args = arguments.parse_args(argv)
+    if args.timeout < 300:
+        arguments.error(t('cli_timeout'))
+    if args.command == "stop" and bool(args.target) == args.all:
+        arguments.error(t('cli_stop_args'))
+    if args.command == 'restart' and args.consent is not None and not args.enter:
+        arguments.error(t('cli_restart_consent'))
+    progress = Progress()
+    try:
+        if args.command == "config":
+            if args.config_action == "set":
+                config.set_value(args.key, args.value)
+                print(t("language_saved", language=args.value))
+            elif args.config_action == "get":
+                print(config.get(args.key))
+            else:
+                print(json.dumps(config.load(), ensure_ascii=False, indent=2))
+            return 0
+        from .menu import confirm as ask_menu
+        ask = ask_menu if getattr(args, "consent", None) is None else lambda _: args.consent
+        manager = manager or Manager(LXD(project=PROJECT, timeout=args.timeout, diagnostic=progress.output.keep), report=progress)
+        if getattr(args, 'legacy', False):
+            manager = manager.legacy
+        if args.command is None:
+            from .terminal_ui import run
+            return 1 if run(manager) == 1 else 0
+        elif args.command == "hardware":
+            with progress.output.waiting(t('hardware_loading', target=args.target)):
+                result = (manager.hardware(args.target, None if args.value is None else args.value == "on", item=args.item)
+                          if args.item else {'gpu': manager.hardware(args.target),
+                                             'network': manager.hardware(args.target, item='network')})
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        elif args.command == "list":
+            with progress.output.waiting(t('list_loading')):
+                items = manager.list()
+            show_containers(items)
+        elif args.command == "info":
+            with progress.output.waiting(t('info_loading', target=args.target)):
+                instance = manager.info(args.target)
+            print(format_info(instance))
+        elif args.command in ("mountfs", "unmountfs"):
+            result = getattr(manager, args.command)(args.target, args.path)
+            print(t("fs_mounted_at", path=result) if args.command == "mountfs" else t("menu_done"))
+        elif args.command == "mountedfs":
+            with progress.output.waiting(t('fs_list_loading', target=args.target)):
+                entries = manager.mountedfs(args.target)
+            show_mounts(entries)
+        elif args.command == "new":
+            manager.new(args.target, args.image)
+        elif args.command == 'migrate':
+            if not manager.migrate(args.target, ask):
+                print(t('cancelled'))
+        elif args.command == "import":
+            manager.import_container(args.target, args.file)
+        elif args.command == "export":
+            if not manager.export(args.target, args.file, ask):
+                print(t('cancelled'))
+        elif args.command == "delete":
+            if not manager.delete(args.target, ask):
+                print(t('cancelled'))
+        elif args.command == 'enter' or args.command == 'restart' and args.enter:
+            from .menu import post_terminal
+            after = post_terminal if args.consent is None else lambda _: args.consent
+            status = 0
+            try:
+                choice = (manager.enter(args.target, after) if args.command == 'enter'
+                          else manager.restart(args.target, enter=True, ask=after))
+            except ShellExitError as exc:
+                if not exc.return_to_menu:
+                    raise
+                progress.output.keep(f'mas: {exc}')
+                status, choice = 1, 'menu'
+            if choice == 'menu':
+                from .terminal_ui import run
+                status = 1 if run(manager, target=args.target) == 1 else status
+            return status
+        elif args.command == "stop" and args.all:
+            manager.stop_all()
+        else:
+            getattr(manager, args.command)(args.target)
+        return 0
+    except config.ConfigError as exc:
+        progress.output.keep(t(exc.key, **exc.values))
+        return 1
+    except (Error, OSError) as exc:
+        progress.output.keep(f"mas: {exc}")
+        return 1
+    except KeyboardInterrupt:
+        progress.output.keep(t("interrupted"))
+        return 130
+    finally:
+        progress.output.clear()
