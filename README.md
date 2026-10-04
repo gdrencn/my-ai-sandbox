@@ -2,21 +2,21 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 最新测试版：0.2.24
+## 当前版本：0.2.24
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
-0.2.24 修复终端放大/恢复时重复出现的菜单，安装语言选择、mas 菜单和独立安全挑战选择器共用修复后的组件。中英文真实终端重排测试验证原地替换活动区，保留默认选项、输入位置和历史。本地冻结包和公开一键入口均通过 444 项单元测试、全部 28 个真实 LXD 环节及一次 76 项完整挑战，分别耗时 1444.9 秒和 1439.7 秒，无跳过项、未执行环节或清理错误。普通安装、中英文公开缩放与取消、独立安全挑战、十二个附件及资源回收已核验；全部 39 个旧发布和 stable/0.1.15 保持不变，详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+0.2.24 修复终端放大/恢复时重复出现的菜单，安装语言选择、mas 菜单和独立安全挑战选择器共用修复后的组件。中英文真实终端重排测试验证原地替换活动区，保留默认选项、输入位置和历史。本地冻结包和公开 test 一键入口均通过 444 项单元测试、全部 28 个真实 LXD 环节及一次 76 项完整挑战，分别耗时 1444.9 秒和 1439.7 秒，无跳过项、未执行环节或清理错误。用户补充验证了实际终端缩放、宿主依赖安装初始化、完整测试和独立安全入口。本版现已发布 stable；原 test 发布及全部 40 个旧发布保留，详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
-## 安装阶段 1 稳定版（0.1.15）
+## 安装稳定版（0.2.24）
 
-[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15) 已发布；产品和安装程序与 [同版本 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15) 完全一致。固定入口安装最新 stable：
+[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.2.24) 已发布并设为 GitHub latest；产品和安装程序与 [同版本 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.24) 字节完全一致。固定入口安装最新 stable：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/stable/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash
 ```
 
-这个命令只下载安装所需文件，不下载测试工具。稳定版附件为产品、独立安装程序和校验清单；Git tag `stable/0.1.15` 仅用于区分发布渠道，程序版本仍为 `0.1.15`。stable 入口从 GitHub latest 解析当前稳定发布；产品版本与发布通道分开。
+这个命令只下载安装所需文件，不下载或覆盖测试工具。稳定版附件只有 `mas.pyz`、`mas-install.pyz` 和 `SHA256SUMS`；Git tag `stable/0.2.24` 用于区分发布渠道，程序版本仍为 `0.2.24`。整个稳定安装源码链来自独立 `release` 分支，产品和安装程序来自所选 stable 发布，不依赖 main。旧 `main/stable/install.sh` 入口兼容转发到该安装链。
 
 需要验证稳定版时，使用同版本 test 发布的自动化测试工具：
 
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/stable/i
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash
 ```
 
-不指定 `--release` 的原有入口仍安装最新测试版，不会因为本次 stable 发布而改变含义。发布前复核通过 162 项单元测试及全部 21 个测试环节，详情见 [审查记录](validation/STABLE_0_1_15_AUDIT.md) 与 [已实现文档](IMPLEMENTED.md)。
+稳定测试严格安装 stable 发布的实际产品和安装程序，只从相同数字版本的 test 发布下载测试工具；先核对两个清单中的产品、安装包哈希，再执行安装和测试，缺失或不一致时停止。稳定分支与稳定附件不包含测试程序或验证记录。公开稳定安装、下载来源追踪和完整 stable 测试均已通过：444 项单元测试、28 个真实环节和一次 76 项安全挑战，耗时 1362.9 秒，无跳过、未执行或清理错误。独立资源回收核验通过；证据见 [已实现文档](IMPLEMENTED.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
 
 ## 安装最新测试版
 
@@ -56,7 +56,8 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 | 入口 | 行为 |
 |---|---|
-| `stable/install.sh` | 安装最新 stable |
+| `release/install.sh` | 从稳定分支安装最新 stable |
+| `main/stable/install.sh` | 兼容转发到 `release/install.sh` |
 | `test/install.sh` | 安装最新 test，不运行测试 |
 | `test/test.sh` | 安装并测试最新 test |
 | `test/test-stable.sh` | 安装并测试当前 stable 的同版本产品 |
@@ -66,7 +67,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
 ```
 
-这些入口由同一个模板生成，仅转发通道和动作到共享安装入口。原 `main/install.sh` 及其 `--test`、`--release` 参数继续兼容，新增 `--security` 独立挑战动作。发布附件同时提供 `install-stable.sh`、`install-test.sh`、`test.sh`、`test-stable.sh`、`security.sh`，固定入口始终解析当前通道版本。
+这些入口由共享模板生成。稳定安装与稳定测试转发到 release 安装入口，test 安装、完整测试及独立挑战转发到 main 安装入口。原 `main/install.sh` 及其 `--test`、`--release`、`--security` 参数继续兼容。test 发布附件提供五个薄入口；stable 发布只有产品、安装程序和校验清单。
 
 ## 独立安全挑战
 
@@ -125,7 +126,7 @@ mas import restored demo.tar.gz
 - 删除和导出要求容器已停止。CLI 和 终端文本菜单 删除都要确认；导出文件存在时询问是否覆盖，默认选“否”。导入要求目标名称不存在。
 - 0.2.11 起仅管理本地 LXD `mas` Project 内标记为 `user.mas.managed=true` 的容器；不接管原生 lxc 创建的其他容器。该标记用于管理范围区分，不是对拥有 LXD 管理权限的用户的安全隔离。
 - 每秒探测一次，默认每个底层操作最多等待 10 分钟。可使用 `mas --timeout 1800 start demo` 延长，最小 300 秒。明确失败立即返回，成功必须同时满足原生命令完成和目标状态。
-- 阶段 1 稳定版不配置 GPU。0.2.1 测试版新增下述 GPU 模块；0.2.21 增加每个容器的网络开关，不增加端口映射或流量规则。
+- 当前稳定版包含下述 GPU 模块和每个容器的网络开关，不增加端口映射或流量规则。历史阶段 1 稳定版 0.1.15 不包含 GPU 模块。
 
 **备份是恢复用途，并非克隆模板。** LXD 导出会保留网卡 MAC。源容器与导入副本同时存在时，LXD 可能拒绝启动副本。恢复前先处理原容器；mas 不静默改写备份中的网络身份。
 

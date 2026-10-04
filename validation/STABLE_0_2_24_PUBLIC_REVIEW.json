@@ -1,0 +1,82 @@
+{
+  "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash",
+  "exit_code": 0,
+  "report": "/home/gordon/mas-stable-024/public-test/test-results/20261004-040440/report.json",
+  "before": {
+    "mas": {
+      "sha256": "27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf",
+      "mtime_ns": 1791104663717072112
+    },
+    "mas-test": {
+      "sha256": "f0cf1cfc5d9e2725da6481c231c8ecc474fddd7c51d1c90173962e3aa5d4c3e7",
+      "mtime_ns": 1791085220272046821
+    }
+  },
+  "after": {
+    "mas": {
+      "sha256": "27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf",
+      "mtime_ns": 1791104681857568295
+    },
+    "mas-test": {
+      "sha256": "f0cf1cfc5d9e2725da6481c231c8ecc474fddd7c51d1c90173962e3aa5d4c3e7",
+      "mtime_ns": 1791104681873739102
+    }
+  },
+  "units": 444,
+  "stages": 28,
+  "elapsed": 1362.8669959649997,
+  "cleanup_errors": [],
+  "boundary_counts": {
+    "PASS": 76
+  },
+  "single_final_challenge": true,
+  "project": "test-54e426dabd564943ad37aa7fa01435b5",
+  "staging_projects": [
+    "mas-import-03bd4f94bb89419d82e2251f0319a7ed",
+    "mas-import-2790ff1b624e42b29cbbb9dfbf7d22f1",
+    "mas-import-690d36a4bfcb46218d5c3c48faa62208",
+    "mas-import-70caae70113d4bffbdfc1a8b6638fabd",
+    "mas-import-7807e2af3984426cad4efe29bf6d71ed",
+    "mas-import-7a056fd136a440cb92e27e76e9a73d25"
+  ],
+  "legacy_resources_absent": true,
+  "mount_record_empty": true,
+  "mount_record": {
+    "version": 1,
+    "directories": {},
+    "mounts": []
+  },
+  "mount_directories_backups_helpers_absent": true,
+  "earlier_releases_unchanged": 40,
+  "stable_release": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.2.24",
+  "metadata_excludes_automatic_asset_download_count": true,
+  "automatic_download_count_changes": [
+    {
+      "release": "v0.2.24",
+      "asset": "mas-install.pyz",
+      "before": 6,
+      "after": 7
+    },
+    {
+      "release": "v0.2.24",
+      "asset": "mas-test.pyz",
+      "before": 7,
+      "after": 9
+    },
+    {
+      "release": "v0.2.24",
+      "asset": "mas.pyz",
+      "before": 6,
+      "after": 7
+    },
+    {
+      "release": "v0.2.24",
+      "asset": "SHA256SUMS",
+      "before": 7,
+      "after": 9
+    }
+  ],
+  "stable_commit": "bf381456c0109237da296c02485dd6a6712522f1",
+  "github_latest": true,
+  "stable_assets_verified": true
+}

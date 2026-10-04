@@ -1,0 +1,30 @@
+{
+  "version": "0.2.24",
+  "urls": [
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/bootstrap.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/config.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/i18n.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/menu.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/output.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/text.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/diagnostics.py",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/locales/en_us.json",
+    "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/mas/locales/zh_cn.json",
+    "https://api.github.com/repos/gdrencn/my-ai-sandbox/releases/latest",
+    "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.24/SHA256SUMS",
+    "https://api.github.com/repos/gdrencn/my-ai-sandbox/releases/tags/v0.2.24",
+    "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/SHA256SUMS",
+    "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.24/mas.pyz",
+    "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.24/mas-install.pyz",
+    "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/mas-test.pyz"
+  ],
+  "downloaded_hashes": {
+    "mas-test.pyz": "f0cf1cfc5d9e2725da6481c231c8ecc474fddd7c51d1c90173962e3aa5d4c3e7",
+    "mas-install.pyz": "e0e613ad304750e8006187eab7ecfff0888758862b2df8447047139999772952",
+    "mas.pyz": "27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf"
+  },
+  "source_from_release_only": true,
+  "product_installer_from_stable_only": true,
+  "tester_from_exact_test_release": true,
+  "execution": "Read-only download trace; installer execution verified separately."
+}

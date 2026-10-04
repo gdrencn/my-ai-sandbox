@@ -1,0 +1,26 @@
+{
+  "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash -s -- --language zh_cn",
+  "exit_code": 0,
+  "before": {
+    "mas": {
+      "sha256": "27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf",
+      "mtime_ns": 1791085220258920823
+    },
+    "mas-test": {
+      "sha256": "f0cf1cfc5d9e2725da6481c231c8ecc474fddd7c51d1c90173962e3aa5d4c3e7",
+      "mtime_ns": 1791085220272046821
+    }
+  },
+  "after": {
+    "mas": {
+      "sha256": "27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf",
+      "mtime_ns": 1791104663717072112
+    },
+    "mas-test": {
+      "sha256": "f0cf1cfc5d9e2725da6481c231c8ecc474fddd7c51d1c90173962e3aa5d4c3e7",
+      "mtime_ns": 1791085220272046821
+    }
+  },
+  "tester_preserved": true,
+  "product_matches_accepted_test": true
+}

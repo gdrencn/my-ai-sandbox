@@ -1,6 +1,6 @@
 # Container operation behavior
 
-This inventories the current shared behavior through batch 0.2.24. CLI and text menus call the same Manager; host installation is separate. Phase 1 stable remains the unchanged 0.1.15 release. Later sections labeled with earlier batches retain their historical scope.
+This inventories the shared product behavior shipped in test v0.2.24 and stable/0.2.24. CLI and text menus call the same Manager; host installation is separate. Stable product and installer bytes match the accepted test release. The stable installation chain uses release source and stable assets; verification obtains only the exact paired tester from v0.2.24. Sections labeled with earlier batches retain their historical scope.
 
 ## Shared menu resize boundary
 

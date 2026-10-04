@@ -1,3 +1,14 @@
+# 0.2.24 — Stable 发布（2026-10-04）
+
+- 将用户已验收的 v0.2.24 发布为 stable/0.2.24，并设为 GitHub latest。产品与独立安装程序字节不变，程序版本仍为 0.2.24；原 test 发布和全部 40 个旧发布、附件保留。
+- 新建独立 release 分支，只保存稳定产品、安装和共用构建源码及相关文档，不包含测试程序、测试入口或验证记录。稳定安装完整源码链来自 release，产品和安装程序来自所选 stable 发布。
+- 稳定附件仅为 mas.pyz、mas-install.pyz、SHA256SUMS。main/test/test-stable.sh 使用实际稳定产品与安装程序，严格配对 v0.2.24 测试工具；版本、清单或下载不一致时明确停止。
+- 共用渠道逻辑的 448 项私有打包回归通过；公开稳定入口使用未改动的 444 项测试工具，通过全部 28 个实机环节和一次 76 项安全挑战，耗时 1362.9 秒，无跳过、未执行或清理错误。普通安装保留现有测试工具，独立来源追踪、附件校验和资源回收均通过。
+
+安装：`curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash`。完整验证：`curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash`。
+
+Agent 实测仍为已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64；用户另行提供宿主依赖安装初始化、实际终端缩放及独立安全挑战成功记录。未新增原生 Ubuntu/cloud、ARM64、其他 GPU 或存储后端实测。详见 IMPLEMENTED.md Stage 44 和 validation/STABLE_0_2_24_*.json。
+
 # 0.2.24 — 共用菜单缩放重绘修复（test）
 
 - 修复终端放大/恢复后语言菜单不断重复的问题：共用 Screen 组件从活动区起点清理和重绘，安装器、mas 菜单及独立安全挑战选择器一起生效。

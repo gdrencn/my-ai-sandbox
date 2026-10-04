@@ -1,5 +1,9 @@
 # Menu interaction review — October 2026
 
+## Stable 0.2.24 user acceptance (2026-10-04)
+
+The user confirmed that terminal maximization/restoration no longer duplicates menus, supplied two successful complete v0.2.24 runs and an independent security run using shared container selection, and authorized stable publication. This is user-reported native-terminal acceptance, separate from the recorded tmux/PTy evidence. Stable product/installer bytes and all menu behavior remain identical to the accepted v0.2.24 test release; promotion changes distribution routing only.
+
 These recommendations were requested alongside the 0.2.12 test/probe review and all ten were approved for batch 0.2.13. REQUIREMENTS.md section 42 records their implementation and acceptance scope. All ten are implemented and locally verified in frozen 0.2.13: 340 packaged units and 26 native stages passed in 663.7 seconds. Public-entry verification also passed all 340 units and 26 stages in 634.3 seconds, with no skipped units or cleanup errors; see validation/V0_2_13_PUBLIC_REPORT.json. Existing lifecycle, default-No confirmations, arrow navigation, inline history and exit-to-host-shell behavior remain the accepted baseline.
 
 ## Approved changes implemented in 0.2.13

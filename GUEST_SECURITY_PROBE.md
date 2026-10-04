@@ -4,6 +4,8 @@
 
 ## 使用入口
 
+验证当前稳定版的安装和完整测试时使用 `main/test/test-stable.sh`，它从 release 安装链和 stable 发布取得实际产品、安装程序，并严格配对同数字版本的 test 工具。release 分支和稳定附件不包含安全挑战程序；下面两个入口属于 test 渠道。当前 stable/0.2.24 与 v0.2.24 的产品和安装程序字节一致。
+
 安装并运行全部自动化测试：
 
     curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash
