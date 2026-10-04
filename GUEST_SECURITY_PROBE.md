@@ -1,6 +1,6 @@
 # 容器安全挑战
 
-v0.2.22 的自动化测试与独立宿主入口共用 mas/security_testing.py，以及原有 host_security_probe.py、guest_security_probe.py。宿主采集参照并传入容器，内部探针在容器运行，完整结果在宿主输出。security-host.sh 不提供，容器内不提供独立一键入口。
+当前版本的自动化测试与独立宿主入口共用 mas/security_testing.py，以及原有 host_security_probe.py、guest_security_probe.py。宿主采集参照并传入容器，内部探针在容器运行，完整结果在宿主输出。security-host.sh 不提供，容器内不提供独立一键入口。
 
 ## 使用入口
 
@@ -190,3 +190,8 @@ JSON schema 为 2。`checks` 中每项只有 PASS/FAIL（通过/失败），保�
 ## 0.2.22 独立公开入口验证
 
 本批保留同一宿主挑战模块与既有断言。实际公开 security.sh 在网络关闭、GPU 开启的临时容器上验证最初 Stopped 的选择组件和最初 Running 的 CLI TARGET；两次均为 76 项通过、0 项失败，恢复原运行状态。临时容器按原 UUID 核验后删除。报告与清理证据见 validation/V0_2_22_PUBLIC_SECURITY_STOPPED.json、V0_2_22_PUBLIC_SECURITY_RUNNING.json、V0_2_22_PUBLIC_SECURITY_REVIEW.json 和 V0_2_22_PUBLIC_SECURITY_CLEANUP.json。本地冻结包与实际公开 test/test.sh 全套测试也各运行一次最终独立容器挑战，均为 76 项通过、0 项失败；两套完整测试均通过 428 项单元测试和全部 28 个环节，分别耗时 1448.8 秒和 1500.0 秒，无跳过项、未执行环节或清理错误。公开报告与独立清理证据见 validation/V0_2_22_PUBLIC_REPORT.json 和 V0_2_22_PUBLIC_REVIEW.json。本轮实测限于已准备好的 Ubuntu 26.04 WSL/LXD 6.9/NVIDIA x86_64 宿主。
+
+
+## 0.2.24 选择组件与独立公开入口验证
+
+共用菜单组件修复缩放后的重复显示，独立入口复用相同组件，挑战模块及隔离断言保持原样。实际公开 security.sh 的选择器通过三次尺寸变化后的显示核验，再挑战网络关闭、GPU 开启的最初 Stopped 容器；显式 CLI TARGET 另行挑战最初 Running 容器。两次各为 76 项通过、0 项失败，保留原 UUID 并恢复原运行状态。临时容器核验原 UUID 后已删除。证据见 validation/V0_2_24_PUBLIC_SECURITY_REVIEW.json、V0_2_24_PUBLIC_SECURITY_STOPPED.json、V0_2_24_PUBLIC_SECURITY_RUNNING.json 和 V0_2_24_PUBLIC_SECURITY_CLEANUP.json。共用组件的真实终端重排范围与历史保留限制见 IMPLEMENTED.md Stage 43；本地冻结包和公开 test/test.sh 全套测试各只运行一次最终挑战，均为 76 项通过、0 项失败；两套完整测试均通过 444 项单元测试和全部 28 个环节，分别耗时 1444.9 秒和 1439.7 秒，无跳过、未执行或清理错误。完整报告与独立回收证据见 validation/V0_2_24_LOCAL_REPORT.json、V0_2_24_LOCAL_REVIEW.json、V0_2_24_PUBLIC_REPORT.json 和 V0_2_24_PUBLIC_REVIEW.json。

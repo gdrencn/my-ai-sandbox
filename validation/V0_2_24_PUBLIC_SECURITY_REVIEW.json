@@ -1,0 +1,35 @@
+[
+  {
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash",
+    "report": "/tmp/mas-v0.2.24-public-security/security-20261003-223939-ed3bd954.json",
+    "counts": {
+      "PASS": 76,
+      "FAIL": 0
+    },
+    "network": "off",
+    "lifecycle": {
+      "initial_status": "Stopped",
+      "identity": "5c1eafdc-683c-4694-9cf6-cf8fb0dddb44",
+      "actions": [
+        "start",
+        "stop"
+      ],
+      "final_status": "Stopped"
+    }
+  },
+  {
+    "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test-eeba40d6e41b4de69409679d3164659d --report /tmp/mas-v0.2.24-public-security/running.json",
+    "report": "/tmp/mas-v0.2.24-public-security/running.json",
+    "counts": {
+      "PASS": 76,
+      "FAIL": 0
+    },
+    "network": "off",
+    "lifecycle": {
+      "initial_status": "Running",
+      "identity": "5c1eafdc-683c-4694-9cf6-cf8fb0dddb44",
+      "actions": [],
+      "final_status": "Running"
+    }
+  }
+]

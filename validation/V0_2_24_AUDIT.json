@@ -1,6 +1,6 @@
 {
   "version": "0.2.24",
-  "status": "local_final_verified_publication_pending",
+  "status": "published_and_verified",
   "authorization": "对，这种就应该修复组件。没错。",
   "component": "mas/menu.py Screen",
   "code_changes": [
@@ -27,7 +27,16 @@
       "elapsed": 1444.8585458309972,
       "cleanup_independently_verified": true
     },
-    "public_verification": "pending",
+    "public_verification": {
+      "units": 444,
+      "stages": 28,
+      "boundary": {
+        "PASS": 76,
+        "FAIL": 0
+      },
+      "elapsed": 1439.665834784988,
+      "cleanup_independently_verified": true
+    },
     "shellcheck": "Rendered scripts pass; raw install template excludes generated-use SC2034 only",
     "python_310": true,
     "locale_keys": 338,
@@ -116,6 +125,23 @@
         "V0_2_24_EMULATOR_REVIEW.json",
         "V0_2_24_BOOTSTRAP_RESIZE.json"
       ]
+    },
+    {
+      "cycle": 5,
+      "finding": "Current status headers in IMPLEMENTED, TEST_COVERAGE and GUEST_SECURITY_PROBE still named 0.2.22",
+      "correction": "Update current baselines and preserve historical stage records",
+      "verification": "Headers now describe 0.2.24 with exact completed checks and pending public-suite result"
+    },
+    {
+      "cycle": 6,
+      "findings": [],
+      "verification": [
+        "Final frozen and exact public suites each passed 444 units, all 28 stages and one 76-check challenge",
+        "No skips, unexecuted stages or cleanup errors",
+        "Bilingual public native resize/cancellation, ordinary installation and independent security state restoration passed",
+        "Twelve assets, manifest, four entries, all 39 earlier releases and latest stable/0.1.15 verified",
+        "Current code and eight documentation files reviewed; no unresolved confirmed finding in this batch"
+      ]
     }
   ],
   "limits": [
@@ -134,5 +160,53 @@
     "MENU_REVIEW.md",
     "RELEASE_NOTES.md"
   ],
-  "stable": "stable/0.1.15 unchanged"
+  "stable": "stable/0.1.15 unchanged",
+  "publication": {
+    "tag": "v0.2.24",
+    "source_commit": "bf2debc8206a4b95ab2f18b112b0414f3243a37e",
+    "assets": 12,
+    "earlier_releases_unchanged": 39,
+    "latest": "stable/0.1.15",
+    "draft_asset_bytes_matched": true,
+    "ordinary_install_preserves_tester": true,
+    "public_resize_both_languages": true,
+    "cancel_exit_code": 130,
+    "independent_security": [
+      {
+        "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash",
+        "report": "/tmp/mas-v0.2.24-public-security/security-20261003-223939-ed3bd954.json",
+        "counts": {
+          "PASS": 76,
+          "FAIL": 0
+        },
+        "network": "off",
+        "lifecycle": {
+          "initial_status": "Stopped",
+          "identity": "5c1eafdc-683c-4694-9cf6-cf8fb0dddb44",
+          "actions": [
+            "start",
+            "stop"
+          ],
+          "final_status": "Stopped"
+        }
+      },
+      {
+        "command": "curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test-eeba40d6e41b4de69409679d3164659d --report /tmp/mas-v0.2.24-public-security/running.json",
+        "report": "/tmp/mas-v0.2.24-public-security/running.json",
+        "counts": {
+          "PASS": 76,
+          "FAIL": 0
+        },
+        "network": "off",
+        "lifecycle": {
+          "initial_status": "Running",
+          "identity": "5c1eafdc-683c-4694-9cf6-cf8fb0dddb44",
+          "actions": [],
+          "final_status": "Running"
+        }
+      }
+    ],
+    "security_selector_resize": true,
+    "owned_security_fixture_removed": true
+  }
 }
