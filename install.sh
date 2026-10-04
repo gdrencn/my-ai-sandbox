@@ -224,4 +224,4 @@ for name in ('bootstrap.py', 'mas/config.py', 'mas/i18n.py', 'mas/menu.py', 'mas
 for name in ('mas/__init__.py', 'mas/locales/__init__.py'):
     (root / name).touch()
 PY
-python3 "$mas_bootstrap/bootstrap.py" "$@"
+python3 "$mas_bootstrap/bootstrap.py"  "$@"

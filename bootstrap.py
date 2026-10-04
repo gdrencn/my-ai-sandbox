@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stable entry: resolve the newest test prerelease and verify its assets."""
+"""Shared channel entry: resolve releases and verify exact installation assets."""
 
 import os
 import hashlib
@@ -38,6 +38,8 @@ def release(version=None, *, channel="test"):
         result = json.loads(download(base + "/tags/v" + version.removeprefix("v")))
         if result.get("draft"):
             raise RuntimeError(t("release_unpublished"))
+        if result.get('tag_name') != 'v' + version.removeprefix('v'):
+            raise RuntimeError(t('stable_version_mismatch'))
         return result
     matches = []
     for page in range(1, 101):
@@ -77,15 +79,20 @@ def main():
     if test_args and not (args.test or args.security):
         parser.error(t("extra_test_args"))
     selected = release(args.release) if args.channel == "test" else release(args.release, channel="stable")
-    stable_product = selected if args.channel == "stable" and args.test else None
-    if stable_product is not None:
-        selected = release(stable_product["tag_name"].split("/")[-1])
     print(t("security_loading" if args.security else "installing", version=selected["tag_name"]), flush=True)
     assets = asset_urls(selected)
     checksums = release_checksums(assets)
-    if stable_product is not None:
-        stable_sums = release_checksums(asset_urls(stable_product))
-        if any(not stable_sums.get(name) or stable_sums[name] != checksums.get(name)
+    if args.channel == 'stable' and any(name not in assets or name not in checksums
+                                      for name in ('mas.pyz', 'mas-install.pyz')):
+        raise RuntimeError(t('no_release'))
+    tester_assets, tester_checksums = assets, checksums
+    if args.channel == 'stable' and (args.test or args.security):
+        paired = release(selected['tag_name'].split('/')[-1])
+        if paired.get('tag_name') != 'v' + selected['tag_name'].split('/')[-1]:
+            raise RuntimeError(t('stable_version_mismatch'))
+        tester_assets = asset_urls(paired)
+        tester_checksums = release_checksums(tester_assets)
+        if any(not checksums.get(name) or checksums[name] != tester_checksums.get(name)
                for name in ('mas.pyz', 'mas-install.pyz')):
             raise RuntimeError(t('stable_version_mismatch'))
     with tempfile.TemporaryDirectory(prefix="mas-install-") as directory:
@@ -95,8 +102,9 @@ def main():
         if args.test:
             names.append("mas-test.pyz")
         for name in names:
-            data = download(assets[name])
-            if hashlib.sha256(data).hexdigest() != checksums[name]:
+            source_assets, source_checksums = (tester_assets, tester_checksums) if name == 'mas-test.pyz' else (assets, checksums)
+            data = download(source_assets[name])
+            if hashlib.sha256(data).hexdigest() != source_checksums[name]:
                 raise RuntimeError(t("checksum_error", name=name))
             paths[name] = Path(directory) / name
             paths[name].write_bytes(data)

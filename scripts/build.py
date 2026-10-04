@@ -2,6 +2,7 @@
 """Build architecture-independent zipapps without pip or external tools."""
 
 import hashlib
+import argparse
 import json
 import shlex
 from pathlib import Path
@@ -15,7 +16,10 @@ DIST = ROOT / "dist"
 sys.path.insert(0, str(ROOT))
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--stable', action='store_true', help='Build product and installer without test files.')
+    args = parser.parse_args(argv)
     DIST.mkdir(exist_ok=True)
     messages = json.loads((ROOT / "mas/locales/zh_cn.json").read_text())
     installer = (ROOT / "scripts/install.template.sh").read_text()
@@ -32,6 +36,8 @@ def main():
     installer = installer.replace('@BOOTSTRAP_TERMINAL_NARROW@',
         shlex.quote(messages['bootstrap_terminal_narrow'].format(columns=minimum)))
     installer = installer.replace('@DEPENDENCIES@', (ROOT / 'mas/dependencies.sh').read_text())
+    installer = installer.replace('@SOURCE_BRANCH@', 'release' if args.stable else 'main')
+    installer = installer.replace('@CHANNEL_ARGUMENTS@', '--channel stable' if args.stable else '')
     for language, suffix in (('zh_cn', 'ZH'), ('en_us', 'EN')):
         catalog = json.loads((ROOT / 'mas/locales' / (language + '.json')).read_text())
         for key in ('apt_setup', 'apt_done', 'apt_failed'):
@@ -43,16 +49,19 @@ def main():
                "test/test.sh": ("--channel", "test", "--test"),
                "test/test-stable.sh": ("--channel", "stable", "--test"),
                "test/security.sh": ("--channel", "test", "--security")}
-    for path, arguments in entries.items():
+    for path, arguments in (() if args.stable else entries.items()):
+        branch = 'release' if '--channel' in arguments and arguments[1] == 'stable' else 'main'
         wrapper = (ROOT / 'scripts/channel.template.sh').read_text().replace('@ARGUMENTS@', shlex.join(arguments))
+        wrapper = wrapper.replace('@SOURCE_BRANCH@', branch)
         target = ROOT / path
         target.parent.mkdir(exist_ok=True)
         target.write_text(wrapper)
         target.chmod(0o755)
 
-    for filename, entry in (("mas.pyz", "mas.cli:main"),
-                            ("mas-install.pyz", "mas.install:main"),
-                            ("mas-test.pyz", "mas.testing:main")):
+    archives = [("mas.pyz", "mas.cli:main"), ("mas-install.pyz", "mas.install:main")]
+    if not args.stable:
+        archives.append(("mas-test.pyz", "mas.testing:main"))
+    for filename, entry in archives:
         with tempfile.TemporaryDirectory() as directory:
             stage = Path(directory)
             excluded = ["__pycache__"]
@@ -81,14 +90,14 @@ def main():
                         info.external_attr = 0o100644 << 16
                         package.writestr(info, source.read_bytes())
             archive.chmod(0o755)
-    for name in ("bootstrap.py", "install.sh"):
+    for name in (() if args.stable else ("bootstrap.py", "install.sh")):
         shutil.copyfile(ROOT / name, DIST / name)
     entry_assets = {"install-stable.sh": "stable/install.sh", "install-test.sh": "test/install.sh",
                     "test.sh": "test/test.sh", "test-stable.sh": "test/test-stable.sh",
                     "security.sh": "test/security.sh"}
-    for name, path in entry_assets.items():
+    for name, path in (() if args.stable else entry_assets.items()):
         shutil.copyfile(ROOT / path, DIST / name)
-    names = ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh", *entry_assets)
+    names = ("mas.pyz", "mas-install.pyz") if args.stable else ("mas.pyz", "mas-install.pyz", "mas-test.pyz", "bootstrap.py", "install.sh", *entry_assets)
     (DIST / "SHA256SUMS").write_text("".join(
         hashlib.sha256((DIST / name).read_bytes()).hexdigest() + "  " + name + "\n" for name in names))
     print("Built " + ", ".join(names))

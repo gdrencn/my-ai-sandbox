@@ -3,5 +3,5 @@
 set -euo pipefail
 mas_entry=$(mktemp)
 trap 'rm -f "$mas_entry"' EXIT
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh -o "$mas_entry"
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/@SOURCE_BRANCH@/install.sh -o "$mas_entry"
 bash "$mas_entry" @ARGUMENTS@ "$@"

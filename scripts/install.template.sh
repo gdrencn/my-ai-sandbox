@@ -81,7 +81,7 @@ python3 - "$mas_bootstrap" <<'PY'
 from pathlib import Path
 import sys, urllib.request
 root = Path(sys.argv[1])
-base = 'https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/'
+base = 'https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/@SOURCE_BRANCH@/'
 for name in ('bootstrap.py', 'mas/config.py', 'mas/i18n.py', 'mas/menu.py', 'mas/output.py', 'mas/text.py', 'mas/diagnostics.py', 'mas/locales/en_us.json', 'mas/locales/zh_cn.json'):
     destination = root / name
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -90,4 +90,4 @@ for name in ('bootstrap.py', 'mas/config.py', 'mas/i18n.py', 'mas/menu.py', 'mas
 for name in ('mas/__init__.py', 'mas/locales/__init__.py'):
     (root / name).touch()
 PY
-python3 "$mas_bootstrap/bootstrap.py" "$@"
+python3 "$mas_bootstrap/bootstrap.py" @CHANNEL_ARGUMENTS@ "$@"
