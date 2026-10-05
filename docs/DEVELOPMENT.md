@@ -68,19 +68,23 @@ python3 -m unittest discover -v
 It has one intentional archive-only skip. Final no-skip evidence comes from the packaged tester, outside the checkout. This exact command only runs units and does not install mas or create LXD containers:
 
 ```bash
-python3 -I - /absolute/path/dist/mas-test.pyz <<'PY'
+python3 -I - /absolute/path/dist/mas-test.pyz /absolute/path/dist/mas.pyz <<'PY'
 import sys
 import unittest
-sys.path.insert(0, sys.argv[1])
-from mas.testing import unit_modules
-modules = unit_modules()
+from pathlib import Path
+tester, product = (Path(value).resolve() for value in sys.argv[1:])
+sys.path.insert(0, str(tester))
+import mas.testing as testing
+sys.argv = [str(tester)]
+testing.PRODUCT_UNDER_TEST = product
+modules = testing.unit_modules()
 suite = unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(m) for m in modules)
 result = unittest.TextTestRunner(verbosity=2).run(suite)
 raise SystemExit(0 if result.wasSuccessful() and not result.skipped else 1)
 PY
 ```
 
-Current discovery contains 449 tests. Use real PTYs/display-engine captures for terminal behavior, not just returned strings. Test subprocesses use mas.testing.python_command with an explicit archive/source root; do not depend on cwd/PYTHONPATH or optimized Python. For code changes run appropriate focused tests first, then frozen packaged/full native checks required by the batch. Docs/handoff changes require restore/rebuild/units and document/artifact checks; a new native run is justified only by a concrete concern.
+Current discovery contains 449 tests. The unit-only command must set sys.argv[0] to the tester archive and PRODUCT_UNDER_TEST to the product archive, matching the public tester's normal initialization: archive-dependent fixtures read that entry, and the product boundary check requires its paired archive. Use real PTYs/display-engine captures for terminal behavior, not just returned strings. Test subprocesses use mas.testing.python_command with an explicit archive/source root; do not depend on cwd/PYTHONPATH or optimized Python. For code changes run appropriate focused tests first, then frozen packaged/full native checks required by the batch. Docs/handoff changes require restore/rebuild/units and document/artifact checks; a new native run is justified only by a concrete concern.
 
 ## Native and public verification
 
