@@ -1,0 +1,143 @@
+{
+  "documentation_audit": {
+    "documentation_count": 25,
+    "local_links_checked": 111,
+    "link_errors": [],
+    "source_baseline": "477f6a5b0c343c642e5cf2b8ec0832aac3a946b6",
+    "historical_documents": [
+      {
+        "original": "README.md",
+        "baseline_sha256": "80b3087038d582bf7e361b1adafad1d5d061f52f8af473b101c1cf8e64107fab",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "REQUIREMENTS.md",
+        "baseline_sha256": "346633d7422cc971353ff87d03542429e4cfc5df310b8796caab029dfdf7624a",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "IMPLEMENTED.md",
+        "baseline_sha256": "3f76f714a0d4f03587d21625a1270bd5c4238ee4bcd3fc951b162f8c2e31297a",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "CORE_BEHAVIOR.md",
+        "baseline_sha256": "3e3512db01b85e720cdf03cc94454ca4db96fd550ba6301636b93dcc736c3a25",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "TEST_COVERAGE.md",
+        "baseline_sha256": "24b1242722cdad11d2e04be396165db1033b88b71794686462c03fe7adc575e3",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "GUEST_SECURITY_PROBE.md",
+        "baseline_sha256": "f903f259093d7201f5d995ce506c48f19e95fa76804a9207f54ed0b18fb014da",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "MENU_REVIEW.md",
+        "baseline_sha256": "3dda1cd9e80aa088b26bf9e57da794b7f8463650eacc9db7ab211681fcb19eeb",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "RELEASE_NOTES.md",
+        "baseline_sha256": "bfb2699d4433c80c26bd37a881b7a6d2812811a7dba9d02e96d183c5f0fa51ec",
+        "preserved_except_notice_and_relative_links": true
+      }
+    ],
+    "unchanged_preexisting_non_document_non_validation_files": 83,
+    "guideline_sha256": "78cbcedfc58b96da650558628b89c34f55b9533d30a6d4cf1bcc4ff97132a1d5",
+    "global_workflow_copied": true,
+    "published_release_catalog_count": 43,
+    "current_facts_reviewed": [
+      "0.2.25 About/version/Back and stable acceptance",
+      "CLI parser and shared Manager/module responsibilities",
+      "25 APT packages, new ends Stopped",
+      "isolation config/device policy, safe stop and recovery",
+      "NIC and GPU approved resources",
+      "filesystem paths, private registry and native metadata semantics",
+      "installer/channel/template/build exclusions and 11 generated/12 published test assets",
+      "449 units; 1 unit + 26 functional + 1 final challenge; 76 current challenge checks",
+      "original final validation receipts and user/agent/platform distinctions",
+      "pending decisions retained without implementation authorization"
+    ]
+  },
+  "private_pilot_restore": {
+    "archive_sha256": "941fda97b40853b1174f75e329926aa6c9acdb1d5cf45a2890234a922bae3dd0",
+    "archive_size": 3529781,
+    "baseline_main_commit": "b2ad350aff558fee11775a00ed3643a4d735c2e5",
+    "restored_ref_count": 45,
+    "restored_tags": 43,
+    "branch_commit_counts": {
+      "main": 91,
+      "release": 2
+    },
+    "tracked_files": 332,
+    "checks": {
+      "external_checksums": true,
+      "internal_checksums": true,
+      "safe_archive_members": true,
+      "manifest_inventory": true,
+      "no_prerequisites_empty_repository_verify": true,
+      "full_git_fsck": true,
+      "offline_restore_all_non_file_protocols_disabled": true,
+      "space_in_destination_path": true,
+      "exact_heads_and_all_tags": true,
+      "public_origin_url": true,
+      "restore_refuses_empty_existing_directory": true,
+      "restore_refuses_nonempty_directory": true,
+      "restore_refuses_dangling_symlink": true,
+      "corrupt_bundle_rejected_before_clone": true,
+      "corrupt_outer_archive_rejected": true,
+      "builder_refuses_existing_output": true
+    }
+  },
+  "scope": "Private unpushed snapshot verifies committed-ref build/restore before freezing shared main. Final archive, unit and public checks follow in separate receipts.",
+  "deterministic_repeat_archive_manifest_checksums": true,
+  "restored_ten_generated_payloads_equal_accepted_v0_2_25_digests": {
+    "bootstrap.py": {
+      "sha256": "003bbe96dba1468f8ada2a2530a0534cc698b7c31d964a4ac71aa4b45c6a403d",
+      "size": 6636
+    },
+    "install-stable.sh": {
+      "sha256": "1c0c7e41e57ed8d661b6405292b681f1e0e03c0ac00fa907b2b474d84f90924c",
+      "size": 310
+    },
+    "install-test.sh": {
+      "sha256": "ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+      "size": 305
+    },
+    "install.sh": {
+      "sha256": "5e3ed2af2fbe265534921877393e0d60d5d49f7e0a9038c3e4f8412b704d84c7",
+      "size": 9677
+    },
+    "mas-install.pyz": {
+      "sha256": "6b8a48d19f146f6bf750edf833af7bedbc330d7f7c05fff20c69d511163ca08b",
+      "size": 67608
+    },
+    "mas-test.pyz": {
+      "sha256": "befd72eaf727736fc1a09e06c40728616ca3753e0c3c06b768e383e12a94bfa9",
+      "size": 240431
+    },
+    "mas.pyz": {
+      "sha256": "fc4acabba8c8974bd9c99f01b82f074b36424646d1c57c474d6eb763f8a50ffc",
+      "size": 65010
+    },
+    "security.sh": {
+      "sha256": "611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+      "size": 316
+    },
+    "test-stable.sh": {
+      "sha256": "fa05a243d2bcf021bafdbf35a099dfa42ee8be685a7f532907127028ffb0cf46",
+      "size": 317
+    },
+    "test.sh": {
+      "sha256": "19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+      "size": 312
+    }
+  },
+  "published_manifest_adds_frozen_WSL_REPORT_entry": true,
+  "restored_build_tracked_source_unchanged": true,
+  "python_3_10_grammar_bash_syntax_shellcheck": true
+}

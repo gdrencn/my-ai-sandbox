@@ -1,10 +1,4 @@
-# 0.2.25 — 文档整理与开发交接（非产品发布）
-
-本批经用户明确授权，整理当前需求、实现、使用、共享行为、菜单、安全和测试范围，补齐项目内工作规范、终端规范、开发/构建/发布指南及新 Codex 接手入口。八份原始主文档保存在 [docs/history](docs/history/README.md)，保留旧决策与验证记录。交接包从已提交的 main 基准封装完整 main/release/标签历史，包含离线恢复、精确清单和内外校验和；核验与上传结果在 [IMPLEMENTED.md](IMPLEMENTED.md) 阶段 47 记录。
-
-本批保持产品版本 0.2.25，不改变 stable/test 产品、安装包和测试工具，不移动 release 或原标签，不创建新 GitHub Release。接手指南：[handoff/START_HERE.md](handoff/START_HERE.md)。
-
-以下发布条目记录各版本当时的状态，阶段编号和延期事项应结合 [历史实现记录](docs/history/IMPLEMENTED_0_2_25.md) 阅读；当前事实以 IMPLEMENTED.md 和 REQUIREMENTS.md 为准。
+> Historical snapshot of `RELEASE_NOTES.md` at main `477f6a5b0c343c642e5cf2b8ec0832aac3a946b6` before the documentation/handoff batch. Statements about current versions, pending work and machine paths below are historical. Only this notice and relative Markdown links were adjusted; use the root documents for current guidance.
 
 # 0.2.25 — Stable 发布（2026-10-04）
 

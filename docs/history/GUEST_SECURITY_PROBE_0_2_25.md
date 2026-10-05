@@ -1,3 +1,5 @@
+> Historical snapshot of `GUEST_SECURITY_PROBE.md` at main `477f6a5b0c343c642e5cf2b8ec0832aac3a946b6` before the documentation/handoff batch. Statements about current versions, pending work and machine paths below are historical. Only this notice and relative Markdown links were adjusted; use the root documents for current guidance.
+
 # 容器安全挑战
 
 当前版本的自动化测试与独立宿主入口共用 mas/security_testing.py，以及原有 host_security_probe.py、guest_security_probe.py。宿主采集参照并传入容器，内部探针在容器运行，完整结果在宿主输出。security-host.sh 不提供，容器内不提供独立一键入口。
@@ -18,7 +20,7 @@
 
 交互时使用与 mas 相同的容器选择组件；显示容器名和状态，默认选中第一个容器，↑/↓ 移动，Enter/→ 确定，Esc/← 取消。没有可测试容器时提示并正常结束，不请求输入名称，不改变状态。无终端且列表非空时必须提供 TARGET，例如：
 
-    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test --report ./security-test.json
+    curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test --report /home/gordon/security-test.json
 
 独立入口只下载经发布清单校验的测试工具，不安装或覆盖 mas。宿主需要 Python 3.10+、lxc、LXD 访问权限和专用 mas Project 中的托管容器；不采用 lxc 当前 Project。容器需要 Python 3.10+，内部探针通过 LXD exec 以 root 运行，无需安装挑战软件。容器内误运行独立入口会明确报错。
 
@@ -184,8 +186,16 @@ JSON schema 为 2。`checks` 中每项只有 PASS/FAIL（通过/失败），保�
 
 依据：[LXD 安全模型](https://canonical.com/lxd/docs/latest/explanation/security/)、[Linux binfmt_misc 文档](https://docs.kernel.org/6.12/admin-guide/binfmt-misc.html)、[Linux 6.12 按 user namespace 分离的 binfmt_misc 实现](https://github.com/torvalds/linux/blob/v6.12/fs/binfmt_misc.c)、[Linux 设备编号](https://docs.kernel.org/admin-guide/devices.html)、[Unix socket peer credentials](https://man7.org/linux/man-pages/man7/unix.7.html)。
 
-## 当前验证与历史证据
+## 0.2.21 发布验证
 
-当前 stable/0.2.25 的实际公开完整入口通过 449 项单元测试、28 个阶段及一次 76-PASS/0-FAIL 挑战，耗时 1408.6 秒，未跳过、未留有未执行阶段或清理错误。独立 Project、挂载、备份、辅助进程及安装哈希核验通过。证据见 [完整报告](validation/STABLE_0_2_25_PUBLIC_REPORT.json) 和 [独立复核](validation/STABLE_0_2_25_PUBLIC_REVIEW.json)。本批“关于”功能及 stable 晋升未改挑战断言。
+公开 test.sh 在项目目录之外完成 419 项单元测试及全部 28 个环节，只在功能测试结束后运行一次独立完整挑战，76 项通过、0 项失败。独立公开 security.sh 在网络关闭、GPU 开启的临时容器上分别验证最初停止和最初运行，两次均为 76 项通过，原状态恢复，临时容器已删除。公开工具与冻结文件一致。验证环境为已准备好的 Ubuntu 26.04 WSL、LXD 6.9 和 NVIDIA GPU；检查数量随实际设备、挂载和 socket 清单变化。完整证据见 validation/V0_2_21_PUBLIC_REPORT.json、V0_2_21_PUBLIC_SECURITY_STOPPED.json、V0_2_21_PUBLIC_SECURITY_RUNNING.json。
 
-原 v0.2.24 独立公开入口有 Stopped/Running 两种状态恢复、选择组件缩放与临时资源清理证据；用户也报告其现有容器独立挑战 76 项通过并恢复 Stopped。不要把它写成新跑的 0.2.25 独立挑战。历史独立入口、报告状态及实测结果见 [安全文档历史记录](docs/history/GUEST_SECURITY_PROBE_0_2_25.md)，当前平台界限见 [TEST_COVERAGE.md](TEST_COVERAGE.md#current-measured-limits)。
+
+## 0.2.22 独立公开入口验证
+
+本批保留同一宿主挑战模块与既有断言。实际公开 security.sh 在网络关闭、GPU 开启的临时容器上验证最初 Stopped 的选择组件和最初 Running 的 CLI TARGET；两次均为 76 项通过、0 项失败，恢复原运行状态。临时容器按原 UUID 核验后删除。报告与清理证据见 validation/V0_2_22_PUBLIC_SECURITY_STOPPED.json、V0_2_22_PUBLIC_SECURITY_RUNNING.json、V0_2_22_PUBLIC_SECURITY_REVIEW.json 和 V0_2_22_PUBLIC_SECURITY_CLEANUP.json。本地冻结包与实际公开 test/test.sh 全套测试也各运行一次最终独立容器挑战，均为 76 项通过、0 项失败；两套完整测试均通过 428 项单元测试和全部 28 个环节，分别耗时 1448.8 秒和 1500.0 秒，无跳过项、未执行环节或清理错误。公开报告与独立清理证据见 validation/V0_2_22_PUBLIC_REPORT.json 和 V0_2_22_PUBLIC_REVIEW.json。本轮实测限于已准备好的 Ubuntu 26.04 WSL/LXD 6.9/NVIDIA x86_64 宿主。
+
+
+## 0.2.24 选择组件与独立公开入口验证
+
+共用菜单组件修复缩放后的重复显示，独立入口复用相同组件，挑战模块及隔离断言保持原样。实际公开 security.sh 的选择器通过三次尺寸变化后的显示核验，再挑战网络关闭、GPU 开启的最初 Stopped 容器；显式 CLI TARGET 另行挑战最初 Running 容器。两次各为 76 项通过、0 项失败，保留原 UUID 并恢复原运行状态。临时容器核验原 UUID 后已删除。证据见 validation/V0_2_24_PUBLIC_SECURITY_REVIEW.json、V0_2_24_PUBLIC_SECURITY_STOPPED.json、V0_2_24_PUBLIC_SECURITY_RUNNING.json 和 V0_2_24_PUBLIC_SECURITY_CLEANUP.json。共用组件的真实终端重排范围与历史保留限制见 IMPLEMENTED.md Stage 43；本地冻结包和公开 test/test.sh 全套测试各只运行一次最终挑战，均为 76 项通过、0 项失败；两套完整测试均通过 444 项单元测试和全部 28 个环节，分别耗时 1444.9 秒和 1439.7 秒，无跳过、未执行或清理错误。完整报告与独立回收证据见 validation/V0_2_24_LOCAL_REPORT.json、V0_2_24_LOCAL_REVIEW.json、V0_2_24_PUBLIC_REPORT.json 和 V0_2_24_PUBLIC_REVIEW.json。

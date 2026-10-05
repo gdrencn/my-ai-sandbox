@@ -1,10 +1,16 @@
+> Historical snapshot of `README.md` at main `477f6a5b0c343c642e5cf2b8ec0832aac3a946b6` before the documentation/handoff batch. Statements about current versions, pending work and machine paths below are historical. Only this notice and relative Markdown links were adjusted; use the root documents for current guidance.
+
 # my-ai-sandbox
 
-基于 LXD 的容器管理工具。CLI 和终端文本菜单使用 Python 标准库，共用同一套容器操作。
+基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-当前 stable 和 test 的产品版本均为 **0.2.25**。“mas 选项 → 关于 my-ai-sandbox”显示当前版本并提供返回，`mas --version` 同样可用。stable 已获用户验收并完成公开验证。
+## 当前测试版与稳定版：0.2.25
 
-开发接手从 [handoff/START_HERE.md](handoff/START_HERE.md) 开始；文档职责与阅读顺序见 [文档索引](docs/README.md)，实测结果见 [IMPLEMENTED.md](IMPLEMENTED.md)。
+0.2.25 在“mas 选项”中新增“关于 my-ai-sandbox”，显示当前产品版本，并提供返回；沿用共享页面组件，返回保留选中位置。冻结包通过 449 项单元测试、28 个实机环节及一次 76 项安全挑战，耗时 1414.5 秒，无跳过、未执行或清理错误。已发布为 test 供用户验收；公开一键入口也通过相同的 449 项单元测试、28 个环节和一次 76 项安全挑战，耗时 1433.9 秒，无跳过、未执行或清理错误。“关于”功能已获用户验收，并晋升为 stable/0.2.25；交接 bundle 是后续工作。
+
+自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
+
+0.2.24 修复终端放大/恢复时重复出现的菜单，安装语言选择、mas 菜单和独立安全挑战选择器共用修复后的组件。中英文真实终端重排测试验证原地替换活动区，保留默认选项、输入位置和历史。本地冻结包和公开 test 一键入口均通过 444 项单元测试、全部 28 个真实 LXD 环节及一次 76 项完整挑战，分别耗时 1444.9 秒和 1439.7 秒，无跳过项、未执行环节或清理错误。用户补充验证了实际终端缩放、宿主依赖安装初始化、完整测试和独立安全入口。本版现已发布 stable；原 test 发布及全部 40 个旧发布保留，详见 [IMPLEMENTED.md](IMPLEMENTED_0_2_25.md)。
 
 ## 安装稳定版（0.2.25）
 
@@ -22,11 +28,11 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/insta
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash
 ```
 
-该入口使用实际 stable 产品和安装程序，只从相同数字版本的 test 发布获取测试工具；先核对两个清单中的产品、安装包哈希，缺失或不一致时明确停止。稳定分支与稳定附件不含测试程序或验证记录。普通公开稳定安装、三份附件、release 源码和 stable/test 配对下载来源均已通过核验。完整公开 stable 入口通过 449 项配对单元测试、28 个实机阶段和一次 76 项安全挑战，耗时 1408.6 秒，无跳过、未执行或清理错误；独立资源回收及安装哈希核验通过，证据见 [已实现文档](IMPLEMENTED.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
+该入口使用实际 stable 产品和安装程序，只从相同数字版本的 test 发布获取测试工具；先核对两个清单中的产品、安装包哈希，缺失或不一致时明确停止。稳定分支与稳定附件不含测试程序或验证记录。普通公开稳定安装、三份附件、release 源码和 stable/test 配对下载来源均已通过核验。完整公开 stable 入口通过 449 项配对单元测试、28 个实机阶段和一次 76 项安全挑战，耗时 1408.6 秒，无跳过、未执行或清理错误；独立资源回收及安装哈希核验通过，证据见 [已实现文档](IMPLEMENTED_0_2_25.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
 
 ## 安装最新测试版
 
-当前测试版为 [0.2.25](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.25)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+本批测试版为 [0.2.25](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.25)。自动化测试在功能测试结束后创建独立临时容器进行一次完整挑战。也可从宿主使用 security.sh 单独挑战指定容器，两者复用同一模块并在宿主输出完整报告。完整实现见 [IMPLEMENTED.md](IMPLEMENTED_0_2_25.md)，挑战范围见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE_0_2_25.md)。
 
 在 Ubuntu 的交互式终端运行：
 
@@ -40,14 +46,14 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/ins
 
 安装脚本自动安装缺失的 Python 3、snapd、最新稳定渠道的 LXD 及其 lxc 客户端，以及宿主 SSHFS，先统一检测缺失依赖，需要 APT 时只刷新一次索引并合并安装；不再单独执行 `sudo -v`，由实际提权命令触发系统认证。正常 APT 进度在终端原地刷新，保留环节总结、警告和错误。sudo 自身连接终端，APT 的输出处理管道位于其内部命令中；重定向输出时软件包输入按非交互 EOF 处理，认证仍由系统 sudo 负责。全新 LXD 使用原生自动初始化（dir 存储和默认桥接网络）；已有环境不自动升级或覆盖配置。安装程序通过独立 systemd drop-in 为 LXD 主 socket 指定实际管理组，保持 `0660`，必要时修正现有 socket 属组；不重启正在运行的 LXD 或容器。用户组准备遵循 LXD 配置的管理组（默认 `lxd`），在目标用户身份下确认 LXD 可访问才报告安装成功。新增管理组权限后，安装过程通过一个刷新用户组的用户进程继续运行，日常使用请打开新终端。
 
-宿主支持范围：Ubuntu 22.04 及更新版本（原生系统和 WSL2），Python 3.10+，需要可运行 snapd 的 systemd 环境。WSL 未启用 systemd 时，安装脚本会给出启用及重启提示。云服务器必须允许容器运行所需的内核功能。当前实际验证环境见 [IMPLEMENTED.md](IMPLEMENTED.md)，不能把支持目标视为所有环境已实测。
+宿主支持范围：Ubuntu 22.04 及更新版本（原生系统和 WSL2），Python 3.10+，需要可运行 snapd 的 systemd 环境。WSL 未启用 systemd 时，安装脚本会给出启用及重启提示。云服务器必须允许容器运行所需的内核功能。当前实际验证环境见 [IMPLEMENTED.md](IMPLEMENTED_0_2_25.md)，不能把支持目标视为所有环境已实测。
 
 test 入口使用公开 GitHub Releases API 查找最高的 `a.b.c` 数字版本（包含 prerelease），并从该版本下载产品、测试工具和 SHA-256 校验清单。test 入口不使用 `/releases/latest`；stable 入口使用它选择 stable 产品，stable 测试入口再选择同一数字版本的测试发布，校验产品及安装包一致后执行，缺失或不一致均报错。
 
 安装指定版本：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.2.25
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.15
 ```
 
 ## 固定发布入口
@@ -77,14 +83,14 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/tes
 
     curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash -s -- test
 
-开始时停止的容器通过标准 start 启动，结束后通过标准 stop 恢复停止；开始时运行的保持运行。完整结果、JSON 和同名日志保存在宿主。GPU 这类资源接入配置调整后，可重新运行此命令。没有容器内独立命令。范围与判定见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE.md)。
+开始时停止的容器通过标准 start 启动，结束后通过标准 stop 恢复停止；开始时运行的保持运行。完整结果、JSON 和同名日志保存在宿主。GPU 这类资源接入配置调整后，可重新运行此命令。没有容器内独立命令。范围与判定见 [GUEST_SECURITY_PROBE.md](GUEST_SECURITY_PROBE_0_2_25.md)。
 
 ## 语言和配置
 
 安装开始前询问语言：`en_us`（英文）或 `zh_cn`（简体中文）。首次默认中文 `zh_cn`，直接回车即可。后续安装以已保存的语言作为默认值。非交互安装可添加 `--language zh_cn` 或 `--language en_us`，例如：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash -s -- --language zh_cn
+curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --language zh_cn
 ```
 
 ```bash
@@ -139,7 +145,7 @@ mas import restored demo.tar.gz
 
 CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 `mas delete demo --yes`、`mas export demo backup.tar.gz --yes`；`--no` 明确拒绝。`mas enter demo --yes` 表示终端退出后停止容器，`--no` 表示保持运行。没有交互终端且未指定确认参数时默认拒绝；不再使用管道输入 `y` 确认。
 
-## 新容器开发环境
+## 新容器开发环境（0.2.20 起）
 
 `new` 在首次启动中使用 Ubuntu 原生 cloud-init 和 APT 准备常用应用开发环境。完整预装清单如下：
 
@@ -161,7 +167,7 @@ CLI 的语言和确认提示使用同一套菜单。自动化调用可以使用 
 
 Codex、Ollama、herdr、模型文件和 LLM 框架由用户自行安装。GPU 接入保持原有功能，不加入 GPU 编译工具。
 
-## 容器网络开关
+## 容器网络开关（0.2.21 起）
 
 硬件选项提供“GPU”和“网络”；没有可用 GPU 的宿主仍可设置网络。网络默认开启，修改前要求停止所选容器。
 
@@ -182,11 +188,11 @@ mas hardware demo network on
 
 网络关闭后，标准启动、进入终端、宿主侧文件挂载和安全挑战使用现有 LXD 管理通道。调整网络或 GPU 后，可从宿主重新运行 `test/security.sh`，挑战会核对当前开关预期；硬件修改本身不自动运行完整挑战。
 
-## 固定隔离配置与旧容器迁移
+## 固定隔离配置与旧容器迁移（0.2.11 起）
 
 安装程序创建专用的 `mas` Project，以及其中的 `mas` 和 `default` Profile。配置固定，不提供通用设置入口。容器使用非特权、独立 UID/GID 映射和 LXD 标准 namespace/seccomp；不启用 nesting、raw 配置、BPF 委派或宿主身份例外。容器内 root 和 sandbox 的免密 sudo 保留。网络默认连接已有的 LXD managed bridge，可关闭该容器的网卡；不增加流量或登录规则。
 
-GPU 是明确授权的资源例外。WSL NVIDIA 映射 `/dev/dxg`、只读运行库和经过官方探测选择的驱动目录；Project 仅允许对应目录前缀。GPU 开关仍位于容器硬件选项。程序核验完整的 expanded 配置和设备，拒绝额外宿主目录、任意字符设备、额外存储卷、管理 socket、Windows 挂载及被改写的 GPU 映射；类别级的 Project 允许值不代表任意硬件已获授权。具体配置见 [当前隔离要求](REQUIREMENTS.md#fixed-isolation-and-resource-approval)。
+GPU 是明确授权的资源例外。WSL NVIDIA 映射 `/dev/dxg`、只读运行库和经过官方探测选择的驱动目录；Project 仅允许对应目录前缀。GPU 开关仍位于容器硬件选项。程序核验完整的 expanded 配置和设备，拒绝额外宿主目录、任意字符设备、额外存储卷、管理 socket、Windows 挂载及被改写的 GPU 映射；类别级的 Project 允许值不代表任意硬件已获授权。具体配置见 [需求文档第 39 节](REQUIREMENTS_0_2_25.md#39-fixed-isolation-policy-and-effective-configuration-verification--v0211)。
 
 旧版容器仍保留在 `default`，升级不自动迁移。选择“迁移旧容器”或执行：
 
@@ -206,7 +212,7 @@ LXD 6.9 的备份导入会携带 volatile 身份元数据，直接导入固定�
 
 当前实测 WSL 内核未启用 AppArmor；报告保存原生运行时属性，并明确记录 AppArmor 约束未获验证。本批没有修改宿主内核配置。原生 Ubuntu、其他 GPU/存储后端和上游漏洞修复不属于当前 WSL 验证结果。CPU、内存和进程限制、额外网络策略、完全关闭 devlxd、宿主 AppArmor 配置及磁盘配额仍待后续讨论。
 
-## 容器文件系统挂载
+## 容器文件系统挂载（0.1.9 起）
 
 ```bash
 mas mountfs demo                 # 默认 home → ~/LXDCMFS/demo/home/sandbox
@@ -260,22 +266,40 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.
 
 ## 自动化安全挑战
 
-自动化测试完成全部功能环节后，新建一个独立临时容器、标准启动，并调用 [完整安全挑战](GUEST_SECURITY_PROBE.md)。宿主准备当次 namespace、管理 socket、非敏感唯一标记和 binfmt_misc 参照，传入该容器后执行一次完整检查，再取回报告并核对宿主状态。GPU 开关的功能测试只核验对应设备、映射、文件和计算能力；完整挑战使用新容器的明确配置预期。
+自动化测试完成全部功能环节后，新建一个独立临时容器、标准启动，并调用 [完整安全挑战](GUEST_SECURITY_PROBE_0_2_25.md)。宿主准备当次 namespace、管理 socket、非敏感唯一标记和 binfmt_misc 参照，传入该容器后执行一次完整检查，再取回报告并核对宿主状态。GPU 开关的功能测试只核验对应设备、映射、文件和计算能力；完整挑战使用新容器的明确配置预期。
 
 完整方法和观察在宿主输出，并保存 boundary-1.log、boundary-1.json 和主报告 guest_boundary 中的证据。测试项只有通过/失败；环境记录单列，缺项、重复项或不完整证据不能算通过。需要再次核对已有容器时，使用上方独立宿主 security.sh 命令；它复用同一模块，并恢复测试前状态。
 
 ## 开发与发布
 
-先读 [AGENTS.md](AGENTS.md)、[REQUIREMENTS.md](REQUIREMENTS.md) 和 [开发指南](docs/DEVELOPMENT.md)。功能需求先讨论，明确授权后开发；先核验实现，再更新已实现文档。当前文档整理不改变产品版本或发布包。
+从 `0.1.3` 起统一使用 `a.b.c`：主版本 `a` 当前固定为 `0`，仅用户明确允许时才能改为 `1`；`b` 为阶段号，当前测试开发进入 `2`（阶段 1 稳定版仍为 `0.1.15`）；`c` 为提交批次号，每批递增一次，同一批中的多个 Git commit 不重复递增。不再使用 `-test.x` 后缀，GitHub prerelease 属性单独保留。
+
 
 ```bash
+python3 -m unittest discover -v
+python3 -m mas.testing
 python3 scripts/build.py
 python3 dist/mas.pyz --version
 ```
 
-主分支构建生成产品、独立安装程序、独立测试工具和固定入口；稳定分支使用 `python3 scripts/build.py --stable`，输出三个稳定附件。生成的 Shell 入口必须修改共享模板后重新构建。打包单元测试和完整实机测试的项目外运行方法、资产清单、频道选择与发布验收见开发指南；覆盖和实测限制见 [TEST_COVERAGE.md](TEST_COVERAGE.md)。历史决定保存在 [docs/history](docs/history/README.md)。
+`dist/mas.pyz` 为产品，不包含安装模块、测试代码或测试专用文案；`dist/mas-install.pyz` 为独立安装程序；`dist/mas-test.pyz` 为独立测试工具。三个文件版本一致。测试工具通过安装程序完成安装，安装程序不负责启动测试。仅使用标准库生成可重复构建的 zipapp，适用于已具备受支持 Python 运行时的架构。
 
-## GPU 硬件选项
+发布验证必须从仓库外的临时工作目录运行打包后的测试工具，使用产品及测试包的绝对路径；不能只在源码目录验证。Python 测试子进程统一使用 `mas.testing.python_command` 显式指定当前测试包来源，不依赖工作目录或 `PYTHONPATH`。
+
+发布前核验 [REQUIREMENTS.md](REQUIREMENTS_0_2_25.md) 并更新 [IMPLEMENTED.md](IMPLEMENTED_0_2_25.md)。GitHub prerelease 保留版本资产、安装脚本、校验清单及测试报告。阶段 1 没有 GPU 接入功能；0.2.1 新增 GPU 模块，不自动安装模型工具。
+
+`install.sh` 由 `scripts/install.template.sh` 和语言文案生成；修改后运行 `python3 scripts/build.py`，避免手工维护重复提示文案。
+
+`0.1.4` 起采用三个独立文件的分发方式。指定更早的数字版本时，固定入口复用该历史版本原有的安装实现和打包方式，不改写已发布文件。
+
+
+测试覆盖范围与未验证环境见 [TEST_COVERAGE.md](TEST_COVERAGE_0_2_25.md)。基础操作在原生命令前后增加的逻辑见 [CORE_BEHAVIOR.md](CORE_BEHAVIOR_0_2_25.md)。测试报告的 `unit_tests` 字段记录单元测试数量、模块、测试标识和跳过原因；测试组结果仍单独记录。请勿用 Python `-O` 或 `PYTHONOPTIMIZE` 运行测试，它们会禁用断言。
+
+
+内部按职责区分外部前处理、完整的 mas 功能、外部后处理。启动中的 sandbox 用户准备属于启动内部，成功后才恢复挂载；原生启动成功本身不代表 mas 启动完成。其它基础功能的职责和成功条件见 [CORE_BEHAVIOR.md](CORE_BEHAVIOR_0_2_25.md)。不需要外部处理的功能不增加空阶段。
+
+
+## GPU 硬件选项（0.2.x test）
 
 选中容器后进入“硬件选项”，第一个选项为 GPU 开关。有受支持的独立显卡时默认开启，可以手动关闭；没有受支持设备时不显示此开关。目前接入实现针对 NVIDIA，已实测 WSL2 + RTX 5090 Laptop GPU；原生 Ubuntu NVIDIA 使用 LXD CDI 路径，尚未实机验证。AMD/Intel 独立显卡尚未实现自动识别和接入。
 
@@ -295,5 +319,7 @@ WSL 路径提供 `/dev/dxg`、只读的 `/usr/lib/wsl/lib` 和官方探测选中
 测试工具会验证开关、菜单、只读资源、关闭后的设备消失、重新开启，以及 sandbox 用户执行真实 CUDA 内核并读回结果。无支持设备的机器明确记录 GPU 计算未执行。此模块不安装 CUDA Toolkit、模型框架或新的宿主驱动。Project/Profile 安全基线已在 0.2.11 实现；CPU/内存/进程限制仍待后续实现。
 
 从 0.2.3 起，WSL 驱动目录由 LXD snap 已附带的 `nvidia-ctk` 以 WSL 模式探测，不扫描全部历史目录。GPU 开启时，每次实际启动前重新查询并复用 GPU 配置函数更新映射，运行期间不自动修改。工具缺失、探测失败或结果无效会报错，不继续使用旧选择。mas 只读取官方工具输出的资源清单，不应用 CDI 文档或执行 hooks，也不额外安装软件包。
+
+0.2.4 使用官方参数关闭本查询不需要的 hooks 生成和 nvsandboxutils 探测；当前实测资源清单不变，单次警告由 5 条减少为 2 条。剩余原生警告继续保留，并在输出前清除临时进度。测试中的直接诊断保存在 `native-diagnostics.log`，CLI/菜单查询诊断进入事件记录。
 
 0.2.6 的 WSL 探测显式设置 `--library-search-path=/usr/lib/wsl/lib`，避免 NVML 误选普通 Linux 驱动库。产品在探测成功并通过资源校验后不显示已知的多个驱动目录提示；自动化测试保留原文，其他诊断不受影响。GPU 模块另管理容器内 `/etc/profile.d/mas-gpu.sh`，新登录 shell 可直接运行 `nvidia-smi`；关闭时清理模块自有文件，不修改宿主或用户 `.bashrc`。实际生效目录通过宿主 CUDA 加载映射与容器配置独立对比验证。

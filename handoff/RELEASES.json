@@ -1,0 +1,2762 @@
+{
+  "repository": "https://github.com/gdrencn/my-ai-sandbox",
+  "snapshot_date": "2026-10-04",
+  "latest_stable": "stable/0.2.25",
+  "numeric_test": "v0.2.25",
+  "releases": [
+    {
+      "tag_name": "stable/0.1.15",
+      "name": "0.1.15 Stable — Phase 1",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.1.15",
+      "target_commitish": "634e37e0feddb8b97740d1c2b71e98ecc9548c46",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-09-29T04:24:03Z",
+      "body": "# my-ai-sandbox 0.1.15 — Phase 1 stable\n\n阶段 1 稳定版。与 [v0.1.15 test](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15) 的产品和安装程序逐字节一致，不修改程序版本，不引入新功能。Git tag `stable/0.1.15` 标识发布渠道，程序版本仍为 `0.1.15`。\n\n## 安装稳定版\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --release v0.1.15\n```\n\n固定到同版本的数字发布，仅下载产品及安装所需文件，不下载测试工具。保留现有最新 test 入口；省略 `--release` 仍选择最新 test，不代表稳定渠道。\n\n## 测试同版本\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test --release v0.1.15\n```\n\n测试工具来自保留的同版本 test 发布。stable 附件仅为 `mas.pyz`、`mas-install.pyz`、`SHA256SUMS`；不附带测试工具或测试报告。\n\n## 范围与验证\n\n包括受管容器基础操作、CLI、双语终端文本菜单、安装依赖准备及文件系统挂载。完整复核结果见仓库 [IMPLEMENTED.md](https://github.com/gdrencn/my-ai-sandbox/blob/main/IMPLEMENTED.md) 和 [稳定版审查记录](https://github.com/gdrencn/my-ai-sandbox/blob/main/validation/STABLE_0_1_15_AUDIT.md)。\n\n本次发布前复核：162 项单元测试、21 个测试环节全部通过，耗时 394.0 秒；没有跳过项或清理错误。独立检查确认测试项目、挂载路径及登记记录已回收。固定版本公开安装通过，既有测试工具未被改动。\n\n实测环境为 Ubuntu 26.04 WSL、LXD 6.9；原生 Ubuntu/云服务器和其他架构尚未完成实测。不包括 GPU、宿主资源白名单或新增 LXD 安全策略。\n\nProduct SHA-256: `bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6`\n",
+      "assets": [
+        {
+          "name": "mas-install.pyz",
+          "size": 35418,
+          "digest": "sha256:9156ff2cec3b3e54b15d4c59d46c44c05f4d9ae3801035396f839ecc51f5d105",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.1.15/mas-install.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 33542,
+          "digest": "sha256:bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.1.15/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 156,
+          "digest": "sha256:b80ce16d97083f85e00c7960730cc16a9a95f5164560c2411ec781381373aad4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.1.15/SHA256SUMS"
+        }
+      ]
+    },
+    {
+      "tag_name": "stable/0.2.24",
+      "name": "Stable 0.2.24",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.2.24",
+      "target_commitish": "release",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-04T09:03:28Z",
+      "body": "# Stable 0.2.24\n\n将已验收的 v0.2.24 发布为稳定版。产品与独立安装程序和 [v0.2.24 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.24) 字节一致，程序版本仍为 0.2.24；原 test 发布和全部历史附件保留。\n\n本稳定版包含固定容器隔离配置、显式旧容器迁移、GPU 接入与开关、容器网络开关、首次创建时的 25 个 Ubuntu APT 开发软件包、独立文件系统挂载、标准启停协调，以及修复终端缩放重复显示的共享菜单组件。\n\n## 安装\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash\n```\n\n稳定安装源码来自独立 release 分支，产品和安装程序来自所选 stable 发布。普通安装只下载安装所需文件，保留现有测试工具。稳定附件仅为 mas.pyz、mas-install.pyz、SHA256SUMS；release 分支不包含自动化测试程序、入口或验证记录。\n\n## 验证稳定版\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash\n```\n\n此入口使用 release 安装链和 stable/0.2.24 的实际产品、安装程序，严格配对 v0.2.24 的测试工具；缺失发布、版本或校验和不一致时停止，不回退到其他版本。\n\n发布准备已核验稳定独立构建可重现产品与安装包，源代码和附件边界正确。此前 v0.2.24 的本地和公开完整测试均通过 444 项单元测试、28 个实机环节和一次 76 项安全检查，无跳过、未执行项或清理错误。用户再次验证完整测试、宿主 SSHFS/LXD 安装初始化、独立安全入口及实际终端缩放。\n\n实测环境为 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64。原生 Ubuntu/cloud、ARM64、其他 GPU/存储后端没有新增实测；检查不构成对全部终端、内核漏洞或网络访问策略的保证。\n\n详细实现、发布验证及平台边界见 [IMPLEMENTED.md](https://github.com/gdrencn/my-ai-sandbox/blob/main/IMPLEMENTED.md)、[TEST_COVERAGE.md](https://github.com/gdrencn/my-ai-sandbox/blob/main/TEST_COVERAGE.md)。\n\n发布后的实际公开 stable 入口已通过全部 444 项配对单元测试、28 个实机环节及一次 76-PASS/0-FAIL 安全挑战，耗时 1362.9 秒，无跳过、未执行或清理错误。独立资源回收、三份稳定附件、tag/branch、GitHub latest 和全部 40 个旧发布内容核验通过（自动下载计数除外）；共用渠道逻辑另通过 448 项私有打包回归。证据见 [稳定版完整报告](https://github.com/gdrencn/my-ai-sandbox/blob/main/validation/STABLE_0_2_24_PUBLIC_REPORT.json) 和 [发布核验](https://github.com/gdrencn/my-ai-sandbox/blob/main/validation/STABLE_0_2_24_PUBLIC_REVIEW.json)。\n",
+      "assets": [
+        {
+          "name": "mas-install.pyz",
+          "size": 67555,
+          "digest": "sha256:e0e613ad304750e8006187eab7ecfff0888758862b2df8447047139999772952",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.24/mas-install.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 64874,
+          "digest": "sha256:27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.24/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 156,
+          "digest": "sha256:0cf9213101cb2cda9e706c77d1acc992bf72945dbb17494e811737cbb81395cc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.24/SHA256SUMS"
+        }
+      ]
+    },
+    {
+      "tag_name": "stable/0.2.25",
+      "name": "stable/0.2.25",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.2.25",
+      "target_commitish": "ddc6ab6caad9dd95b803693a8dd03b7e4ba26da8",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-05T00:02:00Z",
+      "body": "# Stable 0.2.25\n\n将已验收的 v0.2.25 产品和安装程序晋升为 stable，字节和版本号保持一致。“mas 选项 → 关于 my-ai-sandbox”显示当前 mas 版本并提供返回；中英文复用共享组件，返回保留选中位置，`mas --version` 继续可用。\n\n稳定分支 `release` 按稳定版本历史前进，保存产品、安装、共享构建源码和相关文档。稳定附件只有 `mas.pyz`、`mas-install.pyz`、`SHA256SUMS`。原 v0.2.25 test 发布及历史版本保留。\n\n安装最新稳定版：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash\n```\n\n验证稳定版：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash\n```\n\n稳定安装完整源码链来自 release，产品和安装程序来自当前 stable 发布。稳定测试只配对 v0.2.25 发布的原测试工具，并校验版本及产品/安装包哈希。普通安装保留已有测试工具。\n\n独立稳定构建可重现，产品/安装包与 v0.2.25 完全一致；源码与包内容、Python 3.10 语法及 Shell 检查已通过。已验收 test 包的本地和公开入口各通过 449 项单元测试、28 个实机阶段及一次 76 项安全挑战。用户另行提供了包含宿主依赖安装初始化的完整成功日志，并明确验收版本功能。实际公开 stable 安装和完整验证均已通过：449 项配对单元测试、28 个实机阶段和一次 76-PASS/0-FAIL 安全挑战，耗时 1408.6 秒，无跳过、未执行或清理错误。\n\nAgent 实测环境为已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64。完整文档更新和 Codex 交接 bundle 属于后续工作。\n\n独立资源回收、安装哈希、三份稳定附件、release 源码与配对下载来源、GitHub latest、稳定分支/tag 和全部 42 个旧发布内容均已核验（自动下载计数除外）。证据见 [稳定版完整报告](https://github.com/gdrencn/my-ai-sandbox/blob/main/validation/STABLE_0_2_25_PUBLIC_REPORT.json) 和 [实现记录](https://github.com/gdrencn/my-ai-sandbox/blob/main/IMPLEMENTED.md)。\n",
+      "assets": [
+        {
+          "name": "mas-install.pyz",
+          "size": 67608,
+          "digest": "sha256:6b8a48d19f146f6bf750edf833af7bedbc330d7f7c05fff20c69d511163ca08b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.25/mas-install.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 65010,
+          "digest": "sha256:fc4acabba8c8974bd9c99f01b82f074b36424646d1c57c474d6eb763f8a50ffc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.25/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 156,
+          "digest": "sha256:c81c86d89a0ec64c08dfd2078be87033dcc1a11b38d705be48671ff2b1bcdb4a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/stable/0.2.25/SHA256SUMS"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.0-test.1",
+      "name": "v0.1.0-test.1",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.0-test.1",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-27T22:59:49Z",
+      "body": "# v0.1.0-test.1\n\nFirst test release of my-ai-sandbox: manage owned LXD containers through a shared Python implementation, a full CLI, and a curses TUI opened by bare `mas`.\n\n- Commands: new, list, start, stop (including --all), delete, info, import, export, enter.\n- Default Ubuntu image follows the host release. Containers are created stopped.\n- Default terminal user sandbox has passwordless sudo. Exit asks whether to stop, default no.\n- Both interfaces confirm deletion. Existing export files require overwrite confirmation, default no.\n- One-second state polling, 10-minute default operation timeout, minimum configurable timeout of five minutes.\n- Only containers with user.mas.managed=true are managed. Import rejects any existing target name.\n- Separate product and automated test zipapps; fixed installer resolves the latest test prerelease and checks SHA-256.\n\nInstall latest test:\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n\nInstall and run the matching complete test suite:\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\nAssets: mas.pyz, mas-test.pyz, bootstrap.py, install.sh, SHA256SUMS, and WSL_REPORT.json. The report identifies the tested product by hash and includes test results and waiting times; detailed CLI and terminal transcripts are retained locally by each test run.\n\nTest environment: WSL2 Ubuntu 26.04.1, x86_64, Python 3.14.4, LXD 6.9, dir storage and the standard LXD bridge. Native Ubuntu is supported by design but has not been tested on a separate host. Fresh-system package installation by the installer has not been exercised end to end; existing-environment installation has been verified. WSL without systemd needs the documented enable/restart step.\n\nValidation: 19 unit tests and 13 integration groups passed against the release product. The public one-line --test entry was also run successfully after publication, including download, checksums, installation, full CLI/TUI testing and cleanup. Reports are available in the repository's validation directory.\n\nLXD backups preserve MAC identities. Restoring while the source still exists on the same network may prevent the restored container from starting; this release does not rewrite network identities. GPU, host resource whitelists, directory sharing and model installation are outside this release.\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 2987,
+          "digest": "sha256:e80a3f3a1ecbb3bd41eddaf299f9e324fa520051d466804668905f31ba1f99a8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.1/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 529,
+          "digest": "sha256:7c95737bdceab0022f9999124c9312a241bf2e3f67a47ecab2c6b5ce957d130e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.1/install.sh"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 17681,
+          "digest": "sha256:2b3860ab444c1ad23b4cd2b9443eb45c1acced721e677121c6d7e9b44989582e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.1/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 15159,
+          "digest": "sha256:4465143d4548d6a0d3efa176d958b4f8c5972d1a040e31d10599ee77f381d8f5",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.1/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:a83ba138b894cdb0dfe88ea7e31eee6c3e1c95e7dacca65acc52c851a482f27c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.1/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 5545,
+          "digest": "sha256:fc8fb8887d8abcddb78706aa522bb026c8f462a8cf0c7c8c2a3e926fd3039459",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.1/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.0-test.2",
+      "name": "v0.1.0-test.2",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.0-test.2",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T01:40:16Z",
+      "body": "# v0.1.0-test.2\n\nFix fresh installation failing with `error: access denied (try with sudo)` at `snap wait system seed.loaded`. This step now uses the shared privileged-command runner. The permission failure was reproduced on the development host, and a regression test covers both existing and missing snapd. This does not require users to configure passwordless host sudo.\n\nContainer behavior is unchanged from test.1:\n\n- Commands: new, list, start, stop (including --all), delete, info, import, export, enter.\n- Default Ubuntu image follows the host release. Containers are created stopped.\n- Default terminal user sandbox has passwordless sudo. Exit asks whether to stop, default no.\n- Both interfaces confirm deletion. Existing export files require overwrite confirmation, default no.\n- One-second state polling, 10-minute default operation timeout, minimum configurable timeout of five minutes.\n- Only containers with user.mas.managed=true are managed. Import rejects any existing target name.\n- Separate product and automated test zipapps; fixed installer resolves the latest test prerelease and checks SHA-256.\n\nInstall latest test:\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n\nInstall and run the matching complete test suite:\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\nAssets: mas.pyz, mas-test.pyz, bootstrap.py, install.sh, SHA256SUMS, and WSL_REPORT.json. The report identifies the tested product by hash and includes test results and waiting times; detailed CLI and terminal transcripts are retained locally by each test run.\n\nTest environment: WSL2 Ubuntu 26.04.1, x86_64, Python 3.14.4, LXD 6.9, dir storage and the standard LXD bridge. Native Ubuntu is supported by design but has not been tested on a separate host. Fresh-system package installation by the installer has not been exercised end to end; existing-environment installation has been verified. WSL without systemd needs the documented enable/restart step.\n\nValidation: 20 unit tests and all 13 real integration groups passed against the test.2 product, with no cleanup errors. Results and the product hash are recorded in WSL_REPORT.json and validation/TEST_2_REPORT.json. The new regression test exercises the fresh-install command path with subprocess permission checks; it does not claim a full live fresh-host installation.\n\nLXD backups preserve MAC identities. Restoring while the source still exists on the same network may prevent the restored container from starting; this release does not rewrite network identities. GPU, host resource whitelists, directory sharing and model installation are outside this release.\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 2987,
+          "digest": "sha256:e80a3f3a1ecbb3bd41eddaf299f9e324fa520051d466804668905f31ba1f99a8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.2/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 529,
+          "digest": "sha256:7c95737bdceab0022f9999124c9312a241bf2e3f67a47ecab2c6b5ce957d130e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.2/install.sh"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 18251,
+          "digest": "sha256:20afc3f9adb82f473292b14d4dad6678906b558c124691c24d144620ffd154d6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.2/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 15160,
+          "digest": "sha256:c15cd58305a41f85aedfb1c251c334dc457a1121c0abf3c1a5fc74875a9441bd",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.2/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:93430042cd0968e39cf454c62fe87f5646f790b024757324416b1a6745f3f4a0",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.2/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 5543,
+          "digest": "sha256:1c502b88332987a4dfe72475b28f98edb77cca0fe8673cb47eb3ee08c61e972c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.0-test.2/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.10",
+      "name": "0.1.10",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.10",
+      "target_commitish": "b24c4eb7e5cf897c78844afbbcc509390c246ce3",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T11:20:44Z",
+      "body": "完成 0.1.9 文件系统功能后的代码、需求、实现及测试覆盖审计。\n\n- 挂载与启停/删除共用锁，并在锁内复查容器状态和归属。\n- 校验记录、目录和辅助进程身份；恢复 PID 尚未写入的原生辅助进程；容器被外部删除或改为未管理时仍可清理已有宿主挂载。\n- 使用文件系统标识、inode、属主记录目录；旧记录无法验证时保留。卸载直到辅助进程退出及空目录回收完成才报告成功。\n- 唯一临时安装文件、原子替换和可重复构建；修复私有 known_hosts 路径处理，保留原生诊断。\n- 扩展记录损坏、并发锁、进程身份、超时、目录保留、默认 home 变更、标记变更及测试器清理覆盖。\n\n最终本地验证：107 项打包单元测试，无失败或跳过；20 组真实 LXD 集成测试通过，无清理错误。测试报告见 WSL_REPORT.json；覆盖清单见 TEST_COVERAGE.md。\n\n测试环境为当前 Ubuntu WSL/LXD 6.9。SSHFS 使用 Ubuntu 官方软件包中解出的临时宿主可执行文件；没有向容器安装挂载软件。原生 Ubuntu、全新特权安装、实际重启及 ACL-bearing 文件未在本批实测；对应模拟测试不等同于实机认证。本发布为 test prerelease，不是 stable 晋升。\n\n固定入口：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 2877,
+          "digest": "sha256:d4727d9b4298b0cb55760af0a3b42f54f2243735eb72df0ba707b4ec50619ac9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 28365,
+          "digest": "sha256:ca4e1fcfb9f623fdf61c93c532c754db32d9a092fb991447741f50c530ac51af",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 68469,
+          "digest": "sha256:ee144f6a6e95e4b008fcf31528974e4395d327dcf68a56ae2baeb925f1baca60",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 28767,
+          "digest": "sha256:11d9d588bb99b0dbf75cb5f3c61b93a281501c578d8c4e319fc1528c4da68ef2",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:13ceeb0042eece0c0b75ef48aecd8c9a3011dcf85751bf545a6b28caaa3c7989",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 83840,
+          "digest": "sha256:62915cbd16280e469f098f8d4714bf727fc9b5c2709212f2e1add5b5b29b6d7e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.10/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.11",
+      "name": "0.1.11",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.11",
+      "target_commitish": "7d74dcd9c0a07cdb93ea91fadcba94aee881eaa3",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T20:53:50Z",
+      "body": "0.1.11 test\n\n- 统一菜单循环导航、功能入口和结果返回页，保留上级选中项。\n- 移除独立 sudo -v，复用依赖检测与合并 APT 安装；正常进度原地刷新，保留原生交互、警告和失败详情。\n- 新挂载使用 allow_root；安装程序准备宿主 FUSE 配置。Windows UNC 读写验证通过，其他普通宿主身份仍被拒绝，容器文件权限不变。旧挂载需明确卸载后重挂。\n- 118 项打包单元测试及 20 个测试环节（其中 19 个为真实集成环节）全部通过，附 WSL_REPORT.json。Windows 验证使用文件系统 API，未人工操作 Explorer 窗口；原生 Ubuntu/其他架构尚未实测。\n\n安装：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n\n安装并完整测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\n本次为 test prerelease，不晋升 stable。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7108,
+          "digest": "sha256:5d381f3fa0cc3540e85159e9a3f582cc6adaa35a0ef8a6f1af17d4d477d7129f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 31070,
+          "digest": "sha256:209e46b3a14b208685ab56d71f96973dc40361c82747e9f6fd630831cc6bd7d7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 75482,
+          "digest": "sha256:e6f99b2a011c74a535e65c8d3af8e97fbeaca9bb559f4c7f4ae2a68292401de8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 29295,
+          "digest": "sha256:dc9e7d186992d7730712075ec2128b638b1691ec3649ddb0e360f8082aac5aae",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:d52cfb33ada9dada4cfbf134ac94aeca03c04d52a3234fe171ddf35c1c64700f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 84952,
+          "digest": "sha256:b2ef34c8f3efd3f38f86cb0f59af15cadd4e6c909830f84721e28d810bea41d6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.11/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.12",
+      "name": "v0.1.12",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.12",
+      "target_commitish": "a66ab80dbc485f509a13eab971bdba3e004b9768",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T22:39:42Z",
+      "body": "此版本随附的 install.sh 遗漏共享菜单的 bootstrap 依赖，独立运行会在语言选择前退出。已在 [v0.1.13](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.13) 修复；固定入口也已更新。建议使用 v0.1.13。此版本原有发布资产保持不变。\n\n# 0.1.12\n\n- 启停前顺序调用共享卸载功能，成功后调用共享挂载功能恢复已有路径。卸载失败立即中止；启停自身失败保持原错误流程；恢复挂载失败继续其余路径并汇总。\n- 容器终端退出并完成停止询问后，直接结束 mas、回到宿主终端；收尾错误也不会重新进入菜单。\n- 统一输入文案和空行，多列选项左对齐；卸载页不再重复列出表格，需要状态列时所有条目统一显示。\n- 扩展真实多路径启停、终端返回、共享锁和故障分支测试。具体结果和环境限制见 IMPLEMENTED.md、TEST_COVERAGE.md 与版本报告。\n\n本批发布 test prerelease，不晋升 stable。\n\n\n验证：133 项打包单元测试、20 个阶段全部通过；当前 Ubuntu WSL 环境，详见 WSL_REPORT.json。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7140,
+          "digest": "sha256:fa1d5ada94d0998263a8d1d3dbee61512896c46d5e571b3f6a4c392badfb0fc7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 33196,
+          "digest": "sha256:c186cf1616d27479d020f16ca244bee94bee60c45063101d41c85518c88c0148",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 82794,
+          "digest": "sha256:df0c6098673c53d6effb707d1ff8e333acf4d2422cce481d3d01095c01667e95",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 31660,
+          "digest": "sha256:80a6cdeb4f3510c7a3c0fd6a30d26a28bf171d7b2c443abd5249988564f3e111",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:5f046c7d23766649c6202de1d00f911b9fad3aad8ffb1c824c1e5b28c6e0d257",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 104362,
+          "digest": "sha256:d6966040e30386731eec1182f7886e9f9b3d8dc1ce32db7eb94693f5e419f856",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.12/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.13",
+      "name": "v0.1.13",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.13",
+      "target_commitish": "0703f0ed327a1b9f36a6cdc9b62b08aeef51bb5f",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T22:49:24Z",
+      "body": "# 0.1.13\n\n修复 0.1.12 公开安装入口在语言选择前报 `No module named mas.output` 的问题：启动下载清单补齐共享菜单依赖，并增加隔离环境加载回归测试。包含 0.1.12 的全部功能；此前发布资产保持不变。本批仍为 test prerelease。\n\n\n包括启停前后复用基础挂载功能、失败分支、退出终端返回宿主、统一文案/空行和多列菜单。\n\n验证：134 项打包单元测试、20 个阶段全部通过，当前 Ubuntu WSL 环境；详细结果见 WSL_REPORT.json。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7157,
+          "digest": "sha256:749e9123d5b0e415f48dcf371b32e0651eb53c20f093259cdffaebb667c0e9c3",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 33196,
+          "digest": "sha256:eec84c3a357b3ff416c5afe6021f4e8bb92fb8d71348f75422c8b783f2cf83a5",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 86219,
+          "digest": "sha256:89f8ba01839ddde226dba54585901f75ef00b224c2b79ab4b79e7016a8eee46a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 31660,
+          "digest": "sha256:81be0c454b30d2bb8cb6fb260b86d286e70dea7a5d4091361045fdd8bceeeba7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:75a8f3359f195d99db440cce8f6abc291a4ce3ad69f53af189fa33ca555bf933",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 105190,
+          "digest": "sha256:5c90d2ea397eae7d955ece4776ace8c34f9370d079d28dc0a5ca759f9573907b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.13/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.14",
+      "name": "v0.1.14",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.14",
+      "target_commitish": "c752147e7e0c072f97bbe7876bda5e18a372eaad",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-29T00:57:42Z",
+      "body": "# 0.1.14\n\n- 明确启停的外部前处理、内部执行、外部后处理；sandbox 准备仍是启动内部的必要成功步骤。内部失败原样传播，不进入挂载恢复。\n- 拆分挂载资源准备、进程启动、只读探测和身份记录；早期准备失败也复用基础清理，保护已有目录。\n- 区分原生步骤与完整内部功能的成功；正常中间进度短暂显示，保留功能结果和原生诊断。\n- CLI、菜单注入确认交互，共享独立展示模块；清理或报告失败不掩盖原始错误，终端退出的双重失败保留两份诊断。\n- 补充阶段边界测试；详细验证结果、覆盖范围和限制见 IMPLEMENTED.md、TEST_COVERAGE.md 与版本报告。\n\n本批为 test prerelease，不晋升 stable；不增加第三方依赖或宿主资源暴露。\n\n\n验证：153 项打包单元测试、20 个实机测试环节全部通过，耗时 369.4 秒，无跳过或清理错误。当前 Ubuntu 26.04 WSL / LXD 6.9；Windows UNC 访问验证通过。完整记录见附件 WSL_REPORT.json。\n\n安装：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7179,
+          "digest": "sha256:08a1fe89e8fbe0bb0c56e7de809b962a14ddc23226609f7238d44ff2041d60cc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 35305,
+          "digest": "sha256:1a1f636b3491c1c2b4a8516119f33beb1e57524b0eab8e19ab1a706c1d8e4fe4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 91539,
+          "digest": "sha256:12e920b25f0911ad12b1131edb62c9495e42ce7028dfaac9d8a554083e2947e7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 33465,
+          "digest": "sha256:c4da24e24acd99cefe4a93c7b511927d0f84a14e13434445eff547074f58d218",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:e23475d512edfc8ee362ed02be6b0c65faa0da6e9b6314d1fa9619dff5104298",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 128741,
+          "digest": "sha256:d69288891077c529c7d0ff0d5230229c29fcc547c1dc814597015c0af41d85b2",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.14/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.15",
+      "name": "v0.1.15",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.15",
+      "target_commitish": "634e37e0feddb8b97740d1c2b71e98ecc9548c46",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-29T02:14:12Z",
+      "body": "# 0.1.15\n\n- 修复真实 sudo-rs 与终端输入、输出管道组合下安装卡住的问题：保持 sudo 连接终端，把 APT 输出处理放到内部命令中，继续使用系统认证。\n- 修复 APT 正常输出片段因未换行而永久残留的问题，保留原生提示、警告和错误。\n- 合并主菜单与容器管理，使用“mas 选项 / mas Preferences”；“停止全部容器”移入容器列表，按容器数量和实时状态显示，仍复用基础停止功能。\n- 删除保护提示改为仅要求删除前卸载，不再误导用户手动处理正常启停。\n- 增加真实 sudo 终端回归，以及隔离容器内的真实提权 APT/SSHFS 安装测试；162 项打包单元测试、21 个实机测试环节全部通过。\n\n测试版发布，不晋升 stable。完整记录、复现证据和环境限制见 IMPLEMENTED.md、TEST_COVERAGE.md、validation 与附件 WSL_REPORT.json。\n\n安装：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 35418,
+          "digest": "sha256:9156ff2cec3b3e54b15d4c59d46c44c05f4d9ae3801035396f839ecc51f5d105",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 94899,
+          "digest": "sha256:1a8d76d3d0536607e0382ea049c84c6ef0df72db395693d7bc6851afa5f7d1e3",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 33542,
+          "digest": "sha256:bf14e7b76ca767ca03a7ae3eeddbd32b85caf1ddd4c82df195e971119dec5bb6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:756534a7a905d62fb169e2484467617c911d49364df95f3b05cc899f4ce47403",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 133541,
+          "digest": "sha256:135185862c468ece0564ed88e44c4ed0e8629397d422d9127af621a4c51ec2d5",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.15/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.3",
+      "name": "0.1.3",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.3",
+      "target_commitish": "429102553925c0497167917c30304a340cd86866",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T02:19:55Z",
+      "body": "# 0.1.3\n\n版本统一为 `a.b.c`，本批次为 `0.1.3`；产品与测试工具保持一致，不再使用 `-test.x` 后缀。固定入口按数字版本选择最高的已发布版本，包含 GitHub prerelease。\n\n- 支持 `zh_cn` / `en_us`。安装开始前选择语言，后续安装使用已保存的默认值；可通过 `--language` 明确指定。\n- 文案集中保存于语言文件。CLI 支持 `mas config`、`mas config get language` 和 `mas config set language zh_cn|en_us`。TUI 按 `c` 打开配置，`1` / `2` 切换语言并立即生效。\n- 安装需要宿主权限时先使用系统 `sudo -v`；后续使用正常 sudo。没有密码处理、自定义认证缓存、保活或宿主 sudoers 修改。LXD 已准备好的测试环境无需宿主 sudo。\n- 保留 `snap wait system seed.loaded` 的提权修复。测试增加语言持久化、真实终端语言选择、中文 TUI 操作、数字版本排序和 sudo 前置认证检查。\n\n一行下载安装并测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\n默认等待 600 秒，每秒探测。测试使用随机 `test-<uuid>` 容器及隔离的 LXD project、临时语言配置；不修改用户容器或语言偏好。\n\n验证环境：当前 WSL2 / Ubuntu 26.04.1 / Python 3.14.4 / LXD 6.9，详细结果见 `WSL_REPORT.json`。原生 Ubuntu、其他架构和全新机器从零安装尚未做端到端实测；缺失 snapd/LXD 的权限路径通过标准库模拟回归测试验证。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 3302,
+          "digest": "sha256:113f11bb86281c2b207df56fc16cc2cf0a3026a55f654df90c904e7c750f756c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.3/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 1756,
+          "digest": "sha256:3dbb7c1195a81a4227b599b78a6f5419412ef8dfb45bf02b9caeee29a4af7869",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.3/install.sh"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 31107,
+          "digest": "sha256:33f0859a153aa237ec1b75fb5af0ffdb868eeda9ee91f97b0b17037c2bd313b6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.3/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 24445,
+          "digest": "sha256:e50074e574265eda1a3550a09de2347484271ad30247dae227ac4a3a8671fae8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.3/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:03bb16de4a02d388bd6b8d29aca42ff20d73033c27767219e82fbeae769585e3",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.3/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 5766,
+          "digest": "sha256:6bd6db384da4b222d60225e5af86ba4d555e5cf1121db36a1da9f976d78e0861",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.3/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.4",
+      "name": "0.1.4",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.4",
+      "target_commitish": "b21a97509f2386f41170a3a5417410bb78c4773b",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T03:30:34Z",
+      "body": "# 0.1.4\n\n- 安装程序自动配置实际安装目录的 PATH，保留已有配置并避免重复添加。安装后重新打开终端即可运行 `mas`，无需手动 export。\n- 产品、安装程序、测试工具分别发布为 `mas.pyz`、`mas-install.pyz`、`mas-test.pyz`。普通安装不下载或安装测试工具；`--test` 才额外下载测试工具，由它调用配套安装程序后测试。产品中不包含安装模块、测试代码或测试专用文案。\n- 首次默认中文 `zh_cn`，已有语言配置继续生效。自己的安装、测试阶段、进度和总结文案使用所选语言；命令、标识符和原生外部输出保持原样。英文界面测试的原始记录保存在日志中。\n- 正常测试进度在终端同一行刷新，环节结束后清除；每个环节保留成功总结。警告、错误和失败详情保留，故意触发的错误标记为“预期错误”。非交互输出无刷新控制符。\n- 测试结束输出通过、失败、未执行数量、总耗时、清理结果和报告路径。完整原生输出、终端记录和逐秒等待数据仍保留在日志中。\n\n普通安装：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n\n安装并自动测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\n宿主 sudo 继续使用系统默认认证，不保存密码或保活。当前 WSL 环境的验证结果随 `WSL_REPORT.json` 发布；原生 Ubuntu 和其他架构未实测。用户提供的 0.1.3 日志已验证缺失 LXD 时的自动安装及完整测试流程。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 1756,
+          "digest": "sha256:48e5ebfb57e1a1814e19543cdde6905f8005aa6891b274f34d90b3b3aaa62c5f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 16651,
+          "digest": "sha256:568f24424869865df321ef2e5e5162a3b7b6b1f98cbd6c766b34d7453bf3986c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 40618,
+          "digest": "sha256:f4e69d5f81254e43a246de1ac3f22eccdf0bee4ffcccb4ccff81a9840145d9fa",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 17055,
+          "digest": "sha256:87fdf004f0f075694528bb0c46cc624cc990d511ab7d96e169defa1ce4611b80",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 473,
+          "digest": "sha256:eb3c42c53a73157f1dd15c9eb587087656354db672949558096c3dcea44f53ff",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 31895,
+          "digest": "sha256:8ba4903798c8698ffcb29d85353bb4f3f184293c1ca6aa36757e8da68cbf42d8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.4/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.5",
+      "name": "0.1.5",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.5",
+      "target_commitish": "35b2315fe515305ba22ff353ccc2bae8ae787e1a",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T04:33:52Z",
+      "body": "TUI 现已按“容器管理”和“设置”分页，选项逐行左对齐。上下键选择，Enter/右键进入，Esc/左键返回，同时支持 CSI 和 SS3 方向键序列。\n\n安装语言、CLI 确认和 TUI 共用菜单组件。首次语言默认中文，确认默认“否”；支持单选及可复用的多选组件。删除、覆盖和退出后停止可以用 --yes / --no 明确指定，自动化不再通过管道输入 y。\n\n修复进入容器后返回 TUI 的终端模式恢复问题，保留全部共享容器操作和管理范围保护。无新增第三方依赖。\n\n验证：当前 Ubuntu WSL 环境，最终产品、独立安装程序和测试工具通过 49 项单元测试、14 组真实 LXD 集成测试，包含完整 TUI 按键操作、CLI 确认、终端缩放及清理。原生 Ubuntu 和其他架构尚未实测。WSL_REPORT.json 提供本批验证结果。\n\n普通安装：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 2877,
+          "digest": "sha256:d4727d9b4298b0cb55760af0a3b42f54f2243735eb72df0ba707b4ec50619ac9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 19602,
+          "digest": "sha256:a3fa5fe4c6bce921fedb39c950a423bc2589a9646b0ea0f5681584609a4ac2cf",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 45660,
+          "digest": "sha256:4dc66ccf4357aac65be197cb7dd847f2ef1c2f6a632138aa4a2305e945a09018",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 20032,
+          "digest": "sha256:ec7a2e67e68f016fdb2a00eafc58ebb3accdbee9edac8ff17b759e1545024ed0",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 473,
+          "digest": "sha256:04bc698fc2ee1edd37a415103722772191c898be597c388b8cdca4fba544e9ee",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 31147,
+          "digest": "sha256:a52272b8502f38f72b8fa4ce22db6c64c7cea9a19ee21756b1c033c2559df96a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.5/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.6",
+      "name": "0.1.6",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.6",
+      "target_commitish": "a852fbf0df3a533b31c33f6d50f99a4530e64bfa",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T05:46:33Z",
+      "body": "直接运行 mas 现在打开普通终端文本菜单，不再使用全屏 TUI。菜单显示在当前位置，只刷新当前几行；历史菜单、容器信息、操作进度和错误可以向上滚动查看。\n\n保留“容器管理／设置”分类、方向键导航及全部容器操作。安装语言、CLI 确认和交互菜单复用同一组件；默认语言和默认拒绝策略不变。进入容器前恢复普通终端模式，退出后回到文本菜单。文本输入支持中文、光标移动和编辑。\n\n移除 curses，全程使用 Python 标准库，无新增第三方依赖。CLI 命令及 --yes / --no 保持可用。\n\n验证：当前 Ubuntu WSL 环境，51 项打包单元测试及 14 组真实 LXD 集成测试通过，包含完整文本菜单生命周期、终端模式恢复、局部刷新与历史保留。原生 Ubuntu 和其他 CPU 架构未实测；本批未重复全新宿主的提权安装。详见 WSL_REPORT.json。\n\n安装：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash\n```\n\n安装并自动测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 2877,
+          "digest": "sha256:d4727d9b4298b0cb55760af0a3b42f54f2243735eb72df0ba707b4ec50619ac9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 19567,
+          "digest": "sha256:f12a2b0315195141d85c4254c4ef30980450d7dfb0b60915e45c53e9f561e7c7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 46106,
+          "digest": "sha256:e1105a8ed3ca9a9f73232b590e9de3b1be4f63374a2bafda03c75254f71ffbac",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 19573,
+          "digest": "sha256:587d7acbf96ba1ddae49af6d34b3f2998d3296e89766aa93ff610cf265f59617",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 473,
+          "digest": "sha256:acd3121b6313c3db2a75864f2fafeeb3445c9374377bc0cdb731f6df14a5daae",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 46646,
+          "digest": "sha256:a9d317559fd772b53db31bf468da5747741733e82d1a8af1b3705648e44a586f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.6/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.7",
+      "name": "0.1.7",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.7",
+      "target_commitish": "e48958e2796d6e0704dbe95cb6207c8e3dced713",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T06:17:08Z",
+      "body": "本批对照需求、实现文档及代码补齐自动化测试，新增 TEST_COVERAGE.md 覆盖清单与 CORE_BEHAVIOR.md 基础操作逻辑清单。\n\n测试从 51 项扩展至 77 项打包单元测试，从 14 组扩展至 17 组真实 LXD 集成测试。新增异常等待、备份失败保护、部分批量失败、重复启停及用户保留、错误目标/损坏备份、无标记原生备份导入、校验失败禁止安装和测试程序自身的失败退出验证。\n\n测试程序自动发现全部测试模块；JSON 报告记录单元测试数量、标识、失败、错误和跳过原因。拒绝 Python -O / PYTHONOPTIMIZE，避免断言被禁用后错误显示通过。清理异常仍写入报告并返回失败。\n\n新增测试发现并修复了 LXD 列表返回结构不合法时可能被当成目标不存在的问题：现在明确拒绝非法 JSON 结构。\n\n验证环境：当前 Ubuntu WSL，已有 LXD。原生 Ubuntu、其他 CPU 架构和本批全新宿主提权安装未实测；故障注入与真实验证的边界见 TEST_COVERAGE.md。\n\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\n不带 --test 则只安装产品。无新增第三方依赖。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 2877,
+          "digest": "sha256:d4727d9b4298b0cb55760af0a3b42f54f2243735eb72df0ba707b4ec50619ac9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 19662,
+          "digest": "sha256:5e52f74cb47c5b92534c048539ab1e696397c292b1b44d0debd982d3bc9bcb52",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 52521,
+          "digest": "sha256:e0f4a8c9abb8378f3e73899708c7e830311b88d503a028cb62b33d3b3d8aec5c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 19668,
+          "digest": "sha256:36e51c99308258a8443213ea4dda55d9e14035c1223efa75ede7065dee64ea01",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 473,
+          "digest": "sha256:7361dd8c142ed606dff73465b4a2fa3c38c2c7e8037259910b0af35d9dd35c9a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 65932,
+          "digest": "sha256:1119f0f8e8e07f9b1174e82c4523649a32ee99fc46b4c9503fb38ae3507f9511",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.7/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.8",
+      "name": "0.1.8",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.8",
+      "target_commitish": "b4a802e9b70491463901c9cbc84d53297e2e68ae",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T10:16:39Z",
+      "body": "CLI 与终端菜单的等待状态现在原地刷新，完成结果、警告和错误保留在终端历史中。产品和自动化测试复用同一显示组件，修复状态查询警告与进度行混杂的问题；容器操作及每秒状态探测规则保持不变。\n\n验证：当前 Ubuntu WSL 环境下，82 项打包单元测试、17 组真实 LXD 集成测试全部通过，无跳过、无清理错误。附件 WSL_REPORT.json 记录验证结果；产品 SHA-256 与该报告一致。未重新验证原生 Ubuntu 或无 LXD 的全新宿主安装。\n\n程序本体、安装程序和测试程序保持独立。固定入口加 --test 会安装并运行同版本自动化测试。\n\n这是 0.1.8 test 预发布，不是 stable。mountfs / unmountfs / mountedfs 仅加入需求文档，尚未实现。等待期间提前按键仍可能产生系统输入回显。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 2877,
+          "digest": "sha256:d4727d9b4298b0cb55760af0a3b42f54f2243735eb72df0ba707b4ec50619ac9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 20326,
+          "digest": "sha256:df06725a7d2d183623ad14539ea72a05ef16752ac2eb71e3176914ffdc99d316",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 54810,
+          "digest": "sha256:9b38f53e0981141cea703f9f3550a9aa282f8c46d92ca9cd41815e197a24c22c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 20498,
+          "digest": "sha256:ff807b96badd57749290b0e16d1066f7f232b03bcb49d04ee05f09f0e318e197",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:9370c5c5fcf17d741441ff382be0439f5ff3ef465478fdcfbdf99853e441d73e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 66778,
+          "digest": "sha256:8df39171c44019eb3ea0cc36d90043e5e519201236a735af3fb58020a982dc2c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.8/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.1.9",
+      "name": "0.1.9",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.1.9",
+      "target_commitish": "4c862ab4c7dca5f3a230ad70f40916d5496cd4ce",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-28T10:56:53Z",
+      "body": "新增独立的 `mas mountfs TARGET [PATH]`、`mas unmountfs TARGET [PATH]`、`mas mountedfs TARGET`，以及对应文本菜单。目录映射到 `~/LXDCMFS/TARGET`，默认选择 sandbox 的实际 home；支持原生读写、精确卸载、路径冲突/重叠保护、挂载查询和残留清理。\n\n使用 LXD 自带的本地 SFTP 服务与宿主 SSHFS，不修改容器权限或 UID/GID，不安装容器内服务。安装器自动准备缺失的宿主 SSHFS。LXD 6.9 会等待持续文件连接释放，因而 mas 在存在挂载记录时拒绝改变启停状态或删除，提示先明确卸载，不自动卸载。\n\n验证：97 项打包单元测试、20 组真实 LXD 测试全部通过，清理无错误。当前 Ubuntu WSL/LXD 6.9；SSHFS 来自 Ubuntu 官方软件包临时解包，使用已有 FUSE/OpenSSH 库。原生 Ubuntu及全新特权安装未重新实测。报告和产品校验和随附件提供。\n\n本版本为 test 预发布。后续 0.1.10 将继续审查并完善文档、实现和自动化测试。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 2877,
+          "digest": "sha256:d4727d9b4298b0cb55760af0a3b42f54f2243735eb72df0ba707b4ec50619ac9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 27144,
+          "digest": "sha256:8ef22a6d1b5d7aaf0a3f8ade39129a93699751429de5c4510784c9e701edb93a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 65575,
+          "digest": "sha256:5dafd1f706694af9c4dd06b2da5283c6c7af7443a8493efca2e3282567529a8c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 27653,
+          "digest": "sha256:6ad3105dcbcde74e9847e9db60e18cc3b3b5122d2f3930fd7cf97d9ed385babb",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:d4db615c84f82d29db87c52da773107b36d4fb467505b13f4a3abaf61d582ada",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 76173,
+          "digest": "sha256:e021871bcd7758f1661f1279a15fc054a3021d77fecd2c9bbe9f7d8554cd9a7d",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.1.9/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.1",
+      "name": "v0.2.1",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.1",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-29T10:18:09Z",
+      "body": "# 0.2.1 — GPU 硬件选项（test）\n\n- 新增独立 GPU 模块和容器“硬件选项”菜单，GPU 为首项；提供 `mas hardware TARGET [gpu [on|off]]`。\n- 受支持 NVIDIA GPU 默认开启，显式关闭跨启停保留。修改前须停止容器；配置冲突或资源漂移报错，不覆盖外部配置。\n- WSL 使用 LXD 原生 DXG 设备和只读 GPU 运行库映射，记录资源清单并支持撤销；不映射整个 Windows 驱动目录，不安装额外 GPU 软件包。\n- 新增真实 CUDA 内核、普通 sandbox 用户访问、菜单关闭、设备撤销、重新开启和只读映射测试。177 项打包单元测试、22 个本地实机测试环节全部通过，耗时 459.4 秒。\n- 实测 WSL2 + NVIDIA RTX 5090 Laptop GPU。原生 Ubuntu NVIDIA CDI 路径未实机验证；AMD/Intel 独立显卡尚未支持。Project/profile 加固和其他硬件限制留待后续，网络保持原状。\n\n公开普通安装与 --test 入口均已验证，公开测试再次通过 177 项单元测试和 22 个环节，耗时 462.2 秒，无跳过或清理错误。阶段 1 stable/0.1.15 保持不变。完整验证与范围见 IMPLEMENTED.md、TEST_COVERAGE.md 和 WSL_REPORT.json。\n\n\n安装并执行完整自动化测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 40053,
+          "digest": "sha256:bc796bc0263a61a6d5678309fcfb128dc3b971fbf56aab43de83f4c662d5f53b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 104572,
+          "digest": "sha256:b14f8a8e837cf7accc8b3e93339e692d3ee1803ce3f36f6d27ad8adc7f3b7acd",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 38496,
+          "digest": "sha256:4eb61ee5e3b0e726c4c166bc959f4f63ee9b430dc48c4987a83c8721c10dddcc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:87dd7295d21a9abdb4432c66d7ec5e546b91ace32df9689ed74c6a2a3c1f985f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 160715,
+          "digest": "sha256:c69175b17310ddfdd1ed4edc307ed5b7828f1224a35d71957f5d1a7d952967c1",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.1/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.10",
+      "name": "0.2.10 (test)",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.10",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-30T22:19:31Z",
+      "body": "# 0.2.10 — 测试终端与失败边界修正（test）\n\n- 修复子进程正常退出、终端尾部输出尚未读完时误判测试失败的问题，保留最终诊断和完整记录；终端提前关闭而进程仍运行时保持探测间隔。\n- 终端进程清理独立于进度、事件和日志输出，使用有界 TERM/KILL 回收；其他客户端复用有超时的清理实现，清理失败保留原始操作错误并继续尝试独立收尾步骤。\n- 严格校验 GPU 运行库目录查询，以字节比较文件内容；异常查询和非 UTF-8 外来文件明确报错，保留原文件及配置。\n- 补齐 LXD、文件系统查询、监听器、SSHFS 和卸载失败的原始诊断，保留两个输出流；目录查询失败不再被描述成目录不存在或符号链接。\n- 自动测试在安装前拒绝小于 300 秒的超时值。\n- 将 6 条测试专用文案移入测试专用语言文件，产品及安装包不再包含这些文案，并加强打包检查。\n- 新增 18 项回归测试；最终包在仓库外通过 254 项单元测试和全部 23 个环节，耗时 484.5 秒，无跳过、未执行项或清理错误。公开入口也全部通过（481.6 秒）；11 个附件、四个固定入口、普通安装、安装文件一致性和测试项目回收均核验通过。\n\n本批为 test prerelease，stable 保持 0.1.15。历史 Windows UNC 偶发异常的根因仍未确认，保留取证功能。完整记录见 IMPLEMENTED.md、TEST_COVERAGE.md 和版本报告。\n\n安装 test：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 49045,
+          "digest": "sha256:8dd34aa73757dc152517f3b9ffa8ab5f7c91b991fe46c09110dc6e4f448cf5b2",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 137594,
+          "digest": "sha256:fbae85ab96fb5c22bc47db4ac61733aabb41248fec90fec62e75d97b37c43126",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 45557,
+          "digest": "sha256:3fc85866d4c14860798aab90d3b26fba5c295f6ef55f0899da0958694d79efaf",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:090f401fc7d78f4a464af9a087e0567a38a2fa2f93d943709c7fffd898f3cb3c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 227583,
+          "digest": "sha256:ef8f12c0245e25f324e7a87af901ce12754119f7a16fd81034a76f58f0fb68d9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.10/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.11",
+      "name": "0.2.11 — Fixed isolation and native backup compatibility (test)",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.11",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-01T03:14:09Z",
+      "body": "# 0.2.11 — 固定隔离配置与原生备份兼容（test）\n\n- 使用专用 `mas` Project/Profile；固定非特权、独立身份映射、默认 seccomp、禁止 nesting/lowlevel/interception 和未授权宿主设备。保留现有网络行为及容器内免密 sudo。\n- 完整核验 expanded 配置、GPU 精确映射与只读属性、root/NIC 和额外存储卷。配置不合规时拒绝启动；查看信息、安全停止和宿主挂载恢复仍可使用。\n- 增加 `mas migrate TARGET` 及“迁移旧容器”菜单，确认后原生迁移停止且无挂载的旧容器；保留安全的继承配置和用户数据。旧容器挂载可用 mountedfs/unmountfs 的 --legacy 参数恢复。\n- 按用户确认的方案解决 LXD 6.9 原生备份与 lowlevel=block 的冲突：临时 Project 导入、核验后原生复制，正式 Project 限制不变。失败保留备份及停止的临时数据，报告位置；成功仅清理所属临时资源，不修改备份格式或容器文件权限。\n- 补充固定配置、运行时身份/namespace/seccomp、设备拒绝、迁移、临时导入和异步清理验证。本地及公开入口均通过 287 项单元测试和全部 26 个环节，分别耗时 605.7 秒和 602.0 秒，无跳过、未执行项或清理错误。普通安装、11 个发布附件、四个固定入口与资源回收已核验；详细记录见 IMPLEMENTED.md、TEST_COVERAGE.md 和版本报告。\n\n当前 WSL 内核 AppArmor 未启用，已记录；不将其标为已生效。CPU/内存/进程限制、额外网络策略和下一次 stable 的 release 分支仍待后续开发。Stable/0.1.15 不变。\n\n安装并测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 57918,
+          "digest": "sha256:8151c91b306caf4a4dcbfc4d3527360f03374bc3eafca552071118ea07a3df2e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 156152,
+          "digest": "sha256:5478dc981b84579a885cd1c54a95ed44f46ac0f5adc18853a6c578150ba3e5a1",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 54598,
+          "digest": "sha256:f46e387a748e848e62bb3a00b69437cc393c32191f4b4d8bc143ac3424e9c311",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:7f10262bec8e8dafc889fc7824130c8ac4ccdf181956d70713eab9f03f091541",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 269234,
+          "digest": "sha256:eee5501a5002ead4a04639bae3a5608f9ab5e994868dae4589814bf6f9a45464",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.11/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.12",
+      "name": "0.2.12 — Guest boundary coverage and SSHFS readiness (test)",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.12",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-01T09:51:45Z",
+      "body": "# 0.2.12 — 安全挑战覆盖与挂载就绪修正（test）\n\n- 将独立挑战源码、入口和回归测试纳入 mas-test，仓库外也可运行；产品和安装包不含测试代码。\n- 扩展设备、内核控制、进程根路径、管理 socket、Windows/WSL 和 devlxd 探测；保留权限拒绝、能力缺失、来源不明和真实错误的区别，失败时继续其余检查并保留报告。\n- 使用真实宿主参照验证 namespace、唯一标记和 socket 来源；容器内正向文件/符号链接样本确认探测有效；GPU 关闭后复用同一挑战。\n- 收紧原生隔离拒绝的测试判定，防止将命令或连接错误算成安全规则生效。\n- 修复 SSHFS 先出现在挂载表、SSH/SFTP 尚未就绪时提前报告成功的问题；基础挂载统一等待有界只读元数据查询和私有 known_hosts，复用原期限与清理逻辑。\n- 提供十项菜单文案/结构建议，尚未改菜单，见 MENU_REVIEW.md。\n- 本地 frozen 包通过 331 项单元测试、26 个实机环节（632.9 秒），无跳过单元、未执行环节或清理错误。挑战报告无明确越界；不存在的 binfmt_misc/register 单独标为未验证。\n\nStable/0.1.15 保持不变；历史 Windows UNC 偶发问题尚未确认根因。本轮不增加宿主 AppArmor、硬件配额或网络策略。公开安装/测试入口同样通过 331 项单元测试、全部 26 个环节（650.2 秒）；11 个附件、四个入口、普通安装和资源回收已核验。容器内公开挑战命令也已用 sandbox/sudo 实测，无 FAIL/REVIEW/ERROR；缺少参照与接口的检查保留为未验证。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 58201,
+          "digest": "sha256:17164a3b8c8df396287888087912e176f29ebbae9e9868477c82843ed77399a4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 181243,
+          "digest": "sha256:2a2c8682e2eef8c39105c6c48d5b58ab5388739da7d34e55dc192681a9a798a1",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 54881,
+          "digest": "sha256:0d58facdc1d730e81ca8049608369cb983bfc39001000caad3369917ecee1c57",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:1dcb6705413eb392102c7eeaddd5a293c1d86bccca3ed085153b99b0d54281af",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 413088,
+          "digest": "sha256:66c23f155aa436a85e4e3fe8190a0efa1ae653fb1046296874f530e6348ddc60",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.12/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.13",
+      "name": "0.2.13 — 菜单文案、结构与收尾核验（test）",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.13",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-01T21:17:52Z",
+      "body": "# 0.2.13 — 菜单文案、结构与收尾核验（test）\n\n- 完成全部十项已确认建议：导航标题只显示一次；“容器列表”和“迁移旧版本容器”语义明确，空页面先显示标题及说明。\n- 容器菜单将挂载查询、挂载、卸载归入“文件系统”，复用原有基础功能并保留返回时的选中项；卸载选择返回或 Esc 均明确取消。\n- 信息页显示名称、状态和已记录的 GPU 配置，可选择完整配置。页面只查询一次并复用结果，不因显示信息探测 GPU；CLI info JSON 保持一致。\n- 名称提示说明实际命名规则，挂载提示明确容器内绝对目录和非符号链接限制，备份提示明确宿主路径。挂载结果复用显示宽度对齐，不截断路径，不输出 ANSI 或 Tab。\n- 共享按键提示区分退出、返回、取消；双语及安装语言选择同步。标题、说明和输入提示完整保留，短窗口不会截断必要文案。\n- 新增九项回归测试，覆盖双语实际终端、窄终端和短窗口、标题/空行/返回位置、信息查询复用、取消与失败；实机菜单路径同步更新并保留原有状态、JSON 和 shell 断言。\n- 本地冻结包通过 340 项单元测试、全部 26 个实机环节（663.7 秒），无跳过单元或清理错误。固定隔离配置、迁移/导入、GPU 计算、共享安全挑战和 Windows UNC 挂载核验通过。\n\n本轮复查未发现额外的已确认后端缺陷；历史 Windows UNC 偶发问题仍未复现，已保留文档记录与诊断。未扩展资源授权、网络策略或宿主 AppArmor；stable/0.1.15 保持不变，供用户测试后决定后续 stable 发布。公开安装/测试入口也通过全部 340 项单元测试和 26 个实机环节（634.3 秒），无跳过单元或清理错误；11 个附件、公开源码入口、普通安装、已安装文件和资源回收核验通过。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 58991,
+          "digest": "sha256:8f79adf5ec4f52d8fac2c4463d166a513a1953d52dd868ed11d8282418f6ae8e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 186362,
+          "digest": "sha256:054ad90daec01832f3608e6477f0391039c557bf287f302c04bd7ab4c1014393",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 55966,
+          "digest": "sha256:cad64794b9f8780073431d697c239560e68cb3b35e79d0c1b9ec5cdc90320077",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:57c2ad309aa7fb47fba49ed104ba535d3f56a579c3b568e360d2fcb40bb1c756",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 407197,
+          "digest": "sha256:467ced5f361b7eb13ab83dacdefe94b364f432a8484fba1232cd302cae7ab276",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.13/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.14",
+      "name": "0.2.14 — 标准重启与终端结束操作",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.14",
+      "target_commitish": "f70a57da0050d69265c8fc9ee2721bbbd418ba4c",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-02T01:21:18Z",
+      "body": "# 0.2.14 — 标准重启与终端结束操作（test）\n\n- 新增 `restart TARGET`：标准 stop → start；`-e/--enter` 则为 stop → enter。停止失败时中止，启动准备只执行一次，start 不增加参数。\n- 选中容器后加入“重启”，复用同一基础组合和原有挂载前后处理。\n- 终端结束后提供停止容器、重启容器、返回 mas、退出 mas，默认退出；Esc/← 退出。返回菜单保留进入终端的选中位置，不经过操作结果页。\n- 所有终端返回码都允许该选择，非零诊断和同时发生的收尾错误仍保留；返回菜单后最终退出状态也保留失败。兼容 CLI enter 的 --yes/--no，restart --enter 同样支持；非交互默认退出。\n- 新增十一项单元回归和真实重启环节，覆盖失败中止、双语终端恢复、数据保留、挂载恢复和全部返回目的地。\n- 本地冻结包和实际公开入口均通过 351 项单元测试、全部 27 个实机环节（712.1 / 715.0 秒），无跳过单元或清理错误；11 个附件、公开源码、普通安装、已安装文件和资源回收核验通过。\n\n容器内原生 reboot/shutdown 仍不经过 mas 流程，本轮未加入 LXD hooks 或修复原生 Session terminated 缩进。Stable/0.1.15 保持不变。\n\n实测环境：Ubuntu 26.04.1 / WSL2、Python 3.14.4、LXD 6.9。原生 Ubuntu/云平台未在本批实测。\n\n安装：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n附件包含独立产品、安装程序、测试工具、入口脚本、SHA256SUMS 及本地完整实测 WSL_REPORT.json。Stable/0.1.15 不变。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 59809,
+          "digest": "sha256:a147f90d2abe5b59cd4631175117dc31edc5d3f61b4f743350f2336f0bc78f7f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 190906,
+          "digest": "sha256:653067b486314c60ad22732205029eb158b00d2c694d7a6b601ff929350740d3",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 57230,
+          "digest": "sha256:59333cd7c6e4b43ec687ce16491184e4ab5c902849118c0e6067715a95031733",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:3e647d6d4adad33ebf4c1a7fa44a67be324614cd2e32aa4ce817e15c583cffcb",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 459159,
+          "digest": "sha256:eecaeea2f7c608c62b52890307b60036e37ca204e530b2a01d77fc6eba2a5f6e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.14/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.15",
+      "name": "0.2.15 — 容器与宿主挑战分离（test）",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.15",
+      "target_commitish": "5062ea282adcfa3ef2c173f01eb4d01daa76b008",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-02T04:49:05Z",
+      "body": "# 0.2.15 — 容器与宿主挑战分离（test）\n\n- 容器内 security.sh 固定命令不变；只执行无需宿主参照即可判断的检查。\n- 新增宿主侧 security-host.sh 固定入口，默认输入 mas Project 的运行中容器名；自动采集六种 namespace、进程来源、唯一标记及管理 socket 参照，运行容器内挑战并取回报告。\n- binfmt_misc 在宿主侧挑战中检查真实挂载来源，并用独立 user/mount namespace 子进程尝试临时实例；不注册解释器、不执行 Windows 程序，核对宿主注册规则未变。\n- 报告中的测试只有通过或失败，环境记录单列；证据不完整和执行错误明确失败，保留原生诊断、原始失败及报告/清理失败。\n- 补齐 WSL 宿主识别、真实终端输入、参照完整性、有界挂载、报告完整性和下载入口回归；同一基础执行器用于公开宿主挑战和完整自动化测试。\n- 本地冻结包和实际公开入口均通过 369 项单元测试、全部 27 个实机环节（735.6 / 723.7 秒），无跳过单元或清理错误；公开宿主挑战 18 项、容器挑战 60 项全部通过。11 个附件、四份公开挑战源码、普通安装、已安装文件和资源回收均已核验。\n\n产品隔离策略与 restart 行为保持本批之前的实现；Stable/0.1.15 不变。使用方式与精确测试范围见 GUEST_SECURITY_PROBE.md。\n\n实测环境：Ubuntu 26.04.1 / WSL2、Python 3.14.4、LXD 6.9。原生 Ubuntu/云平台未在本批实测。\n\n宿主侧安全挑战（输入 mas Project 的运行中容器名）：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security-host.sh | bash\n```\n\n容器内安全挑战（固定命令不变）：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n\n安装并测试最新 test：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n附件包含独立产品、安装程序、测试工具、入口脚本、SHA256SUMS 及本地完整实测 WSL_REPORT.json。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 59810,
+          "digest": "sha256:4dea7c00c24991f1cb45b76e42046237d7c8bcbbcbbaaee1570d3f25baf80f00",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 203000,
+          "digest": "sha256:812c29bf218a2139575af08c9004b20f32ebd18944c84c07b31c8d9159aa184d",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 57231,
+          "digest": "sha256:75d0489f6ebb43b22150208f4d6fd7438cd9ec7e628fcc8b1ae37180a7b704aa",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:84c43c5319b8ff9a7e89ec7e9092ef722f669558cd8fcf574ec2fc0f43895bad",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 691565,
+          "digest": "sha256:6e2a8eab50cc54e38a091883e523cbefb3095f2629ce1abae275f466dbaf1236",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.15/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.16",
+      "name": "0.2.16 — 容器列表查询等待提示",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.16",
+      "target_commitish": "daa36b117047a953bfd9bc3ba160367fdadb8c02",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-02T07:12:01Z",
+      "body": "# 0.2.16 — 容器列表查询等待提示（test）\n\n- 打开容器列表时显示“正在读取容器列表…”；英文为“Reading container list…”。查询完成后清除，再显示列表或空列表说明。\n- 复用现有临时输出和菜单边界；查询失败、中断及原生诊断出现时正确清除，不增加空行、额外查询或人为延迟。\n- 自动化列表导航统一等待实际活动菜单标题，避免把此前选项或等待文字误认为菜单已就绪。\n- 增加双语真实 PTY 检查，覆盖等待期间、正常/空列表、警告、失败、中断和查询次数；重定向输出保持普通文本。\n- 本地冻结包和实际公开入口均通过全部 371 项单元测试、27 个实机环节（734.6 / 725.9 秒），无跳过单元或清理错误；11 个附件、普通安装及资源回收均已核验。\n\nStable/0.1.15 保持不变。\n\n实测环境：Ubuntu 26.04.1 / WSL2、Python 3.14.4、LXD 6.9。\n\n安装最新测试版：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n\n安装并运行完整测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n附件包含独立产品、安装程序、测试工具、入口脚本、SHA256SUMS 及本地完整实测 WSL_REPORT.json。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 60075,
+          "digest": "sha256:87d46ccbed4e8c7484634133946bd7bec132a059c1e76a52c178acbc782c96b4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 204389,
+          "digest": "sha256:52cc2e3e4264d1b70ea08126da87cddee2ca15388b08f103561ba124b80f91a2",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 57524,
+          "digest": "sha256:bd9616c941ee9435fa9d034a0c2c9ccab0ce700f47c390f3daebf0e32a38c201",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:1d2e48a03bc9a52fd021f68745838e0864403e1f8b26908a23499fe41338544f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 691958,
+          "digest": "sha256:72d8fb0b4fa5bb7de207e35ff6c55d007a63915314e13743d80c1b69de62452e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.16/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.17",
+      "name": "v0.2.17 — 宿主挑战选择容器与恢复状态",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.17",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-02T08:45:14Z",
+      "body": "# 0.2.17 — 宿主挑战选择容器与恢复状态（test）\n\n- 宿主挑战同时列出运行中和已停止的 mas 容器，询问目标名称；无运行容器也可输入，输错允许修正，留空取消。显式目标、查询错误、管理范围及本地 Project 边界保留严格核验。\n- 原本运行保持运行；原本停止通过标准 start 启动，挑战收尾后通过标准 stop 恢复停止。直接复用已安装产品，包含原有隔离、GPU、用户与挂载处理。\n- 启动部分失败、挑战失败、Ctrl-C 与 SIGTERM 都尝试恢复；身份变化拒绝停止替换后的容器，恢复失败独立报告且不能算整体通过。\n- 增加十项回归；实机验证两种原状态和 SIGTERM 恢复。本地冻结包和实际公开入口均通过 381 项单元测试及全部 27 个环节（731.6 / 736.9 秒），无跳过单元或清理错误；公开宿主两种原状态（19 / 18 项）和容器挑战（60 项）、11 个附件、普通安装与清理均已核验。\n\n三个固定命令不变。容器挑战、安全断言和产品隔离策略保持现有实现；stable/0.1.15 不变。小修改可累计，不要求逐项单独发版。\n\n自动化测试（宿主）：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n容器内挑战：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n宿主侧挑战：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security-host.sh | bash\n```\n\n实际本地环境：Ubuntu 26.04.1 / WSL2、Python 3.14.4、LXD 6.9；已准备的宿主，未重复全新系统安装。附件 SHA256SUMS 和 WSL_REPORT.json 提供校验及本地实测结果。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 60075,
+          "digest": "sha256:061116af7d3ad690657b3b0ad02017360cb77a18b9f15c74e05e33fb3cb15302",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 207365,
+          "digest": "sha256:8c999f5c9294a9896d4da405fcaff2fd74aaaa92f328d93947b639715272e314",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 57524,
+          "digest": "sha256:f0c5464467d4304b9bc45e300201253ea1c1252dfab8b6ca92ce0ef9af08047c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:0cfaa35edbc9adaa9a4328a22be967f4293bd723c69021f1f6e43695b81c201e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 693135,
+          "digest": "sha256:f9dc692ac57c490fbbf89b2c0928335a4eedbab4df0275dfe773bbc51867e992",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.17/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.18",
+      "name": "v0.2.18 — 安全挑战整合与分类测试输出",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.18",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-02T20:17:03Z",
+      "body": "容器内与宿主参照安全检查已合并到自动化测试。运行 test/test.sh 即可创建专用临时容器、执行完整挑战，并在宿主显示每项方法、观察和通过/失败结果；不再提供独立挑战下载入口。\n\n全部测试环节新增七类标签、简洁说明和分隔线。真实终端中的成功勾为绿色，失败叉为红色，“预期错误”标签为橙黄色；重定向日志保留纯文本，原生诊断保持原样。产品功能不变，产品、安装包和测试包版本统一为 0.2.18。\n\n验证环境：现有 Ubuntu 26.04.1 / WSL2、Python 3.14.4、LXD 6.9。冻结包在项目外通过 375 项单元测试和全部 27 个真实 LXD 环节（737.4 秒），无跳过、失败或清理错误。GPU 开启/关闭后的完整挑战分别通过 74/72 项，正向标记检测、宿主状态后置核验及资源回收均通过。真实终端颜色、中英文文案、纯文本日志、打包边界和可重复构建已核验。实际固定公开命令也已通过 375 项单元测试和全部 27 个环节（751.2 秒），无跳过、失败或清理错误；公开运行的 GPU 开启/关闭挑战通过 69/72 项（检查数随容器服务清单变化）。11 个下载附件、校验和、安装文件、历史发布保留、独立入口移除和资源回收均已核验。需求、已实现、覆盖文档与版本验证报告已同步。\n\n这是 test prerelease，stable 保持 stable/0.1.15。全新宿主安装、原生 Ubuntu、云主机未在本批次重新实测；检查结果不代表覆盖上游所有漏洞。\n\n在 Linux/WSL 宿主安装并运行完整测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n仅安装测试版、不运行测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n\n附件中的 SHA256SUMS 校验产品、安装程序、测试工具及共享入口，WSL_REPORT.json 保存此次冻结包的原始测试结果。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 60075,
+          "digest": "sha256:58547b9f77122ab3a1e84b227c9fa2c39bf38b1bc682cc211c4023d967bd0c96",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 206488,
+          "digest": "sha256:1c75b0929787a10d324a89b1f9d0798435d49115fb35b2bc017ad288f4e33d58",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 57524,
+          "digest": "sha256:dae7befe1a943ef12b18469c97c0173ba1d0ec4e062ad395178749ecbec9027a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:9375dfcfa88ca81106538fbcae55b48114c10a6a8c2586810aa3a4cc75f22974",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 818640,
+          "digest": "sha256:f69a866ad4325bc03a48afc28d85bbe08754770d59b170050c0dcc5058ddce30",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.18/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.19",
+      "name": "v0.2.19",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.19",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-02T22:17:50Z",
+      "body": "自动化测试按安装、全部功能测试、独立临时容器的一次完整安全挑战、清理和汇总执行。GPU 开关保留对应的设备、映射和计算能力功能核验。\n\n恢复宿主侧独立入口 test/security.sh：输入要测试的 mas 容器名，按需调用标准 start，结束后通过标准生命周期恢复原运行状态。自动化测试和独立入口共用挑战模块，完整结果在宿主输出；独立入口只下载校验后的 tester，不安装 mas。\n\n验证：最终冻结包在仓库外通过 395 项单元测试和全部 27 个测试环节，最后一次完整挑战通过 75 项检查；独立入口、运行状态恢复、启动中断及 LXD 原生操作等待也通过实际核验。实际公开 test.sh 命令已通过同样的 395 项单元测试和全部 27 个环节（718.1 秒），只有最后一次完整挑战。公开 security.sh 通过 75 项检查，恢复初始停止状态并保留安装文件。12 个附件、旧版本资产、普通安装及资源回收已核验。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5731,
+          "digest": "sha256:ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 60188,
+          "digest": "sha256:b53234866097bcef1bc956d2613fee612ae1b37341648aa24fbf9059c20f9128",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 214892,
+          "digest": "sha256:dbd8d78996d1c24ba88c2503723bae8542a5c49c671acdf592fbbb16c28bb609",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 57637,
+          "digest": "sha256:d3adad8d91070906e6809d72062df864406274636bdd51473963ee7a481349e0",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 790,
+          "digest": "sha256:53388f658cf4664b1d10a05d665daf86d9b1ed56997bc9f1cd1e0e47b1cd803d",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 590937,
+          "digest": "sha256:a5a909b574cf5e1819d8e1a90c1697ebc9dc3968050bdc7c142cc35b21e5487d",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.19/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.2",
+      "name": "0.2.2 — Terminal test synchronization",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.2",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-29T20:25:27Z",
+      "body": "修复终端自动化测试过早发送 exit 的时序问题：统一等待实际 shell 提示符，兼容窗口标题控制序列与导入容器的旧 hostname。产品业务逻辑保持不变。\n\n验证：179 项打包单元测试、22 个实机环节全部通过（461.8 秒），无跳过或清理错误；额外 20 轮、40 次伪终端同步检查通过。\n\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n\nGPU 当前生效驱动目录选择另行研究；阶段 1 stable/0.1.15 保持不变。\n\n公开 --test 入口验证：179 项打包单元测试、22 个实机环节全部通过（487.6 秒），菜单环节通过（83.3 秒），无跳过或清理错误。发布附件与已安装产品/测试工具的校验值匹配。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 40052,
+          "digest": "sha256:2b9390959fa153f982194ce73042ed11574a81a4151a57d40acecad12bf615bc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 105894,
+          "digest": "sha256:05c128682585696a2c86744fb5b0d91557df8d2fd235a24187b7b7fadc754d9b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 38495,
+          "digest": "sha256:86072162533ad8247db87133767562df2a2bbf1c12c8fa769fd25fdc8689bcc5",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:b57d99e8cf1d34fd9b67f78ab75431ed14c969499b55a3979d0f76d56463f914",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 161426,
+          "digest": "sha256:807086bfb9638457a2ebf7e3e4cf0d511f50bd850c56998d3b7edaace661a9ca",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.2/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.20",
+      "name": "v0.2.20 — Prepared development containers",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.20",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-03T03:06:31Z",
+      "body": "New containers now finish creation only after standard start, one-time development environment preparation and verification, and standard stop. Existing containers keep their software; subsequent start/restart/enter and backup import do not reinstall user-removed development packages. Independent host security challenges use the shared container selector, with explicit TARGET retained.\n\nIncludes 23 agreed Ubuntu packages plus the latest official Node.js LTS/npm, downloaded from nodejs.org and verified against its SHA-256 manifest. No model tools are installed.\n\nValidated on the current Ubuntu WSL/LXD/NVIDIA x86_64 host: 410 packaged units, all 27 native stages, one final full challenge with 75 passing checks, and complete owned-resource cleanup. Additional native failure and real PTY selection checks passed. Frozen full suite: 1038.1 seconds. Native Ubuntu/cloud/ARM64 and fresh host provisioning were not newly exercised. Stable remains stable/0.1.15.\n\nInstall and run automated tests from the host:\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\nSelect an existing container for a complete host-initiated security challenge:\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n\nSee README.md, REQUIREMENTS.md, IMPLEMENTED.md, TEST_COVERAGE.md and GUEST_SECURITY_PROBE.md. WSL_REPORT.json is the final frozen local report; public-entry validation is recorded separately in the repository.\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5731,
+          "digest": "sha256:ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 64592,
+          "digest": "sha256:ce37b4be4ab8359adefaa88f82a2653585e2977d2d20ab7e95d629cb18ffa9a1",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 222760,
+          "digest": "sha256:3698ddab3e28dd95b6e892c7f5c3f316f07c0d103f6d385cb01fa8fbb8e0c8b5",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 61993,
+          "digest": "sha256:80e84b91b37699275bd1d96970907f8597b981f4500986658854f1fedf685382",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 790,
+          "digest": "sha256:19b1244a33cf88cef08028ebb3d8cdbe8cb8158e1547f463256ed5bb07bdb4d9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 697848,
+          "digest": "sha256:e302a4644cba9de29298918456a4ecf5565c8bde744be3255ba16607de9d60ad",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.20/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.21",
+      "name": "v0.2.21 — APT development environment and network switch",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.21",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-03T07:33:57Z",
+      "body": "New containers now install the agreed 25 development packages from Ubuntu APT, including `nodejs` and `npm`. Creation shows live cloud-init/APT output in a temporary terminal region, retains warnings and errors, verifies preparation, and finishes with the container stopped. Later starts do not reinstall development packages.\n\nHardware menus and `mas hardware TARGET network on|off` control each stopped container's external NIC. The setting and original MAC survive restarts and backups. With networking off, local loopback, host terminal entry, LXD SFTP/SSHFS access and the host-initiated security challenge remain available. The challenge checks the configured network state using local interface and IPv4/IPv6 route evidence.\n\nValidation: the fixed public test command passed 419 packaged unit tests and all 28 stages in 1425.6 seconds, with one final complete challenge (76 checks), no skips, unexecuted stages or cleanup errors. Independent public network-off challenges passed 76 checks from both Stopped and Running and restored the original state. All twelve assets, normal installation and earlier releases were verified. Native verification used the prepared Ubuntu 26.04 WSL host with LXD 6.9 and NVIDIA GPU access. Reports and platform limits are documented in the repository; this is a test prerelease. Stable remains `stable/0.1.15`, and earlier releases are retained.\n\nInstall:\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n\nInstall and run the full automated test:\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\nRun the complete security challenge from the host against a selected existing container:\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5731,
+          "digest": "sha256:ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 64996,
+          "digest": "sha256:b3b8d6ffb343598aa2cdf03f169714eca3b7e9e649aae17518334e6bffb3c2bd",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 227960,
+          "digest": "sha256:e96067b595704a833a62b243442de5b4f30efe58d4b8ace3fdf8758480f783a4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 62625,
+          "digest": "sha256:42713d477e0065a55ebe0470ad695bfe534102cacc42ad423d33aab589225c01",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 790,
+          "digest": "sha256:56d25aafd46e80e62de939d3dfc44e0e391445db3a355b31f631c54dbfbfff6b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 2672951,
+          "digest": "sha256:7296aedfdd19db8d10a1143af0fdb20dcc63870a24646658a8247baa1c367b44",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.21/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.22",
+      "name": "0.2.22 — 单行实时预装提示与完整复查",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.22",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-03T10:26:16Z",
+      "body": "预装进度现在只使用一行，随实际输出及时刷新；正常输出结束后清除，保留耗时、警告和错误。等待 cloud-init 日志生成后再开始跟随，正常创建不会留下 tail 缺失文件提示。产品与测试工具独立处理输出更新和状态核验。\n\n代码复查同时修复 GPU 配置操作的 UUID 核验，防止同名容器被替换后继续修改文件、提交配置或报告成功。八份项目文档已核对，补齐旧创建说明和历史版本记录。\n\n冻结包在项目目录外通过 428 项单元测试及全部 28 个真实 LXD 环节（1448.8 秒），功能测试之后的一次完整安全挑战为 76 项通过、0 项失败。没有跳过项、未执行环节或清理错误，临时 Project、导入资源和挂载清理已独立核验。真实终端记录到 418 次小于一秒的安装输出更新；失败安装和日志跟随进程的中断回收均通过验证。\n\n验证环境：已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA GPU、x86_64。原生 Ubuntu/云服务器、ARM64 和全新宿主安装未在本轮实测。实际公开 test/test.sh 入口也通过 428 项单元测试、全部 28 个环节及一次 76 项完整挑战，耗时 1500.0 秒，无跳过项、未执行环节或清理错误。普通安装、两种原状态的网络关闭独立挑战、十二个发布附件和资源清理均通过核验；全部 37 个旧发布保持不变。Stable/0.1.15 保持不变。\n\n安装本测试版：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n\n完整自动化测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n独立宿主安全挑战：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n\n软件与测试工具使用同一版本；附件 SHA256SUMS 包含产品、安装程序、测试工具及各入口校验值。WSL_REPORT.json 为最终本地冻结包报告。详细需求、实现、覆盖与验证证据见仓库文档及 validation/V0_2_22_*.json。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5731,
+          "digest": "sha256:ae702cd7af7a3300a93e7fc1ae1dfd7e419cb62da42b74fd651f088940f39e53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:d252335896ec4cc90a1427b54faa859dd63c36406568ca10ceea77eea09e0930",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 65361,
+          "digest": "sha256:a5d8ae8648ec326b146282be470d2e7f42097cdcffc07f3bc8666fc11b07bea0",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 229758,
+          "digest": "sha256:fde67ebcc06d892315afd476c0730d23054176a075431c3ca16fb3683fc0c145",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 62990,
+          "digest": "sha256:5f0c4dbb997a7a4a3d0497c46158294baa89aaf3ac8ccba7f9009c5242ef3de7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 790,
+          "digest": "sha256:b8ddf81986cf894d64d821a110c6114b18132b89650af33782571f92a4e56b32",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 4100525,
+          "digest": "sha256:d4f8d175948a165a06c15ae98a56be7ba69450c752492e6d3dae4a07e7e1a968",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.22/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.23",
+      "name": "0.2.23 — shared CLI/TUI components (test)",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.23",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-03T21:05:29Z",
+      "body": "# 0.2.23 — 共用 CLI/TUI 组件与交互规范复查（test）\n\n- Python 可用后，宿主 APT、产品与测试工具共用一套输出组件；终端尺寸、显示宽度、临时行清理和状态颜色统一。安装 Python 前保留最小 Bash 适配，非 ASCII 原生信息完整保留。\n- 保留 APT 的 W:/E:/Err: 诊断；GPU/网络/语言输入标题只出现一次；安装语言取消统一返回 130；CLI 容器列表采用空格列对齐；信息、硬件、迁移和挂载查询使用共用等待提示。\n- 迭代补修空列表反馈、跨组件诊断清理和 CRLF 分片处理。依赖安装测试传入同一组件的实际模块文件，不复制实现。\n- 最终冻结包通过 439 项单元测试、28 个真实 LXD 环节和一次 76 项完整挑战，耗时 1424.6 秒，无跳过、未执行或清理错误。中英文真实菜单检查、文件回收、附件构建和文档复查通过。初步运行在发现 CRLF 问题后主动中断，单独保留，不计入最终结果。\n- 公开一键入口独立通过相同的 439 项单元测试、28 个环节和一次 76 项完整挑战，耗时 1404.9 秒，无跳过、未执行或清理错误。普通安装保持测试工具不变，双语安装取消返回 130；网络关闭时的独立挑战从 Stopped 与 Running 各通过 76 项检查并恢复原状态。\n- 十二个附件、校验和、四个固定入口及临时资源回收已核验，全部 38 个旧发布和稳定版 stable/0.1.15 保持不变。\n\n实测环境为已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64；未新增原生 Ubuntu/云服务器、ARM64 或全新宿主安装认证。尚无 Python 时的语言菜单需要提示中规定的最小尺寸，可通过 --language 绕过选择。\n\n安装或完整测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n独立宿主安全挑战：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n\n附件包含产品、安装器、测试工具、固定入口、SHA256SUMS 和最终冻结包的 WSL_REPORT.json。自动化顺序为安装、全部功能测试、独立临时容器的一次完整挑战、清理及汇总。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 6003,
+          "digest": "sha256:fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 9676,
+          "digest": "sha256:05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 67381,
+          "digest": "sha256:d74b667176901338c6fd6a5c13a37206c2e52d76a809c30d159febd46e081305",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 236800,
+          "digest": "sha256:674c3837a2891ccddf3054285904480a490a229fcbd0293ef5fc7f3bee5fda4a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 64700,
+          "digest": "sha256:2fb3802b9e35191abc631b3429ad35fefe82cb4030f7a520d477550f18b3e23a",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 790,
+          "digest": "sha256:4c2bba9d867be3f885a7c6edcbb7ea38b280048eea730d69ed91a976f53933f4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 3907647,
+          "digest": "sha256:7c157b566108456e8ed8920712fa16b9216b10fa714484b30a8a74a7268f0fc6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.23/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.24",
+      "name": "v0.2.24 (test) — 共享菜单缩放修复",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.24",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-04T03:39:01Z",
+      "body": "# 0.2.24 — 共用菜单缩放重绘修复（test）\n\n- 修复终端放大/恢复后语言菜单不断重复的问题：共用 Screen 组件从活动区起点清理和重绘，安装器、mas 菜单及独立安全挑战选择器一起生效。\n- 清除缩短菜单后的残行，保留选中值、勾选项和输入编辑位置；先处理缩放，再读取已排队按键。确认、取消和中断后恢复输入模式与光标位置。\n- 新增五项回归。中英文真实终端引擎的放大、恢复和高度变化均保持一份菜单；八组窄窗口、Unicode 输入、多选和长列表重排检查通过。无 Python 的最小 Bash 适配也通过受支持尺寸的缩放检查。\n- 本地冻结包和公开一键入口各通过 444 项单元测试、28 个真实环节和一次 76 项挑战，分别耗时 1444.9 秒和 1439.7 秒，无跳过、未执行或清理错误。普通安装、公开双语缩放与取消、独立挑战及资源回收已核验。\n- 十二个附件、校验和及全部 39 个旧发布已核验，文档首页状态已同步；stable/0.1.15 保持不变。\n\n终端引擎实测为 tmux 3.6，宿主为已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64。极窄缩放可能把旧行移入终端历史，组件保留历史；未直接操作 Windows Terminal GUI 的最大化/恢复。实测范围与证据见 IMPLEMENTED.md Stage 43。\n\n安装并完整测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n独立安全挑战（宿主侧选择容器）：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/security.sh | bash\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 6003,
+          "digest": "sha256:fa4ffa35c4ce705e756ee32bb1e7ce3e39f221ca1d558900443a769f48ff272c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 9676,
+          "digest": "sha256:05bd1facf999bdaf2ae60dc56f40e5abd2e778857575882b24d14d72f2659c96",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 67555,
+          "digest": "sha256:e0e613ad304750e8006187eab7ecfff0888758862b2df8447047139999772952",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 239160,
+          "digest": "sha256:f0cf1cfc5d9e2725da6481c231c8ecc474fddd7c51d1c90173962e3aa5d4c3e7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 64874,
+          "digest": "sha256:27efde65babfcf9983e6b313f79ee58dcc29865f3c60bfaf31f58a1b507493bf",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 790,
+          "digest": "sha256:f64d4175682ed74501c2be15ad1b498b5546fe93c919f8fbe33ed893d81bd497",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 3856410,
+          "digest": "sha256:d5b249c3e529a118c6bd851a84c0ec2a4c2632809e70d448ec5322841ae2a665",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.24/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.25",
+      "name": "v0.2.25 (test)",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.25",
+      "target_commitish": "ee6409d4d1a3a1a9ab4822b81ab0bffa69203ad2",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-10-04T10:35:03Z",
+      "body": "# 关于 my-ai-sandbox（test）\n\n“mas 选项”新增“关于 my-ai-sandbox”，显示当前 mas 版本并提供返回。中英文复用现有页面组件；Enter/→、Esc/← 返回时保留选中位置，`mas --version` 继续可用。\n\n29 项针对性检查通过。冻结发布包通过 449 项单元测试、28 个完整实机环节及一次 76 项安全挑战，耗时 1414.5 秒，无失败、跳过、未执行环节或清理错误。实机菜单流程同时验证中英文 About。可重现构建、包内源码、Python 3.10 语法、Shell 检查、安装哈希和独立资源回收均通过；附件含完整报告和 SHA-256 校验清单。\n\n安装测试版：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n\n安装并运行完整测试：\n\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\nAgent 实测范围：已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64。公开下载及安装入口均已核验通过。\n\n此版供用户测试验收。当前 stable 仍为 0.2.24，稳定分支与既有发布保持不变；验收后再晋升 stable，随后处理完整文档刷新和 Codex 交接 bundle。\n\n公开 test/test.sh 入口已独立通过相同的 449 项单元测试、28 个实机环节及一次 76-PASS/0-FAIL 安全挑战，耗时 1433.9 秒，无跳过、未执行或清理错误。十二份附件、公开入口、普通安装保留测试工具、独立资源回收和全部 41 个旧发布内容核验通过（自动下载计数除外）。Stable/0.2.24 及 release 分支保持不变。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 6636,
+          "digest": "sha256:003bbe96dba1468f8ada2a2530a0534cc698b7c31d964a4ac71aa4b45c6a403d",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 310,
+          "digest": "sha256:1c0c7e41e57ed8d661b6405292b681f1e0e03c0ac00fa907b2b474d84f90924c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 9677,
+          "digest": "sha256:5e3ed2af2fbe265534921877393e0d60d5d49f7e0a9038c3e4f8412b704d84c7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 67608,
+          "digest": "sha256:6b8a48d19f146f6bf750edf833af7bedbc330d7f7c05fff20c69d511163ca08b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 240431,
+          "digest": "sha256:befd72eaf727736fc1a09e06c40728616ca3753e0c3c06b768e383e12a94bfa9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 65010,
+          "digest": "sha256:fc4acabba8c8974bd9c99f01b82f074b36424646d1c57c474d6eb763f8a50ffc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/mas.pyz"
+        },
+        {
+          "name": "security.sh",
+          "size": 316,
+          "digest": "sha256:611a2894199120865438dab379439a40b3736f0f37886ef2e8769e175b517d4c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/security.sh"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 872,
+          "digest": "sha256:084f2c1ec22df1246d3395ff65ddfb875791f92f7802ea4b2c4ce27bba84b33b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 317,
+          "digest": "sha256:fa05a243d2bcf021bafdbf35a099dfa42ee8be685a7f532907127028ffb0cf46",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 3880558,
+          "digest": "sha256:ba97f3614b10a2a1dd78b68ab3eb2b4ff6cc3cf2e4823f6ab33a6bae34ff29eb",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.25/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.3",
+      "name": "0.2.3 — Official WSL GPU driver discovery",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.3",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-29T21:10:06Z",
+      "body": "# 0.2.3 — 官方 WSL GPU 驱动目录识别（test）\n\n- 使用 LXD snap 已附带的 NVIDIA 工具查询当前 WSL 驱动目录，取消扫描全部历史目录；不新增软件包。\n- 启动前重新探测，复用现有 GPU 配置函数替换旧映射；运行期间不改动。探测失败明确报错，关闭及清理不依赖探测成功。\n- 只读取官方 JSON 资源清单，不应用 CDI 配置、不执行 hooks；保留原生警告与异常诊断。\n- 189 项打包单元测试、22 个实机环节通过（449.4 秒），无跳过或清理错误；实测排除历史驱动目录后 sandbox CUDA 计算及开关仍通过。\n- 未实际升级 Windows 驱动；路径变化与失败使用控制测试。原生 Ubuntu/其他厂商 GPU 的验证边界保持不变，阶段 1 stable 不变。\n\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 40890,
+          "digest": "sha256:7fa6bf719694276a50cb0ce1ac3000af49cfd99b1dd3f17e568f311f7858a698",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 108961,
+          "digest": "sha256:3f4ec7384bccd0ce416e1c83a62b85738a86bd8ddb06e7ade525acfd356122e7",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 39333,
+          "digest": "sha256:7f858a940c5796f8de44429597aa025936014b5b2c157718a6a6024ed2fcdfbf",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:f33b9856d8ecaf2a2f733f2e63bf0892f3ba13d55fac439a00680aeea00199ad",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 161890,
+          "digest": "sha256:f9d04d428b624bb3545a7a5021f4537fca3ed648ff10c40cb7ca4b2854ff61ac",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.3/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.4",
+      "name": "0.2.4 — GPU and diagnostic integration improvements",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.4",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-29T21:45:40Z",
+      "body": "# 0.2.4 — GPU 与诊断输出优化（test）\n\n- 通过 NVIDIA 官方参数关闭无用的 hooks 生成和 nvsandboxutils 探测；实测设备与挂载清单不变，单次警告从 5 条减少为 2 条，剩余警告仍保留。\n- GPU/LXD 诊断统一复用输出层，先清理临时进度再输出，修复警告粘连；补齐自动测试直接探测和菜单查询诊断的日志/事件记录，避免重复回放。\n- 硬件菜单取消时复用当前状态，实际修改后刷新；启动前仍重新探测驱动。收紧数据校验，复用驱动路径校验和运行库配置常量。\n- 196 项打包单元测试、22 个实机环节通过（484.6 秒），无跳过或清理错误。GPU 计算与开关、挂载恢复和菜单操作通过。\n- 阶段 1 stable 和现有 GPU 平台验证范围保持不变。\n\n安装并测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/install.sh | bash -s -- --test\n```\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 41131,
+          "digest": "sha256:caf917952e17ed63bf189e07770f557f7f466fb4ad0668e4b2448f9069926f2e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 111553,
+          "digest": "sha256:30270903c1e89e56f34c5d40fa4408a5249f791d78804c187f6345e79abc384b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 39621,
+          "digest": "sha256:8a5e4465b31836466ad6cd336f8b36060a8466286b0b3d6ee924ddb055280a45",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:39be5ab1ade858798ebe23c54d6ce526bbc54be0eb98093f65900816eb8324a9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 177267,
+          "digest": "sha256:151d8ac5f9c1420c028a75d12d91ae69c2c917add2e078e761e8eda2d399a2a5",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.4/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.5",
+      "name": "0.2.5 — Portable test subprocess imports",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.5",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-30T00:48:59Z",
+      "body": "修复 v0.2.4 测试工具从源码仓库外运行时，GPU 诊断 PTY 测试子进程报 `ModuleNotFoundError: No module named mas` 的问题。\n\n- Python 测试子进程统一复用显式导入当前测试包的启动函数，以隔离模式运行，不依赖当前目录、用户包或 PYTHONPATH。\n- 菜单、语言、进度、诊断及优化模式检查复用此函数；增加目录和 PYTHONPATH 同名文件干扰的回归验证。\n- 产品 GPU 功能不变；发布验证改为从仓库外执行打包测试。\n\n从仓库外验证：197 项单元测试、22 个实机环节全部通过（452.2 秒），无跳过或清理错误。\n\n公开安装入口在 /tmp 实测同样通过全部 197 项单元测试及 22 个实机环节（450.7 秒），无跳过或清理错误。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 4018,
+          "digest": "sha256:40cde4a76307d43330b1d1ef90bfb6bbdbdc880a1651f202866dff535fdc2b53",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/bootstrap.py"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 41131,
+          "digest": "sha256:145a3382b737ed567ded625112e4e1803c9caaea0baba1cca55c03e993e5ce3f",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 111833,
+          "digest": "sha256:0fd5115f82ca5206f09cbfaa6645f029c6d3cf66263191c1263a1e2136953717",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 39621,
+          "digest": "sha256:af8138e83d553ab4d3b0595cf6fe382d503a0d3eee8a19fe0ea63b40b3d9c1b6",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 391,
+          "digest": "sha256:95f29e3cdb5914ab9af53ebe6d46607cea4644cd258dd9a35695810b628acaf1",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/SHA256SUMS"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 176635,
+          "digest": "sha256:eabd9c0a9064bb0d263471ed36e92309d955efb8c6ef6209725aef43af1c89eb",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.5/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.6",
+      "name": "0.2.6 — WSL GPU runtime and channel entries",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.6",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-30T02:54:30Z",
+      "body": "# 0.2.6 — WSL GPU 运行库与独立发布入口（test）\n\n- 显式指定 WSL 库搜索路径，解决 NVML 误选 Linux 库产生的 Driver Not Loaded。\n- 已确认的多驱动目录提示在产品成功探测后不显示，自动测试继续保留，其他诊断不变。\n- 容器登录 shell 可直接运行 nvidia-smi；GPU 模块管理并清理专用 profile 文件，保护非自有内容和符号链接。\n- 独立验证宿主实际加载的驱动路径与容器映射一致；旧 GPU 记录平滑补齐 profile 管理。\n- 新增 stable/install.sh、test/install.sh、test/test.sh、test/test-stable.sh 固定入口，共用下载、校验和安装实现；旧命令继续兼容。\n- stable 测试严格匹配同版本产品和安装包，stable 产品保持 0.1.15。\n- 仓库外完整验证：201 项单元测试、22 个实机环节全部通过（452.2 秒），无跳过或清理错误。\n- 新公开 test/test.sh 入口完成安装与完整回归：201 项单元测试、22 个实机环节通过（452.5 秒）；11 个发布附件一致性与四个入口路由核验通过。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 41767,
+          "digest": "sha256:cd517850d0ef58812d2b8747f38e838f4b88718661f4638b3c379847801a879b",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 114630,
+          "digest": "sha256:b8da0150843510297d4754ec801ed236001dac067cfdb7a40d036bf368954a1e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 40257,
+          "digest": "sha256:63d46dc60988d81219190b9f9f9738989c4b7a92d08d5b201923030ada6cfe01",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:8b8c6887ae4b3e170ebc34d0217288d36e336944211284a1d49f759a183b75c1",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 172573,
+          "digest": "sha256:f62a8bc8bc6ea18eef7a0435e80f86967f1f0aa804beee954ce027c8b74b4205",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.6/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.7",
+      "name": "0.2.7 — GPU discovery result reuse",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.7",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-30T08:41:45Z",
+      "body": "# 0.2.7 — GPU 探测结果复用（test）\n\n- 硬件菜单复用当前流程的宿主探测结果，开关修改后使用已核验的返回配置刷新显示。\n- 修改失败时读取实际容器配置；读取也失败时保留错误并退出该页面。\n- 自动化测试复用开关操作返回值，并独立读取 LXD 配置核验；保留独立 CLI 查询和重复关闭覆盖。\n- 不修改 detect 的完整探测行为，不引入全局缓存，不改变创建和实际启动的探测时机。\n- 公开 test/test.sh 入口在仓库外完成安装与完整测试：204 项单元测试、22 个实机环节通过（447.9 秒）；11 个发布附件与本地验证文件一致。\n- 本地 204 项单元测试、22 个实机环节通过（453.3 秒），无跳过或清理错误。\n- 下一个 stable 使用 release 分支的约定已记入需求；当前 stable 仍为 0.1.15。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 41803,
+          "digest": "sha256:fe81538bb4c6251c622c9d2a23f0ba5e9cdbc548711d48c1fbdbc0112d73ad79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 115338,
+          "digest": "sha256:8cd9af4a007eba259579d31472186fcd5811cf9042f0118e9f514af1c8596aa8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 40457,
+          "digest": "sha256:4e3b86a31965226a37da0362423da1d4a51b68721c0ace692d544e0089329ad9",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:b5019ea120845613451f6c7f7c41d8ad7a001077866b63f1922ebc1d88f179b4",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 172096,
+          "digest": "sha256:eb191ed0b079e5106f743bf03b2712726b74378614389c74c245e7e63081f08e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.7/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.8",
+      "name": "0.2.8 — Persistent LXD socket group access",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.8",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-30T09:18:24Z",
+      "body": "# 0.2.8 — LXD socket 持久用户组权限（test）\n\n- 安装时为 LXD 主 socket 配置持久 SocketGroup，避免重建或 WSL 重启后停留在 root:root。\n- 遵循实际管理组（默认 lxd），修正已确认的现有 socket，保持 0660；不重启 LXD 守护进程或容器。\n- 已准备环境不请求 sudo；访问验证失败不报告安装成功，普通 mas 不增加提权行为。\n- 公开入口复核通过 214 项单元测试、22 个实机环节（449.3 秒）。首次公开测试遇到 Windows UNC 立即读回不一致，原包复核通过；两次报告均保留，该现象原因尚未确定。\n- 本地 214 项单元测试、22 个实机环节全部通过（456.9 秒）。\n- 独立临时 WSL 实测：复现权限拒绝、安装修复、socket 重建、默认及自定义组下重启后普通用户访问、无 sudo 的重复安装全部通过；临时发行版已删除。\n- 不修改现有 stable 0.1.15，不把本次 socket 修复宣称为对所有 Snap 启动故障的修复。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7707,
+          "digest": "sha256:8fa469c47950d4e35180db44a02f0a763f810be4521d9f1e36f6c34f2a0d2986",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 44028,
+          "digest": "sha256:ea19415505318853f7fc3096b351381c40af6168cce518b46c3d6cf1bb23bd40",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 119434,
+          "digest": "sha256:d1eea17e890f1d92ff8b2e7544fc5bccbe0e0c875c5f712b9ca993028f146935",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 40738,
+          "digest": "sha256:14886d678c57f03cc99d7ebb1cf55f10ce2f493977c4d524c14315e685494ce8",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:7b073fa4415685ec3f2923f28643952f38ab8f439548365107f4be4f290b0083",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 173161,
+          "digest": "sha256:e37c506582160ca494c642ed09f74830b02003dc9f6e8900d7e504380f5d5e61",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.8/WSL_REPORT.json"
+        }
+      ]
+    },
+    {
+      "tag_name": "v0.2.9",
+      "name": "0.2.9 — Conditional configuration and reliability audit",
+      "html_url": "https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.9",
+      "target_commitish": "main",
+      "draft": false,
+      "prerelease": true,
+      "published_at": "2026-09-30T19:49:42Z",
+      "body": "完成本次确认的九项审查改进：\n\n- 使用 LXD ETag / If-Match 条件更新，保护并发修改；GPU 设备和归属记录仍一起发布。\n- 测试终端收尾改为有界 TERM/KILL 处理，保留原始失败、最终事件和语言恢复。\n- 检查损坏或重复的 PATH 标记，原子更新并保留用户内容及权限。\n- 保留原生警告与失败的两个输出流；测试诊断按发生顺序展示并避免重复。\n- Windows UNC 测试记录每步读写内容、长度和失败时 Linux 文件证据，不增加盲目重试。\n- 补齐中英文 CLI 命令、参数、默认值、限制和示例。\n- 菜单与进度复用终端宽度和裁剪能力，最小安装入口同步包含该依赖。\n- 更新需求、实现、行为和覆盖文档，区分当前基线、历史结果和待实现范围。\n\n新增配置并发更新集成环节。本地最终打包验证：236 项单元测试、23 个测试环节（单元测试环节与 22 个实际集成环节）全部通过，耗时 483.2 秒；无跳过或清理错误。报告：validation/V0_2_9_LOCAL_REPORT.json。\n\n发布后通过公开入口再次安装并完整测试：236 项单元测试、全部 23 个测试环节通过，耗时 488.9 秒，无跳过、未执行或清理错误。11 个下载文件与本地验证文件逐一匹配；普通安装保留现有测试程序。报告：validation/V0_2_9_PUBLIC_REPORT.json、validation/V0_2_9_RELEASE_CHECK.json。\n\n安装最新 test：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/install.sh | bash\n```\n安装并完整测试：\n```bash\ncurl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test.sh | bash\n```\n\n本次验证环境为 Ubuntu WSL2 / NVIDIA / LXD 6.9；原生 Ubuntu GPU 硬件尚未验证。项目/profile 安全基线和非 GPU 硬件选项仍待实现。Stable 保持 0.1.15。\n",
+      "assets": [
+        {
+          "name": "bootstrap.py",
+          "size": 5335,
+          "digest": "sha256:a058608335c60e6de47c28a63204fc849fb3f29bbe0067aece268670b9b91659",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/bootstrap.py"
+        },
+        {
+          "name": "install-stable.sh",
+          "size": 307,
+          "digest": "sha256:ab9dbf94ded9e70e60ff70f5dc209a95e18f478a5b1614358dbd0e25051b957e",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/install-stable.sh"
+        },
+        {
+          "name": "install-test.sh",
+          "size": 305,
+          "digest": "sha256:ecc168a5b4dd99d17a1ffa228d9552707759dc01c438d2fadab5375f8f5a8e79",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/install-test.sh"
+        },
+        {
+          "name": "install.sh",
+          "size": 7722,
+          "digest": "sha256:9b27237ddb5c30f515c38bf5bd975c75ab0e99b7d9458bb6fa8d123a6e9b8829",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/install.sh"
+        },
+        {
+          "name": "mas-install.pyz",
+          "size": 48890,
+          "digest": "sha256:8b16a7100d6774c716e589f06be3efa7cbd1859ed9dd9e9c7f3033bb7354badc",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/mas-install.pyz"
+        },
+        {
+          "name": "mas-test.pyz",
+          "size": 132729,
+          "digest": "sha256:ae79a30b13e69fcd3cd99c1bd4322977bf028169bed3f626fb4aa3f5adeeb752",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/mas-test.pyz"
+        },
+        {
+          "name": "mas.pyz",
+          "size": 45402,
+          "digest": "sha256:d39e4c1a0e1525f629bd925725f911e9258e45a80c79b497038fc877a83afc2c",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/mas.pyz"
+        },
+        {
+          "name": "SHA256SUMS",
+          "size": 712,
+          "digest": "sha256:0bba8ad299f9d2cafbd747ef561a09f8a795effe22f4a559b5b15deefd597429",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/SHA256SUMS"
+        },
+        {
+          "name": "test-stable.sh",
+          "size": 314,
+          "digest": "sha256:486100f861a049069e726fe5c000cfff867dfd8e76f01a1890eae5986878bb72",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/test-stable.sh"
+        },
+        {
+          "name": "test.sh",
+          "size": 312,
+          "digest": "sha256:19d1dfca67f0be667dcbcf23d453ed81f563672b7c65369f8e415d9a4f25c484",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/test.sh"
+        },
+        {
+          "name": "WSL_REPORT.json",
+          "size": 225661,
+          "digest": "sha256:9b5deac3935c66a609a9def7eb57b72f94217f7d9c08bbc43d6d0859332a9113",
+          "browser_download_url": "https://github.com/gdrencn/my-ai-sandbox/releases/download/v0.2.9/WSL_REPORT.json"
+        }
+      ]
+    }
+  ]
+}
