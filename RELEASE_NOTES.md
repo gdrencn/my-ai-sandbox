@@ -2,6 +2,8 @@
 
 补齐项目内 [CODE_PRINCIPLE.md](docs/CODE_PRINCIPLE.md)，项目 AGENTS.md 明确项目范围并引用两份开发规范；两份规范保留原文。文档索引和新 Codex 接手说明同步更新，恢复不写入全局 Codex 目录。交接包修订保留完整 Git 历史，显式记录历史中的第一代包；本次包上传仍在冻结基准之后。准备和后续核验结果单独记录在 [IMPLEMENTED.md](IMPLEMENTED.md) 阶段 48，原阶段 47 证据保留。产品仍为 0.2.25，原 stable/test 发布、标签、资产和 release 分支保持不变。
 
+修订包本地及公开下载的两次离线恢复、完整 Git 对象/分支/标签、三份项目规范、旧包清单、拒绝/损坏检查和十份资产重建均通过；449 项打包单元测试无失败、错误或跳过。全部原发布/标签/资产及 latest stable 保持不变。详见 [本次公开核验记录](validation/HANDOFF_0_2_25_GUIDANCE_PUBLIC_REVIEW.json)。
+
 # 0.2.25 — 文档整理与开发交接（非产品发布）
 
 本批经用户明确授权，整理当前需求、实现、使用、共享行为、菜单、安全和测试范围，补齐项目内工作规范、终端规范、开发/构建/发布指南及新 Codex 接手入口。八份原始主文档保存在 [docs/history](docs/history/README.md)，保留旧决策与验证记录。交接包从已提交的 main 基准封装完整 main/release/标签历史，包含离线恢复、精确清单和内外校验和；核验与上传结果在 [IMPLEMENTED.md](IMPLEMENTED.md) 阶段 47 记录。

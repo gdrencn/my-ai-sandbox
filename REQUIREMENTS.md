@@ -24,7 +24,7 @@ Authorization on 2026-10-04: “OK，做吧。” after confirming that the only
 4. Verify exact guide contents/references, unchanged global files and product sources, local Markdown links, deterministic generation, all Git refs/history and offline restoration. Rebuild the accepted artifacts, run the restored packaged units, then verify the public archive/checksums/download and restore. Record the correction's evidence separately from Stage 47 receipts.
 5. Publish the corrected project documents, archive, manifest and checksums at the existing handoff paths. Keep product version 0.2.25, stable/test assets, all existing Releases/tags and the release branch unchanged. This is a project-documentation and handoff-tooling correction, not a product release or global Codex configuration change.
 
-Completion is recorded only after the correction's checks pass in IMPLEMENTED.md.
+Completed on 2026-10-04. All three project guidance files, corrected full-history archive, restored rebuild/449 units, public download/restoration and publication-preservation checks are recorded in [IMPLEMENTED.md Stage 48](IMPLEMENTED.md#project-guidance-handoff-correction--stage-48). The original Stage 47 receipts remain unchanged.
 
 ## Scope and shared architecture
 
