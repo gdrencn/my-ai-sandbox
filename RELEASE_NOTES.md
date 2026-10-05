@@ -3,7 +3,7 @@
 - 用户完整测试通过并明确验收“关于”页后，将 v0.2.25 产品与安装程序以完全相同的字节晋升为 stable/0.2.25，设为 GitHub latest，程序版本保持 0.2.25。
 - release 分支以一条 stable 发布提交从 stable/0.2.24 前进；34 个源码和文档文件不含测试程序、测试入口或验证记录。稳定附件只有 mas.pyz、mas-install.pyz、SHA256SUMS，原 test 及全部 42 个旧发布保留。
 - 可重现独立构建、三份下载附件、包内源码、Python 3.10 语法和 Shell 检查均通过。普通公开安装保留测试工具；九份 release 源码、实际 stable 产品/安装程序与 v0.2.25 原测试工具的严格配对来源已核验。
-- 完整公开 stable 入口验证及独立资源回收正在进行。用户提供的 v0.2.25 全套运行通过全部 28 个阶段、一次 76 项安全挑战并成功清理，耗时 1770.4 秒，包含宿主 SSHFS/LXD 安装初始化。
+- 完整公开 stable 入口通过全部 449 项配对单元测试、28 个实机阶段和一次 76 项安全挑战，耗时 1408.6 秒，无跳过、未执行或清理错误；独立资源回收和安装哈希核验均通过。用户提供的 v0.2.25 全套运行通过全部 28 个阶段、一次 76 项安全挑战并成功清理，耗时 1770.4 秒，包含宿主 SSHFS/LXD 安装初始化。
 
 固定安装：`curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash`。完整验证：`curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash`。完整文档刷新和 Codex 交接 bundle 属于后续工作。
 

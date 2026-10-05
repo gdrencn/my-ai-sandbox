@@ -26,7 +26,7 @@ curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/insta
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash
 ```
 
-该入口使用实际 stable 产品和安装程序，只从相同数字版本的 test 发布获取测试工具；先核对两个清单中的产品、安装包哈希，缺失或不一致时明确停止。稳定分支与稳定附件不含测试程序或验证记录。普通公开稳定安装、三份附件、release 源码和 stable/test 配对下载来源已通过核验；完整公开 stable 测试正在进行，最终结果见 [已实现文档](IMPLEMENTED.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
+该入口使用实际 stable 产品和安装程序，只从相同数字版本的 test 发布获取测试工具；先核对两个清单中的产品、安装包哈希，缺失或不一致时明确停止。稳定分支与稳定附件不含测试程序或验证记录。普通公开稳定安装、三份附件、release 源码和 stable/test 配对下载来源均已通过核验。完整公开 stable 入口通过 449 项配对单元测试、28 个实机阶段和一次 76 项安全挑战，耗时 1408.6 秒，无跳过、未执行或清理错误；独立资源回收及安装哈希核验通过，证据见 [已实现文档](IMPLEMENTED.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
 
 ## 安装最新测试版
 
