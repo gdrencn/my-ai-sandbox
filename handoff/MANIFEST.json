@@ -126,11 +126,11 @@
     ],
     "name": "my-ai-sandbox-0.2.25.tar.gz",
     "root_directory": "my-ai-sandbox-handoff-0.2.25",
-    "sha256": "825307da4320e4b94fcfa9a03f65ac8b787a516ae894a2678104b96ea926d41f",
-    "size": 3544375
+    "sha256": "0fcce0af72202ce5d83cbdce2ac15e5d22dde6eb3ea67c338402289770f45ba9",
+    "size": 7125514
   },
-  "baseline_commit_date": "2026-10-04T20:17:48-05:00",
-  "baseline_main_commit": "a01fefee8a8a86e90786054076d7a085a0b3d721",
+  "baseline_commit_date": "2026-10-04T22:56:00-05:00",
+  "baseline_main_commit": "8674f876d45c21562b4c7f0860fb658d729d2d09",
   "baseline_tracked_files": [
     {
       "git_blob": "3b815daed7e48b8146180cc503e432c4b0dc3447",
@@ -138,7 +138,7 @@
       "path": ".gitignore"
     },
     {
-      "git_blob": "6961f519098a2a1ba229505ac4038f525c713056",
+      "git_blob": "1a3be42ed9682b311d1c9101890d980415b427c0",
       "mode": "100644",
       "path": "AGENTS.md"
     },
@@ -153,7 +153,7 @@
       "path": "GUEST_SECURITY_PROBE.md"
     },
     {
-      "git_blob": "086892a2bd43c546ada323daa67027890f892f16",
+      "git_blob": "29245ba9fae1a816498e013c1d66ae6df9393a65",
       "mode": "100644",
       "path": "IMPLEMENTED.md"
     },
@@ -168,12 +168,12 @@
       "path": "README.md"
     },
     {
-      "git_blob": "a23d955bdd524bd5e2cca021a7cb5255b481e166",
+      "git_blob": "24d129eb2d18f1e3e5833f12910c1434a5fb48f6",
       "mode": "100644",
       "path": "RELEASE_NOTES.md"
     },
     {
-      "git_blob": "134f9653747a622dc65dd83361ba03df0e851564",
+      "git_blob": "2c2e3b8ce9fe4381dbcb997f9972aa3146b06655",
       "mode": "100644",
       "path": "REQUIREMENTS.md"
     },
@@ -193,17 +193,22 @@
       "path": "docs/CLI_TUI_GUIDELINES.md"
     },
     {
-      "git_blob": "5879ec45ed9ee4b43412e4aa11395694f008843d",
+      "git_blob": "d57e448d3113c5f1934ea642b15cab7fa5dafcd1",
+      "mode": "100644",
+      "path": "docs/CODE_PRINCIPLE.md"
+    },
+    {
+      "git_blob": "1171c85d507ba54e2857d7f1a5fb434bf16daf52",
       "mode": "100644",
       "path": "docs/DECISIONS.md"
     },
     {
-      "git_blob": "0b592d8c56206374e4aec65a77df186cf39104a3",
+      "git_blob": "82c801843924fc12872eb9d9559e581a69ed48c2",
       "mode": "100644",
       "path": "docs/DEVELOPMENT.md"
     },
     {
-      "git_blob": "f430a7fe52c016870d09430f004a7046078a96cb",
+      "git_blob": "449301f9ae3fc619a14da339eb0989e3c64d398b",
       "mode": "100644",
       "path": "docs/README.md"
     },
@@ -253,7 +258,12 @@
       "path": "docs/history/TEST_COVERAGE_0_2_25.md"
     },
     {
-      "git_blob": "f069ceeb4ffbaeacf4120bd50cc7afc8e07de7b9",
+      "git_blob": "737e7102f4fd1a6bc0983ad54c41fb71a418472a",
+      "mode": "100644",
+      "path": "handoff/MANIFEST.json"
+    },
+    {
+      "git_blob": "d8de5669ba556a86a10c40990ef3e94b5fc77c17",
       "mode": "100644",
       "path": "handoff/README.md"
     },
@@ -268,9 +278,19 @@
       "path": "handoff/RESTORE.sh"
     },
     {
-      "git_blob": "fd942ee7e4aeb63a38d300be5f7767173eedf4c3",
+      "git_blob": "b87a50c9bb13b405cb4caf5faed846b3a2abfae6",
+      "mode": "100644",
+      "path": "handoff/SHA256SUMS"
+    },
+    {
+      "git_blob": "638e2401648b33c191ef731f6db4d5d69262c85e",
       "mode": "100644",
       "path": "handoff/START_HERE.md"
+    },
+    {
+      "git_blob": "405cb7637f423394de613358c99be20fc7e076e6",
+      "mode": "100644",
+      "path": "handoff/my-ai-sandbox-0.2.25.tar.gz"
     },
     {
       "git_blob": "f160a69717b7841f260ba57c45c0d0c809385fd8",
@@ -433,7 +453,7 @@
       "path": "scripts/build.py"
     },
     {
-      "git_blob": "187a399643fb602891cab8de71bd05bed64951a0",
+      "git_blob": "f7260edd06c6935f0b282dd2a13270ad6dc6e8bd",
       "mode": "100755",
       "path": "scripts/build_handoff.py"
     },
@@ -688,9 +708,24 @@
       "path": "validation/GUEST_SECURITY_PROBE_REPORT.json"
     },
     {
+      "git_blob": "d218a7cb34763e0634203e455b246710f380ce2d",
+      "mode": "100644",
+      "path": "validation/HANDOFF_0_2_25_GUIDANCE_PREPARATION.json"
+    },
+    {
+      "git_blob": "fe1b5c68b8a243de29a6b99d757f3ab20fffc546",
+      "mode": "100644",
+      "path": "validation/HANDOFF_0_2_25_LOCAL_REVIEW.json"
+    },
+    {
       "git_blob": "82ebc1f9af53d28236971ede82e8fa7f9f2f3f68",
       "mode": "100644",
       "path": "validation/HANDOFF_0_2_25_PREPARATION.json"
+    },
+    {
+      "git_blob": "d6e8fa8b55cc480c227fea370a5ecb69be5a1dd6",
+      "mode": "100644",
+      "path": "validation/HANDOFF_0_2_25_PUBLIC_REVIEW.json"
     },
     {
       "git_blob": "e548e94c7fd9274f05088794a5475d7fcc1528b4",
@@ -1809,7 +1844,7 @@
     }
   ],
   "branch_commit_counts": {
-    "main": 91,
+    "main": 94,
     "release": 2
   },
   "excluded": [
@@ -1832,20 +1867,28 @@
       "size": 1050
     },
     "START_HERE.md": {
-      "sha256": "bb3ec3765e29ef425fc4bfd9f46d34eb11afc7f9639a60e9591dcfea2183b627",
-      "size": 4952
+      "sha256": "336050aacb05527978f0fbe0cc70f63628784fd2938c1849a0257dc4eccf1b59",
+      "size": 6042
     },
     "my-ai-sandbox.git.bundle": {
-      "sha256": "78b9db4baf55c0a1947a4a518de871cd220411e17739b327bb81ebb049ef8c41",
-      "size": 3497200
+      "sha256": "4ac07b14538c1cd5c3938bb54737f120d719df790b1fa0981cbd427b406f04a5",
+      "size": 7076668
     }
   },
+  "prior_handoff_archives": [
+    {
+      "git_blob": "405cb7637f423394de613358c99be20fc7e076e6",
+      "path": "handoff/my-ai-sandbox-0.2.25.tar.gz",
+      "sha256": "825307da4320e4b94fcfa9a03f65ac8b787a516ae894a2678104b96ea926d41f",
+      "size": 3544375
+    }
+  ],
   "product_version": "0.2.25",
   "publication_commits": "Archive upload and subsequent verification receipts are outside this frozen baseline",
   "refs": {
     "refs/heads/main": {
-      "commit": "a01fefee8a8a86e90786054076d7a085a0b3d721",
-      "object": "a01fefee8a8a86e90786054076d7a085a0b3d721"
+      "commit": "8674f876d45c21562b4c7f0860fb658d729d2d09",
+      "object": "8674f876d45c21562b4c7f0860fb658d729d2d09"
     },
     "refs/heads/release": {
       "commit": "ddc6ab6caad9dd95b803693a8dd03b7e4ba26da8",

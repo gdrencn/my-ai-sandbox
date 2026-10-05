@@ -20,6 +20,8 @@ python3 scripts/build_handoff.py --commit HEAD --include-prior-archives --output
 
 本次规范补齐后的精确冻结提交、文件/提交数量、包大小和 SHA-256 以 [MANIFEST.json](MANIFEST.json) 为准。第一代包冻结于 `a01fefee8a8a86e90786054076d7a085a0b3d721`，包含 335 个 tracked 文件、91 条 main 提交，大小 3,544,375 字节，SHA-256 为 `825307da4320e4b94fcfa9a03f65ac8b787a516ae894a2678104b96ea926d41f`；其历史身份和原核验记录保留在 Git 与 IMPLEMENTED.md 阶段 47。release 仍为两条提交，43 个原标签保持不变。
 
+修订包冻结 main `8674f876d45c21562b4c7f0860fb658d729d2d09`，含 342 个 tracked 文件、94 条 main 提交，大小 7,125,514 字节，SHA-256 为 `0fcce0af72202ce5d83cbdce2ac15e5d22dde6eb3ea67c338402289770f45ba9`。本地完整历史/离线恢复、三份项目规范、旧包清单、重复构建一致、拒绝/损坏检查及十份重建资产均通过；449 项打包单元测试无失败、错误或跳过。证据见 [本次本地核验记录](../validation/HANDOFF_0_2_25_GUIDANCE_LOCAL_REVIEW.json)。公开下载与恢复结果验证后另行记录。
+
 第一代包的本地/公开离线恢复、完整历史、拒绝/损坏检查、重建和 449 项打包单元测试已通过；其 [公开核验记录](../validation/HANDOFF_0_2_25_PUBLIC_REVIEW.json) 保留不改。本次三份项目规范补齐及重新打包的独立核验结果另记在 [IMPLEMENTED.md](../IMPLEMENTED.md)，在验证完成后记录，不沿用第一代的包哈希作为本次结果。该批不改产品版本、不新增产品发布，也不声称新的完整 LXD 实机测量。
 
 格式依据：[Git bundle](https://git-scm.com/docs/git-bundle)。使用说明见 START_HERE；构建、测试和发布规则见 [DEVELOPMENT.md](../docs/DEVELOPMENT.md)。
