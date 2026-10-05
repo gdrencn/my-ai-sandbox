@@ -1,4 +1,4 @@
-# my-ai-sandbox — stable 0.2.24
+# my-ai-sandbox — stable 0.2.25
 
 基于 LXD 的容器管理工具，Python 标准库实现 CLI 和终端文本菜单。
 
@@ -8,17 +8,17 @@
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash
 ```
 
-安装链从 release 分支读取共享引导源码，从 GitHub latest 选择 stable 发布并校验产品和独立安装程序。普通安装不下载、安装或覆盖测试工具。安装位置为 ~/.local/bin/mas；安装程序配置 PATH，安装后打开新终端运行 mas。
+安装链从 release 分支读取共享引导源码，从 GitHub latest 选择 stable 发布并校验产品和独立安装程序。普通安装保留已有测试工具。安装位置为 ~/.local/bin/mas；安装程序配置 PATH，安装后打开新终端运行 mas。
 
 宿主目标为 Ubuntu 22.04+（原生系统或 WSL2）、Python 3.10+，需要启用 systemd 的 snapd/LXD 环境。安装程序准备缺失的 Python、snapd、稳定渠道 LXD、lxc 和 SSHFS，并仅在新环境执行 LXD 初始化；已有配置和运行中的容器保留。新加入 LXD 管理组后，请打开新终端。
 
-产品和安装程序与已验收的 [v0.2.24 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.24) 字节一致，版本仍为 0.2.24。稳定发布标签为 stable/0.2.24，附件只有 mas.pyz、mas-install.pyz 和 SHA256SUMS。
+产品和安装程序与已验收的 [v0.2.25 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.25) 字节一致，版本仍为 0.2.25。稳定发布标签为 stable/0.2.25，附件只有 mas.pyz、mas-install.pyz 和 SHA256SUMS。“mas 选项 → 关于 my-ai-sandbox”显示当前版本并提供返回；mas --version 同样显示版本。
 
-实测包括 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64；用户补充验证了 SSHFS/LXD 安装初始化、完整功能与安全检查和实际终端缩放。原生 Ubuntu/cloud、ARM64、其他 GPU/存储后端没有新增实测，内核漏洞和完整网络访问策略不由这些检查保证。
+Agent 实测环境为已准备好的 Ubuntu 26.04 WSL、LXD 6.9、NVIDIA x86_64。v0.2.25 的冻结包和公开 test 入口均通过 449 项单元测试、28 个实机阶段和一次 76 项安全挑战，无跳过、未执行或清理错误。用户另行提供了成功的宿主 SSHFS/LXD 安装初始化和完整测试日志，并明确验收了“关于”页。原生 Ubuntu/cloud、ARM64、其他 GPU/存储后端没有新增实测。
 
 ## 构建
 
-release 分支只保留稳定产品、安装源码、共享构建文件和产品文档，没有自动化测试程序、测试入口或验证记录。构建只使用 Python 标准库：
+release 分支保存稳定产品、安装源码、共享构建文件和产品文档。构建只使用 Python 标准库：
 
 ```bash
 python3 scripts/build.py --stable
@@ -26,7 +26,7 @@ python3 scripts/build.py --stable
 
 输出到 dist：mas.pyz、mas-install.pyz、SHA256SUMS。重复构建可重现已发布的产品和安装包；共享模板生成的根 install.sh 固定读取 release 源码并默认选择 stable。
 
-稳定版的自动化验证入口在开发分支，由它调用 release 安装链并取得与 stable 数字版本一致的 test 工具；稳定分支和稳定附件不包含测试工具。发布记录和验证结果见 [开发分支已实现文档](https://github.com/gdrencn/my-ai-sandbox/blob/main/IMPLEMENTED.md)。
+稳定版的自动化验证入口在 main/test/test-stable.sh，由它调用 release 安装链并取得与 stable 数字版本一致的 test 工具；稳定分支和稳定附件不包含测试工具或验证记录。发布记录和验证结果见 [开发分支已实现文档](https://github.com/gdrencn/my-ai-sandbox/blob/main/IMPLEMENTED.md)。
 
 ## 语言和配置
 
@@ -43,13 +43,14 @@ mas config set language zh_cn
 mas config set language en_us
 ```
 
-终端文本菜单的主菜单选择“mas 选项”，进入语言菜单后用 ↑/↓ 选择，Enter 确认，立即生效；Esc/← 返回。CLI、终端文本菜单 和安装程序共享配置，保存于 `$XDG_CONFIG_HOME/my-ai-sandbox/config.json`，默认 `~/.config/my-ai-sandbox/config.json`。查看和修改配置不需要 LXD。
+终端文本菜单的主菜单选择“mas 选项”，其中依次提供“语言”“关于 my-ai-sandbox”和“返回”。进入语言菜单后用 ↑/↓ 选择，Enter 确认，立即生效；Esc/← 返回。0.2.25 的“关于”页显示当前 mas 版本，Enter/→ 选择返回或 Esc/← 均回到“mas 选项”，保留“关于”选中位置。CLI、终端文本菜单 和安装程序共享配置，保存于 `$XDG_CONFIG_HOME/my-ai-sandbox/config.json`，默认 `~/.config/my-ai-sandbox/config.json`。查看和修改配置不需要 LXD。
 
 产品文案集中在 `mas/locales/en_us.json` 和 `mas/locales/zh_cn.json`。LXD、sudo、包管理器原生输出和机器可读字段保留原样。宿主 sudo 完全使用系统认证机制，不保存密码、不保活、不修改 sudo 超时或宿主 sudoers。已准备好的测试环境不需要宿主 sudo。
 
 ## 使用
 
 ```bash
+mas --version                          # 显示当前产品版本
 mas                                    # 打开 终端文本菜单
 mas new demo                           # 默认匹配宿主 Ubuntu 版本
 mas new other --image ubuntu:24.04      # 指定镜像
@@ -73,7 +74,7 @@ mas import restored demo.tar.gz
 - 删除和导出要求容器已停止。CLI 和 终端文本菜单 删除都要确认；导出文件存在时询问是否覆盖，默认选“否”。导入要求目标名称不存在。
 - 0.2.11 起仅管理本地 LXD `mas` Project 内标记为 `user.mas.managed=true` 的容器；不接管原生 lxc 创建的其他容器。该标记用于管理范围区分，不是对拥有 LXD 管理权限的用户的安全隔离。
 - 每秒探测一次，默认每个底层操作最多等待 10 分钟。可使用 `mas --timeout 1800 start demo` 延长，最小 300 秒。明确失败立即返回，成功必须同时满足原生命令完成和目标状态。
-- 本稳定版包含 GPU 接入和每个容器的网络开关，不增加端口映射或流量规则。
+- 当前稳定版包含下述 GPU 模块和每个容器的网络开关，不增加端口映射或流量规则。历史阶段 1 稳定版 0.1.15 不包含 GPU 模块。
 
 **备份是恢复用途，并非克隆模板。** LXD 导出会保留网卡 MAC。源容器与导入副本同时存在时，LXD 可能拒绝启动副本。恢复前先处理原容器；mas 不静默改写备份中的网络身份。
 

@@ -140,6 +140,8 @@
   "menu_export": "导出",
   "menu_delete": "删除",
   "menu_language": "语言：{language}",
+  "menu_about": "关于 my-ai-sandbox",
+  "about_version": "mas 版本：{version}",
   "menu_done": "操作完成。",
   "menu_empty": "暂无托管容器。",
   "help_yes": "明确同意确认操作；enter/restart --enter 中表示终端结束后停止容器",

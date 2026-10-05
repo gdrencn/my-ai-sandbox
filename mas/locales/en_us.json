@@ -140,6 +140,8 @@
   "menu_export": "Export",
   "menu_delete": "Delete",
   "menu_language": "Language: {language}",
+  "menu_about": "About my-ai-sandbox",
+  "about_version": "mas version: {version}",
   "menu_done": "Completed.",
   "menu_empty": "No managed containers.",
   "help_yes": "Explicitly accept confirmation; for enter/restart --enter, stop the container after the terminal finishes",
