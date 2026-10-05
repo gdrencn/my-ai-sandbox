@@ -2,7 +2,7 @@
 
 This maps current behavior through published test v0.2.25: Preferences About/version/back navigation, shared inline menu resize/reflow, APT preparation, one-row live output, GPU identity protection, network switch, ordered tests and the shared host challenge. It is a behavioral inventory, not a claim of 100% line or branch coverage. Historical batch records retain their then-current behavior.
 
-Stable/0.2.24 is published with identical product/installer bytes. The stable-only source/build boundary, public ordinary installation and exact public stable-entry run are verified: 444 paired packaged units, all 28 native stages and one 76-check challenge in 1362.9 seconds, with zero skips, unexecuted stages or cleanup errors. Four new routing regressions and strengthened download-origin assertions passed in 448 privately packaged units. The published paired v0.2.24 tester remains unchanged at 444 units. See the stable promotion record below for final publication results.
+Current stable/0.2.25 is published with product/installer bytes identical to accepted v0.2.25. Its isolated 34-file stable-only source/build boundary, reproducible three-asset build, ordinary public installation preserving the tester, nine release-source files and actual stable/exactly paired tester download origins are verified. The exact public stable full-suite run is in progress; it uses the unchanged 449-unit v0.2.25 tester. Historical stable/0.2.24 verification remains recorded below.
 
 Functional tests finish before one full challenge on a new owned container. The separate host-only test/security.sh invocation selects a user container and uses the same module with standard lifecycle and original-state restoration.
 

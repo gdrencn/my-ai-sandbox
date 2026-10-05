@@ -2,7 +2,7 @@
 
 ## Preferences About page — 0.2.25
 
-The authorized About entry appears after Language and before Back. It uses the shared selection page to show the running product version and one Back choice; returns retain the parent focus. Real-PTY checks cover both languages, Enter/Right/Escape/Left navigation, title/spacing, terminal restoration and unchanged language configuration. The frozen native complete menu flow also visits About in both languages. This is a test-release change; stable 0.2.24 and the handoff work remain separate.
+The authorized About entry appears after Language and before Back. It uses the shared selection page to show the running product version and one Back choice; returns retain the parent focus. Real-PTY checks cover both languages, Enter/Right/Escape/Left navigation, title/spacing, terminal restoration and unchanged language configuration. The frozen native complete menu flow also visits About in both languages. The user has accepted this About/version page and authorized its stable/0.2.25 promotion. The handoff work remains subsequent.
 
 ## Stable 0.2.24 user acceptance (2026-10-04)
 

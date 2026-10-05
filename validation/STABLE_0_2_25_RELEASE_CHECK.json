@@ -1,0 +1,20 @@
+{
+  "version": "0.2.25",
+  "tag": "stable/0.2.25",
+  "draft": false,
+  "prerelease": false,
+  "stable_commit": "ddc6ab6caad9dd95b803693a8dd03b7e4ba26da8",
+  "stable_history_commits": 2,
+  "stable_tracked_files": 34,
+  "assets": {
+    "mas-install.pyz": "6b8a48d19f146f6bf750edf833af7bedbc330d7f7c05fff20c69d511163ca08b",
+    "SHA256SUMS": "c81c86d89a0ec64c08dfd2078be87033dcc1a11b38d705be48671ff2b1bcdb4a",
+    "mas.pyz": "fc4acabba8c8974bd9c99f01b82f074b36424646d1c57c474d6eb763f8a50ffc"
+  },
+  "downloaded_assets_manifest_verified": true,
+  "product_installer_identical_to_accepted_test": true,
+  "earlier_publication_records_unchanged": 42,
+  "automatic_download_counts_excluded": true,
+  "previous_stable_and_test_tags_preserved": true,
+  "github_latest": "stable/0.2.25"
+}

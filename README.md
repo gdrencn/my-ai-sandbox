@@ -2,31 +2,31 @@
 
 基于 LXD 的轻量容器管理工具。Python 标准库实现 CLI 和终端文本菜单，没有第三方 Python 依赖。
 
-## 当前测试版：0.2.25；稳定版：0.2.24
+## 当前测试版与稳定版：0.2.25
 
-0.2.25 在“mas 选项”中新增“关于 my-ai-sandbox”，显示当前产品版本，并提供返回；沿用共享页面组件，返回保留选中位置。冻结包通过 449 项单元测试、28 个实机环节及一次 76 项安全挑战，耗时 1414.5 秒，无跳过、未执行或清理错误。已发布为 test 供用户验收；公开一键入口也通过相同的 449 项单元测试、28 个环节和一次 76 项安全挑战，耗时 1433.9 秒，无跳过、未执行或清理错误。稳定版仍为 0.2.24，交接 bundle 延后。
+0.2.25 在“mas 选项”中新增“关于 my-ai-sandbox”，显示当前产品版本，并提供返回；沿用共享页面组件，返回保留选中位置。冻结包通过 449 项单元测试、28 个实机环节及一次 76 项安全挑战，耗时 1414.5 秒，无跳过、未执行或清理错误。已发布为 test 供用户验收；公开一键入口也通过相同的 449 项单元测试、28 个环节和一次 76 项安全挑战，耗时 1433.9 秒，无跳过、未执行或清理错误。“关于”功能已获用户验收，并晋升为 stable/0.2.25；交接 bundle 是后续工作。
 
 自动化测试按“安装 → 全部功能测试 → 创建独立临时容器 → 一次完整安全挑战 → 清理与汇总”执行。GPU 开关核验设备、映射及计算能力变化。独立入口 test/security.sh 从宿主选择容器、完整输出结果，并恢复测试前的运行状态。两个入口调用同一个挑战模块。
 
 0.2.24 修复终端放大/恢复时重复出现的菜单，安装语言选择、mas 菜单和独立安全挑战选择器共用修复后的组件。中英文真实终端重排测试验证原地替换活动区，保留默认选项、输入位置和历史。本地冻结包和公开 test 一键入口均通过 444 项单元测试、全部 28 个真实 LXD 环节及一次 76 项完整挑战，分别耗时 1444.9 秒和 1439.7 秒，无跳过项、未执行环节或清理错误。用户补充验证了实际终端缩放、宿主依赖安装初始化、完整测试和独立安全入口。本版现已发布 stable；原 test 发布及全部 40 个旧发布保留，详见 [IMPLEMENTED.md](IMPLEMENTED.md)。
 
-## 安装稳定版（0.2.24）
+## 安装稳定版（0.2.25）
 
-[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.2.24) 已发布并设为 GitHub latest；产品和安装程序与 [同版本 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.24) 字节完全一致。固定入口安装最新 stable：
+[Stable 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/stable/0.2.25) 已设为 GitHub latest；产品和安装程序与已验收的 [v0.2.25 test 发布](https://github.com/gdrencn/my-ai-sandbox/releases/tag/v0.2.25) 字节一致，程序版本仍为 0.2.25。固定入口安装最新 stable：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/release/install.sh | bash
 ```
 
-这个命令只下载安装所需文件，不下载或覆盖测试工具。稳定版附件只有 `mas.pyz`、`mas-install.pyz` 和 `SHA256SUMS`；Git tag `stable/0.2.24` 用于区分发布渠道，程序版本仍为 `0.2.24`。整个稳定安装源码链来自独立 `release` 分支，产品和安装程序来自所选 stable 发布，不依赖 main。旧 `main/stable/install.sh` 入口兼容转发到该安装链。
+普通稳定安装保留现有测试工具。稳定附件只有 `mas.pyz`、`mas-install.pyz` 和 `SHA256SUMS`。完整安装源码链来自独立 `release` 分支，产品和安装程序来自所选 stable 发布；旧 `main/stable/install.sh` 兼容转发到该安装链。release 历史按稳定版本前进，保留 stable/0.2.24 和所有已有发布。
 
-需要验证稳定版时，使用同版本 test 发布的自动化测试工具：
+需要验证稳定版时，使用严格配对的 v0.2.25 测试工具：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/test/test-stable.sh | bash
 ```
 
-稳定测试严格安装 stable 发布的实际产品和安装程序，只从相同数字版本的 test 发布下载测试工具；先核对两个清单中的产品、安装包哈希，再执行安装和测试，缺失或不一致时停止。稳定分支与稳定附件不包含测试程序或验证记录。公开稳定安装、下载来源追踪和完整 stable 测试均已通过：444 项单元测试、28 个真实环节和一次 76 项安全挑战，耗时 1362.9 秒，无跳过、未执行或清理错误。独立资源回收核验通过；证据见 [已实现文档](IMPLEMENTED.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
+该入口使用实际 stable 产品和安装程序，只从相同数字版本的 test 发布获取测试工具；先核对两个清单中的产品、安装包哈希，缺失或不一致时明确停止。稳定分支与稳定附件不含测试程序或验证记录。普通公开稳定安装、三份附件、release 源码和 stable/test 配对下载来源已通过核验；完整公开 stable 测试正在进行，最终结果见 [已实现文档](IMPLEMENTED.md)。不指定 `--release` 的原 `main/install.sh` 仍安装最新测试版。
 
 ## 安装最新测试版
 
