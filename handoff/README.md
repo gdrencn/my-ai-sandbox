@@ -20,6 +20,6 @@ python3 scripts/build_handoff.py --commit HEAD --output /absolute/path/new-hando
 
 冻结 main 基准为 `a01fefee8a8a86e90786054076d7a085a0b3d721`，包含 335 个 tracked 文件和 main 的 91 条提交；release 保持两条提交，43 个原标签完整保留。包大小为 3,544,375 字节，内外清单记录准确 SHA-256。
 
-本地恢复验证已通过完整历史、所有标签/分支、Git fsck、现有目标拒绝、路径含空格、内部/外部损坏拒绝、三份 zipapp 重建一致和 449 项项目外打包单元测试。GitHub 下载后的校验/恢复在上传后记录；具体证据见 [IMPLEMENTED.md](../IMPLEMENTED.md)。该批不改版本、不新增产品发布，也不声称新的完整 LXD 实机测量。
+本地恢复验证已通过完整历史、所有标签/分支、Git fsck、现有目标拒绝、路径含空格、内部/外部损坏拒绝、三份 zipapp 重建一致和 449 项项目外打包单元测试。GitHub 公开下载后的校验、新目录离线恢复和再次重建也全部通过，旧 43 个 Releases/资产/标签、release 分支和 latest stable 保持不变；具体证据见 [IMPLEMENTED.md](../IMPLEMENTED.md) 与 [公开核验记录](../validation/HANDOFF_0_2_25_PUBLIC_REVIEW.json)。该批不改版本、不新增产品发布，也不声称新的完整 LXD 实机测量。
 
 格式依据：[Git bundle](https://git-scm.com/docs/git-bundle)。使用说明见 START_HERE；构建、测试和发布规则见 [DEVELOPMENT.md](../docs/DEVELOPMENT.md)。

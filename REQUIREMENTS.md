@@ -12,6 +12,8 @@ Authorization on 2026-10-04: “OK，现在可以做完整文档整理和交接b
 4. Verify checksums, Git completeness, offline restoration in a new directory, branch/tag identities, history, documentation links/anchors and first-read instructions. Rebuild the three accepted zipapps from the restored checkout and compare exact hashes; run all restored packaged units. This documentation-only batch does not require a new native full suite unless a concrete concern appears.
 5. Upload documents/archive to GitHub and verify the public archive download and restore. Preserve all existing releases/assets/tags, latest stable/0.2.25 and the release branch. Keep version 0.2.25 and product behavior unchanged; record verified stages after their checks pass.
 
+Completed on 2026-10-04; the document audit, full-history archive, restored rebuild/449 units and public download/restoration/preservation evidence are recorded in [IMPLEMENTED.md Stage 47](IMPLEMENTED.md#documentation-and-handoff-batch--stage-47). Pending feature decisions below remain separate.
+
 ## Scope and shared architecture
 
 The product is a Python-standard-library CLI and inline terminal menu for local LXD Ubuntu containers. The two interfaces call the same Manager. Product, installer and tester are separate zipapps; no third-party Python library is required. Host targets are Ubuntu 22.04+ on native Linux or WSL2, Python 3.10+ and systemd-capable snapd/LXD. A target is not a claim of measured compatibility; see [coverage limits](TEST_COVERAGE.md#current-measured-limits).

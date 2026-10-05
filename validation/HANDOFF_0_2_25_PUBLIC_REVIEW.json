@@ -1,0 +1,134 @@
+{
+  "verified_at_utc": "2026-10-05T01:22:21.909350+00:00",
+  "archive_upload_commit": "35ae5703a57e9129b90d00c38f2509e4c0602a34",
+  "baseline_main_commit": "a01fefee8a8a86e90786054076d7a085a0b3d721",
+  "public_downloads": [
+    {
+      "name": "my-ai-sandbox-0.2.25.tar.gz",
+      "url": "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/handoff/my-ai-sandbox-0.2.25.tar.gz",
+      "size": 3544375,
+      "sha256": "825307da4320e4b94fcfa9a03f65ac8b787a516ae894a2678104b96ea926d41f"
+    },
+    {
+      "name": "MANIFEST.json",
+      "url": "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/handoff/MANIFEST.json",
+      "size": 67516,
+      "sha256": "f234c7d4ce876ab8d50e284dd8a1a963438a47fea25411263589ac95ccd92367"
+    },
+    {
+      "name": "SHA256SUMS",
+      "url": "https://raw.githubusercontent.com/gdrencn/my-ai-sandbox/main/handoff/SHA256SUMS",
+      "size": 174,
+      "sha256": "64c921e2820748f224b58a5e4ceb969a44355d22faebcfe1fa76c4fd87c4da9e"
+    }
+  ],
+  "public_offline_restore": {
+    "archive_sha256": "825307da4320e4b94fcfa9a03f65ac8b787a516ae894a2678104b96ea926d41f",
+    "archive_size": 3544375,
+    "baseline_main_commit": "a01fefee8a8a86e90786054076d7a085a0b3d721",
+    "restored_ref_count": 45,
+    "restored_tags": 43,
+    "branch_commit_counts": {
+      "main": 91,
+      "release": 2
+    },
+    "tracked_files": 335,
+    "checks": {
+      "external_checksums": true,
+      "internal_checksums": true,
+      "safe_archive_members": true,
+      "manifest_inventory": true,
+      "no_prerequisites_empty_repository_verify": true,
+      "full_git_fsck": true,
+      "offline_restore_all_non_file_protocols_disabled": true,
+      "space_in_destination_path": true,
+      "exact_heads_and_all_tags": true,
+      "public_origin_url": true,
+      "restore_refuses_empty_existing_directory": true,
+      "restore_refuses_nonempty_directory": true,
+      "restore_refuses_dangling_symlink": true,
+      "corrupt_bundle_rejected_before_clone": true,
+      "corrupt_outer_archive_rejected": true,
+      "builder_refuses_existing_output": true
+    }
+  },
+  "public_restored_rebuild_ten_payloads_equal_public_v0_2_25": true,
+  "public_restored_tester_same_as_449_unit_receipt": true,
+  "old_release_and_asset_metadata_preserved": {
+    "count": 43,
+    "only_excluded_field": "asset.download_count",
+    "normalized_records_sha256": "4387d360e6983f990b80075ddfff5579d9858f8d8ac78bbae5ea036cf3a0ce6f"
+  },
+  "all_43_remote_tags_and_peeled_commits_match_manifest": true,
+  "release_branch_unchanged": "ddc6ab6caad9dd95b803693a8dd03b7e4ba26da8",
+  "release_tracked_files": 34,
+  "latest_stable": "stable/0.2.25",
+  "latest_is_public_nonprerelease": true,
+  "product_version_unchanged": "0.2.25",
+  "no_new_product_release": true,
+  "scope": "Published main documentation and a complete committed-source Git handoff. Current main closing receipts intentionally follow the frozen archive baseline.",
+  "completed_documentation_audit": {
+    "documentation_count": 25,
+    "local_links_checked": 123,
+    "link_errors": [],
+    "source_baseline": "477f6a5b0c343c642e5cf2b8ec0832aac3a946b6",
+    "historical_documents": [
+      {
+        "original": "README.md",
+        "baseline_sha256": "80b3087038d582bf7e361b1adafad1d5d061f52f8af473b101c1cf8e64107fab",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "REQUIREMENTS.md",
+        "baseline_sha256": "346633d7422cc971353ff87d03542429e4cfc5df310b8796caab029dfdf7624a",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "IMPLEMENTED.md",
+        "baseline_sha256": "3f76f714a0d4f03587d21625a1270bd5c4238ee4bcd3fc951b162f8c2e31297a",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "CORE_BEHAVIOR.md",
+        "baseline_sha256": "3e3512db01b85e720cdf03cc94454ca4db96fd550ba6301636b93dcc736c3a25",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "TEST_COVERAGE.md",
+        "baseline_sha256": "24b1242722cdad11d2e04be396165db1033b88b71794686462c03fe7adc575e3",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "GUEST_SECURITY_PROBE.md",
+        "baseline_sha256": "f903f259093d7201f5d995ce506c48f19e95fa76804a9207f54ed0b18fb014da",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "MENU_REVIEW.md",
+        "baseline_sha256": "3dda1cd9e80aa088b26bf9e57da794b7f8463650eacc9db7ab211681fcb19eeb",
+        "preserved_except_notice_and_relative_links": true
+      },
+      {
+        "original": "RELEASE_NOTES.md",
+        "baseline_sha256": "bfb2699d4433c80c26bd37a881b7a6d2812811a7dba9d02e96d183c5f0fa51ec",
+        "preserved_except_notice_and_relative_links": true
+      }
+    ],
+    "unchanged_preexisting_non_document_non_validation_files": 83,
+    "guideline_sha256": "78cbcedfc58b96da650558628b89c34f55b9533d30a6d4cf1bcc4ff97132a1d5",
+    "global_workflow_copied": true,
+    "published_release_catalog_count": 43,
+    "current_facts_reviewed": [
+      "0.2.25 About/version/Back and stable acceptance",
+      "CLI parser and shared Manager/module responsibilities",
+      "25 APT packages, new ends Stopped",
+      "isolation config/device policy, safe stop and recovery",
+      "NIC and GPU approved resources",
+      "filesystem paths, private registry and native metadata semantics",
+      "installer/channel/template/build exclusions and 11 generated/12 published test assets",
+      "449 units; 1 unit + 26 functional + 1 final challenge; 76 current challenge checks",
+      "original final validation receipts and user/agent/platform distinctions",
+      "pending decisions retained without implementation authorization"
+    ]
+  }
+}
