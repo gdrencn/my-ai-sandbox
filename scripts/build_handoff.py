@@ -35,7 +35,7 @@ def json_bytes(value):
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
 
 
-def build(commit_argument, output):
+def build(commit_argument, output, include_prior_archives=False):
     if output.exists() or output.is_symlink():
         raise ValueError(f"Output already exists; choose a new directory: {output}")
     if not output.parent.is_dir():
@@ -60,11 +60,16 @@ def build(commit_argument, output):
         if f"refs/tags/{tag}" not in refs:
             raise ValueError(f"Both accepted test and stable tags are required: {tag}")
 
-    # Full history must not carry an earlier generated handoff archive into a new one.
+    # Preserve published history only with explicit opt-in; never silently filter it.
+    prior_archives = []
     for line in git("rev-list", "--objects", commit, *list(refs)[1:]).splitlines():
-        _, separator, path = line.partition(" ")
+        object_id, separator, path = line.partition(" ")
         if separator and path.startswith("handoff/") and path.endswith((".tar.gz", ".git.bundle")):
-            raise ValueError("Selected history contains a prior handoff binary; agree on distribution/history scope first")
+            data = subprocess.check_output(["git", "-C", str(ROOT), "cat-file", "blob", object_id])
+            prior_archives.append({"path": path, "git_blob": object_id,
+                                   "sha256": sha256(data), "size": len(data)})
+    if prior_archives and not include_prior_archives:
+        raise ValueError("Selected history contains prior handoff binaries; use --include-prior-archives to retain them explicitly")
 
     payload = {name: committed_bytes(commit, f"handoff/{name}")
                for name in ("START_HERE.md", "RESTORE.sh", "RELEASES.json")}
@@ -108,6 +113,7 @@ def build(commit_argument, output):
             "baseline_commit_date": git("show", "-s", "--format=%cI", commit),
             "snapshot_scope": "Full reachable history for the frozen main, release and every existing tag; no prerequisites",
             "publication_commits": "Archive upload and subsequent verification receipts are outside this frozen baseline",
+            "prior_handoff_archives": sorted(prior_archives, key=lambda item: (item["path"], item["git_blob"])),
             "refs": {name: {"object": object_id,
                             "commit": git("rev-parse", f"{name}^{{commit}}", directory=bare)}
                      for name, object_id in sorted(refs.items())},
@@ -151,9 +157,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--commit", default="HEAD", help="Committed main baseline (default: HEAD)")
     parser.add_argument("--output", type=Path, required=True, help="New output directory; must not exist")
+    parser.add_argument("--include-prior-archives", action="store_true",
+                        help="Explicitly retain and inventory earlier handoff binaries in complete Git history")
     args = parser.parse_args()
     try:
-        build(args.commit, args.output.absolute())
+        build(args.commit, args.output.absolute(), args.include_prior_archives)
     except (ValueError, OSError, subprocess.CalledProcessError) as error:
         detail = error.stderr.decode().strip() if isinstance(error, subprocess.CalledProcessError) and error.stderr else str(error)
         parser.exit(2, f"build_handoff: {detail}\n")

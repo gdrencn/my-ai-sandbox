@@ -14,6 +14,18 @@ Authorization on 2026-10-04: “OK，现在可以做完整文档整理和交接b
 
 Completed on 2026-10-04; the document audit, full-history archive, restored rebuild/449 units and public download/restoration/preservation evidence are recorded in [IMPLEMENTED.md Stage 47](IMPLEMENTED.md#documentation-and-handoff-batch--stage-47). Pending feature decisions below remain separate.
 
+## Authorized project-guidance handoff correction
+
+Authorization on 2026-10-04: “OK，做吧。” after confirming that the only missing guidance is CODE_PRINCIPLE.md and that all three instruction files belong to the restored project.
+
+1. Copy CODE_PRINCIPLE.md into docs/ without changing its principles. Keep CLI_TUI_GUIDELINES.md unchanged. Root AGENTS.md must state its repository scope and explicitly apply both development guides; do not install or alter files under any Codex global directory.
+2. Update the documentation index, development guide, accepted decisions and fresh-Codex handoff instructions so all three project-owned guidance files are discoverable. Preserve the existing discuss-before-execution rule and recorded project exceptions.
+3. Regenerate the complete handoff on main from a committed baseline containing the correction. Preserve every existing branch/tag identity and reachable historical object, including the already committed first archive. Make that prior-archive inclusion explicit in the builder invocation and manifest, rather than filtering history. Keep this generation's archive-upload and final-receipt commits outside its own baseline.
+4. Verify exact guide contents/references, unchanged global files and product sources, local Markdown links, deterministic generation, all Git refs/history and offline restoration. Rebuild the accepted artifacts, run the restored packaged units, then verify the public archive/checksums/download and restore. Record the correction's evidence separately from Stage 47 receipts.
+5. Publish the corrected project documents, archive, manifest and checksums at the existing handoff paths. Keep product version 0.2.25, stable/test assets, all existing Releases/tags and the release branch unchanged. This is a project-documentation and handoff-tooling correction, not a product release or global Codex configuration change.
+
+Completion is recorded only after the correction's checks pass in IMPLEMENTED.md.
+
 ## Scope and shared architecture
 
 The product is a Python-standard-library CLI and inline terminal menu for local LXD Ubuntu containers. The two interfaces call the same Manager. Product, installer and tester are separate zipapps; no third-party Python library is required. Host targets are Ubuntu 22.04+ on native Linux or WSL2, Python 3.10+ and systemd-capable snapd/LXD. A target is not a claim of measured compatibility; see [coverage limits](TEST_COVERAGE.md#current-measured-limits).

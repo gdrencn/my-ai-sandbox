@@ -15,15 +15,18 @@ cd my-ai-sandbox
 
 外部 SHA256SUMS/MANIFEST.json 与压缩包放在同一目录。恢复脚本核对内部校验和，离线克隆 Git bundle，恢复 main、release 和全部标签，把 origin 设置成公开 GitHub URL；已有目标（包括空目录或符号链接）一律拒绝。它不安装软件、不登录、不运行 mas、不修改 LXD。只需 Bash、Git、tar、sha256sum；构建和测试另需 Python 3.10+。
 
-压缩包的 MANIFEST.json 记录冻结 main 提交、release/test/stable/tag 身份、Git 历史范围和资产哈希。后续上传压缩包及验证报告的提交不在这个冻结快照内，避免自包含；它们不改变产品。联网后可 `git fetch origin` 查看较新的文档/收尾提交，再自行比较，不能把包内状态误当最新远端状态。
+压缩包顶层的 MANIFEST.json 记录本次冻结 main 提交、release/test/stable/tag 身份、Git 历史范围和资产哈希。后续上传本次压缩包及验证报告的提交不在这个冻结快照内，避免本次包包含自身；它们不改变产品。此次保留 main 完整历史，其中包括已经提交的第一代交接包；其路径、Git blob、SHA-256 和大小列在 prior_handoff_archives。恢复后的仓库 handoff/ 目录仍包含冻结时的上一代压缩包和清单，不能用那份旧清单判断本次包身份；使用本次压缩包顶层清单。联网后可 `git fetch origin` 查看较新的文档/收尾提交，再自行比较，不能把包内状态误当最新远端状态。
 
 ## 必须阅读
 
-1. [AGENTS.md](../AGENTS.md)：中文沟通、先讨论后执行、需求先行、核验后更新文档；已有明确授权不要重复请求。
+1. [AGENTS.md](../AGENTS.md)：本仓库的项目规范入口，明确引用下面两份开发规范；中文沟通、先讨论后执行、需求先行、核验后更新文档；已有明确授权不要重复请求。
 2. [REQUIREMENTS.md](../REQUIREMENTS.md)：当前已批准契约、当前交接整理范围及完整待确认表。
 3. [IMPLEMENTED.md](../IMPLEMENTED.md)：完成范围、版本/提交/资产身份和实测证据。
 4. [docs/DEVELOPMENT.md](../docs/DEVELOPMENT.md)、[docs/DECISIONS.md](../docs/DECISIONS.md)：模块职责、构建/测试/发布流程、已确定的选择。
-5. [docs/CLI_TUI_GUIDELINES.md](../docs/CLI_TUI_GUIDELINES.md)、[CORE_BEHAVIOR.md](../CORE_BEHAVIOR.md)、[TEST_COVERAGE.md](../TEST_COVERAGE.md)：共享交互、完成/失败边界和验证限制。
+5. [docs/CODE_PRINCIPLE.md](../docs/CODE_PRINCIPLE.md)、[docs/CLI_TUI_GUIDELINES.md](../docs/CLI_TUI_GUIDELINES.md)：代码复用、模块组合、调用边界和终端交互规范。由项目 AGENTS.md 明确应用，原文中的“明确引用”在本项目已满足。
+6. [CORE_BEHAVIOR.md](../CORE_BEHAVIOR.md)、[TEST_COVERAGE.md](../TEST_COVERAGE.md)：共享行为、完成/失败边界和验证限制。
+
+这三份规范文件都保存在恢复后的项目目录。恢复脚本不会把它们放入新 Codex 的 `~/.codex`，也不会修改全局配置；新环境已有的全局规范由该环境独立管理。
 
 菜单、安全和用户操作分别见 MENU_REVIEW.md、GUEST_SECURITY_PROBE.md、README.md；完整索引见 [docs/README.md](../docs/README.md)。历史批准和 46 个原始实施阶段在 docs/history，不能用已过时的方案覆盖当前文档。
 
@@ -40,7 +43,8 @@ cd my-ai-sandbox
 
 ```text
 这是 my-ai-sandbox 的交接 bundle。请核对外部与内部 SHA-256 清单，并恢复到一个不存在的新目录；这一步已授权，不要安装软件或运行容器操作。
-然后阅读项目 AGENTS.md、handoff/START_HERE.md、REQUIREMENTS.md、IMPLEMENTED.md、docs/DEVELOPMENT.md、docs/DECISIONS.md 和 docs/CLI_TUI_GUIDELINES.md。
+然后阅读项目 AGENTS.md、handoff/START_HERE.md、REQUIREMENTS.md、IMPLEMENTED.md、docs/DEVELOPMENT.md、docs/DECISIONS.md、docs/CODE_PRINCIPLE.md 和 docs/CLI_TUI_GUIDELINES.md。
+三份规范只在项目目录使用，不要将它们复制到 ~/.codex 或修改全局配置。以本次压缩包顶层 MANIFEST.json 判断冻结基准；恢复仓库 handoff/ 内的清单可能属于上一代包。
 请用中文说明：当前 0.2.25 stable/test 状态、已完成范围、main/release/tag 身份、验证证据与未验证平台，以及仍待确认的事项。
 先讨论下一项需求和验收标准，等我明确授权后开发；不要自行实现待确认事项、重写已有发布，或把旧历史方案当当前要求。
 新工作要先更新项目 REQUIREMENTS.md，按需求修改共享模块，验证后更新 IMPLEMENTED.md 和受影响文档。不要依赖旧会话、全局 Codex 文件或 /home/gordon 临时目录。

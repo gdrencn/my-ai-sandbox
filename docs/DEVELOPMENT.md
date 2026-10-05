@@ -2,6 +2,8 @@
 
 Baseline is accepted stable/test 0.2.25. Read [AGENTS.md](../AGENTS.md), [current requirements](../REQUIREMENTS.md), [implementation/evidence](../IMPLEMENTED.md) and [decisions](DECISIONS.md) first. Historical proposals cannot authorize new features. Discuss scope/acceptance, obtain explicit execution authorization, update requirements, implement in the owning module, verify, then update implementation and affected documentation.
 
+Root AGENTS.md explicitly applies the project-owned [CODE_PRINCIPLE.md](CODE_PRINCIPLE.md) and [CLI_TUI_GUIDELINES.md](CLI_TUI_GUIDELINES.md). Read both before development. Their contents preserve the user's general guidance; their use here is scoped to this repository. Restore does not install them into a Codex global directory or change global configuration.
+
 ## Source map
 
 | Path | Responsibility |
@@ -127,6 +129,8 @@ GitHub write authentication belongs to the new host; the handoff contains no cre
 
 ## Handoff update
 
-See [handoff/README.md](../handoff/README.md). Freeze a committed documentation/source baseline before creating an archive; a later archive/receipt publication commit is intentionally outside that snapshot to avoid embedding the archive into itself. Generate from selected main/release/tag refs only. Do not use local untracked files, .git/config, global Codex directories or LXD backups. Verify an offline clean restore and byte-identical build/packaged units, then public download and metadata preservation. Future archives must start from an explicit baseline, avoid carrying earlier archive binaries in Git history, and state their included scope and verification clearly.
+See [handoff/README.md](../handoff/README.md). Freeze a committed documentation/source baseline before creating an archive; a later archive/receipt publication commit is intentionally outside that snapshot to avoid embedding this generation's archive into itself. Generate from selected main/release/tag refs only. Do not use local untracked files, .git/config, global Codex directories or LXD backups. The three project-owned guidance files are committed documents and are included. Verify an offline clean restore and byte-identical build/packaged units, then public download and metadata preservation.
+
+The first archive is already in published main history. For the authorized guidance correction, retain that history with --include-prior-archives; the manifest records every included prior archive's Git blob, SHA-256 and size. Without that flag the builder still rejects a history containing prior archives. This keeps refs/history complete and leaves this generation's upload outside its own baseline. Repeated full-history archives can grow because earlier binaries are retained; discuss distribution/history changes before a later packaging policy change rather than silently filtering or rewriting published history.
 
 Primary format reference: [Git bundle documentation](https://git-scm.com/docs/git-bundle). The implementation/receipts establish this project's actual no-prerequisite restore behavior.

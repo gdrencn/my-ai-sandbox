@@ -14,6 +14,7 @@ Current product baseline: test v0.2.25 and accepted stable/0.2.25. Main owns mai
 | [DECISIONS.md](DECISIONS.md) | Accepted choices and consequences that later work must preserve. |
 | [TEST_COVERAGE.md](../TEST_COVERAGE.md) | Behavior/failure matrix, test layers and measured limits. |
 | [MENU_REVIEW.md](../MENU_REVIEW.md) | Complete current menus, controls and accepted navigation. |
+| [CODE_PRINCIPLE.md](CODE_PRINCIPLE.md) | Project-owned verbatim code guidance: reuse, modules, composition and call boundaries; explicitly applied by root AGENTS.md. |
 | [CLI_TUI_GUIDELINES.md](CLI_TUI_GUIDELINES.md) | Verbatim repository snapshot of the previously applied user guideline. |
 | [GUEST_SECURITY_PROBE.md](../GUEST_SECURITY_PROBE.md) | Exact host/guest challenge methods, paths, outcomes and bounds. |
 | [RELEASE_NOTES.md](../RELEASE_NOTES.md) | Chronological changelog; older entries remain historical. |

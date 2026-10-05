@@ -20,6 +20,8 @@ This records current outcomes and why later work must preserve them. Original ap
 | Security testing | One host-assisted full challenge after all functional stages on a fresh temporary container; independent host entry reuses it and restores initial state. No guest/public second implementation. |
 | Versions/releases | Product submission batches increment phase batch once; docs and stable promotion do not. a remains 0 until user says otherwise. Immutable test assets, separately accepted stable promotion and exact same-version pairing. |
 | Stable branch | Product/installer/shared-build sources and product docs only. Advance by stable publications, preserve old release history/tags and do not merge main's tests/handoff archive. |
+| Project guidance | Root AGENTS.md explicitly applies docs/CODE_PRINCIPLE.md and docs/CLI_TUI_GUIDELINES.md. All three are project-owned files; restoring the repository does not write Codex global instructions or configuration. |
 | Handoff | Full selected Git history, portable instructions and immutable baseline manifest. Publish archive on main; subsequent receipt/archive upload commits can be fetched without changing the frozen snapshot. |
+| Corrected handoff | Retain the first archive already committed to main via explicit --include-prior-archives and record its blob/hash/size. Do not filter history or include this generation's upload in its own baseline. Future distribution-policy changes still require discussion. |
 
 Current pending choices and required confirmations are complete in [REQUIREMENTS.md](../REQUIREMENTS.md#pending-decisions). Measured platform limits are in [TEST_COVERAGE.md](../TEST_COVERAGE.md#current-measured-limits).
